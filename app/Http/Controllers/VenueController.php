@@ -16,6 +16,37 @@ class VenueController extends Controller
         $venues = Venue::whereNull('deleted_at')
         ->with('extraInfo')
         ->get();
+
+        // Process each venue
+    foreach ($venues as $venue) {
+        // Split the field containing multiple URLs into an array
+        $urls = explode(',', $venue->contact_link); // Assuming the field name is 'contact_links'
+        $platforms = [];
+
+        // Check each URL against the platforms
+        foreach ($urls as $url) {
+            // Initialize the platform as unknown
+            $matchedPlatform = 'Unknown';
+
+            // Check if the URL contains platform names
+            $platformsToCheck = ['facebook', 'twitter', 'instagram'];
+            foreach ($platformsToCheck as $platform) {
+                if (stripos($url, $platform) !== false) {
+                    $matchedPlatform = $platform;
+                    break; // Stop checking once a platform is found
+                }
+            }
+
+            // Store the platform information for each URL
+            $platforms[] = [
+                'url' => $url,
+                'platform' => $matchedPlatform
+            ];
+        }
+
+        // Add the processed data to the venue
+        $venue->platforms = $platforms;
+    }
         return view('venues', compact('venues'));
         // return $dataTable->render('venues');
     }

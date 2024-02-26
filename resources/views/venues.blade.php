@@ -41,8 +41,26 @@
                 <td class="whitespace-nowrap px-6 py-4 font-sans text-xl text-white">
                   {{ $venue->location }}
                 </td>
-                <td class="whitespace-nowrap px-6 py-4 font-sans text-xl text-white">
-                  {{ $venue->contact_name ?? 'N/A' }}
+                <td class="flex gap-4 whitespace-nowrap px-6 py-4 font-sans text-xl text-white">
+                  @if ($venue->contact_number || $venue->contact_email || $venue->contact_link ?? 'N/A')
+                    @if ($venue->contact_number)
+                      <a href="tel:{{ $venue->contact_number }}"><span class="fas fa-phone"></span></a>
+                    @endif
+                    @if ($venue->contact_email)
+                      <a href="mailto:{{ $venue->contact_email }}"><span class="fas fa-envelope"></span></a>
+                    @endif
+                    @if ($venue->platforms)
+                      @foreach ($venue->platforms as $platform)
+                        @if ($platform['platform'] == 'facebook')
+                          <a href="{{ $platform['url'] }}" target=_blank><span class="fab fa-facebook"></span></a>
+                        @elseif($platform['platform'] == 'twitter')
+                          <a href="{{ $platform['url'] }}" target=_blank><span class="fab fa-twitter"></span></a>
+                        @elseif($platform['platform'] == 'instagram')
+                          <a href="{{ $platform['url'] }}" target=_blank><span class="fab fa-instagram"></span></a>
+                        @endif
+                      @endforeach
+                    @endif
+                  @endif
                 </td>
                 <td class="whitespace-nowrap px-6 py-4 font-sans text-xl text-white">
                   {{ $venue->promoter->name ?? 'N/A' }}
@@ -58,7 +76,13 @@
             </div>
             <div id="modalContent">
               <h3 class="mb-4 text-center font-heading text-2xl text-white underline">More Info</h3>
-              <p class="text font-sans text-white"></p>
+              <p class="font-sans text-white">Capacity: {{ $venue->capacity }}</p>
+              <p class="font-sans text-white">Band Type: {{ $venue->band_type }}</p>
+              <p class="font-sans text-white">Genre: {{ $venue->genre }}</p>
+              <p class="font-sans text-white">Contact: {{ $venue->contact_name }}</p>
+              <p class="font-sans text-white">In House Gear: {{ $venue->in_house_gear }}</p>
+
+              <p class="more-info mt-2 font-sans text-white"></p>
             </div>
           </div>
         </div>
@@ -82,7 +106,7 @@
         url: "/api/venues/" + venueId,
         type: "GET",
         success: function(response) {
-          $("#modalContent p").html(response.text);
+          $("#modalContent .more-info").html(response.text);
           $("#venueModal").addClass('modal-visible');
         },
         failure: function(e) {
