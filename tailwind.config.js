@@ -1,0 +1,25 @@
+import defaultTheme from "tailwindcss/defaultTheme";
+import forms from "@tailwindcss/forms";
+
+/** @type {import('tailwindcss').Config} */
+export default {
+    content: [
+        "./vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php",
+        "./storage/framework/views/*.php",
+        "./resources/views/**/*.blade.php",
+    ],
+
+    theme: {
+        extend: {
+            fontFamily: {
+                sans: ["Kite One", "sans-serif"],
+                heading: ["Kings", "sans-serif"],
+            },
+            backgroundImage: {
+                "hero-bg": "url('/images/hero-bg.jpg')",
+            },
+        },
+    },
+
+    plugins: [forms],
+};
