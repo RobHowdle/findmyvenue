@@ -2,28 +2,23 @@
 
 namespace App\Models;
 
-use App\Models\Promoter;
+use App\Models\Venue;
 use App\Models\VenueExtraInfo;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Venue extends Model
+class Promoter extends Model
 {
     use HasFactory;
     use SoftDeletes;
 
-    protected $table = 'venues';
+    protected $table = 'promoters';
 
     protected $fillable = [
         'name',
         'location',
-        'capacity',
-        'in_house_gear',
-        'band_type',
-        'genre',
-        'contact_name',
         'contact_number',
         'contact_email',
         'contact_link',
@@ -34,8 +29,8 @@ class Venue extends Model
         return $this->hasOne(VenueExtraInfo::class, 'venues_id');
     }
 
-    public function promoters()
+    public function venues()
     {
-        return $this->belongsToMany(Promoter::class, 'promoter_venue_pivot', 'venues_id', 'promoters_id');
+    return $this->belongsToMany(Venue::class, 'promoter_venue_pivot', 'promoter_id', 'venue_id');
     }
 }

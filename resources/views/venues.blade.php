@@ -63,7 +63,11 @@
                   @endif
                 </td>
                 <td class="whitespace-nowrap px-6 py-4 font-sans text-xl text-white">
-                  {{ $venue->promoter->name ?? 'N/A' }}
+                  @if ($venue->promoters)
+                    @foreach ($venue->promoters as $promoter)
+                      {{ $promoter['name'] }}
+                    @endforeach
+                  @endif
                 </td>
               </tr>
             @endforeach

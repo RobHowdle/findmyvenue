@@ -24,6 +24,7 @@ class VenueTestSeeder extends Seeder
             'contact_name' => 'June',
             'contact_number' => '01325363135',
             'contact_email' => 'info@theforumonline.co.uk',
+            'contact_link' => 'https://www.facebook.com/theforumonline, https://www.twitter.com/theforumonline, https://www.instagram.com/theforumonline'
         ]);
     }
 }
