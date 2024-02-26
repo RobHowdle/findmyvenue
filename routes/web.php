@@ -19,17 +19,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-    Route::get('/venues', [VenueController::class, 'index'])->name('venues');
+Route::get('/venues', [VenueController::class, 'index'])->name('venues');
 
-
-// Route::group(function () {
-    
-//     Route::middleware('auth' {
-//     Route::get('/venue/{id}', [VenueController::class, 'edit'])->name('venue.edit');
-//     Route::patch('/venue/{id}', [VenueController::class, 'update'])->name('venue.update');
-//     Route::delete('/venue/{id}', [VenueController::class, 'destroy'])->name('venue.destroy');
-//     });
-// });
 
 Route::get('/dashboard', function () {
     return view('dashboard');

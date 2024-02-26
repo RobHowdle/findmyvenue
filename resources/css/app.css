@@ -1,5 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Kings&family=Kite+One&display=swap');
 
+@import "bootstrap-icons/font/bootstrap-icons.css";
+@import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
+@import "datatables.net-buttons-bs5/css/buttons.bootstrap5.min.css";
+@import "datatables.net-select-bs5/css/select.bootstrap5.css";
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -35,3 +41,50 @@ body {
 .search::placeholder {
         color: var(--color-white)
     }
+
+table {
+    background-color: var(--color-blue);
+}
+
+.modal {
+    background-color: var(--color-blue);
+    display: none;
+    /* visibility: hidden; */
+    opacity: 0;
+    width: 100%;
+    height: 700px;
+    position: absolute;
+    width: 90%;
+    height: 100%;
+    top: 0;
+    margin-inline: auto;
+    left: 0;
+    right: 0;
+    transition-property: opacity;
+    transition-duration: 300ms;
+    transition-timing-function: ease-in-out;
+}
+
+.modal.modal-visible {
+    display:block;
+    /* visibility: visible; */
+    overflow: visible;
+    opacity: 1;
+}
+
+.close {
+    background-color: var(--color-white);
+    display: flex;
+    width: 25px;
+    height: 25px;
+    z-index: 1;
+    cursor: pointer;
+    transition-property: background-color, color;
+    transition-duration: 300ms;
+    transition-timing-function: ease-in-out;
+}
+
+.close:hover {
+    background-color: transparent;
+    color: var(--color-white)
+}

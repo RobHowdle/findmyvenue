@@ -12,12 +12,21 @@
   <link rel="preconnect" href="https://fonts.bunny.net">
   <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+  <link rel="stylesheet" href="https://cdn.datatables.net/2.0.0/css/dataTables.dataTables.css" />
+
+  <script src="https://cdn.datatables.net/2.0.0/js/dataTables.js"></script>
+  <script src="https://kit.fontawesome.com/dd6bff54df.js" crossorigin="anonymous"></script>
+
+
   <!-- Scripts -->
   @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="font-sans text-gray-900 antialiased">
-  <div class="flex min-h-screen flex-col items-center bg-hero-bg pt-6 sm:justify-center sm:pt-0">
+  <div class="bg-hero-bg flex min-h-screen flex-col items-center pt-6 sm:justify-center sm:pt-0">
     <div>
       @if (Route::has('login'))
         <div class="z-10 flex w-full justify-between p-6 text-right sm:fixed sm:right-0 sm:top-0">
@@ -45,6 +54,7 @@
       {{ $slot }}
     </div>
   </div>
+  @stack('scripts')
 </body>
 
 </html>

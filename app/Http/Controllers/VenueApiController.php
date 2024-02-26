@@ -2,22 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\DataTables\VenuesDataTable;
 use App\Models\Venue;
 use Illuminate\Http\Request;
 
-class VenueController extends Controller
+class VenueApiController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(VenuesDataTable $dataTable)
+    public function index()
     {
-        $venues = Venue::whereNull('deleted_at')
-        ->with('extraInfo')
-        ->get();
-        return view('venues', compact('venues'));
-        // return $dataTable->render('venues');
+        //
     }
 
     /**
@@ -41,7 +36,10 @@ class VenueController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $venue = Venue::findOrFail($id);
+        $extraInfo = $venue->extraInfo()->first();
+
+        return response()->json($extraInfo);
     }
 
     /**

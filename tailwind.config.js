@@ -15,9 +15,6 @@ export default {
                 sans: ["Kite One", "sans-serif"],
                 heading: ["Kings", "sans-serif"],
             },
-            backgroundImage: {
-                "hero-bg": "url('/images/hero-bg.jpg')",
-            },
         },
     },
 
