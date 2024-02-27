@@ -65,7 +65,7 @@
                 <td class="whitespace-nowrap px-6 py-4 font-sans text-xl text-white">
                   @if ($venue->promoters)
                     @foreach ($venue->promoters as $promoter)
-                      {{ $promoter['name'] }}
+                      <a href="{{ url('promoters', $promoter->id) }}">{{ $promoter['name'] }}</a>
                     @endforeach
                   @endif
                 </td>
