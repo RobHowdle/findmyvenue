@@ -19,9 +19,12 @@ class Promoter extends Model
     protected $fillable = [
         'name',
         'location',
+        'logo_url',
         'contact_number',
         'contact_email',
         'contact_link',
+        'about_me',
+        'my_venues',
     ];
 
     public function extraInfo()
@@ -31,6 +34,6 @@ class Promoter extends Model
 
     public function venues()
     {
-    return $this->belongsToMany(Venue::class, 'promoter_venue_pivot', 'promoter_id', 'venue_id');
+    return $this->belongsToMany(Venue::class, 'promoter_venue_pivot', 'promoters_id', 'venues_id');
     }
 }
