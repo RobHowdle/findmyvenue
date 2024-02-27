@@ -10,7 +10,7 @@
       <h1 class="text-center font-heading text-6xl text-white">Venues</h1>
       {{-- {{ $dataTable->table() }} --}}
       <div class="relative mt-4 overflow-x-auto shadow-md sm:rounded-lg">
-        <table class="w-full border-2 border-white text-left font-sans rtl:text-right">
+        <table class="w-full border-2 border-white text-left font-sans rtl:text-right" id="venues">
           <thead class="text-2xl text-white underline">
             <tr>
               <th scope="col" class="px-6 py-3">

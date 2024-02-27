@@ -31,10 +31,10 @@
       <div>
         @if (Route::has('login'))
           <div class="z-10 flex w-full justify-between p-6 text-right sm:fixed sm:right-0 sm:top-0">
+            <a href="{{ url('/') }}"
+              class="font-heading text-2xl font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-gray-400">Home</a>
             <a href="{{ url('/venues') }}"
               class="font-heading text-2xl font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-gray-400">Venues</a>
-            <a href="{{ url('/locations') }}"
-              class="font-heading text-2xl font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-gray-400">Locations</a>
             <a href="{{ url('/promoters') }}"
               class="font-heading text-2xl font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-gray-400">Promoters</a>
             <a href="{{ url('/other') }}"
@@ -49,9 +49,6 @@
             @endauth
           </div>
         @endif
-
-        <a href="{{ url('/') }}"
-          class="font-heading text-2xl font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-gray-400">Home</a>
       </div>
 
       <div class="w-full overflow-hidden px-6 py-4">

@@ -110,4 +110,9 @@ class VenueController extends Controller
         return view('locations', compact('locations'));
     }
 
+    public function filterByLocation($location)
+    {
+        $venues = Venue::where('location', $location) ->get();
+        return response()->json($venues);
+    }
 }
