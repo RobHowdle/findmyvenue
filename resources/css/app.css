@@ -122,3 +122,16 @@ table {
     max-width: 25px;
     height: 25px;
 }
+
+.review p {
+    padding-bottom: 1rem;
+}
+
+.review:not(:last-child)::after {
+    content: "";
+    display: block;
+    width: 70%;
+    margin-inline: auto;
+    background-color: var(--color-white);
+    height: 1px;
+}

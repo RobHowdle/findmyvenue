@@ -8,6 +8,8 @@ use Database\Seeders\AdminUserSeeder;
 use Database\Seeders\VenueTestSeeder;
 use Database\Seeders\PromoterTestSeeder;
 use Database\Seeders\VenueExtraInfoSeeder;
+use Database\Seeders\PromoterReviewTestSeeder;
+use Database\Seeders\PromoterVenueTestPivotSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -21,6 +23,8 @@ class DatabaseSeeder extends Seeder
             VenueTestSeeder::class,
             VenueExtraInfoSeeder::class,
             PromoterTestSeeder::class,
+            PromoterVenueTestPivotSeeder::class,
+            PromoterReviewTestSeeder::class,
         ]);
     }
 }

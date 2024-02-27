@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Promoter;
 use Illuminate\Http\Request;
+use App\Models\PromoterReview;
 use App\DataTables\PromotersDataTable;
 
 class PromoterController extends Controller
@@ -85,6 +86,7 @@ class PromoterController extends Controller
 
             // Add the processed data to the venue
             $promoter->platforms = $platforms;
+            $promoter->recentReviews = PromoterReview::getRecentReviewsForPromoter($id);
 
         return view('promoter', compact('promoter'));
     }

@@ -5,8 +5,8 @@
     </h1>
   </x-slot>
 
-  <div class="promoter-wrapper py-12">
-    <div class="wrapper mx-auto grid px-4">
+  <div class="promoter-wrapper py-8">
+    <div class="wrapper mx-auto grid px-8">
       <div class="wrapper-header col-span-1 row-start-1 row-end-2 pr-8">
         {{-- <img src="{{ $promoter->logo_url }}" alt="{{ $promoter->name }} Logo"> --}}
         <img class="promoter-logo"
@@ -49,9 +49,9 @@
       {{-- {{ $dataTable->table() }} --}}
       <div class="wrapper-body col-span-1 row-start-2 row-end-3 mt-4 overflow-x-auto pr-8 shadow-md sm:rounded-lg">
         <h2 class="font-sans text-2xl underline">About Me</h2>
-        <p class="font-sans text-xl">{{ $promoter->about_me }}</p>
+        <p class="pt-2 font-sans text-xl">{{ $promoter->about_me }}</p>
         <h3 class="mt-4 font-sans text-2xl underline">My Venues</h3>
-        <p class="font-sans text-xl">{{ $promoter->my_venues }}</p>
+        <p class="pt-2 font-sans text-xl">{{ $promoter->my_venues }}</p>
       </div>
 
       <div class="col-start-2 col-end-3 row-span-3 border-l-2 border-white pl-8">
@@ -94,11 +94,15 @@
             </span>
           </p>
 
-          <h5 class="text-sans mt-2">OverallRating (69): 5/5</h5>
+          <h5 class="text-sans mt-4">Overall Rating (69): 5/5</h5>
         </div>
 
-        <div class="reviews-block mt-4 flex flex-col gap-4">
-          <div class="review"></div>
+        <div class="reviews-block mt-8 flex flex-col gap-4">
+          @foreach ($promoter->recentReviews as $review)
+            <div class="review text-center font-sans">
+              <p class="flex flex-col">"{{ $review->review }}" <span>- {{ $review->author }}</span></p>
+            </div>
+          @endforeach
         </div>
       </div>
     </div>
