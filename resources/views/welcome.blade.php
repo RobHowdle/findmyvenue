@@ -831,24 +831,22 @@
 </head>
 
 <body class="antialiased">
-  <div class="overlay">
-    <x-guest-layout>
-      <div class="py-12">
-        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-          <h1 class="text-center font-heading text-6xl text-white">Find Your Next Show!</h1>
-          <p class="text-center font-heading text-xl text-white">search below to find a venue in your desired area</p>
-          <input class="search mx-auto my-4 flex w-2/6 justify-center font-heading text-2xl" type="search"
-            placeholder="Search..." />
+  <x-guest-layout>
+    <div class="py-12">
+      <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <h1 class="text-center font-heading text-6xl text-white">Find Your Next Show!</h1>
+        <p class="text-center font-heading text-xl text-white">search below to find a venue in your desired area</p>
+        <input class="search mx-auto my-4 flex w-2/6 justify-center font-heading text-2xl" type="search"
+          placeholder="Search..." />
 
-          <h2 class="text-center font-heading text-2xl text-white">Or</h2>
-          <a href="{{ url('/venues') }}"
-            class="flex justify-center font-heading text-2xl text-white underline dark:hover:text-gray-400">Browse
-            all
-            venues</a>
-        </div>
+        <h2 class="text-center font-heading text-2xl text-white">Or</h2>
+        <a href="{{ url('/venues') }}"
+          class="flex justify-center font-heading text-2xl text-white underline dark:hover:text-gray-400">Browse
+          all
+          venues</a>
       </div>
-    </x-guest-layout>
-  </div>
+    </div>
+  </x-guest-layout>
 </body>
 
 </html>

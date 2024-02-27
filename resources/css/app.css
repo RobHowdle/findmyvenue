@@ -88,3 +88,37 @@ table {
     background-color: transparent;
     color: var(--color-white)
 }
+
+.promoter-wrapper {
+    background-color: var(--color-blue);
+    color: var(--color-white);
+    max-width: 1508px;
+    margin-inline: auto;
+}
+
+.promoter-wrapper .wrapper {
+    grid-template-columns: auto 400px;
+}
+
+.wrapper-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 2rem;
+}
+
+.promoter-logo {
+    aspect-ratio: 1/1;
+    max-width: 250px;
+}
+
+.socials-wrapper img,
+.ratings-block p img {
+    width: 20px;
+    height: 20px;
+}
+
+.rating-wrapper img {
+    max-width: 25px;
+    height: 25px;
+}
