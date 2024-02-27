@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\DataTables\VenuesDataTable;
 use App\Models\Venue;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\DataTables\VenuesDataTable;
 
 class VenueController extends Controller
 {
@@ -98,4 +99,15 @@ class VenueController extends Controller
     {
         //
     }
+
+    public function locations()
+    {
+        $locations = Venue::whereNull('deleted_at')
+                        ->select('location', DB::raw('COUNT(*) as count'))
+                        ->groupBy('location')
+                        ->get();
+
+        return view('locations', compact('locations'));
+    }
+
 }

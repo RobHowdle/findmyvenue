@@ -24,6 +24,8 @@ Route::get('/venues', [VenueController::class, 'index'])->name('venues');
 Route::get('/promoters', [PromoterController::class, 'index'])->name('promoters');
 Route::get('/promoters/{id}', [PromoterController::class, 'show'])->name('promoter');
 
+Route::get('/locations', [VenueController::class, 'locations'])->name('locations');
+
 
 Route::get('/dashboard', function () {
     return view('dashboard');
