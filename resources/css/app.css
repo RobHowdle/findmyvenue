@@ -155,3 +155,43 @@ table {
     grid-template-columns: repeat(3, 1fr);
     grid-gap: 2rem;
 }
+
+.other-grid-wrapper {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.service-block img {
+    max-width: 250px;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.service-block {
+    @supports not (aspect-ratio: 1/1) {
+       position: relative;
+       
+       &::before {
+         content: "";
+         display: block;
+         padding-top: calc((250/250) * 100%);
+       }
+       
+       img {
+           position: absolute;
+           width: 100%;
+           height: 100%;
+           inset: 0;
+           object-fit: cover;
+       }
+    }
+    
+    @supports (aspect-ratio: 1/1) {
+       img {
+           aspect-ratio: 250/250;
+           height: auto;
+           width: 100%;
+           object-fit: cover;
+       }
+    }
+}

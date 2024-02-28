@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\OtherService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class OtherServiceController extends Controller
 {
@@ -12,7 +13,12 @@ class OtherServiceController extends Controller
      */
     public function index()
     {
-        //
+        $otherServices = OtherService::select('services', DB::raw('COUNT(*) as count'))
+            ->whereNull('deleted_at')
+            ->groupBy('services')
+            ->get();
+
+        return view('other', compact('otherServices'));
     }
 
     /**
