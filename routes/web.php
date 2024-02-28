@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VenueController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PromoterController;
+use App\Http\Controllers\OtherServiceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +24,7 @@ Route::get('/', function () {
 Route::get('/venues', [VenueController::class, 'index'])->name('venues');
 Route::get('/promoters', [PromoterController::class, 'index'])->name('promoters');
 Route::get('/promoters/{id}', [PromoterController::class, 'show'])->name('promoter');
+Route::get('/other', [OtherServiceController::class, 'index'])->name('other');
 
 
 Route::get('/dashboard', function () {
