@@ -28,7 +28,7 @@
             </tr>
           </thead>
           <tbody>
-            @foreach ($venues as $venue)
+            @forelse ($venues as $venue)
               <tr
                 class="border-b odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-gray-900 even:dark:bg-gray-800">
                 <th scope="row" class="whitespace-nowrap px-6 py-4 font-sans text-xl text-white">
@@ -70,28 +70,33 @@
                   @endif
                 </td>
               </tr>
-            @endforeach
+            @empty
+              <tr>
+                <td colspan="4" class="text-center text-2xl text-white">No venues found</td>
+              </tr>
+            @endforelse
           </tbody>
         </table>
-        <div class="modal" id="venueModal" data-venue-id="">
-          <div class="modal-content px-6 py-4">
-            <div class="modal-header flex justify-end">
-              <span class="close fas fa-times"></span>
-            </div>
-            <div id="modalContent">
-              <h3 class="mb-4 text-center font-heading text-2xl text-white underline">More Info</h3>
-              <p class="font-sans text-white">Capacity: {{ $venue->capacity }}</p>
-              <p class="font-sans text-white">Band Type: {{ $venue->band_type }}</p>
-              <p class="font-sans text-white">Genre: {{ $venue->genre }}</p>
-              <p class="font-sans text-white">Contact: {{ $venue->contact_name }}</p>
-              <p class="font-sans text-white">In House Gear: {{ $venue->in_house_gear }}</p>
+        @if ($venues->isNotEmpty())
+          <div class="modal" id="venueModal" data-venue-id="">
+            <div class="modal-content px-6 py-4">
+              <div class="modal-header flex justify-end">
+                <span class="close fas fa-times"></span>
+              </div>
+              <div id="modalContent">
+                <h3 class="mb-4 text-center font-heading text-2xl text-white underline">More Info</h3>
+                <p class="capacity font-sans text-white">Capacity: {{ $venue->capacity }}</p>
+                <p class="band-type font-sans text-white">Band Type: {{ $venue->band_type }}</p>
+                <p class="genre font-sans text-white">Genre: {{ $venue->genre }}</p>
+                <p class="contact font-sans text-white">Contact: {{ $venue->contact_name }}</p>
+                <p class="in-house-gear font-sans text-white">In House Gear: {{ $venue->in_house_gear }}</p>
 
-              <p class="more-info mt-2 font-sans text-white"></p>
+                <p class="more-info mt-2 font-sans text-white"></p>
+              </div>
             </div>
           </div>
-        </div>
+        @endif
       </div>
-
     </div>
   </div>
 </x-guest-layout>
@@ -110,10 +115,11 @@
         url: "/api/venues/" + venueId,
         type: "GET",
         success: function(response) {
-          $("#modalContent .more-info").html(response.text);
+          var venue = response; // Assuming the venue details are returned directly
+          populateModal(venue);
           $("#venueModal").addClass('modal-visible');
         },
-        failure: function(e) {
+        error: function(e) {
           console.log(e);
         }
       });
@@ -133,4 +139,13 @@
       closeModal();
     }
   });
+
+  function populateModal(venue) {
+    console.log(venue);
+    $(".capacity").text("Capacity: " + venue.capacity);
+    $(".band-type").text("Band Type: " + venue.band_type);
+    $(".genre").text("Genre: " + venue.genre);
+    $(".contact").text("Contact: " + venue.contact_name);
+    $(".in-house-gear").text("In House Gear: " + venue.in_house_gear);
+  }
 </script>

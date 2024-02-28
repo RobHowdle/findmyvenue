@@ -110,9 +110,16 @@ class VenueController extends Controller
         return view('locations', compact('locations'));
     }
 
-    public function filterByLocation($location)
+    public function filterByCoordinates(Request $request)
     {
-        $venues = Venue::where('location', $location) ->get();
-        return response()->json($venues);
+        $latitude = $request->input('latitude');
+        $longitude = $request->input('longitude');
+        
+        // Filter venues by latitude and longitude
+        $venues = Venue::where('latitude', $latitude)
+                    ->where('longitude', $longitude)
+                    ->get();
+        
+        return view('venues', compact('venues'));
     }
 }

@@ -22,6 +22,8 @@ Route::get('/', function () {
 });
 
 Route::get('/venues', [VenueController::class, 'index'])->name('venues');
+Route::get('/venues/filterByCoordinates', [VenueController::class, 'filterByCoordinates'])
+     ->name('venues.filterByCoordinates');
 Route::get('/promoters', [PromoterController::class, 'index'])->name('promoters');
 Route::get('/promoters/{id}', [PromoterController::class, 'show'])->name('promoter');
 Route::get('/other', [OtherServiceController::class, 'index'])->name('other');

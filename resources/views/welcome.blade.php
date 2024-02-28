@@ -836,8 +836,22 @@
       <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
         <h1 class="text-center font-heading text-6xl text-white">Find Your Next Show!</h1>
         <p class="text-center font-heading text-xl text-white">search below to find a venue in your desired area</p>
-        <input class="search mx-auto my-4 flex w-2/6 justify-center font-heading text-2xl" type="search"
-          placeholder="Search..." />
+        <form action="{{ route('venues.filterByCoordinates') }}" method="GET">
+          @csrf
+          <div class="search-wrapper my-4 flex justify-center">
+            <input class="search map-input flex w-2/6 justify-center font-heading text-2xl" type="search"
+              id="address-input" placeholder="Search..." />
+            <button type="submit" class="search-button bg-white p-2 text-black">
+              <span class="fas fa-search"></span>
+            </button>
+          </div>
+          <div id="address-map-container" style="width: 100%; height: 400px; display: none;">
+            <div style="width: 100%; height: 100%;" id="address-map"></div>
+          </div>
+
+          <input style="display: none;" type="text" id="address-latitude" name="latitude" placeholder="Latitude">
+          <input style="display: none;" type="text" id="address-longitude" name="longitude" placeholder="Longitude">
+        </form>
 
         <h2 class="text-center font-heading text-2xl text-white">Or</h2>
         <a href="{{ url('/venues') }}"
@@ -847,6 +861,108 @@
       </div>
     </div>
   </x-guest-layout>
+
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcMjlXwDOk74oMDPgOp4YWdWxPa5xtHGA&libraries=places&callback=initialize"
+    async defer></script>
+
+  <script>
+    function initialize() {
+
+      $('form').on('keyup keypress', function(e) {
+        var keyCode = e.keyCode || e.which;
+        if (keyCode === 13) {
+          e.preventDefault();
+          return false;
+        }
+      });
+      const locationInputs = document.getElementsByClassName("map-input");
+
+      const autocompletes = [];
+      const geocoder = new google.maps.Geocoder;
+      for (let i = 0; i < locationInputs.length; i++) {
+
+        const input = locationInputs[i];
+        const fieldKey = input.id.replace("-input", "");
+        const isEdit = document.getElementById(fieldKey + "-latitude").value != '' && document.getElementById(fieldKey +
+          "-longitude").value != '';
+
+        const latitude = parseFloat(document.getElementById(fieldKey + "-latitude").value) || 59.339024834494886;
+        const longitude = parseFloat(document.getElementById(fieldKey + "-longitude").value) || 18.06650573462189;
+
+        const map = new google.maps.Map(document.getElementById(fieldKey + '-map'), {
+          center: {
+            lat: latitude,
+            lng: longitude
+          },
+          zoom: 13
+        });
+        const marker = new google.maps.Marker({
+          map: map,
+          position: {
+            lat: latitude,
+            lng: longitude
+          },
+        });
+
+        marker.setVisible(isEdit);
+
+        const autocomplete = new google.maps.places.Autocomplete(input);
+        autocomplete.key = fieldKey;
+        autocompletes.push({
+          input: input,
+          map: map,
+          marker: marker,
+          autocomplete: autocomplete
+        });
+      }
+
+      for (let i = 0; i < autocompletes.length; i++) {
+        const input = autocompletes[i].input;
+        const autocomplete = autocompletes[i].autocomplete;
+        const map = autocompletes[i].map;
+        const marker = autocompletes[i].marker;
+
+        google.maps.event.addListener(autocomplete, 'place_changed', function() {
+          marker.setVisible(false);
+          const place = autocomplete.getPlace();
+
+          geocoder.geocode({
+            'placeId': place.place_id
+          }, function(results, status) {
+            if (status === google.maps.GeocoderStatus.OK) {
+              const lat = results[0].geometry.location.lat();
+              const lng = results[0].geometry.location.lng();
+              setLocationCoordinates(autocomplete.key, lat, lng);
+            }
+          });
+
+          if (!place.geometry) {
+            window.alert("No details available for input: '" + place.name + "'");
+            input.value = "";
+            return;
+          }
+
+          if (place.geometry.viewport) {
+            map.fitBounds(place.geometry.viewport);
+          } else {
+            map.setCenter(place.geometry.location);
+            map.setZoom(17);
+          }
+          marker.setPosition(place.geometry.location);
+          marker.setVisible(true);
+
+        });
+      }
+    }
+
+    function setLocationCoordinates(key, lat, lng) {
+      const latitudeField = document.getElementById(key + "-" + "latitude");
+      const longitudeField = document.getElementById(key + "-" + "longitude");
+      latitudeField.value = lat;
+      longitudeField.value = lng;
+    }
+  </script>
 </body>
 
 </html>
