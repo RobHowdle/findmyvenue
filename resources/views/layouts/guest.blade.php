@@ -20,12 +20,11 @@
   <script src="https://cdn.datatables.net/2.0.0/js/dataTables.js"></script>
   <script src="https://kit.fontawesome.com/dd6bff54df.js" crossorigin="anonymous"></script>
 
-
   <!-- Scripts -->
   @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans text-gray-900 antialiased">
+<body class="font-sans antialiased">
   <div class="overlay">
     <div class="bg-hero-bg flex min-h-screen flex-col items-center pt-6 sm:justify-center sm:pt-0">
       <div>
