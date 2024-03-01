@@ -5,13 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Admin;
 use App\Models\Venue;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class AdminController extends Controller
 {
     public function getVenues()
     {
         $venueCount = Venue::whereNull('deleted_at')->count();
-        $locationCount = Venue::whereNull('deleted_at')->distinct('location')->count();
+        $locationCount = Venue::whereNull('deleted_at')->distinct('postal_town')->count();
 
         $genreList = file_get_contents(storage_path('app/public/text/genre_list.json'));
         $data = json_decode($genreList, true);
@@ -21,53 +23,52 @@ class AdminController extends Controller
         return view('admin.venues', compact('venueCount', 'locationCount', 'genres'));
     }
 
-    public function saveNewVenue(Request $request)
+public function saveNewVenue(Request $request)
     {
-        $formData = $request->validate([
-            'floating_name' => 'required|string',
-            'address-input' => 'required',
-            'latitude' => 'required',
-            'longitude' => 'required',
-            'floating_capacity' => 'required|numeric',
-            'floating_in_house_gear' => 'required|string',
-            'floating_band_type' => 'required',
-            'genres' => 'required|array',
-            'floating_contact_name' => 'required|string',
-            'floating_contact_number' => 'nullable|numeric|digits:11',
-            'floating_contact_email' => 'nullable|email',
-            'floating_contact_links' => 'nullable|url',
-        ]);
+        try {
+            $validator = Validator::make($request->all(), [
+                'floating_name' => 'required|string',
+                'address-input' => 'required',
+                'postal-town-input' => 'required',
+                'latitude' => 'required',
+                'longitude' => 'required',
+                'floating_capacity' => 'required|numeric',
+                'floating_in_house_gear' => 'required|string',
+                'floating_band_type' => 'required',
+                'genres' => 'required|array',
+                'floating_contact_name' => 'required|string',
+                'floating_contact_number' => 'nullable|numeric|digits:11',
+                'floating_contact_email' => 'nullable|email',
+                'floating_contact_links' => 'nullable',
+            ]);
 
-        $newVenue = Venue::create([
-            'name' => $formData['floating_name'],
-            'location' => $formData['address-input'],
-            'longitude' => $formData['latitude'],
-            'latitude' => $formData['longitude'],
-            'capacity' => $formData['floating_capacity'],
-            'in_house_gear' => $formData['floating_in_house_gear'],
-            'band_type' => $formData['floating_band_type'],
-            'genre' => json_encode($formData['genres']),
-            'contact_name' => $formData['floating_contact_name'],
-            'contact_number' => $formData['floating_contact_number'],
-            'contact_email' => $formData['floating_contact_email'],
-            'contact_link' => $formData['floating_contact_links'],
-        ]);
+            if ($validator->fails()) {
+                return back()->withErrors($validator)->withInput();
+            }
 
-        // $newVenue = new Venue;
-        // $newVenue->name = $formData['floating_name'];
-        // $newVenue->location = $formData['address-input'];
-        // $newVenue->longitude = $formData['latitude'];
-        // $newVenue->latitude = $formData['longitude'];
-        // $newVenue->capacity = $formData['floating_capacity'];
-        // $newVenue->in_house_gear = $formData['floating_in_house_gear'];
-        // $newVenue->band_type = $formData['floating_band_type'];
-        // $newVenue->genre = $formData['genres'];
-        // $newVenue->contact_name = $formData['floating_contact_name'];
-        // $newVenue->contact_number = $formData['floating_contact_number'];
-        // $newVenue->contact_email = $formData['floating_contact_email'];
-        // $newVenue->contact_link = $formData['floating_contact_links'];
-        // $newVenue->save();
+            Venue::create([
+                'name' => $request->input('floating_name'),
+                'location' => $request->input('address-input'),
+                'postal_town' => $request->input('postal-town-input'),
+                'longitude' => $request->input('latitude'),
+                'latitude' => $request->input('longitude'),
+                'capacity' => $request->input('floating_capacity'),
+                'in_house_gear' => $request->input('floating_in_house_gear'),
+                'band_type' => $request->input('floating_band_type'),
+                'genre' => json_encode($request->input('genres')),
+                'contact_name' => $request->input('floating_contact_name'),
+                'contact_number' => $request->input('floating_contact_number'),
+                'contact_email' => $request->input('floating_contact_email'),
+                'contact_link' => $request->input('floating_contact_links'),
+            ]);
 
-        return back();
+            return back()->with('success', 'Venue created successfully.');
+        } catch (\Exception $e) {
+            // Log the error
+            Log::error('Error saving new venue: ' . $e->getMessage());
+
+            // Optionally, you can return an error response or redirect to an error page
+            return back()->with('error', 'An error occurred while saving the venue. Please try again later.')->withInput();
+        }
     }
 }

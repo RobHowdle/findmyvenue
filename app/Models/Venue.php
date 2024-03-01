@@ -19,6 +19,7 @@ class Venue extends Model
     protected $fillable = [
         'name',
         'location',
+        'postal_town',
         'longitude',
         'latitude',
         'capacity',

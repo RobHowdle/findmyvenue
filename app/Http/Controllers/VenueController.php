@@ -30,7 +30,7 @@ class VenueController extends Controller
                 $matchedPlatform = 'Unknown';
 
                 // Check if the URL contains platform names
-                $platformsToCheck = ['facebook', 'twitter', 'instagram'];
+                $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
                 foreach ($platformsToCheck as $platform) {
                     if (stripos($url, $platform) !== false) {
                         $matchedPlatform = $platform;
@@ -103,23 +103,50 @@ class VenueController extends Controller
     public function locations()
     {
         $locations = Venue::whereNull('deleted_at')
-                        ->select('location', DB::raw('COUNT(*) as count'))
-                        ->groupBy('location')
+                        ->select('postal_town', DB::raw('COUNT(*) as count'))
+                        ->groupBy('postal_town')
                         ->get();
 
         return view('locations', compact('locations'));
     }
 
-    public function filterByCoordinates(Request $request)
-    {
-        $latitude = $request->input('latitude');
-        $longitude = $request->input('longitude');
-        
-        // Filter venues by latitude and longitude
-        $venues = Venue::where('latitude', $latitude)
-                    ->where('longitude', $longitude)
-                    ->get();
-        
-        return view('venues', compact('venues'));
+public function filterByCoordinates(Request $request)
+{
+    // Get latitude and longitude from the request
+    $latitude = $request->input('latitude');
+    $longitude = $request->input('longitude');
+    
+    // Filter venues by latitude and longitude
+    $venuesByCoordinates = Venue::where('latitude', $latitude)
+        ->where('longitude', $longitude)
+        ->get();
+
+    // Get the search query from the request
+    $searchQuery = $request->input('search_query');
+
+    // dd($searchQuery);
+
+    // Check if the search query contains a comma (indicating both town and specific address)
+    if (strpos($searchQuery, ',') !== false) {
+        // If the search query contains a comma, split it into town and address
+        list($town, $address) = explode(',', $searchQuery);
+
+        // Perform search for venues matching the town or the address
+        $venuesByAddress = Venue::where(function($query) use ($town, $address) {
+            $query->where('postal_town', 'LIKE', "%$address%")
+                  ->orWhere('postal_town', 'LIKE', "%$town%");
+        })->get();
+    } else {
+        // If the search query does not contain a comma, search for venues matching the town only
+        $venuesByAddress = Venue::where('postal_town', 'LIKE', "%$searchQuery%")
+            ->get();
     }
+    
+    // Merge the search results and remove duplicates
+    $venues = $venuesByCoordinates->merge($venuesByAddress)->unique();
+
+    // Pass the search results to the view
+    return view('venues', compact('venues'));
+}
+
 }

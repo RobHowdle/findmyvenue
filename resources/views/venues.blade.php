@@ -39,7 +39,7 @@
                   @endif
                 </th>
                 <td class="whitespace-nowrap px-6 py-4 font-sans text-xl text-white">
-                  {{ $venue->location }}
+                  {{ $venue->postal_town }}
                 </td>
                 <td class="flex gap-4 whitespace-nowrap px-6 py-4 font-sans text-xl text-white">
                   @if ($venue->contact_number || $venue->contact_email || $venue->contact_link ?? 'N/A')
@@ -57,6 +57,13 @@
                           <a href="{{ $platform['url'] }}" target=_blank><span class="fab fa-twitter"></span></a>
                         @elseif($platform['platform'] == 'instagram')
                           <a href="{{ $platform['url'] }}" target=_blank><span class="fab fa-instagram"></span></a>
+                        @elseif($platform['platform'] == 'snapchat')
+                          <a href="{{ $platform['url'] }}" target=_blank><span
+                              class="fab fa-snapchat-ghost"></span></a>
+                        @elseif($platform['platform'] == 'tiktok')
+                          <a href="{{ $platform['url'] }}" target=_blank><span class="fab fa-tiktok"></span></a>
+                        @elseif($platform['platform'] == 'youtube')
+                          <a href="{{ $platform['url'] }}" target=_blank><span class="fab fa-youtube"></span></a>
                         @endif
                       @endforeach
                     @endif

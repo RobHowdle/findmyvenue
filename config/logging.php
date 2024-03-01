@@ -116,6 +116,7 @@ return [
             'driver' => 'errorlog',
             'level' => env('LOG_LEVEL', 'debug'),
             'replace_placeholders' => true,
+            'path' => storage_path('logs/laravel.log'),
         ],
 
         'null' => [

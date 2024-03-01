@@ -10,15 +10,15 @@
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.bunny.net">
-  <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+  {{-- <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" /> --}}
 
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
-  <link rel="stylesheet" href="https://cdn.datatables.net/2.0.0/css/dataTables.dataTables.css" />
+  {{-- <link rel="stylesheet" href="https://cdn.datatables.net/2.0.0/css/dataTables.dataTables.css" /> --}}
 
-  <script src="https://cdn.datatables.net/2.0.0/js/dataTables.js"></script>
-  <script src="https://kit.fontawesome.com/dd6bff54df.js" crossorigin="anonymous"></script>
+  {{-- <script src="https://cdn.datatables.net/2.0.0/js/dataTables.js"></script> --}}
+  {{-- <script src="https://kit.fontawesome.com/dd6bff54df.js" crossorigin="anonymous"></script> --}}
 
   <!-- Scripts -->
   @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -41,7 +41,7 @@
       {{ $slot }}
     </main>
   </div>
-  @stack('scripts')
+  {{-- @stack('scripts') --}}
 </body>
 
 </html>

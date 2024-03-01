@@ -20,11 +20,11 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             AdminUserSeeder::class,
-            VenueTestSeeder::class,
-            VenueExtraInfoSeeder::class,
-            PromoterTestSeeder::class,
-            PromoterVenueTestPivotSeeder::class,
-            PromoterReviewTestSeeder::class,
+            // VenueTestSeeder::class,
+            // VenueExtraInfoSeeder::class,
+            // PromoterTestSeeder::class,
+            // PromoterVenueTestPivotSeeder::class,
+            // PromoterReviewTestSeeder::class,
         ]);
     }
 }

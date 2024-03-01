@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('capacity');
             $table->longText('in_house_gear');
             $table->string('band_type');
-            $table->string('genre');
+            $table->longText('genre');
             $table->string('contact_name');
             $table->string('contact_number')->limit(11);
             $table->string('contact_email');

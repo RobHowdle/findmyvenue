@@ -840,7 +840,7 @@
           @csrf
           <div class="search-wrapper my-4 flex justify-center">
             <input class="search map-input flex w-2/6 justify-center font-heading text-2xl" type="search"
-              id="address-input" placeholder="Search..." />
+              id="address-input" name="search_query" placeholder="Search..." />
             <button type="submit" class="search-button bg-white p-2 text-black">
               <span class="fas fa-search"></span>
             </button>

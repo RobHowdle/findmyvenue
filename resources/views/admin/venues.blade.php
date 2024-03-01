@@ -11,35 +11,39 @@
         <div class="count-wrapper p-6 text-gray-900 dark:text-gray-100">
           <p class="text-2xl">Active Venues: <span>{{ $venueCount }}</span></p>
           <p class="mt-4 text-xl">Create New Venue</p>
-          @if (session('success'))
-            <div class="alert alert-success">
-              {{ session('success') }}
-            </div>
-          @endif
-
-          @if (session('error'))
+          @if ($errors->any())
             <div class="alert alert-danger">
-              {{ session('error') }}
+              <ul>
+                @foreach ($errors->all() as $error)
+                  <li>{{ $error }}</li>
+                @endforeach
+              </ul>
             </div>
           @endif
           <form class="mt-2" action="{{ route('admin.new-venue') }}" method="POST">
             @csrf
             <div class="group relative z-0 mb-5 w-full">
-              <input type="text" name="floating_name" id="floating_name"
+              <input type="text" name="floating_name" id="floating_name" value="{{ old('floating_name') }}"
                 class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
                 placeholder=" " required />
               <label for="floating_name"
                 class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
                 Name
               </label>
+              @error('floating_name')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
             </div>
 
             <div class="group relative z-0 mb-5 w-full">
-              <input type="search" name="address-input" id="address-input"
+              <input type="search" name="address-input" id="address-input" value="{{ old('address-input') }}"
                 class="map-input peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
                 placeholder=" " required />
               <label for="address-input"
                 class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">Location</label>
+              @error('address-input')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
             </div>
 
             <div id="address-map-container" style="width: 100%; height: 400px; display: none;">
@@ -49,40 +53,58 @@
             <div class="group relative z-0 mb-5 w-full">
               <input
                 class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-                type="text" id="address-latitude" name="latitude" placeholder="Latitude">
+                type="text" id="postal-town-input" name="postal-town-input" placeholder="Postal Town Input"
+                value="{{ old('postal-town-input') }}">
               <input
                 class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-                type="text" id="address-longitude" name="longitude" placeholder="Longitude">
+                type="text" id="address-latitude" name="latitude" placeholder="Latitude"
+                value="{{ old('latitude') }}">
+              <input
+                class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
+                type="text" id="address-longitude" name="longitude" placeholder="Longitude"
+                value="{{ old('longitude') }}">
             </div>
 
             <div class="group relative z-0 mb-5 w-full">
               <input type="text" name="floating_capacity" id="floating_capacity"
+                value="{{ old('floating_capacity') }}"
                 class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
                 placeholder=" " required />
               <label for="floating_capacity"
                 class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
                 Capacity
               </label>
+              @error('floating_capacity')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
             </div>
 
             <div class="group relative z-0 mb-5 w-full">
               <input type="text" name="floating_in_house_gear" id="floating_in_house_gear"
+                value="{{ old('floating_in_house_gear') }}"
                 class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
                 placeholder=" " required />
               <label for="floating_in_house_gear"
                 class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
                 In House Gear (Separate by comma)
               </label>
+              @error('floating_in_house_gear')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
             </div>
 
             <div class="group relative z-0 mb-5 w-full">
               <input type="text" name="floating_band_type" id="floating_band_type"
+                value="{{ old('floating_band_type') }}"
                 class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
                 placeholder=" " required />
               <label for="floating_band_type"
                 class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
-                Band Type (Original, Covers, Tribute)
+                Band Type (Original, Covers, Tribute, All)
               </label>
+              @error('floating_band_type')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
             </div>
 
             <div class="group relative z-0 mb-5 w-full">
@@ -106,10 +128,14 @@
                       <div class="accordion-item">
                         <input type="checkbox"
                           class="genre-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
-                          id="all-genre-{{ $index }}" name="genres[]" value="All {{ $genre['name'] }}">
+                          id="all-genre-{{ $index }}" name="genres[]" value="All {{ $genre['name'] }}"
+                          {{ in_array('All ' . $genre['name'], old('genres', [])) ? 'checked' : '' }}>
                         <label for="all-genre-{{ $index }}"
                           class="accordion-title ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">All
                           {{ $genre['name'] }}</label>
+                        @error('genres[]')
+                          <span class="text-danger">{{ $message }}</span>
+                        @enderror
 
                         <div class="accordion-content">
                           @foreach ($genre['subgenres'] as $subIndex => $subgenre)
@@ -117,7 +143,8 @@
                               <input type="checkbox"≈
                                 class="subgenre-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
                                 id="subgenre-{{ $index }}-{{ $subIndex }}" name="genres[]"
-                                value="{{ $subgenre }}">
+                                value="{{ $subgenre }}"
+                                {{ in_array($subgenre, old('genres', [])) ? 'checked' : '' }}>
                               <label class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                                 for="subgenre-{{ $index }}-{{ $subIndex }}">{{ $subgenre }}</label>
                             </div>
@@ -132,42 +159,58 @@
 
             <div class="group relative z-0 mb-5 w-full">
               <input type="text" name="floating_contact_name" id="floating_contact_name"
+                value="{{ old('floating_contact_name') }}"
                 class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
                 placeholder=" " required />
               <label for="floating_contact_name"
                 class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
                 Contact Name
               </label>
+              @error('floating_contact_name')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
             </div>
 
             <div class="group relative z-0 mb-5 w-full">
               <input type="text" name="floating_contact_number" id="floating_contact_number"
+                value="{{ old('floating_contact_number') }}"
                 class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
                 placeholder=" " required />
               <label for="floating_contact_number"
                 class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
                 Contact Number
               </label>
+              @error('floating_contact_number')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
             </div>
 
             <div class="group relative z-0 mb-5 w-full">
               <input type="text" name="floating_contact_email" id="floating_contact_email"
+                value="{{ old('floating_contact_email') }}"
                 class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
                 placeholder=" " required />
               <label for="floating_contact_email"
                 class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
                 Contact Email
               </label>
+              @error('floating_contact_email')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
             </div>
 
             <div class="group relative z-0 mb-5 w-full">
               <input type="text" name="floating_contact_links" id="floating_contact_links"
+                value="{{ old('floating_contact_links') }}"
                 class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
                 placeholder=" " required />
               <label for="floating_contact_links"
                 class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
                 Contact Links (Separate by comma)
               </label>
+              @error('floating_contact_links')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
             </div>
 
             <div class="group relative z-0 mb-5 w-full">
@@ -245,6 +288,19 @@
       google.maps.event.addListener(autocomplete, 'place_changed', function() {
         marker.setVisible(false);
         const place = autocomplete.getPlace();
+
+        let postalTown = '';
+        place.address_components.forEach(component => {
+          if (component.types.includes('postal_town')) {
+            postalTown = component.long_name;
+          }
+        });
+
+        const postalTownComponent = place.address_components.find(component => component.types.includes(
+          'postal_town'));
+        if (postalTownComponent) {
+          document.getElementById('postal-town-input').value = postalTownComponent.long_name;
+        }
 
         geocoder.geocode({
           'placeId': place.place_id

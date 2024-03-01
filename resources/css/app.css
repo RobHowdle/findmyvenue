@@ -201,3 +201,7 @@ table {
     grid-template-columns: repeat(3, 1fr);
     grid-gap: 1rem;
 }
+
+.text-danger {
+    color: red;
+}
