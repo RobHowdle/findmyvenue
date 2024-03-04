@@ -8,10 +8,8 @@
   <div class="promoter-wrapper py-8">
     <div class="wrapper mx-auto grid px-8">
       <div class="wrapper-header col-span-1 row-start-1 row-end-2 pr-8">
-        {{-- <img src="{{ $promoter->logo_url }}" alt="{{ $promoter->name }} Logo"> --}}
-        <img class="promoter-logo"
-          src="https://scontent-lhr8-1.xx.fbcdn.net/v/t39.30808-6/394364801_827203366075009_5760893529690586399_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=efb6e6&_nc_ohc=BHGkbGEBfsAAX8tBfl5&_nc_ht=scontent-lhr8-1.xx&oh=00_AfCcfnMt8Id70YAKUFTOHxu63DIPSDA8IjRyU_YaJzSveQ&oe=65E22064"
-          alt="{{ $promoter->name }} Logo">
+        <img src="{{ asset($promoter->logo_url) }}" alt="{{ $promoter->name }} Logo" class="promoter-logo">
+
         <div class="text-wrapper flex flex-col gap-3">
           <h1 class="text-left font-heading text-4xl text-white">{{ $promoter->name }}</h1>
           <p class="font-sans text-2xl text-white">{{ $promoter->location }}</p>

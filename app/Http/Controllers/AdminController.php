@@ -98,6 +98,7 @@ public function saveNewVenue(Request $request)
             if ($validator->fails()) {
                 return back()->withErrors($validator)->withInput();
             }
+
             // Get the uploaded image file
             $promoterLogoFile = $request->file('promoter_logo');
 
@@ -106,13 +107,20 @@ public function saveNewVenue(Request $request)
             $promoterLogoExtension = $promoterLogoFile->getClientOriginalExtension();
             $promoterLogoFilename = Str::slug($promoterName) . '.' . $promoterLogoExtension;
 
-            // Store the uploaded image in the storage directory
-            $promoterLogoPath = $promoterLogoFile->storeAs('public/images', $promoterLogoFilename);
+            // Specify the destination directory within the public folder
+            $destinationPath = 'images/promoters_logos';
+
+            // Move the uploaded image to the specified directory
+            $promoterLogoFile->move(public_path($destinationPath), $promoterLogoFilename);
+
+            // Construct the URL to the stored image
+            $logoUrl = $destinationPath . '/' . $promoterLogoFilename;
+
 
             Promoter::create([
                 'name' => $request->input('promoter_name'),
                 'location' => $request->input('promoter_location'),
-                'logo_url' => $promoterLogoPath,
+                'logo_url' => $logoUrl,
                 'about_me' => $request->input('promoter_about_me'),
                 'my_venues' => $request->input('promoter_my_venues'),
                 'contact_number' => $request->input('promoter_contact_number'),
