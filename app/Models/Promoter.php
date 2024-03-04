@@ -19,6 +19,9 @@ class Promoter extends Model
     protected $fillable = [
         'name',
         'location',
+        'postal_town',
+        'longitude',
+        'latitude',
         'logo_url',
         'about_me',
         'my_venues',

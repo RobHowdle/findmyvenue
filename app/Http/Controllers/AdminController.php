@@ -86,7 +86,10 @@ public function saveNewVenue(Request $request)
         try {
             $validator = Validator::make($request->all(), [
                 'promoter_name' => 'required|string',
-                'promoter_location' => 'required|string',
+                'address-input' => 'required',
+                'postal-town-input' => 'required',
+                'latitude' => 'required',
+                'longitude' => 'required',
                 'promoter_logo' => 'required|image|mimes:jpeg,jpg,png,webp,svg|max:2048',
                 'promoter_about_me' => 'required',
                 'promoter_my_venues' => 'required',
@@ -119,7 +122,10 @@ public function saveNewVenue(Request $request)
 
             Promoter::create([
                 'name' => $request->input('promoter_name'),
-                'location' => $request->input('promoter_location'),
+                'location' => $request->input('address-input'),
+                'postal_town' => $request->input('postal-town-input'),
+                'longitude' => $request->input('latitude'),
+                'latitude' => $request->input('longitude'),
                 'logo_url' => $logoUrl,
                 'about_me' => $request->input('promoter_about_me'),
                 'my_venues' => $request->input('promoter_my_venues'),

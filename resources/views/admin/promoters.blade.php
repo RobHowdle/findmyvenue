@@ -36,14 +36,33 @@
             </div>
 
             <div class="group relative z-0 mb-5 w-full">
-              <input type="search" name="promoter_location"
-                class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-                placeholder=" " value="{{ old('promoter_location') }}" required />
-              <label for="promoter_location"
+              <input type="search" name="address-input" id="address-input" value="{{ old('address-input') }}"
+                class="map-input peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
+                placeholder=" " required />
+              <label for="address-input"
                 class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">Location</label>
-              @error('promoter_location')
+              @error('address-input')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
+            </div>
+
+            <div id="address-map-container" style="width: 100%; height: 400px; display: none;">
+              <div style="width: 100%; height: 100%;" id="address-map"></div>
+            </div>
+
+            <div class="group relative z-0 mb-5 hidden w-full">
+              <input
+                class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
+                type="text" id="postal-town-input" name="postal-town-input" placeholder="Postal Town Input"
+                value="{{ old('postal-town-input') }}">
+              <input
+                class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
+                type="text" id="address-latitude" name="latitude" placeholder="Latitude"
+                value="{{ old('latitude') }}">
+              <input
+                class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
+                type="text" id="address-longitude" name="longitude" placeholder="Longitude"
+                value="{{ old('longitude') }}">
             </div>
 
             <div class="group relative z-0 mb-5 w-full">
@@ -250,31 +269,4 @@
     latitudeField.value = lat;
     longitudeField.value = lng;
   }
-
-  $(document).ready(function() {
-    // Hide accordion content by default
-    $('.accordion-content').hide();
-
-    $('.accordion-item .accordion-title').click(function() {
-      // Toggle active class to show/hide accordion content
-      $(this).parent().toggleClass('active');
-      $(this).parent().find('.accordion-content').slideToggle();
-      $('.accordion-item').not($(this).parent()).removeClass('active').find('.accordion-content').slideUp();
-
-      // Prevent checkbox from being checked/unchecked when clicking on label
-      var checkbox = $(this).siblings('input[type="checkbox"]');
-      checkbox.prop('checked', !checkbox.prop('checked'));
-    });
-
-    // Event handler for "All Genres" checkbox
-    $('#all-genres').change(function() {
-      var isChecked = $(this).prop('checked');
-      $('.genre-checkbox').prop('checked', isChecked);
-
-      // If "All Genres" checkbox is checked, select all subgenres of each genre
-      if (isChecked) {
-        $('.accordion-item .subgenre-checkbox').prop('checked', false); // Uncheck subgenres
-      }
-    });
-  });
 </script>
