@@ -11,6 +11,9 @@
         <div class="count-wrapper p-6 text-gray-900 dark:text-gray-100">
           <p class="text-2xl">Active Promoters: <span>{{ $promoterCount }}</span></p>
           <p class="mt-4 text-xl">Create New Promoter</p>
+          <span class="text-sm">Due to the large amounts of information, we suggest typing your information in a notes
+            app and pasting
+            them in. Please ensure there are no weird characters before pasting!</span>
           @if ($errors->any())
             <div class="alert alert-danger">
               <ul>
@@ -22,6 +25,17 @@
           @endif
           <form class="mt-2" action="{{ route('admin.new-promoter') }}" method="POST" enctype="multipart/form-data">
             @csrf
+            <div class="group relative z-0 mb-5 w-full">
+              <input type="search" name="address-input" id="address-input" value="{{ old('address-input') }}"
+                class="map-input peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
+                placeholder=" " required />
+              <label for="address-input"
+                class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">Location</label>
+              @error('address-input')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
+            </div>
+
             <div class="group relative z-0 mb-5 w-full">
               <input type="text" name="promoter_name" id="promoter_name" value="{{ old('promoter_name') }}"
                 class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
@@ -35,16 +49,6 @@
               @enderror
             </div>
 
-            <div class="group relative z-0 mb-5 w-full">
-              <input type="search" name="address-input" id="address-input" value="{{ old('address-input') }}"
-                class="map-input peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-                placeholder=" " required />
-              <label for="address-input"
-                class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">Location</label>
-              @error('address-input')
-                <span class="text-danger">{{ $message }}</span>
-              @enderror
-            </div>
 
             <div id="address-map-container" style="width: 100%; height: 400px; display: none;">
               <div style="width: 100%; height: 100%;" id="address-map"></div>
@@ -102,6 +106,48 @@
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
+
+            <div class="group relative z-0 mb-5 w-full">
+              <label class="text-sm font-medium text-gray-900 dark:text-gray-300">My Venues</label>
+              <div class="mt-4 grid grid-cols-3 gap-4">
+                <!-- Genres -->
+                @foreach ($venuesByTown as $townVenue)
+                  <div>
+                    <div class="accordion" id="accordion-container">
+                      <div class="accordion-item">
+                        <input type="checkbox"
+                          class="venues-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
+                          id="all-venues-{{ $townVenue->postal_town }}" name="venues[]"
+                          value="All {{ $townVenue->postal_town }}"
+                          {{ in_array('All ' . $townVenue->postal_town, old('venues', [])) ? 'checked' : '' }}>
+                        <label for="all-venues-{{ $townVenue->postal_town }}"
+                          class="accordion-title ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">All
+                          {{ $townVenue->postal_town }}</label>
+                        @error('venues[]')
+                          <span class="text-danger">{{ $message }}</span>
+                        @enderror
+                        <div class="accordion-content">
+                          @php
+                            $venueNames = explode(',', $townVenue->venue_names);
+                          @endphp
+                          @foreach ($venueNames as $venue)
+                            <div class="checkbox-wrapper">
+                              <input type="checkbox"
+                                class="venue-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
+                                id="venue-{{ $townVenue->id }}" name="venues[]" value="{{ $venue }}"
+                                {{ in_array($venue, old('venues', [])) ? 'checked' : '' }}>
+                              <label class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                for="venue-{{ $townVenue->id }}">{{ $venue }}</label>
+                            </div>
+                          @endforeach
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                @endforeach
+              </div>
+            </div>
+
 
             <div class="group relative z-0 mb-5 w-full">
               <input type="text" name="promoter_contact_number" id="promoter_contact_number"
@@ -269,4 +315,31 @@
     latitudeField.value = lat;
     longitudeField.value = lng;
   }
+
+  $(document).ready(function() {
+    // Hide accordion content by default
+    $('.accordion-content').hide();
+
+    $('.accordion-item .accordion-title').click(function() {
+      // Toggle active class to show/hide accordion content
+      $(this).parent().toggleClass('active');
+      $(this).parent().find('.accordion-content').slideToggle();
+      $('.accordion-item').not($(this).parent()).removeClass('active').find('.accordion-content').slideUp();
+
+      // Prevent checkbox from being checked/unchecked when clicking on label
+      var checkbox = $(this).siblings('input[type="checkbox"]');
+      checkbox.prop('checked', !checkbox.prop('checked'));
+    });
+
+    // Event handler for "All Genres" checkbox
+    $('#all-venues').change(function() {
+      var isChecked = $(this).prop('checked');
+      $('.venues-checkbox').prop('checked', isChecked);
+
+      // If "All Genres" checkbox is checked, select all subgenres of each genre
+      if (isChecked) {
+        $('.accordion-item .venue-checkbox').prop('checked', false); // Uncheck subgenres
+      }
+    });
+  });
 </script>

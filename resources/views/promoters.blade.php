@@ -23,7 +23,7 @@
                 Contact
               </th>
               <th scope="col" class="px-6 py-3">
-                Venue
+                Venue(s)
               </th>
             </tr>
           </thead>
@@ -62,9 +62,7 @@
                 </td>
                 <td class="whitespace-nowrap px-6 py-4 font-sans text-xl text-white">
                   @if ($promoter->venues)
-                    @foreach ($promoter->venues as $promoter)
-                      {{ $promoter['name'] }}
-                    @endforeach
+                    {{ implode(', ', $promoter->venues->pluck('name')->toArray()) }}
                   @endif
                 </td>
               </tr>

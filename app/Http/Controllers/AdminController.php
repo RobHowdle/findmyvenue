@@ -7,6 +7,7 @@ use App\Models\Venue;
 use App\Models\Promoter;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
@@ -77,8 +78,12 @@ public function saveNewVenue(Request $request)
     public function getPromoters()
     {
         $promoterCount = Promoter::whereNull('deleted_at')->count();
+        $venuesByTown = Venue::select('postal_town', DB::raw('GROUP_CONCAT(name) as venue_names'), DB::raw('COUNT(id) as id'))
+            ->whereNull('deleted_at')
+            ->groupBy('postal_town')
+            ->get();
 
-        return view('admin.promoters', compact('promoterCount'));
+        return view('admin.promoters', compact('promoterCount', 'venuesByTown'));
     }
 
     public function saveNewPromoter(Request $request)
@@ -120,7 +125,7 @@ public function saveNewVenue(Request $request)
             $logoUrl = $destinationPath . '/' . $promoterLogoFilename;
 
 
-            Promoter::create([
+            $promoter = Promoter::create([
                 'name' => $request->input('promoter_name'),
                 'location' => $request->input('address-input'),
                 'postal_town' => $request->input('postal-town-input'),
@@ -133,6 +138,20 @@ public function saveNewVenue(Request $request)
                 'contact_email' => $request->input('promoter_contact_email'),
                 'contact_link' => $request->input('promoter_contact_links'),
             ]);
+
+            // Get the array of venue names from the request
+            $venueNames = $request->input('venues');
+
+            // Iterate over the venue names and create records in the pivot table
+            foreach ($venueNames as $venueName) {
+                // Find the venue by name
+                $venue = Venue::where('name', $venueName)->first();
+
+                // If the venue exists, attach it to the promoter
+                if ($venue) {
+                    $promoter->venues()->attach($venue->id);
+                }
+            }
 
             return back()->with('success', 'Promoter created successfully.');
         } catch (\Exception $e) {

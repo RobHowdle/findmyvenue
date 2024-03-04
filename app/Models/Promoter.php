@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Venue;
+use App\Models\PromoterVenue;
 use App\Models\PromoterReview;
 use App\Models\VenueExtraInfo;
 use Illuminate\Database\Eloquent\Model;

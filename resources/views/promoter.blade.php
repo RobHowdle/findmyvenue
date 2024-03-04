@@ -50,6 +50,10 @@
         <p class="pt-2 font-sans text-xl">{{ $promoter->about_me }}</p>
         <h3 class="mt-4 font-sans text-2xl underline">My Venues</h3>
         <p class="pt-2 font-sans text-xl">{{ $promoter->my_venues }}</p>
+        <h4 class="mt-4 font-sans text-2xl underline">Where can you find me?</h4>
+        @foreach ($promoter->venues as $venue)
+          <p class="pt-2 font-sans text-xl">{{ $venue['name'] }}</p>
+        @endforeach
       </div>
 
       <div class="col-start-2 col-end-3 row-span-3 border-l-2 border-white pl-8">
