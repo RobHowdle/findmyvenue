@@ -20,11 +20,11 @@ class Promoter extends Model
         'name',
         'location',
         'logo_url',
+        'about_me',
+        'my_venues',
         'contact_number',
         'contact_email',
         'contact_link',
-        'about_me',
-        'my_venues',
     ];
 
     public function extraInfo()
