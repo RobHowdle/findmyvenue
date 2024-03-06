@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Promoter;
 use Illuminate\Http\Request;
 use App\Models\PromoterReview;
+use Illuminate\Support\Facades\Log;
 use App\DataTables\PromotersDataTable;
+use Illuminate\Support\Facades\Validator;
 
 class PromoterController extends Controller
 {
@@ -88,6 +90,50 @@ class PromoterController extends Controller
             $promoter->platforms = $platforms;
             $promoter->recentReviews = PromoterReview::getRecentReviewsForPromoter($id);
 
-        return view('promoter', compact('promoter'));
+            // Get Review Scores
+            $overallReview = PromoterReview::calculateOverallScore($id);
+            $averageCommunicationRating = PromoterReview::calculateAverageScore($id, 'communication_rating');
+            $averageRopRating = PromoterReview::calculateAverageScore($id, 'rop_rating');
+            $averagePromotionRating = PromoterReview::calculateAverageScore($id, 'promotion_rating');
+            $averageQualityRating = PromoterReview::calculateAverageScore($id, 'quality_rating');
+            $reviewCount = PromoterReview::getReviewCount($id);
+
+        return view('promoter', compact('promoter', 'overallReview', 'averageCommunicationRating', 'averageRopRating', 'averagePromotionRating', 'averageQualityRating', 'reviewCount'));
+    }
+
+    public function submitPromoterReview(Request $request, Promoter $id)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'communication-rating' => 'required',
+                'rop-rating' => 'required',
+                'promotion-rating' => 'required',
+                'quality-rating' => 'required',
+                'review_author' => 'required',
+                'review_message' => 'required'
+            ]);
+
+            if ($validator->fails()) {
+                return back()->withErrors($validator)->withInput();
+            }
+
+            PromoterReview::create([
+                'promoter_id' => $id['id'],
+                'communication_rating' => $request->input('communication-rating'),
+                'rop_rating' => $request->input('rop-rating'),
+                'promotion_rating' => $request->input('promotion-rating'),
+                'quality_rating' => $request->input('quality-rating'),
+                'author' => $request->input('review_author'),
+                'review' => $request->input('review_message'),
+            ]);
+
+            return back()->with('success', 'Review submitted successfully.');
+        } catch (\Exception $e) {
+            // Log the error
+            Log::error('Error submitting review: ' . $e->getMessage());
+
+            // Optionally, you can return an error response or redirect to an error page
+            return back()->with('error', 'An error occurred while submitting the review. Please try again later.')->withInput();
+        }
     }
 }

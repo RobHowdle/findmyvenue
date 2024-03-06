@@ -16,15 +16,18 @@
               <th scope="col" class="px-6 py-3">
                 Venue
               </th>
-              <th scope="col" class="px-6 py-3">
-                Location
-              </th>
-              <th scope="col" class="px-6 py-3">
-                Contact
-              </th>
-              <th scope="col" class="px-6 py-3">
-                Venue(s)
-              </th>
+              <thQ scope="col" class="px-6 py-3">
+                Rating
+                </th>
+                <th scope="col" class="px-6 py-3">
+                  Location
+                </th>
+                <th scope="col" class="px-6 py-3">
+                  Contact
+                </th>
+                <th scope="col" class="px-6 py-3">
+                  Venue(s)
+                </th>
             </tr>
           </thead>
           <tbody>
@@ -35,6 +38,42 @@
                   <a href="{{ url('promoters', $promoter->id) }}"
                     class="venue-link hover:text-gray-500">{{ $promoter->name }}</a>
                 </th>
+                <td class="rating-wrapper flex whitespace-nowrap px-6 py-4 font-sans text-xl text-white">
+                  @php
+                    $overallScore = 0;
+                    $reviewCount = 0;
+
+                    // Loop through each review
+                    foreach ($promoter->review as $review) {
+                        // Calculate the overall score for each review
+                        $overallScore += $review->calculateOverallScore($promoter->id);
+                        $reviewCount++;
+                    }
+
+                    // Calculate the overall score by taking the average of all review scores
+                    if ($reviewCount > 0) {
+                        $overallScore /= $reviewCount;
+                    }
+
+                    // Calculate the number of full icons and the fraction
+                    $fullIcons = floor($overallScore);
+                    $fraction = $overallScore - $fullIcons;
+                  @endphp
+
+                  @for ($i = 0; $i < $fullIcons; $i++)
+                    <img src="https://img.icons8.com/emoji/48/sign-of-the-horns-emoji.png"
+                      alt="sign-of-the-horns-emoji" />
+                  @endfor
+
+                  @if ($fraction > 0)
+                    <div class="partially-filled-icon" style="width: {{ $fraction * 25 }}px; overflow: hidden;">
+                      <img src="https://img.icons8.com/emoji/48/sign-of-the-horns-emoji.png"
+                        alt="sign-of-the-horns-emoji" />
+                    </div>
+                  @endif
+                </td>
+
+
                 <td class="whitespace-nowrap px-6 py-4 font-sans text-xl text-white">
                   {{ $promoter->location }}
                 </td>

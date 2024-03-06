@@ -98,7 +98,7 @@ public function saveNewVenue(Request $request)
                 'promoter_logo' => 'required|image|mimes:jpeg,jpg,png,webp,svg|max:2048',
                 'promoter_about_me' => 'required',
                 'promoter_my_venues' => 'required',
-                'promoter_contact_email' => 'required|email',
+                'promoter_contact_email' => 'nullable|email',
                 'promoter_contact_number' => 'nullable|numeric|digits:11',
                 'promoter_links' => 'nullable',
             ]);
