@@ -4,12 +4,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
 
-  <title>Laravel</title>
+  <title>{{ config('app.name', 'Laravel') }}</title>
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.bunny.net">
   <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  <script src="https://kit.fontawesome.com/dd6bff54df.js" crossorigin="anonymous"></script>
 
   <!-- Styles -->
   <style>
@@ -835,11 +839,12 @@
     <div class="py-12">
       <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
         <h1 class="text-center font-heading text-6xl text-white">Find Your Next Show!</h1>
-        <p class="text-center font-heading text-xl text-white">search below to find a venue in your desired area</p>
+        <p class="text-center font-sans text-lg capitalize text-white">search below to find a venue in your desired area
+        </p>
         <form action="{{ route('venues.filterByCoordinates') }}" method="GET">
           @csrf
           <div class="search-wrapper my-4 flex justify-center">
-            <input class="search map-input flex w-2/6 justify-center font-heading text-2xl" type="search"
+            <input class="search map-input flex w-2/6 justify-center font-sans text-xl" type="search"
               id="address-input" name="search_query" placeholder="Search..." />
             <button type="submit" class="search-button bg-white p-2 text-black">
               <span class="fas fa-search"></span>

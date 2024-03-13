@@ -14,7 +14,7 @@ class PromoterController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(PromotersDataTable $dataTable)
+    public function index()
     {
         $promoters = Promoter::whereNull('deleted_at')
         ->with('venues')

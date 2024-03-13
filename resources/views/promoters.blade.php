@@ -16,18 +16,18 @@
               <th scope="col" class="px-6 py-3">
                 Venue
               </th>
-              <thQ scope="col" class="px-6 py-3">
+              <th scope="col" class="px-6 py-3">
                 Rating
-                </th>
-                <th scope="col" class="px-6 py-3">
-                  Location
-                </th>
-                <th scope="col" class="px-6 py-3">
-                  Contact
-                </th>
-                <th scope="col" class="px-6 py-3">
-                  Venue(s)
-                </th>
+              </th>
+              <th scope="col" class="px-6 py-3">
+                Location
+              </th>
+              <th scope="col" class="px-6 py-3">
+                Contact
+              </th>
+              <th scope="col" class="px-6 py-3">
+                Venue(s)
+              </th>
             </tr>
           </thead>
           <tbody>

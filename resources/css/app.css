@@ -1,11 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Kings&family=Kite+One&display=swap');
 
-@import "bootstrap-icons/font/bootstrap-icons.css";
-@import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
-@import "datatables.net-buttons-bs5/css/buttons.bootstrap5.min.css";
-@import "datatables.net-select-bs5/css/select.bootstrap5.css";
-
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -197,6 +191,37 @@ table {
            object-fit: cover;
        }
     }
+}
+
+/* Styles for the navbar */
+#navbar {
+/* Default styles */
+transition: background-color 0.3s;
+}
+
+/* Styles for the navbar when scrolled */
+#navbar.scrolled {
+background-color: black; /* Change to your desired background color */
+}
+
+.search-wrapper {
+    background-color: var(--color-blue);
+}
+
+.filter-search {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    width: 100%;
+}
+
+.filters {
+    grid-column: 1/2;
+    grid-row: 1/2;
+}
+
+.search-bar {
+    grid-column: 2/3;
+    grid-row: 1/2;
 }
 
 /* Admin Page */

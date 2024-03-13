@@ -14,10 +14,6 @@
 
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-
-  <link rel="stylesheet" href="https://cdn.datatables.net/2.0.0/css/dataTables.dataTables.css" />
-
-  <script src="https://cdn.datatables.net/2.0.0/js/dataTables.js"></script>
   <script src="https://kit.fontawesome.com/dd6bff54df.js" crossorigin="anonymous"></script>
 
   <!-- Scripts -->
@@ -29,7 +25,7 @@
     <div class="bg-hero-bg flex min-h-screen flex-col items-center pt-6 sm:justify-center sm:pt-0">
       <div>
         @if (Route::has('login'))
-          <div class="z-10 flex w-full justify-between p-6 text-right sm:fixed sm:right-0 sm:top-0">
+          <div id="navbar" class="z-10 flex w-full justify-between p-6 text-right sm:fixed sm:right-0 sm:top-0">
             <a href="{{ url('/') }}"
               class="font-heading text-2xl font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-gray-400">Home</a>
             <a href="{{ url('/venues') }}"
@@ -56,6 +52,21 @@
     </div>
   </div>
   @stack('scripts')
+
+  <script>
+    // Get the navbar element
+    const navbar = document.getElementById('navbar');
+
+    // Add a scroll event listener
+    window.addEventListener('scroll', () => {
+      // Add or remove the 'scrolled' class based on the scroll position
+      if (window.scrollY > 0) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+  </script>
 </body>
 
 </html>

@@ -1,10 +1,8 @@
+import $ from "jquery";
 import "./bootstrap";
-import "laravel-datatables-vite";
 
 import Alpine from "alpinejs";
-
-import jQuery from "jquery";
-window.$ = jQuery;
+window.$ = $;
 
 window.Alpine = Alpine;
 

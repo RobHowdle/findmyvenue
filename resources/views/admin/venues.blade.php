@@ -12,7 +12,7 @@
           <p class="text-2xl">Active Venues: <span>{{ $venueCount }}</span></p>
           <p class="mt-4 text-xl">Create New Venue</p>
           @if ($errors->any())
-            <div class="alert alert-danger">
+            <div class="alert-danger alert">
               <ul>
                 @foreach ($errors->all() as $error)
                   <li>{{ $error }}</li>
@@ -94,18 +94,40 @@
             </div>
 
             <div class="group relative z-0 mb-5 w-full">
-              <input type="text" name="floating_band_type" id="floating_band_type"
-                value="{{ old('floating_band_type') }}"
-                class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-                placeholder=" " required />
-              <label for="floating_band_type"
-                class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
-                Band Type (Original, Covers, Tribute, All)
-              </label>
-              @error('floating_band_type')
-                <span class="text-danger">{{ $message }}</span>
-              @enderror
+              <label class="text-sm font-medium text-gray-900 dark:text-gray-300">Preferred Band Types</label>
+              <div class="mt-4 grid grid-cols-3 gap-4">
+                <div class="flex items-center">
+                  <input id="all-types" name="band_type[]" type="checkbox" value="all"
+                    class="band-type-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
+                    {{ in_array('all', old('band_type', [])) ? 'checked' : '' }} />
+                  <label for="all-types" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">All
+                    Types</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="original-bands" name="band_type[]" type="checkbox" value="original-bands"
+                    class="band-type-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
+                    {{ in_array('original-bands', old('band_type', [])) ? 'checked' : '' }} />
+                  <label for="original-bands"
+                    class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Original</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="cover-bands" name="band_type[]" type="checkbox" value="cover-bands"
+                    class="band-type-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
+                    {{ in_array('cover-bands', old('band_type', [])) ? 'checked' : '' }} />
+                  <label for="cover-bands"
+                    class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Covers</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="tribute-bands" name="band_type[]" type="checkbox" value="tribute-bands"
+                    class="band-type-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
+                    {{ in_array('tribute-bands', old('band_type', [])) ? 'checked' : '' }} />
+                  <label for="tribute-bands"
+                    class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Tributes</label>
+                </div>
+              </div>
+
             </div>
+
 
             <div class="group relative z-0 mb-5 w-full">
               <label class="text-sm font-medium text-gray-900 dark:text-gray-300">Preferred Genre(s) - <span>Yes,
@@ -353,15 +375,20 @@
       checkbox.prop('checked', !checkbox.prop('checked'));
     });
 
-    // Event handler for "All Genres" checkbox
-    $('#all-genres').change(function() {
-      var isChecked = $(this).prop('checked');
-      $('.genre-checkbox').prop('checked', isChecked);
+    // Event handler for "All Types" checkbox
+    document.getElementById('all-types').addEventListener('change', function() {
+      var checkboxes = document.querySelectorAll('.band-type-checkbox');
+      checkboxes.forEach(function(checkbox) {
+        checkbox.checked = this.checked;
+      });
+    });
 
-      // If "All Genres" checkbox is checked, select all subgenres of each genre
-      if (isChecked) {
-        $('.accordion-item .subgenre-checkbox').prop('checked', false); // Uncheck subgenres
-      }
+    // Event handler for "All Genres" checkbox
+    document.getElementById('all-types').addEventListener('change', function() {
+      var checkboxes = document.querySelectorAll('.band-type-checkbox');
+      checkboxes.forEach(function(checkbox) {
+        checkbox.checked = this.checked;
+      });
     });
   });
 </script>
