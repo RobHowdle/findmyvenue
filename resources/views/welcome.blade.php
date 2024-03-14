@@ -834,140 +834,139 @@
   </style>
 </head>
 
-<body class="antialiased">
-  <x-guest-layout>
-    <div class="py-12">
-      <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <h1 class="text-center font-heading text-6xl text-white">Find Your Next Show!</h1>
-        <p class="text-center font-sans text-lg capitalize text-white">search below to find a venue in your desired area
-        </p>
-        <form action="{{ route('venues.filterByCoordinates') }}" method="GET">
-          @csrf
-          <div class="search-wrapper my-4 flex justify-center">
-            <input class="search map-input flex w-2/6 justify-center font-sans text-xl" type="search"
-              id="address-input" name="search_query" placeholder="Search..." />
-            <button type="submit" class="search-button bg-white p-2 text-black">
-              <span class="fas fa-search"></span>
-            </button>
-          </div>
-          <div id="address-map-container" style="width: 100%; height: 400px; display: none;">
-            <div style="width: 100%; height: 100%;" id="address-map"></div>
-          </div>
 
-          <input style="display: none;" type="text" id="address-latitude" name="latitude" placeholder="Latitude">
-          <input style="display: none;" type="text" id="address-longitude" name="longitude" placeholder="Longitude">
-        </form>
-
-        <h2 class="text-center font-heading text-2xl text-white">Or</h2>
-        <a href="{{ url('/venues') }}"
-          class="flex justify-center font-heading text-2xl text-white underline dark:hover:text-gray-400">Browse
-          all
-          venues</a>
+<x-guest-layout>
+  <div class="home-search">
+    <h1 class="text-center font-heading text-4xl text-white md:text-5xl lg:text-6xl">Find Your Next Show!</h1>
+    <p class="text-center font-sans text-base capitalize text-white md:text-lg">search below to find a venue in your
+      desired area
+    </p>
+    <form action="{{ route('venues.filterByCoordinates') }}" method="GET">
+      @csrf
+      <div class="my-4 flex justify-center">
+        <input class="search map-input sm:w-100 flex justify-center font-sans text-xl focus:border-white md:w-4/6"
+          type="search" id="address-input" name="search_query" placeholder="Search..." />
+        <button type="submit"
+          class="search-button border-b-2 border-r-2 border-t-2 border-white bg-black p-2 text-white">
+          <span class="fas fa-search"></span>
+        </button>
       </div>
-    </div>
-  </x-guest-layout>
+      <div id="address-map-container" style="width: 100%; height: 400px; display: none;">
+        <div style="width: 100%; height: 100%;" id="address-map"></div>
+      </div>
 
-  <script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcMjlXwDOk74oMDPgOp4YWdWxPa5xtHGA&libraries=places&callback=initialize"
-    async defer></script>
+      <input style="display: none;" type="text" id="address-latitude" name="latitude" placeholder="Latitude">
+      <input style="display: none;" type="text" id="address-longitude" name="longitude" placeholder="Longitude">
+    </form>
 
-  <script>
-    function initialize() {
+    <h2 class="text-center font-heading text-2xl text-white">Or</h2>
+    <a href="{{ url('/venues') }}"
+      class="flex justify-center font-heading text-2xl text-white underline dark:hover:text-gray-400">Browse
+      all
+      venues</a>
+  </div>
+</x-guest-layout>
 
-      $('form').on('keyup keypress', function(e) {
-        var keyCode = e.keyCode || e.which;
-        if (keyCode === 13) {
-          e.preventDefault();
-          return false;
-        }
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcMjlXwDOk74oMDPgOp4YWdWxPa5xtHGA&libraries=places&callback=initialize"
+  async defer></script>
+
+<script>
+  function initialize() {
+
+    $('form').on('keyup keypress', function(e) {
+      var keyCode = e.keyCode || e.which;
+      if (keyCode === 13) {
+        e.preventDefault();
+        return false;
+      }
+    });
+    const locationInputs = document.getElementsByClassName("map-input");
+
+    const autocompletes = [];
+    const geocoder = new google.maps.Geocoder;
+    for (let i = 0; i < locationInputs.length; i++) {
+
+      const input = locationInputs[i];
+      const fieldKey = input.id.replace("-input", "");
+      const isEdit = document.getElementById(fieldKey + "-latitude").value != '' && document.getElementById(fieldKey +
+        "-longitude").value != '';
+
+      const latitude = parseFloat(document.getElementById(fieldKey + "-latitude").value) || 59.339024834494886;
+      const longitude = parseFloat(document.getElementById(fieldKey + "-longitude").value) || 18.06650573462189;
+
+      const map = new google.maps.Map(document.getElementById(fieldKey + '-map'), {
+        center: {
+          lat: latitude,
+          lng: longitude
+        },
+        zoom: 13
       });
-      const locationInputs = document.getElementsByClassName("map-input");
+      const marker = new google.maps.Marker({
+        map: map,
+        position: {
+          lat: latitude,
+          lng: longitude
+        },
+      });
 
-      const autocompletes = [];
-      const geocoder = new google.maps.Geocoder;
-      for (let i = 0; i < locationInputs.length; i++) {
+      marker.setVisible(isEdit);
 
-        const input = locationInputs[i];
-        const fieldKey = input.id.replace("-input", "");
-        const isEdit = document.getElementById(fieldKey + "-latitude").value != '' && document.getElementById(fieldKey +
-          "-longitude").value != '';
-
-        const latitude = parseFloat(document.getElementById(fieldKey + "-latitude").value) || 59.339024834494886;
-        const longitude = parseFloat(document.getElementById(fieldKey + "-longitude").value) || 18.06650573462189;
-
-        const map = new google.maps.Map(document.getElementById(fieldKey + '-map'), {
-          center: {
-            lat: latitude,
-            lng: longitude
-          },
-          zoom: 13
-        });
-        const marker = new google.maps.Marker({
-          map: map,
-          position: {
-            lat: latitude,
-            lng: longitude
-          },
-        });
-
-        marker.setVisible(isEdit);
-
-        const autocomplete = new google.maps.places.Autocomplete(input);
-        autocomplete.key = fieldKey;
-        autocompletes.push({
-          input: input,
-          map: map,
-          marker: marker,
-          autocomplete: autocomplete
-        });
-      }
-
-      for (let i = 0; i < autocompletes.length; i++) {
-        const input = autocompletes[i].input;
-        const autocomplete = autocompletes[i].autocomplete;
-        const map = autocompletes[i].map;
-        const marker = autocompletes[i].marker;
-
-        google.maps.event.addListener(autocomplete, 'place_changed', function() {
-          marker.setVisible(false);
-          const place = autocomplete.getPlace();
-
-          geocoder.geocode({
-            'placeId': place.place_id
-          }, function(results, status) {
-            if (status === google.maps.GeocoderStatus.OK) {
-              const lat = results[0].geometry.location.lat();
-              const lng = results[0].geometry.location.lng();
-              setLocationCoordinates(autocomplete.key, lat, lng);
-            }
-          });
-
-          if (!place.geometry) {
-            window.alert("No details available for input: '" + place.name + "'");
-            input.value = "";
-            return;
-          }
-
-          if (place.geometry.viewport) {
-            map.fitBounds(place.geometry.viewport);
-          } else {
-            map.setCenter(place.geometry.location);
-            map.setZoom(17);
-          }
-          marker.setPosition(place.geometry.location);
-          marker.setVisible(true);
-
-        });
-      }
+      const autocomplete = new google.maps.places.Autocomplete(input);
+      autocomplete.key = fieldKey;
+      autocompletes.push({
+        input: input,
+        map: map,
+        marker: marker,
+        autocomplete: autocomplete
+      });
     }
 
-    function setLocationCoordinates(key, lat, lng) {
-      const latitudeField = document.getElementById(key + "-" + "latitude");
-      const longitudeField = document.getElementById(key + "-" + "longitude");
-      latitudeField.value = lat;
-      longitudeField.value = lng;
+    for (let i = 0; i < autocompletes.length; i++) {
+      const input = autocompletes[i].input;
+      const autocomplete = autocompletes[i].autocomplete;
+      const map = autocompletes[i].map;
+      const marker = autocompletes[i].marker;
+
+      google.maps.event.addListener(autocomplete, 'place_changed', function() {
+        marker.setVisible(false);
+        const place = autocomplete.getPlace();
+
+        geocoder.geocode({
+          'placeId': place.place_id
+        }, function(results, status) {
+          if (status === google.maps.GeocoderStatus.OK) {
+            const lat = results[0].geometry.location.lat();
+            const lng = results[0].geometry.location.lng();
+            setLocationCoordinates(autocomplete.key, lat, lng);
+          }
+        });
+
+        if (!place.geometry) {
+          window.alert("No details available for input: '" + place.name + "'");
+          input.value = "";
+          return;
+        }
+
+        if (place.geometry.viewport) {
+          map.fitBounds(place.geometry.viewport);
+        } else {
+          map.setCenter(place.geometry.location);
+          map.setZoom(17);
+        }
+        marker.setPosition(place.geometry.location);
+        marker.setVisible(true);
+
+      });
     }
-  </script>
-</body>
+  }
+
+  function setLocationCoordinates(key, lat, lng) {
+    const latitudeField = document.getElementById(key + "-" + "latitude");
+    const longitudeField = document.getElementById(key + "-" + "longitude");
+    latitudeField.value = lat;
+    longitudeField.value = lng;
+  }
+</script>
 
 </html>
