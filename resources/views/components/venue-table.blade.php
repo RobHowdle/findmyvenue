@@ -92,7 +92,7 @@
                                 <div class="checkbox-wrapper">
                                   <input type="checkbox"≈
                                     class="subgenre-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
-                                    id="subgenre-{{ $index }}-{{ $subIndex }}" name="genres[]"
+                                    id="genre-{{ $index }}-subgenre-{{ $subIndex }}" name="genres[]"
                                     value="{{ $subgenre }}"
                                     {{ in_array($subgenre, old('genres', [])) ? 'checked' : '' }}
                                     data-parent-genre="{{ $genre['name'] }}">

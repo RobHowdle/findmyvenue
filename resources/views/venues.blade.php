@@ -101,19 +101,7 @@
       // Prevent checkbox from being checked/unchecked when clicking on label
       var checkbox = $(this).siblings('input[type="checkbox"]');
       checkbox.prop("checked", !checkbox.prop("checked"));
-    });
-
-    // Event handler for "All Genres" checkbox
-    $("#all-genres").change(function() {
-      var isChecked = $(this).prop("checked");
-      $(".genre-checkbox").prop("checked", isChecked);
-
-      // If "All Genres" checkbox is checked, select all subgenres of each genre
-      if (isChecked) {
-        $(".accordion-item .subgenre-checkbox").prop("checked", true); // Uncheck subgenres
-      }
-      applyFilters();
-    });
+    });;
   });
 
   // Search Bar
@@ -219,25 +207,30 @@
     $(".filter-checkbox").prop("checked", isChecked);
   });
 
+  // Event handler for "All Genres" checkbox
+  $("#all-genres").change(function() {
+    var isChecked = $(this).prop("checked");
+    $(".genre-checkbox").prop("checked", isChecked);
+
+    // If "All Genres" checkbox is checked, select all subgenres of each genre
+    if (isChecked) {
+      $(".accordion-item .subgenre-checkbox").prop("checked", true); // Uncheck subgenres
+    }
+    applyFilters();
+  })
+
   // Attach event listener for genre checkboxes
   $('.genre-checkbox').change(function() {
     var isChecked = $(this).prop('checked');
-    var parentGenre = $(this).data('parent-genre');
+    var genreId = $(this).attr('id');
 
-    if ($(this).prop('id') === 'all-genres') {
-      // If "All Genres" checkbox is selected, deselect all individual genre checkboxes
-      $('.genre-checkbox').not(this).prop('checked', isChecked);
-    } else {
-      // If an individual genre checkbox is selected, deselect the "All Genres" checkbox
-      $('#all-genres').prop('checked', false);
-    }
+    var genreIdParts = genreId.split('-');
+    var genreIndex = genreIdParts[2];
 
-    // Check/uncheck subgenre checkboxes corresponding to the selected genre
-    if (isChecked) {
-      $('.subgenre-checkbox[data-parent-genre="' + parentGenre + '"]').prop('checked', true);
-    } else {
-      $('.subgenre-checkbox[data-parent-genre="' + parentGenre + '"]').prop('checked', false);
-    }
+    var subgenreCheckboxes = $('input[type="checkbox"][id*="genre-' + genreIndex + '-subgenre"]');
+
+    subgenreCheckboxes.prop('checked', isChecked);
+
     applyFilters();
   });
 
@@ -374,7 +367,7 @@
       // Display message if no venues found
       var noVenuesRow = `
             <tr>
-                <td colspan="4" class="text-center text-2xl text-white">No venues found</td>
+                <td colspan="4" class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4 uppercase text-center">No venues found</td>
             </tr>
         `;
       $('#venues tbody').append(noVenuesRow);
