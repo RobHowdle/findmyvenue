@@ -23,10 +23,10 @@ Route::get('/', function () {
 });
 
 Route::get('/venues', [VenueController::class, 'index'])->name('venues');
+Route::get('/venues/filter', [VenueController::class, 'filterCheckboxesSearch'])->name('venues.filterCheckboxesSearch');
 Route::get('/venues/{id}', [VenueController::class, 'show'])->name('venue');
 Route::get('/venues/filterByCoordinates', [VenueController::class, 'filterByCoordinates'])
      ->name('venues.filterByCoordinates');
-Route::get('/venues/filter', [VenueController::class, 'filterCheckboxes'])->name('venues.filterCheckboxes');
 Route::get('/promoters', [PromoterController::class, 'index'])->name('promoters');
 Route::get('/promoters/{id}', [PromoterController::class, 'show'])->name('promoter');
 Route::post('/promoters/{id}/submitReview', [PromoterController::class, 'submitPromoterReview'])->name('submit-promoter-review');

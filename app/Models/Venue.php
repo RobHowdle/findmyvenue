@@ -31,6 +31,8 @@ class Venue extends Model
         'contact_number',
         'contact_email',
         'contact_link',
+        'description',
+        'additional_info'
     ];
 
     public function extraInfo()

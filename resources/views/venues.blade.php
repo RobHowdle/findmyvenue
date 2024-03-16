@@ -5,22 +5,26 @@
 
   <x-venue-table :venues="$venues" :genres="$genres">
     @forelse ($venues as $venue)
-      <tr class="border-b odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-gray-900 even:dark:bg-gray-800">
-        <th scope="row" class="whitespace-nowrap px-6 py-4 font-sans text-xl text-white">
+      <tr class="border-b odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+        <th scope="row"
+          class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
           <!-- Venue name -->
-          <a href="{{ route('venue', $venue->id) }}" class="venue-link">{{ $venue->name }}</a>
+          <a href="{{ route('venue', $venue->id) }}" class="venue-link hover:text-gray-400">{{ $venue->name }}</a>
         </th>
-        <td class="whitespace-nowrap px-6 py-4 font-sans text-xl text-white">
+        <td
+          class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
           <!-- Location -->
           {{ $venue->postal_town }}
         </td>
-        <td class="flex gap-4 whitespace-nowrap px-6 py-4 font-sans text-xl text-white">
+        <td
+          class="flex gap-4 whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
           <!-- Contact links -->
           @if ($venue->contact_number)
-            <a href="tel:{{ $venue->contact_number }}"><span class="fas fa-phone"></span></a>
+            <a class="hover:text-gray-400" href="tel:{{ $venue->contact_number }}"><span class="fas fa-phone"></span></a>
           @endif
           @if ($venue->contact_email)
-            <a href="mailto:{{ $venue->contact_email }}"><span class="fas fa-envelope"></span></a>
+            <a class="hover:text-gray-400" href="mailto:{{ $venue->contact_email }}"><span
+                class="fas fa-envelope"></span></a>
           @endif
           <!-- Additional processing for contact links -->
           @if ($venue->platforms)
@@ -41,11 +45,12 @@
             @endforeach
           @endif
         </td>
-        <td class="whitespace-nowrap px-6 py-4 font-sans text-xl text-white">
+        <td
+          class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
           <!-- Promoter names -->
           @if ($venue->promoters)
             @foreach ($venue->promoters as $promoter)
-              <a href="{{ url('promoters', $promoter->id) }}">{{ $promoter['name'] }}</a>
+              <a class="hover:text-gray-400" href="{{ url('promoters', $promoter->id) }}">{{ $promoter['name'] }}</a>
             @endforeach
           @endif
         </td>
@@ -57,39 +62,27 @@
     @endforelse
   </x-venue-table>
 </x-guest-layout>
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcMjlXwDOk74oMDPgOp4YWdWxPa5xtHGA&libraries=places&callback=initialize"
+  async defer></script>
 <script>
   $(document).ready(function() {
-    // Close modal click event
-    $(document).on("click", ".close", function() {
-      closeModal();
-    });
-
-    // Close modal on escape key press
-    $(document).keydown(function(event) {
-      if (event.keyCode === 27 && $(".modal").hasClass("modal-visible")) {
-        closeModal();
-      }
-    });
-
     // Accordion functionality
     $("[data-accordion-target]").click(function() {
       const isExpanded = $(this).attr("aria-expanded") === "true";
       const accordionBody = $(this).attr("data-accordion-target");
 
+      $(this).find('svg').toggleClass('rotate-180');
+
       if (isExpanded) {
         $(this).attr("aria-expanded", "false");
-        $(accordionBody).addClass("hidden");
+        $(accordionBody).slideUp().addClass("hidden");
       } else {
+        $(accordionBody).slideDown().removeClass("hidden");
         $(this).attr("aria-expanded", "true");
-        $(accordionBody).removeClass("hidden");
       }
     });
   });
-
-  // Function to close modal
-  function closeModal() {
-    $(".modal").removeClass("modal-visible");
-  }
 
   $(document).ready(function() {
     // Hide accordion content by default
@@ -117,10 +110,98 @@
 
       // If "All Genres" checkbox is checked, select all subgenres of each genre
       if (isChecked) {
-        $(".accordion-item .subgenre-checkbox").prop("checked", false); // Uncheck subgenres
+        $(".accordion-item .subgenre-checkbox").prop("checked", true); // Uncheck subgenres
       }
+      applyFilters();
     });
   });
+
+  // Search Bar
+  function initialize() {
+    $('form').on('keyup keypress', function(e) {
+      var keyCode = e.keyCode || e.which;
+      if (keyCode === 13) {
+        return false;
+      }
+    });
+    const locationInputs = document.getElementsByClassName("map-input");
+
+    const autocompletes = [];
+    const geocoder = new google.maps.Geocoder;
+    for (let i = 0; i < locationInputs.length; i++) {
+
+      const input = locationInputs[i];
+      const fieldKey = input.id.replace("-input", "");
+      const isEdit = document.getElementById(fieldKey + "-latitude").value != '' && document.getElementById(fieldKey +
+        "-longitude").value != '';
+
+      const latitude = parseFloat(document.getElementById(fieldKey + "-latitude").value) || 59.339024834494886;
+      const longitude = parseFloat(document.getElementById(fieldKey + "-longitude").value) || 18.06650573462189;
+
+      const map = new google.maps.Map(document.getElementById(fieldKey + '-map'), {
+        center: {
+          lat: latitude,
+          lng: longitude
+        },
+        zoom: 13
+      });
+      const marker = new google.maps.Marker({
+        map: map,
+        position: {
+          lat: latitude,
+          lng: longitude
+        },
+      });
+
+      marker.setVisible(isEdit);
+
+      const autocomplete = new google.maps.places.Autocomplete(input);
+      autocomplete.key = fieldKey;
+      autocompletes.push({
+        input: input,
+        map: map,
+        marker: marker,
+        autocomplete: autocomplete
+      });
+    }
+
+    for (let i = 0; i < autocompletes.length; i++) {
+      const input = autocompletes[i].input;
+      const autocomplete = autocompletes[i].autocomplete;
+      const map = autocompletes[i].map;
+      const marker = autocompletes[i].marker;
+
+      google.maps.event.addListener(autocomplete, 'place_changed', function() {
+        marker.setVisible(false);
+        const place = autocomplete.getPlace();
+
+        geocoder.geocode({
+          'placeId': place.place_id
+        }, function(results, status) {
+          if (status === google.maps.GeocoderStatus.OK) {
+            const lat = results[0].geometry.location.lat();
+            const lng = results[0].geometry.location.lng();
+            setLocationCoordinates(autocomplete.key, lat, lng);
+          }
+        });
+
+        if (!place.geometry) {
+          window.alert("No details available for input: '" + place.name + "'");
+          input.value = "";
+          return;
+        }
+
+        if (place.geometry.viewport) {
+          map.fitBounds(place.geometry.viewport);
+        } else {
+          map.setCenter(place.geometry.location);
+          map.setZoom(17);
+        }
+        marker.setPosition(place.geometry.location);
+        marker.setVisible(true);
+      });
+    }
+  }
 
   // Attach event listener for filter checkboxes
   $('.filter-checkbox').change(function() {
@@ -128,21 +209,38 @@
   });
 
   // Attach event listener for search input
-  $('#search-input').on('input', function() {
+  $('#address-input').on('input', function() {
     applyFilters();
+  });
+
+  // Event handler for "All Types" checkbox
+  $("#all-bands").change(function() {
+    var isChecked = $(this).prop("checked");
+    $(".filter-checkbox").prop("checked", isChecked);
   });
 
   // Attach event listener for genre checkboxes
   $('.genre-checkbox').change(function() {
-    // If "All Genres" checkbox is selected, deselect all individual genre checkboxes
+    var isChecked = $(this).prop('checked');
+    var parentGenre = $(this).data('parent-genre');
+
     if ($(this).prop('id') === 'all-genres') {
-      $('.genre-checkbox').not(this).prop('checked', false);
+      // If "All Genres" checkbox is selected, deselect all individual genre checkboxes
+      $('.genre-checkbox').not(this).prop('checked', isChecked);
     } else {
       // If an individual genre checkbox is selected, deselect the "All Genres" checkbox
       $('#all-genres').prop('checked', false);
     }
+
+    // Check/uncheck subgenre checkboxes corresponding to the selected genre
+    if (isChecked) {
+      $('.subgenre-checkbox[data-parent-genre="' + parentGenre + '"]').prop('checked', true);
+    } else {
+      $('.subgenre-checkbox[data-parent-genre="' + parentGenre + '"]').prop('checked', false);
+    }
     applyFilters();
   });
+
 
   // Attach event listener for subgenre checkboxes
   $('.subgenre-checkbox').change(function() {
@@ -155,7 +253,7 @@
     // Get selected filter values
     var bandTypeValue = [];
     var allTypesSelected = false;
-
+    var searchQuery = $('#address-input').val();
     $('.filter-checkbox:checked').each(function() {
       var filterValue = $(this).val();
 
@@ -198,15 +296,13 @@
 
     var mergedGenres = selectedGenres.concat(selectedSubgenres)
 
-    // Get search query
-    var searchQuery = $('#search-input').val();
-
     // Send AJAX request to fetch filtered data
+
     $.ajax({
       url: '/venues/filter',
       method: 'GET',
       data: {
-        location: searchQuery,
+        search_query: searchQuery,
         band_type: bandTypeValue,
         genres: mergedGenres,
       },
@@ -222,22 +318,25 @@
 
   // Updates the table after filter
   function updateTable(data) {
+    var venues = data.venues;
+    var pagination = data.pagination;
     // Clear existing table content
     $('#venues tbody').empty();
 
     // Check if data is not null or empty array
-    if (data && data.length > 0) {
+    if (data.venues && data.venues.length > 0) {
       // Append new rows based on filtered data
-      data.forEach(function(venue) {
+      data.venues.forEach(function(venue) {
+
         var rowHtml = `
-                <tr class="border-b odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-gray-900 even:dark:bg-gray-800">
-                    <th scope="row" class="whitespace-nowrap px-6 py-4 font-sans text-xl text-white">
+                <tr class="border-b odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+                    <th scope="row" class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
                         ${venue.name}
                     </th>
-                    <td class="whitespace-nowrap px-6 py-4 font-sans text-xl text-white">
-                        ${venue.location}
+                    <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
+                        ${venue.postal_town}
                     </td>
-                    <td class="flex gap-4 whitespace-nowrap px-6 py-4 font-sans text-xl text-white">
+                    <td class="flex gap-4 whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
                         <!-- Contact links -->
                         ${venue.contact_number ? '<a href="tel:' + venue.contact_number + '"><span class="fas fa-phone"></span></a>' : ''}
                         ${venue.contact_email ? '<a href="mailto:' + venue.contact_email + '"><span class="fas fa-envelope"></span></a>' : ''}
@@ -261,7 +360,7 @@
                             }
                         }).join('') : ''}
                     </td>
-                    <td class="whitespace-nowrap px-6 py-4 font-sans text-xl text-white">
+                    <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
                         <!-- Promoter names -->
                         ${venue.promoters ? venue.promoters.map(function(promoter) {
                             return '<a href="' + promoter.url + '">' + promoter.name + '</a>';
@@ -282,9 +381,11 @@
     }
   }
 
-  // Event handler for "All Types" checkbox
-  $("#all-bands").change(function() {
-    var isChecked = $(this).prop("checked");
-    $(".filter-checkbox").prop("checked", isChecked);
-  });
+
+  function setLocationCoordinates(key, lat, lng) {
+    const latitudeField = document.getElementById(key + "-" + "latitude");
+    const longitudeField = document.getElementById(key + "-" + "longitude");
+    latitudeField.value = lat;
+    longitudeField.value = lng;
+  }
 </script>

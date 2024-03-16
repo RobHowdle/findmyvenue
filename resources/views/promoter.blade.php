@@ -56,9 +56,7 @@
           </div>
         </div>
       </div>
-      {{-- {{ $dataTable->table() }} --}}
-      <div
-        class="wrapper-body row-finderend-3 col-span-1 row-start-2 mt-4 overflow-x-auto pr-8 shadow-md sm:rounded-lg">
+      <div class="wrapper-body col-span-1 row-start-2 row-end-3 mt-4 overflow-x-auto pr-8 shadow-md sm:rounded-lg">
         <h2 class="font-sans text-2xl underline">About Me</h2>
         <p class="pt-2 font-sans text-xl">{{ $promoter->about_me }}</p>
         <h3 class="mt-4 font-sans text-2xl underline">My Venues</h3>

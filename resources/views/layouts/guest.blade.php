@@ -21,38 +21,59 @@
 </head>
 
 <body class="font-sans antialiased">
-  <div class="overlay">
-    <div class="bg-hero-bg flex min-h-screen flex-col items-center pt-6 sm:justify-center sm:pt-0">
-      <div>
-        @if (Route::has('login'))
-          <div id="navbar" class="z-10 flex w-full justify-between p-6 text-right sm:fixed sm:right-0 sm:top-0">
-            <a href="{{ url('/') }}"
-              class="font-heading text-2xl font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-gray-400">Home</a>
-            <a href="{{ url('/venues') }}"
-              class="font-heading text-2xl font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-gray-400">Venues</a>
-            <a href="{{ url('/promoters') }}"
-              class="font-heading text-2xl font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-gray-400">Promoters</a>
-            <a href="{{ url('/other') }}"
-              class="font-heading text-2xl font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-gray-400">Other</a>
+  @if (Route::has('login'))
+    <nav class="border-gray-200 bg-white dark:bg-gray-900">
+      <div class="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between px-2 py-4 md:px-4 md:py-8">
+        <a href="{{ url('/') }}" class="flex items-center space-x-3 rtl:space-x-reverse">
+          <img src="https://flowbite.com/docs/images/logo.svg" class="h-8"
+            alt="{{ config('app.name', 'Laravel') }} Logo" />
+          <span class="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">Giggerz</span>
+        </a>
+        <button data-collapse-toggle="navbar-default" type="button"
+          class="inline-flex h-10 w-10 items-center justify-center rounded-lg p-2 text-sm text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600 md:hidden"
+          aria-controls="navbar-default" aria-expanded="false">
+          <span class="sr-only">Open main menu</span>
+          <svg class="h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M1 1h15M1 7h15M1 13h15" />
+          </svg>
+        </button>
+        <div class="hidden w-full md:block md:w-auto" id="navbar-default">
+          <ul
+            class="mt-4 flex flex-col rounded-lg border border-gray-100 bg-gray-50 p-4 font-medium rtl:space-x-reverse dark:border-gray-700 dark:bg-gray-800 md:mt-0 md:flex-row md:space-x-8 md:border-0 md:bg-white md:p-0 md:dark:bg-gray-900">
+            <li>
+              <a href="{{ url('/venues') }}"
+                class="font-heading text-2xl font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-gray-400">Venues</a>
+            </li>
+            <li>
+              <a href="{{ url('/promoters') }}"
+                class="font-heading text-2xl font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-gray-400">Promoters</a>
+            </li>
+            <li>
+              <a href="{{ url('/other') }}"
+                class="font-heading text-2xl font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-gray-400">Other</a>
+            </li>
             @auth
-              <a href="{{ url('/dashboard') }}"
-                class="font-heading text-2xl font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-gray-400">Dashboard</a>
+              <li>
+                <a href="{{ url('/dashboard') }}"
+                  class="font-heading text-2xl font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-gray-400">Dashboard</a>
+              </li>
             @else
-              <a href="{{ route('login') }}"
-                class="font-heading text-2xl font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-gray-400">Log
-                In</a>
+              <li>
+                <a href="{{ url('/login') }}"
+                  class="font-heading text-2xl font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-gray-400">Login</a>
+              </li>
             @endauth
-          </div>
-        @endif
+          </ul>
+        </div>
       </div>
-
-      <div class="w-full overflow-hidden px-6 py-4">
-        {{ $slot }}
-      </div>
-    </div>
+    </nav>
+  @endif
+  <div
+    class="bg-hero-bg flex h-[calc(100vh-96px)] w-full items-center justify-center overflow-auto px-2 backdrop-brightness-50">
+    {{ $slot }}
   </div>
   @stack('scripts')
-
   <script>
     // Get the navbar element
     const navbar = document.getElementById('navbar');
