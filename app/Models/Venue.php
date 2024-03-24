@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Promoter;
+use App\Models\VenueReview;
 use App\Models\PromoterVenue;
 use App\Models\VenueExtraInfo;
 use Illuminate\Support\Facades\DB;
@@ -43,5 +44,10 @@ class Venue extends Model
     public function promoters()
     {
         return $this->belongsToMany(Promoter::class, 'promoter_venue_pivot', 'venues_id', 'promoters_id');
+    }
+
+        public function review()
+    {
+        return $this->hasMany(VenueReview::class);
     }
 }

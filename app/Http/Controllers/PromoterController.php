@@ -23,7 +23,7 @@ class PromoterController extends Controller
         // Process each promoter
         foreach ($promoters as $promoter) {
             // Split the field containing multiple URLs into an array
-            $urls = explode(',', $promoter->contact_link); // Assuming the field name is 'contact_links'
+            $urls = explode(',', $promoter->contact_link);
             $platforms = [];
 
             // // Check each URL against the platforms
@@ -60,9 +60,8 @@ class PromoterController extends Controller
     public function show(string $id)
     {
         $promoter = Promoter::where('id', $id)->first();
-
             // Split the field containing multiple URLs into an array
-            $urls = explode(',', $promoter->contact_link); // Assuming the field name is 'contact_links'
+            $urls = explode(',', $promoter->contact_link);
             $platforms = [];
 
             // // Check each URL against the platforms

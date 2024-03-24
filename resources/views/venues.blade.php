@@ -335,29 +335,29 @@
                         ${venue.contact_email ? '<a href="mailto:' + venue.contact_email + '"><span class="fas fa-envelope"></span></a>' : ''}
                         <!-- Additional processing for contact links -->
                         ${venue.platforms ? venue.platforms.map(function(platform) {
-                            switch (platform.platform) {
-                                case 'facebook':
-                                    return '<a href="' + platform.url + '" target=_blank><span class="fab fa-facebook"></span></a>';
-                                case 'twitter':
-                                    return '<a href="' + platform.url + '" target=_blank><span class="fab fa-twitter"></span></a>';
-                                case 'instagram':
-                                    return '<a href="' + platform.url + '" target=_blank><span class="fab fa-instagram"></span></a>';
-                                case 'snapchat':
-                                    return '<a href="' + platform.url + '" target=_blank><span class="fab fa-snapchat-ghost"></span></a>';
-                                case 'tiktok':
-                                    return '<a href="' + platform.url + '" target=_blank><span class="fab fa-tiktok"></span></a>';
-                                case 'youtube':
-                                    return '<a href="' + platform.url + '" target=_blank><span class="fab fa-youtube"></span></a>';
-                                default:
-                                    return '';
-                            }
-                        }).join('') : ''}
+                switch (platform.platform) {
+                    case 'facebook':
+                        return '<a href="' + platform.url + '" target=_blank><span class="fab fa-facebook"></span></a>';
+                    case 'twitter':
+                        return '<a href="' + platform.url + '" target=_blank><span class="fab fa-twitter"></span></a>';
+                    case 'instagram':
+                        return '<a href="' + platform.url + '" target=_blank><span class="fab fa-instagram"></span></a>';
+                    case 'snapchat':
+                        return '<a href="' + platform.url + '" target=_blank><span class="fab fa-snapchat-ghost"></span></a>';
+                    case 'tiktok':
+                        return '<a href="' + platform.url + '" target=_blank><span class="fab fa-tiktok"></span></a>';
+                    case 'youtube':
+                        return '<a href="' + platform.url + '" target=_blank><span class="fab fa-youtube"></span></a>';
+                    default:
+                        return '';
+                }
+            }).join('') : ''}
                     </td>
                     <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
                         <!-- Promoter names -->
                         ${venue.promoters ? venue.promoters.map(function(promoter) {
-                            return '<a href="' + promoter.url + '">' + promoter.name + '</a>';
-                        }).join('') : ''}
+                return '<a href="' + promoter.url + '">' + promoter.name + '</a>';
+            }).join('') : ''}
                     </td>
                 </tr>
             `;
@@ -373,6 +373,7 @@
       $('#venues tbody').append(noVenuesRow);
     }
   }
+
 
 
   function setLocationCoordinates(key, lat, lng) {

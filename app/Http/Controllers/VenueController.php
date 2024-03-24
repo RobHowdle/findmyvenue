@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Venue;
+use App\Models\VenueReview;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 
 class VenueController extends Controller
@@ -25,36 +27,20 @@ class VenueController extends Controller
             })
             ->paginate(10);
 
-        if ($request->ajax()) {
-            return response()->json([
-                'venues' => $venues,
-                'view' => view('partials.venue-list', compact('venues'))->render()
-            ]);
-        }
-
         // Fetch genres for initial page load
         $genreList = file_get_contents(storage_path('app/public/text/genre_list.json'));
         $data = json_decode($genreList, true);
         $genres = $data['genres'];
 
+        if ($request->ajax()) {
+            return response()->json([
+                'venues' => $venues,
+                'view' => view('partials.venue-list', compact('venues', 'genres'))->render()
+            ]);
+        }
+
         // Return the initial view
         return view('venues', compact('venues', 'genres'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
     }
 
     /**
@@ -66,7 +52,6 @@ class VenueController extends Controller
             // Split the field containing multiple URLs into an array
             if($venue->contact_link) {
                 $urls = explode(',', $venue->contact_link);
-                dump($urls);
                 $platforms = [];
             }
 
@@ -93,34 +78,21 @@ class VenueController extends Controller
 
             // Add the processed data to the venue
             $venue->platforms = $platforms;
+            $venue->recentReviews = VenueReview::getRecentReviewsForPromoter($id);
+
+            // Get Review Scores
+            $overallReview = VenueReview::calculateOverallScore($id);
+            $averageCommunicationRating = VenueReview::calculateAverageScore($id, 'communication_rating');
+            $averageRopRating = VenueReview::calculateAverageScore($id, 'rop_rating');
+            $averagePromotionRating = VenueReview::calculateAverageScore($id, 'promotion_rating');
+            $averageQualityRating = VenueReview::calculateAverageScore($id, 'quality_rating');
+            $reviewCount = VenueReview::getReviewCount($id);
+
+
 
             $genres = json_decode($venue->genre);
 
-        return view('venue', compact('venue', 'genres'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return view('venue', compact('venue', 'genres', 'overallReview', 'averageCommunicationRating', 'averageRopRating', 'averagePromotionRating', 'averageQualityRating', 'reviewCount'));
     }
 
     public function locations()
@@ -166,9 +138,15 @@ class VenueController extends Controller
         // Merge the search results and remove duplicates
         $venues = $venuesByCoordinates->merge($venuesByAddress)->unique();
 
+        // Fetch genres for initial page load
+        $genreList = file_get_contents(storage_path('app/public/text/genre_list.json'));
+        $data = json_decode($genreList, true);
+        $genres = $data['genres'];
+
         // Pass the search results to the view
-        return view('venues', compact('venues'));
+        return view('venues', compact('venues', 'genres'));
     }
+
 
     public function filterCheckboxesSearch(Request $request)
     {
@@ -217,4 +195,39 @@ class VenueController extends Controller
         return response()->json($transformedData);
     }
 
+    public function submitVenueReview(Request $request, Venue $id)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'communication-rating' => 'required',
+                'rop-rating' => 'required',
+                'promotion-rating' => 'required',
+                'quality-rating' => 'required',
+                'review_author' => 'required',
+                'review_message' => 'required'
+            ]);
+
+            if ($validator->fails()) {
+                return back()->withErrors($validator)->withInput();
+            }
+
+            VenueReview::create([
+                'venue_id' => $id['id'],
+                'communication_rating' => $request->input('communication-rating'),
+                'rop_rating' => $request->input('rop-rating'),
+                'promotion_rating' => $request->input('promotion-rating'),
+                'quality_rating' => $request->input('quality-rating'),
+                'author' => $request->input('review_author'),
+                'review' => $request->input('review_message'),
+            ]);
+
+            return back()->with('success', 'Review submitted successfully.');
+        } catch (\Exception $e) {
+            // Log the error
+            Log::error('Error submitting review: ' . $e->getMessage());
+
+            // Optionally, you can return an error response or redirect to an error page
+            return back()->with('error', 'An error occurred while submitting the review. Please try again later.')->withInput();
+        }
+    }
 }

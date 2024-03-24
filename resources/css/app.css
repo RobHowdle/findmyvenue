@@ -237,6 +237,21 @@ background-color: black;
     transition-timing-function: ease;
 }
 
+.venue-logo {
+    max-width: 250px;
+    
+}
+
+.band-types-list,
+.genre-list {
+    list-style-type: disc;
+}
+
+.band-types-list li::marker,
+.genre-list li::marker {
+    color: var(--color-white);
+}
+
 /* Admin Page */
 .genres-wrapper {
     grid-template-columns: repeat(3, 1fr);
