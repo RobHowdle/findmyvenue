@@ -49,68 +49,68 @@ class VenueController extends Controller
     public function show(string $id)
     {
         $venue = Venue::where('id', $id)->first();
-            // Split the field containing multiple URLs into an array
-            if($venue->contact_link) {
-                $urls = explode(',', $venue->contact_link);
-                $platforms = [];
-            }
+        $venueId = $venue->id;
+        // Split the field containing multiple URLs into an array
+        if ($venue->contact_link) {
+            $urls = explode(',', $venue->contact_link);
+            $platforms = [];
+        }
 
-            // // Check each URL against the platforms
-            foreach ($urls as $url) {
-                // Initialize the platform as unknown
-                $matchedPlatform = 'Unknown';
+        // // Check each URL against the platforms
+        foreach ($urls as $url) {
+            // Initialize the platform as unknown
+            $matchedPlatform = 'Unknown';
 
-                // Check if the URL contains platform names
-                $platformsToCheck = ['facebook', 'twitter', 'instagram'];
-                foreach ($platformsToCheck as $platform) {
-                    if (stripos($url, $platform) !== false) {
-                        $matchedPlatform = $platform;
-                        break; // Stop checking once a platform is found
-                    }
+            // Check if the URL contains platform names
+            $platformsToCheck = ['facebook', 'twitter', 'instagram'];
+            foreach ($platformsToCheck as $platform) {
+                if (stripos($url, $platform) !== false) {
+                    $matchedPlatform = $platform;
+                    break; // Stop checking once a platform is found
                 }
-
-                // Store the platform information for each URL
-                $platforms[] = [
-                    'url' => $url,
-                    'platform' => $matchedPlatform
-                ];
             }
 
-            // Add the processed data to the venue
-            $venue->platforms = $platforms;
-            $venue->recentReviews = VenueReview::getRecentReviewsForPromoter($id);
+            // Store the platform information for each URL
+            $platforms[] = [
+                'url' => $url,
+                'platform' => $matchedPlatform
+            ];
+        }
 
-            // Get Review Scores
-            $overallReview = VenueReview::calculateOverallScore($id);
-            $averageCommunicationRating = VenueReview::calculateAverageScore($id, 'communication_rating');
-            $averageRopRating = VenueReview::calculateAverageScore($id, 'rop_rating');
-            $averagePromotionRating = VenueReview::calculateAverageScore($id, 'promotion_rating');
-            $averageQualityRating = VenueReview::calculateAverageScore($id, 'quality_rating');
-            $reviewCount = VenueReview::getReviewCount($id);
+        // Add the processed data to the venue
+        $venue->platforms = $platforms;
+        $venue->recentReviews = VenueReview::getRecentReviewsForPromoter($id);
+
+        // Get Review Scores
+        $overallReview = VenueReview::calculateOverallScore($id);
+        $averageCommunicationRating = VenueReview::calculateAverageScore($id, 'communication_rating');
+        $averageRopRating = VenueReview::calculateAverageScore($id, 'rop_rating');
+        $averagePromotionRating = VenueReview::calculateAverageScore($id, 'promotion_rating');
+        $averageQualityRating = VenueReview::calculateAverageScore($id, 'quality_rating');
+        $reviewCount = VenueReview::getReviewCount($id);
 
 
 
-            $genres = json_decode($venue->genre);
+        $genres = json_decode($venue->genre);
 
-        return view('venue', compact('venue', 'genres', 'overallReview', 'averageCommunicationRating', 'averageRopRating', 'averagePromotionRating', 'averageQualityRating', 'reviewCount'));
+        return view('venue', compact('venue', 'genres', 'overallReview', 'averageCommunicationRating', 'averageRopRating', 'averagePromotionRating', 'averageQualityRating', 'reviewCount', 'venueId'));
     }
 
     public function locations()
     {
         $locations = Venue::whereNull('deleted_at')
-                        ->select('postal_town', DB::raw('COUNT(*) as count'))
-                        ->groupBy('postal_town')
-                        ->get();
+            ->select('postal_town', DB::raw('COUNT(*) as count'))
+            ->groupBy('postal_town')
+            ->get();
 
         return view('locations', compact('locations'));
     }
 
     public function filterByCoordinates(Request $request)
     {
-        // Get latitude and longitude from the request
         $latitude = $request->input('latitude');
         $longitude = $request->input('longitude');
-        
+
         // Filter venues by latitude and longitude
         $venuesByCoordinates = Venue::where('latitude', $latitude)
             ->where('longitude', $longitude)
@@ -125,7 +125,7 @@ class VenueController extends Controller
             list($town, $address) = explode(',', $searchQuery);
 
             // Perform search for venues matching the town or the address
-            $venuesByAddress = Venue::where(function($query) use ($town, $address) {
+            $venuesByAddress = Venue::where(function ($query) use ($town, $address) {
                 $query->where('postal_town', 'LIKE', "%$address%")
                     ->orWhere('postal_town', 'LIKE', "%$town%");
             })->get();
@@ -134,7 +134,7 @@ class VenueController extends Controller
             $venuesByAddress = Venue::where('postal_town', 'LIKE', "%$searchQuery%")
                 ->get();
         }
-        
+
         // Merge the search results and remove duplicates
         $venues = $venuesByCoordinates->merge($venuesByAddress)->unique();
 
@@ -143,7 +143,6 @@ class VenueController extends Controller
         $data = json_decode($genreList, true);
         $genres = $data['genres'];
 
-        // Pass the search results to the view
         return view('venues', compact('venues', 'genres'));
     }
 
@@ -181,7 +180,7 @@ class VenueController extends Controller
                 });
             }
         }
-        
+
         $venues = $query->paginate(10);
 
         $transformedData = [
@@ -191,7 +190,7 @@ class VenueController extends Controller
                 'last_page' => $venues->lastPage(),
             ]
         ];
-        
+
         return response()->json($transformedData);
     }
 

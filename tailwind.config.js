@@ -12,8 +12,8 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ["Kite One", "sans-serif"],
-                heading: ["Kings", "sans-serif"],
+                sans: ["Raleway", "sans-serif"],
+                heading: ["Roboto", "sans-serif"],
             },
             colors: {
                 opacBlack: "rgba(255,255,255,0.4)",

@@ -12,20 +12,22 @@
         @foreach ($otherServices as $other)
           <div class="service-block justify-self-center text-center text-white">
             @if ($other->services == 'Photography')
-              <img src="{{ asset('storage/images/photography.jpg') }}">
-              <p class="bg-black px-6 py-2 text-white">{{ $other->services }}</p>
+              <div class="service-overlay">
+                <img src="{{ asset('storage/images/photography.jpg') }}">
+                <p class="bg-black px-6 py-2 text-white">{{ $other->services }}</p>
+              </div>
             @elseif($other->services == 'Videography')
-              <div class="overlay">
+              <div class="service-overlay">
                 <img src="{{ asset('storage/images/videography.jpg') }}">
                 <p class="bg-black px-6 py-2 text-white">{{ $other->services }}</p>
               </div>
             @elseif($other->services == 'Graphics Design')
-              <div class="overlay">
+              <div class="service-overlay">
                 <img src="{{ asset('storage/images/designer.jpg') }}">
                 <p class="bg-black px-6 py-2 text-white">{{ $other->services }}</p>
               </div>
             @elseif($other->services == 'Band')
-              <div class="overlay">
+              <div class="service-overlay">
                 <img src="{{ asset('storage/images/band.jpeg') }}">
                 <p class="bg-black px-6 py-2 text-white">{{ $other->services }}</p>
               </div>

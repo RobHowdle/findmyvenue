@@ -3,7 +3,7 @@
 <div class="mx-auto w-full max-w-screen-xl">
   <h1 class="mt-6 text-center font-heading text-6xl text-white">Venues</h1>
   <div class="relative shadow-md sm:rounded-lg">
-    <div class="search-wrapper flex justify-center border-2 border-white">
+    <div class="search-wrapper flex justify-center border-2 border-white dark:bg-black">
       <form class="filter-search flex items-center sm:p-1 md:p-3" action="{{ route('venues.filterCheckboxesSearch') }}"
         method="GET">
         <div class="filters relative flex items-center">
@@ -121,7 +121,7 @@
       <table class="w-full border-b-2 border-l-2 border-r-2 border-white text-left font-sans rtl:text-right"
         id="venues">
         <!-- Table headers -->
-        <thead class="text-white underline">
+        <thead class="text-white underline dark:bg-black">
           <tr>
             <th scope="col" class="md-text-2xl sm:px-2 sm:py-2 sm:text-xl md:px-6 md:py-3 lg:px-8 lg:py-4">Venue
             </th>
@@ -141,7 +141,7 @@
     </div>
     <!-- Pagination links -->
     <div class="mt-4 px-6 py-3">
-      @if ($venues->isNotEmpty())
+      @if ($venues->count() >= 10)
         {{ $venues->links() }}
       @endif
     </div>

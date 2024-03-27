@@ -329,6 +329,8 @@
       </div>
     </div>
 
+    {{-- <x-promoter-suggestions :venueId="$venueId" :filters="$filters" /> --}}
+
     {{-- Review Modal --}}
     <!-- Main modal -->
     <div id="review-modal" tabindex="-1" aria-hidden="true"
