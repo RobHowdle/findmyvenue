@@ -16,19 +16,23 @@
         <div class="socials-wrapper flex flex-row gap-4">
           @if ($venue->contact_number || $venue->contact_email || $venue->contact_link ?? 'N/A')
             @if ($venue->contact_number)
-              <a href="tel:{{ $venue->contact_number }}"><span class="fas fa-phone"></span></a>
+              <a class="hover:text-white" href="tel:{{ $venue->contact_number }}"><span class="fas fa-phone"></span></a>
             @endif
             @if ($venue->contact_email)
-              <a href="mailto:{{ $venue->contact_email }}"><span class="fas fa-envelope"></span></a>
+              <a class="hover:text-white" href="mailto:{{ $venue->contact_email }}"><span
+                  class="fas fa-envelope"></span></a>
             @endif
             @if ($venue->platforms)
               @foreach ($venue->platforms as $platform)
                 @if ($platform['platform'] == 'facebook')
-                  <a href="{{ $platform['url'] }}" target=_blank><span class="fab fa-facebook"></span></a>
+                  <a class="hover:text-white" href="{{ $platform['url'] }}" target=_blank><span
+                      class="fab fa-facebook"></span></a>
                 @elseif($platform['platform'] == 'twitter')
-                  <a href="{{ $platform['url'] }}" target=_blank><span class="fab fa-twitter"></span></a>
+                  <a class="hover:text-white" href="{{ $platform['url'] }}" target=_blank><span
+                      class="fab fa-twitter"></span></a>
                 @elseif($platform['platform'] == 'instagram')
-                  <a href="{{ $platform['url'] }}" target=_blank><span class="fab fa-instagram"></span></a>
+                  <a class="hover:text-white" href="{{ $platform['url'] }}" target=_blank><span
+                      class="fab fa-instagram"></span></a>
                 @endif
               @endforeach
             @endif
@@ -260,8 +264,15 @@
 
           <div id="other">
             @if ($venue->capacity)
-              <p>Other Information you may want to know about {{ $venue->name }}:</p>
-              <p>Capacity: {{ $venue->capacity }}</p>
+              <p class="bold pb-2 text-2xl">Other Information you may want to know about {{ $venue->name }}.</p>
+              @if ($venue->contact_name)
+                <p>Person(s) To Speak To: {{ $venue->contact_name }}</p>
+              @endif
+              @if ($venue->capacity)
+                <p class="pb-2">Capacity: {{ $venue->capacity }}</p>
+              @endif
+              <p class="bold pb-2 pt-2 text-2xl">More Info:</p>
+              <p class="pb-2">{!! nl2br(e($venue->additional_info)) !!}</p>
           </div>
         @else
           <p>No Further Information Avaliable</p>
