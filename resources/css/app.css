@@ -10,6 +10,138 @@
     --color-blue-light: rgba(2, 2, 35, 0.85);
 }
 
+/* Preloader */
+@keyframes music-first{
+    0% {
+        height: 20px;
+    }
+    100% {
+        height: 70px;
+    }
+}
+@keyframes music-sec{
+    0% {
+        height: 20px;
+    }
+    100% {
+        height: 90px;
+    }
+}
+@keyframes music-third{
+    0% {
+        height: 20px;
+    }
+    100% {
+        height: 100px;
+    }
+}
+@keyframes blink{
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+.pre-overlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-blue-light);
+    z-index: 50;
+    transition: all 1.8s ease;
+}
+.pre-overlay.o-1 {
+    left: 0;
+    top: 0;
+}
+.pre-overlay.o-2 {
+    right: 0;
+    bottom: 0;
+}
+#preloader {
+    display: flex;
+    position: fixed;
+    z-index: 100;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+#preloader p {
+    font-size: 20px;
+    color: var(--color-white);
+    margin: 25px auto auto auto;
+    text-transform: uppercase;
+    text-align: center;
+}
+#preloader.animation p {
+    animation-name: blink;
+    animation-duration: .85s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in;
+    animation-direction: alternate;
+}
+#preloader .decor {
+    width: 30px;
+    height: 100px;
+    margin: auto auto 0 auto;
+    position: relative;
+}
+#preloader .decor .bar {
+    height: 100px;
+    background-color: var(--color-white);
+    position: absolute;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+}
+#preloader.animation .decor .bar {
+    animation-name: music-sec;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in;
+    animation-direction: alternate;
+    max-height: 90px;
+}
+#preloader .decor::before {
+    display: block;
+    content: "";
+    width: 30px;
+    height: 70px;
+    position: absolute;
+    left: -45px;
+    bottom: 0px;
+    background-color: var(--color-white);
+}
+#preloader.animation .decor::before {
+    animation-name: music-first;
+    animation-duration: 0.5s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in;
+    animation-direction: alternate;
+}
+#preloader .decor::after {
+    display: block;
+    content: "";
+    width: 30px;
+    height: 70px;
+    background-color: var(--color-white);
+    left: 45px;
+    bottom:  0;
+    position: absolute;
+}
+#preloader.animation .decor::after {
+    animation-name: music-third;
+    animation-duration: .75s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease;
+    animation-direction: alternate;
+}
+#preloader.over {
+    display: none;
+}
+
 
 body {
     background-image: url('../../storage/app/public/images/hero-bg.jpg');

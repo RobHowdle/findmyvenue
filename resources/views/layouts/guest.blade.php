@@ -21,6 +21,15 @@
 </head>
 
 <body class="font-sans antialiased">
+  <div id="preloader" class="animation">
+    <div class="decor">
+      <div class="bar"></div>
+    </div>
+    <p>Loading...</p>
+  </div>
+
+  <div class="pre-overlay o-1"></div>
+  <div class="pre-overlay o-2"></div>
   @if (Route::has('login'))
     <nav class="border-gray-200 bg-white dark:bg-gray-900">
       <div class="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between px-2 py-4 md:px-4 md:py-8">
@@ -76,6 +85,38 @@
   </div>
   @stack('scripts')
   <script>
+    $(document).ready(function() {
+      var startTime = performance.now(); // Record the start time when the document is ready
+
+      // Function to hide the loader and overlay
+      function hideLoader() {
+        $("#preloader").delay(100).removeClass("animation").addClass("over");
+        $(".pre-overlay").css({
+          "height": "0%"
+        });
+      }
+
+      // Function to calculate loading time and decide whether to show the loader
+      function checkLoadingTime() {
+        var endTime = performance.now(); // Record the end time after the document is fully loaded
+        var loadingTime = endTime - startTime; // Calculate the loading time in milliseconds
+
+        // Check if the loading time exceeds a threshold (e.g., 1000 milliseconds)
+        if (loadingTime > 1000) {
+          // Show the loader if loading time exceeds the threshold
+          setTimeout(hideLoader, 4000);
+        } else {
+          // Hide the loader if loading time is fast
+          hideLoader();
+        }
+      }
+
+      // Call the function to check loading time when the document is fully loaded
+      $(window).on('load', function() {
+        checkLoadingTime();
+      });
+    });
+
     // Get the navbar element
     const navbar = document.getElementById('navbar');
 
