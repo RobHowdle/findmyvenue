@@ -5,7 +5,7 @@
     </h1>
   </x-slot>
 
-  <div class="venue-wrapper relative mx-auto my-6 w-full max-w-screen-xl p-8">
+  <div class="venue-wrapper min-w-screen-xl relative mx-auto my-6 w-full max-w-screen-xl p-8">
     <div class="header flex gap-4">
       @if ($venue->logo_url)
         <img src="{{ asset($venue->logo_url) }}" alt="{{ $venue->name }} Logo" class="venue-logo">
