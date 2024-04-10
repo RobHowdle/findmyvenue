@@ -23,6 +23,18 @@
           <form class="mt-2" action="{{ route('admin.new-venue') }}" method="POST">
             @csrf
             <div class="group relative z-0 mb-5 w-full">
+              <input type="search" name="address-input" id="address-input" value="{{ old('address-input') }}"
+                class="map-input peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
+                placeholder=" " required />
+              <label for="address-input"
+                class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">Location
+                <span>(Town/ City)</span></label>
+              @error('address-input')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
+            </div>
+
+            <div class="group relative z-0 mb-5 w-full">
               <input type="text" name="floating_name" id="floating_name" value="{{ old('floating_name') }}"
                 class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
                 placeholder=" " required />
@@ -35,22 +47,11 @@
               @enderror
             </div>
 
-            <div class="group relative z-0 mb-5 w-full">
-              <input type="search" name="address-input" id="address-input" value="{{ old('address-input') }}"
-                class="map-input peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-                placeholder=" " required />
-              <label for="address-input"
-                class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">Location</label>
-              @error('address-input')
-                <span class="text-danger">{{ $message }}</span>
-              @enderror
-            </div>
-
             <div id="address-map-container" style="width: 100%; height: 400px; display: none;">
               <div style="width: 100%; height: 100%;" id="address-map"></div>
             </div>
 
-            <div class="group relative z-0 mb-5 w-full">
+            <div class="group relative z-0 mb-5 hidden w-full">
               <input
                 class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
                 type="text" id="postal-town-input" name="postal-town-input" placeholder="Postal Town Input"
@@ -80,18 +81,34 @@
             </div>
 
             <div class="group relative z-0 mb-5 w-full">
-              <input type="text" name="floating_in_house_gear" id="floating_in_house_gear"
+              <textarea type="text" name="floating_in_house_gear" id="floating_in_house_gear"
                 value="{{ old('floating_in_house_gear') }}"
-                class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-                placeholder=" " required />
+                class="venues-textarea peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
+                placeholder=" " required></textarea>
               <label for="floating_in_house_gear"
                 class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
-                In House Gear (Separate by comma)
+                In House Gear
               </label>
               @error('floating_in_house_gear')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
+
+            <div class="group relative z-0 mb-5 w-full">
+              <label class="text-sm font-medium text-gray-900 dark:text-gray-300">Existing Promoter</label>
+              <select id="existingPromoter" name="existingPromoter"
+                class="form-select mt-1 block rounded-lg border-gray-300 bg-white shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:focus:border-blue-500 dark:focus:ring-blue-500">
+                <option value="">None</option>
+                @foreach ($promoters as $promoter)
+                  <option value="{{ $promoter->id }}">{{ $promoter->name }}</option>
+                @endforeach
+              </select>
+
+              @error('existingPromoter')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
+            </div>
+
 
             <div class="group relative z-0 mb-5 w-full">
               <label class="text-sm font-medium text-gray-900 dark:text-gray-300">Preferred Band Types</label>
@@ -231,6 +248,19 @@
                 Contact Links (Separate by comma)
               </label>
               @error('floating_contact_links')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
+            </div>
+
+            <div class="group relative z-0 mb-5 w-full">
+              <textarea type="text" name="extra_info" id="extra_info" value="{{ old('extra_info') }}"
+                class="venues-textarea peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
+                placeholder=" " required></textarea>
+              <label for="extra_info"
+                class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
+                Extra Information
+              </label>
+              @error('extra_info')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
@@ -380,15 +410,24 @@
       var checkboxes = document.querySelectorAll('.band-type-checkbox');
       checkboxes.forEach(function(checkbox) {
         checkbox.checked = this.checked;
-      });
+      }, this); // Added 'this' as the second argument to maintain the correct context
     });
 
     // Event handler for "All Genres" checkbox
-    document.getElementById('all-types').addEventListener('change', function() {
-      var checkboxes = document.querySelectorAll('.band-type-checkbox');
+    document.getElementById('all-genres').addEventListener('change', function() {
+      var checkboxes = document.querySelectorAll('.genre-checkbox');
       checkboxes.forEach(function(checkbox) {
         checkbox.checked = this.checked;
-      });
+      }, this); // Added 'this' as the second argument to maintain the correct context
+    });
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var dropdownButton = document.getElementById('dropdownDefaultButton');
+    var dropdownMenu = document.getElementById('dropdown');
+
+    dropdownButton.addEventListener('click', function() {
+      dropdownMenu.classList.toggle('hidden');
     });
   });
 </script>

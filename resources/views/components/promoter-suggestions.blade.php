@@ -1,3 +1,7 @@
-<div>
-    <!-- No surplus words or unnecessary actions. - Marcus Aurelius -->
-</div>
+{{-- <div>
+  @if ($existingPromoters)
+    {{ $existingPromoters }}
+  @elseif($promotersByLocation)
+    {{ $promotersByLocation }}
+  @endif
+</div> --}}

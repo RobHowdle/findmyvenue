@@ -51,8 +51,9 @@
           @endif
         </div>
         <div class="leave-review">
-          <button class="text-sm">Visited us? <span data-modal-target="review-modal" data-modal-toggle="review-modal"
-              type="button">Leave Us A Review</span></button>
+          <button class="px-6 py-2 text-sm text-gray-900 hover:bg-gray-600 hover:text-gray-300 dark:bg-gray-400">Visited
+            us? <span data-modal-target="review-modal" data-modal-toggle="review-modal" type="button">Leave Us A
+              Review</span></button>
         </div>
       </div>
     </div>
@@ -72,22 +73,20 @@
               <span class="fas fa-cogs mr-2"></span>In House Gear
             </a>
           </li>
-          {{-- <li class="tab me-2">
+          <li class="tab me-2">
             <a href="#" data-tab="band-types"
               class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:border-gray-300 hover:text-gray-600 dark:hover:text-gray-300">
-              <svg
-                class="me-2 h-4 w-4 text-gray-400 group-hover:text-gray-500 dark:text-gray-500 dark:group-hover:text-gray-300"
+              <svg class="me-2 h-4 w-4 text-white group-hover:text-white dark:text-white dark:group-hover:text-white"
                 aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   d="M5 11.424V1a1 1 0 1 0-2 0v10.424a3.228 3.228 0 0 0 0 6.152V19a1 1 0 1 0 2 0v-1.424a3.228 3.228 0 0 0 0-6.152ZM19.25 14.5A3.243 3.243 0 0 0 17 11.424V1a1 1 0 0 0-2 0v10.424a3.227 3.227 0 0 0 0 6.152V19a1 1 0 1 0 2 0v-1.424a3.243 3.243 0 0 0 2.25-3.076Zm-6-9A3.243 3.243 0 0 0 11 2.424V1a1 1 0 0 0-2 0v1.424a3.228 3.228 0 0 0 0 6.152V19a1 1 0 1 0 2 0V8.576A3.243 3.243 0 0 0 13.25 5.5Z" />
               </svg>Band Types
             </a>
-          </li> --}}
+          </li>
           <li class="tab me-2">
             <a href="#" data-tab="genres"
               class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:border-gray-300 hover:text-gray-600 dark:hover:text-gray-300">
-              <svg
-                class="me-2 h-4 w-4 text-gray-400 group-hover:text-gray-500 dark:text-gray-500 dark:group-hover:text-gray-300"
+              <svg class="me-2 h-4 w-4 text-white group-hover:text-white dark:text-white dark:group-hover:text-white"
                 aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
                 <path
                   d="M16 1h-3.278A1.992 1.992 0 0 0 11 0H7a1.993 1.993 0 0 0-1.722 1H2a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2Zm-3 14H5a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2Zm0-4H5a1 1 0 0 1 0-2h8a1 1 0 1 1 0 2Zm0-5H5a1 1 0 0 1 0-2h2V2h4v2h2a1 1 0 1 1 0 2Z" />
@@ -100,144 +99,76 @@
               <span class="fas fa-star mr-2"></span> Reviews
             </a>
           </li>
+          <li class="tab me-2">
+            <a href="#" data-tab="other"
+              class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:border-gray-300 hover:text-gray-600 dark:hover:text-gray-300">
+              <span class="fas fa-plus mr-2"></span> Other
+            </a>
+          </li>
         </ul>
       </div>
 
       <div class="venue-tab-content mt-4 overflow-auto font-sans text-lg text-white">
         <div id="about">
-          <p>{{ $venue->description }}</p>
+          @if (!$venue->decription)
+            <p>We're still working on this! Come back later to read about us!</p>
+          @else
+            <p>{{ $venue->description }}</p>
+          @endif
+        </div>
 
-          <p class="mt-4 text-xl underline">Band Types</p>
-          <p>We showcase:</p>
-          <ul class="band-types-list mb-2">
-            @php $bandTypes = json_decode($venue->band_type); @endphp
-            @foreach ($bandTypes as $type)
-              @switch($type)
-                @case('original-bands')
-                  <li class="ml-6">Original Bands</li>
-                @break
+        <div id="in-house-gear" class="max-h-80 flex h-full flex-col gap-4 overflow-auto">
+          @if (!$venue->in_house_gear)
+            <p>We do not have any avaliable in house gear to use so you will be required to bring your own. Please
+              contact
+              us if you have any questions about what you can bring.</p>
+          @else
+            <p>We have the following gear in house. If you require the use of anything imparticular please contact us.
+            </p>
+            <div class="gear-block flex flex-col">
+              <p class="text-base text-white">
+                <pre>{{ $venue->in_house_gear }}</pre>
+              </p>
+            </div>
+          @endif
+        </div>
 
-                @case('cover-bands')
-                  <li class="ml-6">Cover Bands</li>
-                @break
+        <div id="band-types">
+          @php $bandTypes = json_decode($venue->band_type); @endphp
+          @if (!$bandTypes)
+            <p>We don't have any specific band types listed, please contact us if you would like to enquire about
+              booking your band.
+            </p>
+          @else
+            <p>The band types that we usually have at {{ $venue->name }} are:</p>
+            <ul class="band-types-list mb-2">
+              @foreach ($bandTypes as $type)
+                @switch($type)
+                  @case('original-bands')
+                    <li class="ml-6">Original Bands</li>
+                  @break
 
-                @case('tribute-bands')
-                  <li class="ml-6">Tribute Bands</li>
-                @break
+                  @case('cover-bands')
+                    <li class="ml-6">Cover Bands</li>
+                  @break
 
-                @case('all-bands')
-                  <li class="ml-6">All Band Types</li>
+                  @case('tribute-bands')
+                    <li class="ml-6">Tribute Bands</li>
+                  @break
 
-                  @default
-                @endswitch
-              @endforeach
-            </ul>
-            <p>If you would like to enquire about a show, please contact us.</p>
+                  @case('all-bands')
+                    <li class="ml-6">All Band Types</li>
+
+                    @default
+                  @endswitch
+                @endforeach
+              </ul>
+              <p>If you would like to enquire about a show, please contact us.</p>
+            @endif
           </div>
 
-          <div id="in-house-gear" class="max-h-80 flex h-full flex-col gap-4 overflow-auto">
-            <p>We have the following gear in house. If you require the use of anything imparticular please contact us.</p>
-            <div class="gear-block flex flex-col">
-              <p class="text-lg uppercase text-white">Stage:</p>
-              <span class="text-base text-white">Size: 12ft x 28ft x 2ft</span>
-            </div>
 
-            <div class="gear-block flex flex-col">
-              <p class="text-lg uppercase text-white">Lighting</p>
-              <span class="text-base text-white">Rig: LightShark LS-1</span>
-              <span class="text-base text-white">Console: GrandMA2</span>
-            </div>
 
-            <div class="gear-block flex flex-col">
-              <p class="text-lg uppercase text-white">Sound:</p>
-              <span class="text-base text-white">Desk: Yamaha M7CL-48</span>
-              <span class="text-base text-white">Monitors: Mackie SRM 450 active x9</span>
-              <span class="text-base text-white">Microphones: Shure SM58 x12, Shure SM57 x8</span>
-              <span class="text-base text-white">Guitar Gear: Marshall Valve State AVT2000 Combo, Laney LX65R Combo</span>
-              <span class="text-base text-white">Bass Gear: Fender Rumble 100 Combo</span>
-              <span class="text-base text-white">Drum Gear: Pearl Vision Drum Kit, Single Bass Drum Pedal, Hi-Hat Stand,
-                Snare Stand,
-                Boom Cymbal Stand,
-                Straight Cymbal Stand, Drum Throne</span>
-
-              <div class="gear-block flex flex-col">
-                <span class="text-base text-white">Other Gear: Yamaha P45 Electric Piano, Trace Elliot 15" Bass Cab,
-                  Marshall
-                  4x12"
-                  Guitar
-                  Cab</span>
-              </div>
-            </div>
-            <div class="gear-block flex flex-col">
-              <p class="text-lg uppercase text-white">Stage:</p>
-              <span class="text-base text-white">Size: 12ft x 28ft x 2ft</span>
-            </div>
-
-            <div class="gear-block flex flex-col">
-              <p class="text-lg uppercase text-white">Lighting</p>
-              <span class="text-base text-white">Rig: LightShark LS-1</span>
-              <span class="text-base text-white">Console: GrandMA2</span>
-            </div>
-
-            <div class="gear-block flex flex-col">
-              <p class="text-lg uppercase text-white">Sound:</p>
-              <span class="text-base text-white">Desk: Yamaha M7CL-48</span>
-              <span class="text-base text-white">Monitors: Mackie SRM 450 active x9</span>
-              <span class="text-base text-white">Microphones: Shure SM58 x12, Shure SM57 x8</span>
-              <span class="text-base text-white">Guitar Gear: Marshall Valve State AVT2000 Combo, Laney LX65R Combo</span>
-              <span class="text-base text-white">Bass Gear: Fender Rumble 100 Combo</span>
-              <span class="text-base text-white">Drum Gear: Pearl Vision Drum Kit, Single Bass Drum Pedal, Hi-Hat Stand,
-                Snare Stand,
-                Boom Cymbal Stand,
-                Straight Cymbal Stand, Drum Throne</span>
-
-              <div class="gear-block flex flex-col">
-                <span class="text-base text-white">Other Gear: Yamaha P45 Electric Piano, Trace Elliot 15" Bass Cab,
-                  Marshall
-                  4x12"
-                  Guitar
-                  Cab</span>
-              </div>
-            </div>
-            <div class="gear-block flex flex-col">
-              <p class="text-lg uppercase text-white">Stage:</p>
-              <span class="text-base text-white">Size: 12ft x 28ft x 2ft</span>
-            </div>
-
-            <div class="gear-block flex flex-col">
-              <p class="text-lg uppercase text-white">Lighting</p>
-              <span class="text-base text-white">Rig: LightShark LS-1</span>
-              <span class="text-base text-white">Console: GrandMA2</span>
-            </div>
-
-            <div class="gear-block flex flex-col">
-              <p class="text-lg uppercase text-white">Sound:</p>
-              <span class="text-base text-white">Desk: Yamaha M7CL-48</span>
-              <span class="text-base text-white">Monitors: Mackie SRM 450 active x9</span>
-              <span class="text-base text-white">Microphones: Shure SM58 x12, Shure SM57 x8</span>
-              <span class="text-base text-white">Guitar Gear: Marshall Valve State AVT2000 Combo, Laney LX65R
-                Combo</span>
-              <span class="text-base text-white">Bass Gear: Fender Rumble 100 Combo</span>
-              <span class="text-base text-white">Drum Gear: Pearl Vision Drum Kit, Single Bass Drum Pedal, Hi-Hat Stand,
-                Snare Stand,
-                Boom Cymbal Stand,
-                Straight Cymbal Stand, Drum Throne</span>
-
-              <div class="gear-block flex flex-col">
-                <span class="text-base text-white">Other Gear: Yamaha P45 Electric Piano, Trace Elliot 15" Bass Cab,
-                  Marshall
-                  4x12"
-                  Guitar
-                  Cab</span>
-              </div>
-            </div>
-
-            <p class="text-lg uppercase text-white">Effects:</p>
-            <span class="text-base text-white">Smoke Machine, Lasers, Projector</span>
-          </div>
-          {{-- <div id="band-types">
-
-          </div> --}}
           <div id="genres">
             <p>The genres that we usually have at {{ $venue->name }} are:</p>
             @php $genres = json_decode($venue->genre); @endphp
@@ -248,6 +179,7 @@
             </ul>
             <p>If you would like to enquire about a show, please contact us.</p>
           </div>
+
           <div id="reviews">
             <p class="text-center">Want to know what we're like? Check out our reviews!</p>
             <div class="ratings-block mt-4 flex flex-col items-center gap-4">
@@ -325,11 +257,20 @@
               @endforeach
             </div>
           </div>
+
+          <div id="other">
+            @if ($venue->capacity)
+              <p>Other Information you may want to know about {{ $venue->name }}:</p>
+              <p>Capacity: {{ $venue->capacity }}</p>
+          </div>
+        @else
+          <p>No Further Information Avaliable</p>
+          @endif
         </div>
       </div>
     </div>
 
-    {{-- <x-promoter-suggestions :venueId="$venueId" :filters="$filters" /> --}}
+    <x-promoter-suggestions :venueId="$venueId" />
 
     {{-- Review Modal --}}
     <!-- Main modal -->
@@ -457,6 +398,11 @@
       // Hide all tab contents except the first one
       $(".venue-tab-content > div:not(:first)").hide();
 
+      // Add active class to the default tab link
+      $(".tabLinks:first").addClass(
+        "active text-blue-600 border-b-2 border-blue-600 rounded-t-lg dark:text-blue-500 dark:border-blue-500 group"
+      );
+
       // Add click event to tab links
       $(".tabLinks").click(function() {
         // Get the tab ID from the data attribute
@@ -508,5 +454,30 @@
       modalCloseButtons.forEach((button) => {
         button.addEventListener("click", hideModal);
       });
+    });
+
+    var venueId = {{ json_encode($venueId) }};
+
+    $.ajax({
+      url: "{{ route('suggestPromoters') }}",
+      method: "GET",
+      data: {
+        venue_id: venueId
+      },
+      success: function(response) {
+        var existingPromoters = response.existingPromoters;
+        var promotersByLocation = response.promotersByLocation;
+
+        // Now you can update your UI, for example, by passing these variables to your component
+        var promoterSuggestionsComponent = document.querySelector('x-promoter-suggestions');
+        promoterSuggestionsComponent.setAttribute('venueId', venueId);
+        promoterSuggestionsComponent.setAttribute('existingPromoters', JSON.stringify(existingPromoters));
+        promoterSuggestionsComponent.setAttribute('promotersByLocation', JSON.stringify(promotersByLocation));
+
+      },
+      error: function(xhr, status, error) {
+        // Handle errors
+        console.error(xhr.responseText);
+      }
     });
   </script>

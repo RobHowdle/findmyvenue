@@ -308,6 +308,10 @@ background-color: black;
     min-width: 25px;
 }
 
+.venues-textarea {
+    height: 150px;
+}
+
 
 /* @media only screen and (max-width: 1920px) {} */
 

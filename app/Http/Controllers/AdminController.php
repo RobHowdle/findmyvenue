@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Admin;
 use App\Models\Venue;
 use App\Models\Promoter;
+use App\Models\PromoterVenue;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -20,13 +21,14 @@ class AdminController extends Controller
 
         $genreList = file_get_contents(storage_path('app/public/text/genre_list.json'));
         $data = json_decode($genreList, true);
+        $promoters = Promoter::whereNull('deleted_at')->get();
 
         $genres = $data['genres'];
 
-        return view('admin.venues', compact('venueCount', 'locationCount', 'genres'));
+        return view('admin.venues', compact('venueCount', 'locationCount', 'genres', 'promoters'));
     }
 
-public function saveNewVenue(Request $request)
+    public function saveNewVenue(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
@@ -37,6 +39,7 @@ public function saveNewVenue(Request $request)
                 'longitude' => 'required',
                 'floating_capacity' => 'required|numeric',
                 'floating_in_house_gear' => 'required|string',
+                'existingPromoter' => 'required|string',
                 'band_type' => 'required|array',
                 'genres' => 'required|array',
                 'floating_contact_name' => 'required|string',
@@ -49,7 +52,7 @@ public function saveNewVenue(Request $request)
                 return back()->withErrors($validator)->withInput();
             }
 
-            Venue::create([
+            $newVenue = Venue::create([
                 'name' => $request->input('floating_name'),
                 'location' => $request->input('address-input'),
                 'postal_town' => $request->input('postal-town-input'),
@@ -63,7 +66,15 @@ public function saveNewVenue(Request $request)
                 'contact_number' => $request->input('floating_contact_number'),
                 'contact_email' => $request->input('floating_contact_email'),
                 'contact_link' => $request->input('floating_contact_links'),
+                'additional_info' => $request->input('extra_info'),
             ]);
+
+            if ($request->input('existingPromoter')) {
+                PromoterVenue::create([
+                    'promoters_id' => $request->input('existingPromoter'),
+                    'venues_id' => $newVenue->id,
+                ]);
+            }
 
             return back()->with('success', 'Venue created successfully.');
         } catch (\Exception $e) {

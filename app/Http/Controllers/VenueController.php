@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Venue;
+use App\Models\Promoter;
 use App\Models\VenueReview;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -48,8 +49,9 @@ class VenueController extends Controller
      */
     public function show(string $id)
     {
-        $venue = Venue::where('id', $id)->first();
+        $venue = Venue::where('id', $id)->with('extraInfo')->first();
         $venueId = $venue->id;
+
         // Split the field containing multiple URLs into an array
         if ($venue->contact_link) {
             $urls = explode(',', $venue->contact_link);
@@ -146,7 +148,6 @@ class VenueController extends Controller
         return view('venues', compact('venues', 'genres'));
     }
 
-
     public function filterCheckboxesSearch(Request $request)
     {
         $query = Venue::query();
@@ -228,5 +229,24 @@ class VenueController extends Controller
             // Optionally, you can return an error response or redirect to an error page
             return back()->with('error', 'An error occurred while submitting the review. Please try again later.')->withInput();
         }
+    }
+
+    public function suggestPromoters(Request $request)
+    {
+        $venueId = $request->input('venue_id');
+        $venue = Venue::findOrFail($venueId);
+        $existingPromoters = $venue->promoters()->get();
+
+        // If there is already a promoter assigned to the venue
+        if ($existingPromoters->isNotEmpty()) {
+            return view('promoter-suggestions', ['existingPromoters' => $existingPromoters]);
+        }
+
+        $location = $venue->postal_town;
+        $promotersByLocation = Promoter::where('location', $location)->get();
+
+        //TODO
+        // Include Genres and Types with Promoters
+        return view('promoter-suggestions', ['existingPromoters' => $existingPromoters, 'promotersByLocation' => $promotersByLocation]);
     }
 }

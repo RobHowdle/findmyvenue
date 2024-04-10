@@ -27,7 +27,8 @@
         <a href="{{ url('/') }}" class="flex items-center space-x-3 rtl:space-x-reverse">
           <img src="https://flowbite.com/docs/images/logo.svg" class="h-8"
             alt="{{ config('app.name', 'Laravel') }} Logo" />
-          <span class="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">Giggerz</span>
+          <span
+            class="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">{{ config('app.name') }}</span>
         </a>
         <button data-collapse-toggle="navbar-default" type="button"
           class="inline-flex h-10 w-10 items-center justify-center rounded-lg p-2 text-sm text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600 md:hidden"
