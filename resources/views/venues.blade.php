@@ -309,60 +309,66 @@
     });
   }
 
-  // Updates the table after filter
+  // Define the updateVenuesTable function outside of the updateTable function
+  function updateVenuesTable(filteredVenues) {
+    // Generate HTML for the filtered venues
+    var rowsHtml = filteredVenues.map(function(venue) {
+      var venueRoute = "{{ route('venue', ':venueId') }}";
+      return `
+            <tr class="border-b odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+                <th scope="row" class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
+                    <a href="${venueRoute.replace(':venueId', venue.id)}" class="venue-link hover:text-gray-400">${venue.name}</a>
+                </th>
+                <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
+                    ${venue.postal_town}
+                </td>
+                <td class="flex gap-4 whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
+                    <!-- Contact links -->
+                    ${venue.contact_number ? '<a href="tel:' + venue.contact_number + '"><span class="fas fa-phone"></span></a>' : ''}
+                    ${venue.contact_email ? '<a href="mailto:' + venue.contact_email + '"><span class="fas fa-envelope"></span></a>' : ''}
+                    <!-- Additional processing for contact links -->
+                    ${venue.platforms ? venue.platforms.map(function(platform) {
+                        switch (platform.platform) {
+                            case 'facebook':
+                                return '<a href="' + platform.url + '" target=_blank><span class="fab fa-facebook"></span></a>';
+                            case 'twitter':
+                                return '<a href="' + platform.url + '" target=_blank><span class="fab fa-twitter"></span></a>';
+                            case 'instagram':
+                                return '<a href="' + platform.url + '" target=_blank><span class="fab fa-instagram"></span></a>';
+                            case 'snapchat':
+                                return '<a href="' + platform.url + '" target=_blank><span class="fab fa-snapchat-ghost"></span></a>';
+                            case 'tiktok':
+                                return '<a href="' + platform.url + '" target=_blank><span class="fab fa-tiktok"></span></a>';
+                            case 'youtube':
+                                return '<a href="' + platform.url + '" target=_blank><span class="fab fa-youtube"></span></a>';
+                            default:
+                                return '';
+                        }
+                    }).join('') : ''}
+                </td>
+                <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
+                    <!-- Promoter names -->
+                    ${venue.promoters ? venue.promoters.map(function(promoter) {
+                        return '<a href="' + promoter.url + '">' + promoter.name + '</a>';
+                    }).join('') : ''}
+                </td>
+            </tr>
+        `;
+    }).join('');
+
+    // Replace the existing HTML content with the new HTML
+    $('#venues tbody').html(rowsHtml);
+  }
+
+  // Update the updateTable function to pass the filtered venues to updateVenuesTable
   function updateTable(data) {
     var venues = data.venues;
     var pagination = data.pagination;
-    // Clear existing table content
-    $('#venues tbody').empty();
 
     // Check if data is not null or empty array
     if (data.venues && data.venues.length > 0) {
       // Append new rows based on filtered data
-      data.venues.forEach(function(venue) {
-
-        var rowHtml = `
-                <tr class="border-b odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
-                    <th scope="row" class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
-                        ${venue.name}
-                    </th>
-                    <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
-                        ${venue.postal_town}
-                    </td>
-                    <td class="flex gap-4 whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
-                        <!-- Contact links -->
-                        ${venue.contact_number ? '<a href="tel:' + venue.contact_number + '"><span class="fas fa-phone"></span></a>' : ''}
-                        ${venue.contact_email ? '<a href="mailto:' + venue.contact_email + '"><span class="fas fa-envelope"></span></a>' : ''}
-                        <!-- Additional processing for contact links -->
-                        ${venue.platforms ? venue.platforms.map(function(platform) {
-                switch (platform.platform) {
-                    case 'facebook':
-                        return '<a href="' + platform.url + '" target=_blank><span class="fab fa-facebook"></span></a>';
-                    case 'twitter':
-                        return '<a href="' + platform.url + '" target=_blank><span class="fab fa-twitter"></span></a>';
-                    case 'instagram':
-                        return '<a href="' + platform.url + '" target=_blank><span class="fab fa-instagram"></span></a>';
-                    case 'snapchat':
-                        return '<a href="' + platform.url + '" target=_blank><span class="fab fa-snapchat-ghost"></span></a>';
-                    case 'tiktok':
-                        return '<a href="' + platform.url + '" target=_blank><span class="fab fa-tiktok"></span></a>';
-                    case 'youtube':
-                        return '<a href="' + platform.url + '" target=_blank><span class="fab fa-youtube"></span></a>';
-                    default:
-                        return '';
-                }
-            }).join('') : ''}
-                    </td>
-                    <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
-                        <!-- Promoter names -->
-                        ${venue.promoters ? venue.promoters.map(function(promoter) {
-                return '<a href="' + promoter.url + '">' + promoter.name + '</a>';
-            }).join('') : ''}
-                    </td>
-                </tr>
-            `;
-        $('#venues tbody').append(rowHtml);
-      });
+      updateVenuesTable(data.venues);
     } else {
       // Display message if no venues found
       var noVenuesRow = `
@@ -370,10 +376,9 @@
                 <td colspan="4" class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4 uppercase text-center">No venues found</td>
             </tr>
         `;
-      $('#venues tbody').append(noVenuesRow);
+      $('#venues tbody').html(noVenuesRow);
     }
   }
-
 
 
   function setLocationCoordinates(key, lat, lng) {
