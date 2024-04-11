@@ -15,7 +15,7 @@
             app and pasting
             them in. Please ensure there are no weird characters before pasting!</span>
           @if ($errors->any())
-            <div class="alert alert-danger">
+            <div class="alert-danger alert">
               <ul>
                 @foreach ($errors->all() as $error)
                   <li>{{ $error }}</li>
@@ -333,15 +333,11 @@
       checkbox.prop('checked', !checkbox.prop('checked'));
     });
 
-    // Event handler for "All Genres" checkbox
-    $('#all-venues').change(function() {
+    // Event handler for "All {location name}" checkbox
+    $('.venues-checkbox').change(function() {
       var isChecked = $(this).prop('checked');
-      $('.venues-checkbox').prop('checked', isChecked);
-
-      // If "All Genres" checkbox is checked, select all subgenres of each genre
-      if (isChecked) {
-        $('.accordion-item .venue-checkbox').prop('checked', false); // Uncheck subgenres
-      }
+      var accordionContent = $(this).closest('.accordion-item').find('.accordion-content');
+      accordionContent.find('.venue-checkbox').prop('checked', isChecked);
     });
   });
 </script>
