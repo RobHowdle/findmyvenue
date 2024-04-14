@@ -26,6 +26,8 @@ class Promoter extends Model
         'logo_url',
         'about_me',
         'my_venues',
+        'genre',
+        'band_types',
         'contact_number',
         'contact_email',
         'contact_link',
@@ -38,7 +40,7 @@ class Promoter extends Model
 
     public function venues()
     {
-    return $this->belongsToMany(Venue::class, 'promoter_venue_pivot', 'promoters_id', 'venues_id');
+        return $this->belongsToMany(Venue::class, 'promoter_venue_pivot', 'promoters_id', 'venues_id');
     }
 
     public function review()

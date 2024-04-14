@@ -30,8 +30,8 @@
                 class="map-input peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
                 placeholder=" " required />
               <label for="address-input"
-                class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">Location<span
-                  class="required">*</span></label>
+                class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">Location
+                - Where are you based?<span class="required">*</span></label>
               @error('address-input')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
@@ -140,6 +140,91 @@
                                 {{ in_array($venue, old('venues', [])) ? 'checked' : '' }}>
                               <label class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                                 for="venue-{{ $townVenue->id }}">{{ $venue }}</label>
+                            </div>
+                          @endforeach
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                @endforeach
+              </div>
+            </div>
+
+            <div class="group relative z-0 mb-5 w-full">
+              <label class="text-sm font-medium text-gray-900 dark:text-gray-300">Preferred Band Types</label>
+              <div class="mt-4 grid grid-cols-3 gap-4">
+                <div class="flex items-center">
+                  <input id="all-types" name="band_type[]" type="checkbox" value="all"
+                    class="band-type-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
+                    {{ in_array('all', old('band_type', [])) ? 'checked' : '' }} />
+                  <label for="all-types" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">All
+                    Types</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="original-bands" name="band_type[]" type="checkbox" value="original-bands"
+                    class="band-type-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
+                    {{ in_array('original-bands', old('band_type', [])) ? 'checked' : '' }} />
+                  <label for="original-bands"
+                    class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Original</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="cover-bands" name="band_type[]" type="checkbox" value="cover-bands"
+                    class="band-type-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
+                    {{ in_array('cover-bands', old('band_type', [])) ? 'checked' : '' }} />
+                  <label for="cover-bands"
+                    class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Covers</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="tribute-bands" name="band_type[]" type="checkbox" value="tribute-bands"
+                    class="band-type-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
+                    {{ in_array('tribute-bands', old('band_type', [])) ? 'checked' : '' }} />
+                  <label for="tribute-bands"
+                    class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Tributes</label>
+                </div>
+              </div>
+            </div>
+
+
+            <div class="group relative z-0 mb-5 w-full">
+              <label class="text-sm font-medium text-gray-900 dark:text-gray-300">Preferred Genre(s) - <span>Yes,
+                  there
+                  is a lot</span></label>
+              <div class="mt-4 grid grid-cols-3 gap-4">
+                <!-- "All Genres" checkbox -->
+                <div>
+                  <div class="flex items-center">
+                    <input id="all-genres" name="all-genres" type="checkbox" value=""
+                      class="focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800" />
+                    <label for="all-genres" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">All
+                      Genres</label>
+                  </div>
+                </div>
+                <!-- Genres -->
+                @foreach ($genres as $index => $genre)
+                  <div>
+                    <div class="accordion" id="accordion-container">
+                      <div class="accordion-item">
+                        <input type="checkbox"
+                          class="genre-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
+                          id="all-genre-{{ $index }}" name="genres[]" value="All {{ $genre['name'] }}"
+                          {{ in_array('All ' . $genre['name'], old('genres', [])) ? 'checked' : '' }}>
+                        <label for="all-genre-{{ $index }}"
+                          class="accordion-title ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">All
+                          {{ $genre['name'] }}</label>
+                        @error('genres[]')
+                          <span class="text-danger">{{ $message }}</span>
+                        @enderror
+
+                        <div class="accordion-content">
+                          @foreach ($genre['subgenres'] as $subIndex => $subgenre)
+                            <div class="checkbox-wrapper">
+                              <input type="checkbox"≈
+                                class="subgenre-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
+                                id="subgenre-{{ $index }}-{{ $subIndex }}" name="genres[]"
+                                value="{{ $subgenre }}"
+                                {{ in_array($subgenre, old('genres', [])) ? 'checked' : '' }}>
+                              <label class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                for="subgenre-{{ $index }}-{{ $subIndex }}">{{ $subgenre }}</label>
                             </div>
                           @endforeach
                         </div>

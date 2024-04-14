@@ -52,14 +52,17 @@
     z-index: 50;
     transition: all 1.8s ease;
 }
+
 .pre-overlay.o-1 {
     left: 0;
     top: 0;
 }
+
 .pre-overlay.o-2 {
     right: 0;
     bottom: 0;
 }
+
 #preloader {
     display: flex;
     position: fixed;
@@ -68,6 +71,7 @@
     width: 100%;
     height: 100%;
 }
+
 #preloader p {
     font-size: 20px;
     color: var(--color-white);
@@ -75,6 +79,7 @@
     text-transform: uppercase;
     text-align: center;
 }
+
 #preloader.animation p {
     animation-name: blink;
     animation-duration: .85s;
@@ -82,12 +87,14 @@
     animation-timing-function: ease-in;
     animation-direction: alternate;
 }
+
 #preloader .decor {
     width: 30px;
     height: 100px;
     margin: auto auto 0 auto;
     position: relative;
 }
+
 #preloader .decor .bar {
     height: 100px;
     background-color: var(--color-white);
@@ -96,6 +103,7 @@
     left: 0;
     bottom: 0;
 }
+
 #preloader.animation .decor .bar {
     animation-name: music-sec;
     animation-duration: 1s;
@@ -104,6 +112,7 @@
     animation-direction: alternate;
     max-height: 90px;
 }
+
 #preloader .decor::before {
     display: block;
     content: "";
@@ -114,6 +123,7 @@
     bottom: 0px;
     background-color: var(--color-white);
 }
+
 #preloader.animation .decor::before {
     animation-name: music-first;
     animation-duration: 0.5s;
@@ -121,6 +131,7 @@
     animation-timing-function: ease-in;
     animation-direction: alternate;
 }
+
 #preloader .decor::after {
     display: block;
     content: "";
@@ -131,6 +142,7 @@
     bottom:  0;
     position: absolute;
 }
+
 #preloader.animation .decor::after {
     animation-name: music-third;
     animation-duration: .75s;
@@ -138,6 +150,7 @@
     animation-timing-function: ease;
     animation-direction: alternate;
 }
+
 #preloader.over {
     display: none;
 }
@@ -226,7 +239,8 @@ table {
     overflow: auto;
 }
 
-.venue-wrapper {
+.venue-wrapper,
+.promoter-wrapper {
     background-color: var(--color-blue-light);
 }
 
@@ -367,7 +381,8 @@ background-color: black;
     transition-timing-function: ease;
 }
 
-.venue-logo {
+.venue-logo,
+.promoter-logo {
     max-width: 250px;
     
 }

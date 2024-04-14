@@ -94,7 +94,11 @@ class AdminController extends Controller
             ->groupBy('postal_town')
             ->get();
 
-        return view('admin.promoters', compact('promoterCount', 'venuesByTown'));
+        $genreList = file_get_contents(storage_path('app/public/text/genre_list.json'));
+        $data = json_decode($genreList, true);
+        $genres = $data['genres'];
+
+        return view('admin.promoters', compact('promoterCount', 'venuesByTown', 'genres'));
     }
 
     public function saveNewPromoter(Request $request)
