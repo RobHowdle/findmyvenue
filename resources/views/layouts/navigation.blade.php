@@ -15,10 +15,11 @@
           <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
             {{ __('Dashboard') }}
           </x-nav-link>
-
-          <x-nav-link :href="route('admin.venues')" :active="request()->routeIs('venues')">
-            {{ __('Venues') }}
-          </x-nav-link>
+          @can('manage_venue')
+            <x-nav-link :href="route('admin.venues')" :active="request()->routeIs('venues')">
+              {{ __('Venues') }}
+            </x-nav-link>
+          @endcan
 
           <x-nav-link :href="route('admin.promoters')" :active="request()->routeIs('promoters')">
             {{ __('Promoters') }}
