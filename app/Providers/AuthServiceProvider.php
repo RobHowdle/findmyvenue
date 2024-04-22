@@ -4,7 +4,6 @@ namespace App\Providers;
 
 // use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -25,8 +24,6 @@ class AuthServiceProvider extends ServiceProvider
     {
         Gate::before(function ($user, $ability) {
             if ($user->hasRole('administrator')) {
-                // Log a message when the user has the 'administrator' role
-                Log::info('User is an administrator. Granting all permissions.');
                 return true;
             }
         });
