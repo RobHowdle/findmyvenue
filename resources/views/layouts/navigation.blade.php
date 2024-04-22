@@ -23,6 +23,10 @@
           <x-nav-link :href="route('admin.promoters')" :active="request()->routeIs('promoters')">
             {{ __('Promoters') }}
           </x-nav-link>
+
+          <x-nav-link :href="route('admin.createOther')" :active="request()->routeIs('createOther')">
+            {{ __('Other') }}
+          </x-nav-link>
         </div>
       </div>
 

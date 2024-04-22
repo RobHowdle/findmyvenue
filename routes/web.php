@@ -49,6 +49,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/admin/venues', [AdminController::class, 'saveNewVenue'])->name('admin.new-venue');
     Route::get('/admin/promoters', [AdminController::class, 'getPromoters'])->name('admin.promoters');
     Route::post('/admin/promoters', [AdminController::class, 'saveNewPromoter'])->name('admin.new-promoter');
+    Route::get('/admin/create-other', [AdminController::class, 'createOtherService'])->name('admin.createOther');
+    Route::post('/admin/save-other', [AdminController::class, 'saveNewOtherService'])->name('admin.save-other');
 });
 
 require __DIR__ . '/auth.php';

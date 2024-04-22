@@ -177,4 +177,9 @@ class AdminController extends Controller
             return back()->with('error', 'An error occurred while saving the promter. Please try again later.')->withInput();
         }
     }
+
+    public function createOtherService()
+    {
+        return view('admin.create-other');
+    }
 }
