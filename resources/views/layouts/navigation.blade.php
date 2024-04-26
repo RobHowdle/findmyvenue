@@ -21,13 +21,17 @@
             </x-nav-link>
           @endcan
 
-          <x-nav-link :href="route('admin.promoters')" :active="request()->routeIs('promoters')">
-            {{ __('Promoters') }}
-          </x-nav-link>
+          @can('manage_promoter')
+            <x-nav-link :href="route('admin.promoters')" :active="request()->routeIs('promoters')">
+              {{ __('Promoters') }}
+            </x-nav-link>
+          @endcan
 
-          <x-nav-link :href="route('admin.createOther')" :active="request()->routeIs('createOther')">
-            {{ __('Other') }}
-          </x-nav-link>
+          @can(['manage_band', 'manage_photographer', 'manage_designer'])
+            <x-nav-link :href="route('admin.createOther')" :active="request()->routeIs('createOther')">
+              {{ __('Other') }}
+            </x-nav-link>
+          @endcan
         </div>
       </div>
 

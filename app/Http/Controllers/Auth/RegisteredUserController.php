@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Providers\RouteServiceProvider;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rules;
+use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
-use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Auth\Events\Registered;
+use App\Providers\RouteServiceProvider;
 
 class RegisteredUserController extends Controller
 {
@@ -20,7 +22,8 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        return view('auth.register');
+        $roles = Role::where('name', '!=', 'administrator')->get();
+        return view('auth.register', ['roles' => $roles]);
     }
 
     /**
@@ -30,22 +33,39 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
+        $admin = Role::where('name', '=', 'administrator')->get();
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        // Check if the request contains a role that is not an administrator
+        if ($request->has('role') && $admin->isNotEmpty()) {
+            $selectedRole = $request->input('role');
 
-        event(new Registered($user));
+            // Check if the selected role matches the administrator role by name or id
+            if (!$admin->contains('name', $selectedRole) && !$admin->contains('id', $selectedRole)) {
+                $request->validate([
+                    'name' => ['required', 'string', 'max:255'],
+                    'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+                    'password' => ['required', 'confirmed', Rules\Password::defaults()],
+                    'role' => ['required', 'exists:App\Models\Role,id'],
+                ]);
 
-        Auth::login($user);
+                $user = User::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'password' => Hash::make($request->password),
+                ]);
 
-        return redirect(RouteServiceProvider::HOME);
+                $role = Role::findOrFail($request->role);
+                $user->assignRole($role->name);
+                event(new Registered($user));
+
+                Auth::login($user);
+
+                return redirect(RouteServiceProvider::HOME);
+            } else {
+                $ipAddress = $request->ip();
+                Log::error('A user has attempted to register with a dedicate admin role, please investigate', ['ip_address' => $ipAddress]);
+                return back()->withInput()->withErrors(['role' => 'There has been an error. Please try again later.']);
+            }
+        }
     }
 }
