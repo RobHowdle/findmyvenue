@@ -8,6 +8,7 @@
     --color-white: #fff;
     --color-blue: #020223;
     --color-blue-light: rgba(2, 2, 35, 0.85);
+    --color-black-light: rgba(0, 0, 0, 0.85);
 }
 
 /* Preloader */
@@ -240,8 +241,9 @@ table {
 }
 
 .venue-wrapper,
-.promoter-wrapper {
-    background-color: var(--color-blue-light);
+.promoter-wrapper,
+.suggestion-wrapper {
+    background-color: var(--color-black-light);
 }
 
 .promoter-wrapper .wrapper,

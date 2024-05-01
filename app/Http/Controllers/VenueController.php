@@ -52,6 +52,15 @@ class VenueController extends Controller
         $venue = Venue::where('id', $id)->with('extraInfo')->first();
         $venueId = $venue->id;
 
+        // Promoter Suggestion
+        $existingPromoters = $venue->promoters()->get();
+        $location = $venue->postal_town;
+        $promotersByLocation = Promoter::where('postal_town', $location)->take(min(3, Promoter::where('postal_town', $location)->count()))->get();
+
+        // Photographer Suggestion
+
+
+
         // Split the field containing multiple URLs into an array
         if ($venue->contact_link) {
             $urls = explode(',', $venue->contact_link);
@@ -95,7 +104,7 @@ class VenueController extends Controller
 
         $genres = json_decode($venue->genre);
 
-        return view('venue', compact('venue', 'genres', 'overallReview', 'averageCommunicationRating', 'averageRopRating', 'averagePromotionRating', 'averageQualityRating', 'reviewCount', 'venueId'));
+        return view('venue', compact('promotersByLocation', 'existingPromoters', 'venue', 'genres', 'overallReview', 'averageCommunicationRating', 'averageRopRating', 'averagePromotionRating', 'averageQualityRating', 'reviewCount', 'venueId'));
     }
 
     public function locations()
@@ -235,18 +244,13 @@ class VenueController extends Controller
     {
         $venueId = $request->input('venue_id');
         $venue = Venue::findOrFail($venueId);
-        $existingPromoters = $venue->promoters()->get();
-
-        // If there is already a promoter assigned to the venue
-        if ($existingPromoters->isNotEmpty()) {
-            return view('promoter-suggestions', ['existingPromoters' => $existingPromoters]);
-        }
 
         $location = $venue->postal_town;
         $promotersByLocation = Promoter::where('location', $location)->get();
 
-        //TODO
-        // Include Genres and Types with Promoters
-        return view('promoter-suggestions', ['existingPromoters' => $existingPromoters, 'promotersByLocation' => $promotersByLocation]);
+        return view('components.promoter-suggestions', [
+            'venueId' => $venueId,
+            'promotersByLocation' => $promotersByLocation
+        ]);
     }
 }
