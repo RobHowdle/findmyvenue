@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\VenueController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PromoterController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OtherServiceController;
 
 /*
@@ -35,14 +36,11 @@ Route::get('/promoters/{id}', [PromoterController::class, 'show'])->name('promot
 Route::post('/promoters/{id}/submitReview', [PromoterController::class, 'submitPromoterReview'])->name('submit-promoter-review');
 Route::get('/other', [OtherServiceController::class, 'index'])->name('other');
 
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/{user}', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile/{user}', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/admin/venues', [AdminController::class, 'getVenues'])->name('admin.venues');

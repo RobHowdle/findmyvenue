@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Admin;
 use App\Models\Venue;
 use App\Models\Promoter;
-use App\Models\PromoterVenue;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Models\PromoterVenue;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
