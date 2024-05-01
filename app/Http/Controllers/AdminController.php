@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Admin;
+use App\Models\OtherServiceList;
 use App\Models\Venue;
 use App\Models\Promoter;
 use Illuminate\Support\Str;
@@ -79,10 +80,7 @@ class AdminController extends Controller
 
             return back()->with('success', 'Venue created successfully.');
         } catch (\Exception $e) {
-            // Log the error
             Log::error('Error saving new venue: ' . $e->getMessage());
-
-            // Optionally, you can return an error response or redirect to an error page
             return back()->with('error', 'An error occurred while saving the venue. Please try again later.')->withInput();
         }
     }
@@ -181,6 +179,7 @@ class AdminController extends Controller
 
     public function createOtherService()
     {
-        return view('admin.create-other');
+        $serviceList = OtherServiceList::all();
+        return view('admin.create-other', compact('serviceList'));
     }
 }
