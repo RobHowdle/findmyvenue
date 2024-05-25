@@ -34,8 +34,7 @@
     <nav class="border-gray-200 bg-white dark:bg-gray-900">
       <div class="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between px-2 py-4 md:px-4 md:py-8">
         <a href="{{ url('/') }}" class="flex items-center space-x-3 rtl:space-x-reverse">
-          <img src="https://flowbite.com/docs/images/logo.svg" class="h-8"
-            alt="{{ config('app.name', 'Laravel') }} Logo" />
+          <img src="{{ asset('images/yns_logo.png') }}" class="h-16" alt="{{ config('app.name', 'Laravel') }} Logo" />
           <span
             class="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">{{ config('app.name') }}</span>
         </a>

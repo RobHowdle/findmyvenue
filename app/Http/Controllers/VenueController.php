@@ -57,9 +57,6 @@ class VenueController extends Controller
         $location = $venue->postal_town;
         $promotersByLocation = Promoter::where('postal_town', $location)->take(min(3, Promoter::where('postal_town', $location)->count()))->get();
 
-        // Photographer Suggestion
-
-
 
         // Split the field containing multiple URLs into an array
         if ($venue->contact_link) {

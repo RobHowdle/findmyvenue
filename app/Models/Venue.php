@@ -20,6 +20,7 @@ class Venue extends Model
 
     protected $fillable = [
         'name',
+        'logo_url',
         'location',
         'postal_town',
         'longitude',
@@ -46,7 +47,7 @@ class Venue extends Model
         return $this->belongsToMany(Promoter::class, 'promoter_venue_pivot', 'venues_id', 'promoters_id');
     }
 
-        public function review()
+    public function review()
     {
         return $this->hasMany(VenueReview::class);
     }

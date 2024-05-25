@@ -9,8 +9,9 @@
     <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
         <div class="count-wrapper p-6 text-gray-900 dark:text-gray-100">
-          <p class="mt-4 text-xl">Create Other Service</p>
-          <span class="text-sm">Create a photographer, videographer, designer etc</span>
+          <p class="mt-4 text-xl">Register New Service</p>
+          <span class="text-sm">Register your business using the form below from Photographers, Designers, Bands and
+            more!</span>
           @if ($errors->any())
             <div class="alert-danger alert">
               <ul>
@@ -20,11 +21,11 @@
               </ul>
             </div>
           @endif
-          <form class="mt-2" action="{{ route('admin.save-other') }}" method="POST" enctype="multipart/form-data">
+          <form class="mt-4" action="{{ route('admin.save-other') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="group relative z-0 mb-5 w-full">
-              <label class="text-sm font-medium text-gray-900 dark:text-gray-300">Service<span
-                  class="required">*</span></label>
+              <label class="text-sm font-medium text-gray-900 dark:text-gray-300">What type of service are you
+                registering?<span class="required">*</span></label>
               <select id="service" name="service"
                 class="form-select mt-1 block rounded-lg border-gray-300 bg-white shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:focus:border-blue-500 dark:focus:ring-blue-500">
                 <option value="">Please Select</option>

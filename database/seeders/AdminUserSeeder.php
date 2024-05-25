@@ -18,7 +18,7 @@ class AdminUserSeeder extends Seeder
             'name' => 'Rob',
             'email' => 'robhowdle94@gmail.com',
             'email_verified_at' => now(),
-            'password' => Hash::make('password'),
+            'password' => Hash::make('yfT11LpReC43(dV(U5'),
         ]);
     }
 }

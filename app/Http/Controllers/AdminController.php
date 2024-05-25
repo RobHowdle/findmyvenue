@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Admin;
-use App\Models\OtherServiceList;
 use App\Models\Venue;
 use App\Models\Promoter;
 use Illuminate\Support\Str;
+use App\Models\OtherService;
 use Illuminate\Http\Request;
 use App\Models\PromoterVenue;
+use App\Models\OtherServiceList;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -35,6 +34,7 @@ class AdminController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'floating_name' => 'required|string',
+                'venue_logo' => 'required|image|mimes:jpeg,jpg,png,webp,svg|max:2048',
                 'address-input' => 'required',
                 'postal-town-input' => 'required',
                 'latitude' => 'required',
@@ -54,8 +54,26 @@ class AdminController extends Controller
                 return back()->withErrors($validator)->withInput();
             }
 
+            // Get the uploaded image file
+            $venueLogoFile = $request->file('venue_logo');
+
+            // Generate a unique filename based on the promoter's name and extension
+            $venueName = $request->input('floating_name');
+            $venueLogoExtension = $venueLogoFile->getClientOriginalExtension();
+            $venueLogoFilename = Str::slug($venueName) . '.' . $venueLogoExtension;
+
+            // Specify the destination directory within the public folder
+            $destinationPath = 'images/venue_logos';
+
+            // Move the uploaded image to the specified directory
+            $venueLogoFile->move(public_path($destinationPath), $venueLogoFilename);
+
+            // Construct the URL to the stored image
+            $logoUrl = $destinationPath . '/' . $venueLogoFilename;
+
             $newVenue = Venue::create([
                 'name' => $request->input('floating_name'),
+                'logo_url' => $logoUrl,
                 'location' => $request->input('address-input'),
                 'postal_town' => $request->input('postal-town-input'),
                 'longitude' => $request->input('latitude'),
@@ -181,5 +199,75 @@ class AdminController extends Controller
     {
         $serviceList = OtherServiceList::all();
         return view('admin.create-other', compact('serviceList'));
+    }
+
+    public function saveNewOtherService(Request $request)
+    {
+        try {
+            $jsonPackage = json_decode($request->input('packages_json'), true);
+
+            // Check if there was an error during decoding
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                Log::error('Error saving json array: ' . json_last_error_msg());
+            }
+
+            $validator = Validator::make($request->all(), [
+                'service' => 'required|exists:App\Models\OtherServiceList,id',
+                'address-input' => 'required',
+                'postal-town-input' => 'required',
+                'latitude' => 'required',
+                'longitude' => 'required',
+                'photographer_logo' => 'nullable|image|mimes:jpeg,jpg,png,webp,svg|max:2048',
+                'photographer_name' => 'required|string',
+                'packages_json' => 'required',
+                'environment_type' => 'required|array',
+                'working_times' => 'required|array',
+                'contact_email' => 'nullable|email',
+                'contact_number' => 'nullable|numeric|digits:11',
+                'contact_links' => 'nullable',
+            ]);
+
+            if ($validator->fails()) {
+                return back()->withErrors($validator)->withInput();
+            }
+
+            $photographerLogoFile = $request->file('photographer_logo');
+            $photographerName = $request->input('photographer_name');
+            $photographerLogoExtension = $photographerLogoFile->getClientOriginalExtension();
+            $photographerLogoFilename = Str::slug($photographerName) . '.' . $photographerLogoExtension;
+
+            // Specify the destination directory within the public folder
+            $destinationPath = 'images/other_services';
+
+            // Move the uploaded image to the specified directory
+            $photographerLogoFile->move(public_path($destinationPath), $photographerLogoFilename);
+
+            // Construct the URL to the stored image
+            $logoUrl = $destinationPath . '/' . $photographerLogoFilename;
+
+            $photographer = OtherService::create([
+                'name' => $request->input('photographer_name'),
+                'location' => $request->input('address-input'),
+                'postal_town' => $request->input('postal-town-input'),
+                'longitude' => $request->input('latitude'),
+                'latitude' => $request->input('longitude'),
+                'logo_url' => $logoUrl,
+                'other_service_id' => $request->input('service'),
+                'packages' => json_encode($jsonPackage),
+                'environment_type' => json_encode($request->input('environment_type')),
+                'working_times' => json_encode($request->input('working_times')),
+                'contact_email' => $request->input('contact_email'),
+                'contact_number' => $request->input('contact_number'),
+                'contact_link' => $request->input('contact_links'),
+            ]);
+
+            return back()->with('success', 'Service created successfully.');
+        } catch (\Exception $e) {
+            // Log the error
+            Log::error('Error saving new service: ' . $e->getMessage());
+
+            // Optionally, you can return an error response or redirect to an error page
+            return back()->with('error', 'An error occurred while saving the service. Please try again later.')->withInput();
+        }
     }
 }

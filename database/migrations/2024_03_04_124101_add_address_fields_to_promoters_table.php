@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('promoters', function (Blueprint $table) {
-            $table->string('postal-town')->after('location');
-            $table->string('latitude')->after('postal-town-input');
+            $table->string('postal_town')->after('location');
+            $table->string('latitude')->after('postal_town');
             $table->string('longitude')->after('latitude');
         });
     }
@@ -24,7 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('promoters', function (Blueprint $table) {
-            $table->dropColumn('postal-town');
+            $table->dropColumn('postal_town');
             $table->dropColumn('latitude');
             $table->dropColumn('longitude');
         });

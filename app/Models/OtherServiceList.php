@@ -15,4 +15,9 @@ class OtherServiceList extends Model
     protected $fillable = [
         'name',
     ];
+
+    public function otherServices()
+    {
+        return $this->hasMany(OtherService::class, 'other_service_id');
+    }
 }

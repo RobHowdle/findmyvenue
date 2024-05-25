@@ -848,7 +848,7 @@
           class="search map-input sm:w-100 flex justify-center border-b-2 border-l-2 border-r-0 border-t-2 border-white bg-opacBlack font-sans text-xl focus:border-white md:w-4/6"
           type="search" id="address-input" name="search_query" placeholder="Search..." />
         <button type="submit"
-          class="search-button border-b-2 border-r-2 border-t-2 border-white bg-black p-2 text-white hover:bg-gray-800 hover:text-white">
+          class="search-button border-b-2 border-r-2 border-t-2 border-white bg-black p-4 text-white hover:bg-gray-800 hover:text-white">
           <span class="fas fa-search"></span>
         </button>
       </div>

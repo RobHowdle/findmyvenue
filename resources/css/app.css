@@ -242,7 +242,8 @@ table {
 
 .venue-wrapper,
 .promoter-wrapper,
-.suggestion-wrapper {
+.suggestion-wrapper,
+.other-wrapper {
     background-color: var(--color-black-light);
 }
 
@@ -259,7 +260,8 @@ table {
     gap: 2rem;
 }
 
-.promoter-logo {
+.promoter-logo,
+.other-logo {
     aspect-ratio: 1/1;
     max-width: 250px;
 }
@@ -384,7 +386,8 @@ background-color: black;
 }
 
 .venue-logo,
-.promoter-logo {
+.promoter-logo,
+.other-logo {
     max-width: 250px;
     
 }

@@ -15,7 +15,12 @@ class PromoterTestSeeder extends Seeder
     {
         DB::table('promoters')->insert([
             'name' => 'Shadow Fest Promotions',
-            'location' => 'Bradford',
+            'location' => 'Bradford, UK',
+            'postal_town' => 'Bradford',
+            'longitude' => '00.00',
+            'latitude' => '00.00',
+            'genre' => '[]',
+            'band_types' => '[]',
             'logo_url' => '../../storage/app/public/images/shadow.jpg',
             'contact_number' => '01325123456',
             'contact_email' => 'shadowfestuk@gmail.com',

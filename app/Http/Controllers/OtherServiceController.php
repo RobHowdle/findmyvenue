@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\OtherService;
 use Illuminate\Http\Request;
+use App\Models\OtherServiceList;
 use Illuminate\Support\Facades\DB;
 
 class OtherServiceController extends Controller
@@ -13,9 +14,11 @@ class OtherServiceController extends Controller
      */
     public function index()
     {
-        $otherServices = OtherService::select('services', DB::raw('COUNT(*) as count'))
+        // Retrieve all OtherService records
+        $otherServices = OtherService::with('otherServiceList')
+            ->select('other_service_id')
             ->whereNull('deleted_at')
-            ->groupBy('services')
+            ->groupBy('other_service_id')
             ->get();
 
         return view('other', compact('otherServices'));
@@ -37,12 +40,58 @@ class OtherServiceController extends Controller
         //
     }
 
+    public function showGroup($serviceName)
+    {
+        $otherService = OtherService::whereHas('otherServiceList', function ($query) use ($serviceName) {
+            $query->where('service_name', $serviceName);
+        })->with('otherServiceList')->get();
+
+        $otherTitle = OtherServiceList::where('service_name', $serviceName)->first();
+
+        return view('single-service-group', compact('otherService', 'otherTitle'));
+    }
+
+
     /**
      * Display the specified resource.
      */
-    public function show(OtherService $otherService)
+    public function show($serviceName, $serviceId)
     {
-        //
+        $singleService = OtherService::where('id', $serviceId)->with('otherServiceList')->first();
+        $singleServiceTitle =
+            OtherService::where('id', $serviceId)->with('otherServiceList')->first();
+
+        // Split the field containing multiple URLs into an array
+        if ($singleService->contact_link) {
+            $urls = explode(',', $singleService->contact_link);
+            $platforms = [];
+        }
+
+        // // Check each URL against the platforms
+        foreach ($urls as $url) {
+            // Initialize the platform as unknown
+            $matchedPlatform = 'Unknown';
+
+            // Check if the URL contains platform names
+            $platformsToCheck = ['facebook', 'twitter', 'instagram'];
+            foreach ($platformsToCheck as $platform) {
+                if (stripos($url, $platform) !== false) {
+                    $matchedPlatform = $platform;
+                    break; // Stop checking once a platform is found
+                }
+            }
+
+            // Store the platform information for each URL
+            $platforms[] = [
+                'url' => $url,
+                'platform' => $matchedPlatform
+            ];
+        }
+
+        $singleService->platforms = $platforms;
+
+
+        return view('single-service', compact('singleService', 'singleServiceTitle'));
     }
 
     /**

@@ -16,7 +16,12 @@ class VenueTestSeeder extends Seeder
     {
         DB::table('venues')->insert([
             'name' => 'The Forum Music Center',
-            'location' => 'Darlington',
+            'location' => 'Darlington, UK',
+            'postal_town' => 'Darlington',
+            'longitude' => '00.00',
+            'latitude' => '00.00',
+            'description' => 'This is a test venue',
+            'additional_info' => 'This is some additional Info',
             'capacity' => '200',
             'in_house_gear' => 'Full Stage, PA, Lighting Rig',
             'band_type' => 'Any',

@@ -35,6 +35,8 @@ Route::get('/promoters', [PromoterController::class, 'index'])->name('promoters'
 Route::get('/promoters/{id}', [PromoterController::class, 'show'])->name('promoter');
 Route::post('/promoters/{id}/submitReview', [PromoterController::class, 'submitPromoterReview'])->name('submit-promoter-review');
 Route::get('/other', [OtherServiceController::class, 'index'])->name('other');
+Route::get('/other/{serviceName}', [OtherServiceController::class, 'showGroup'])->name('singleServiceGroup');
+Route::get('/other/{serviceName}/{serviceId}', [OtherServiceController::class, 'show'])->name('singleService');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
