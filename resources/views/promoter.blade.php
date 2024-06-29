@@ -100,10 +100,10 @@
 
       <div class="promoter-tab-content mt-4 overflow-auto font-sans text-lg text-white">
         <div id="about">
-          @if (!$promoter->decription)
+          @if (!$promoter->about_me)
             <p>We're still working on this! Come back later to read about us!</p>
           @else
-            <p>{{ $promoter->description }}</p>
+            <p>{{ $promoter->about_me }}</p>
           @endif
         </div>
 

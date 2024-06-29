@@ -1,7 +1,7 @@
 <x-app-layout>
   <x-slot name="header">
     <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-      {{ __('Venues') }}
+      {{ __('Promoters') }}
     </h2>
   </x-slot>
 
@@ -9,9 +9,7 @@
     <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
         <div class="count-wrapper p-6 text-gray-900 dark:text-gray-100">
-          <a class="text-2xl underline" href="{{ route('admin.venue-list') }}">View Active Venues:
-            <span>{{ $venueCount }}</span></a>
-          <p class="mt-4 text-xl">Create New Venue</p>
+          <p class="mb-4 mt-4 text-xl">Updating Promoter - {{ $promoter->name }}</p>
           @if ($errors->any())
             <div class="alert-danger alert">
               <ul>
@@ -21,29 +19,18 @@
               </ul>
             </div>
           @endif
-          <form class="mt-2" action="{{ route('admin.new-venue') }}" method="POST" enctype="multipart/form-data">
+          <form class="mt-2" action="{{ route('admin.update-promoter', $promoter->id) }}" method="POST"
+            enctype="multipart/form-data">
             @csrf
             <div class="group relative z-0 mb-5 w-full">
-              <input type="search" name="address-input" id="address-input" value="{{ old('address-input') }}"
-                class="map-input peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-                placeholder=" " required />
-              <label for="address-input"
-                class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">Location
-                <span>(Town/ City)</span></label>
-              @error('address-input')
-                <span class="text-danger">{{ $message }}</span>
-              @enderror
-            </div>
-
-            <div class="group relative z-0 mb-5 w-full">
-              <input type="text" name="floating_name" id="floating_name" value="{{ old('floating_name') }}"
+              <input type="text" name="promoter_name" id="promoter_name" value="{{ $promoter->name }}"
                 class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
                 placeholder=" " required />
-              <label for="floating_name"
+              <label for="promoter_name"
                 class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
                 Name
-              </label>1
-              @error('floating_name')
+              </label>
+              @error('promoter_name')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
@@ -51,82 +38,34 @@
             <div class="group relative z-0 mb-5 w-full">
               <input
                 class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-                aria-describedby="venue_logo" name="venue_logo" id="venue_logo" type="file">
+                aria-describedby="promoter_logo" name="promoter_logo" id="venuepromoter_logo_logo" type="file">
               <label
                 class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500"
-                for="venue_logo">Upload Logo</label>
-              @error('venue_logo')
-                <span class="text-danger">{{ $message }}</span>
-              @enderror
-            </div>
-
-            <div id="address-map-container" style="width: 100%; height: 400px; display: none;">
-              <div style="width: 100%; height: 100%;" id="address-map"></div>
-            </div>
-
-            <div class="group relative z-0 mb-5 hidden w-full">
-              <input
-                class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-                type="text" id="postal-town-input" name="postal-town-input" placeholder="Postal Town Input"
-                value="{{ old('postal-town-input') }}">
-              <input
-                class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-                type="text" id="address-latitude" name="latitude" placeholder="Latitude"
-                value="{{ old('latitude') }}">
-              <input
-                class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-                type="text" id="address-longitude" name="longitude" placeholder="Longitude"
-                value="{{ old('longitude') }}">
-            </div>
-
-            <div class="group relative z-0 mb-5 w-full">
-              <input type="text" name="floating_capacity" id="floating_capacity"
-                value="{{ old('floating_capacity') }}"
-                class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-                placeholder=" " required />
-              <label for="floating_capacity"
-                class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
-                Capacity
-              </label>
-              @error('floating_capacity')
+                for="promoter_logo">Upload Logo</label>
+              @error('promoter_logo')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
 
             <div class="group relative z-0 mb-5 w-full">
-              <textarea type="text" name="floating_description" id="floating_description"
-                value="{{ old('floating_description') }}"
+              <textarea type="text" name="promoter_about_me" id="promoter_about_me"
                 class="venues-textarea peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-                placeholder=" " required></textarea>
-              <label for="floating_description"
+                placeholder=" " required>{{ $promoter->about_me }}</textarea>
+              <label for="promoter_about_me"
                 class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
-                Description
+                About Me
               </label>
-              @error('floating_description')
+              @error('promoter_about_me')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
 
-            <div class="group relative z-0 mb-5 w-full">
-              <textarea type="text" name="floating_in_house_gear" id="floating_in_house_gear"
-                value="{{ old('floating_in_house_gear') }}"
-                class="venues-textarea peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-                placeholder=" " required></textarea>
-              <label for="floating_in_house_gear"
-                class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
-                In House Gear
-              </label>
-              @error('floating_in_house_gear')
-                <span class="text-danger">{{ $message }}</span>
-              @enderror
-            </div>
-
-            <div class="group relative z-0 mb-5 w-full">
-              <label class="text-sm font-medium text-gray-900 dark:text-gray-300">Existing Promoter</label>
+            {{-- <div class="group relative z-0 mb-5 w-full">
+              <label class="text-sm font-medium text-gray-900 dark:text-gray-300">Venues</label>
               <select id="existingPromoter" name="existingPromoter"
                 class="form-select mt-1 block rounded-lg border-gray-300 bg-white shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:focus:border-blue-500 dark:focus:ring-blue-500">
                 <option value="">None</option>
-                @foreach ($promoters as $promoter)
+                @foreach ($venue->promoters as $promoter)
                   <option value="{{ $promoter->id }}">{{ $promoter->name }}</option>
                 @endforeach
               </select>
@@ -134,8 +73,7 @@
               @error('existingPromoter')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
-            </div>
-
+            </div> --}}
 
             <div class="group relative z-0 mb-5 w-full">
               <label class="text-sm font-medium text-gray-900 dark:text-gray-300">Preferred Band Types</label>
@@ -143,28 +81,28 @@
                 <div class="flex items-center">
                   <input id="all-types" name="band_type[]" type="checkbox" value="all"
                     class="band-type-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
-                    {{ in_array('all', old('band_type', [])) ? 'checked' : '' }} />
+                    {{ in_array('all', is_array($promoter->band_types) ? $promoter->band_types : []) ? 'checked' : '' }} />
                   <label for="all-types" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">All
                     Types</label>
                 </div>
                 <div class="flex items-center">
                   <input id="original-bands" name="band_type[]" type="checkbox" value="original-bands"
                     class="band-type-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
-                    {{ in_array('original-bands', old('band_type', [])) ? 'checked' : '' }} />
+                    {{ in_array('original-bands', is_array($promoter->band_types) ? $promoter->band_types : []) ? 'checked' : '' }} />
                   <label for="original-bands"
                     class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Original</label>
                 </div>
                 <div class="flex items-center">
                   <input id="cover-bands" name="band_type[]" type="checkbox" value="cover-bands"
                     class="band-type-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
-                    {{ in_array('cover-bands', old('band_type', [])) ? 'checked' : '' }} />
+                    {{ in_array('cover-bands', is_array($promoter->band_types) ? $promoter->band_types : []) ? 'checked' : '' }} />
                   <label for="cover-bands"
                     class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Covers</label>
                 </div>
                 <div class="flex items-center">
                   <input id="tribute-bands" name="band_type[]" type="checkbox" value="tribute-bands"
                     class="band-type-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
-                    {{ in_array('tribute-bands', old('band_type', [])) ? 'checked' : '' }} />
+                    {{ in_array('tribute-bands', is_array($promoter->band_types) ? $promoter->band_types : []) ? 'checked' : '' }} />
                   <label for="tribute-bands"
                     class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Tributes</label>
                 </div>
@@ -173,8 +111,7 @@
 
 
             <div class="group relative z-0 mb-5 w-full">
-              <label class="text-sm font-medium text-gray-900 dark:text-gray-300">Preferred Genre(s) - <span>Yes,
-                  there
+              <label class="text-sm font-medium text-gray-900 dark:text-gray-300">Preferred Genre(s) - <span>Yes, there
                   is a lot</span></label>
               <div class="mt-4 grid grid-cols-3 gap-4">
                 <!-- "All Genres" checkbox -->
@@ -187,14 +124,14 @@
                   </div>
                 </div>
                 <!-- Genres -->
-                @foreach ($genres as $index => $genre)
-                  <div>
+                @foreach ($genreNames as $index => $genre)
+                  @if (is_array($genre) && array_key_exists('name', $genre))
                     <div class="accordion" id="accordion-container">
                       <div class="accordion-item">
                         <input type="checkbox"
                           class="genre-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
                           id="all-genre-{{ $index }}" name="genres[]" value="All {{ $genre['name'] }}"
-                          {{ in_array('All ' . $genre['name'], old('genres', [])) ? 'checked' : '' }}>
+                          {{ in_array('All ' . $genre['name'], $promoter->genre) ? 'checked' : '' }}>
                         <label for="all-genre-{{ $index }}"
                           class="accordion-title ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">All
                           {{ $genre['name'] }}</label>
@@ -205,11 +142,11 @@
                         <div class="accordion-content">
                           @foreach ($genre['subgenres'] as $subIndex => $subgenre)
                             <div class="checkbox-wrapper">
-                              <input type="checkbox"≈
+                              <input type="checkbox"
                                 class="subgenre-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
                                 id="subgenre-{{ $index }}-{{ $subIndex }}" name="genres[]"
-                                value="{{ $subgenre }}"
-                                {{ in_array($subgenre, old('genres', [])) ? 'checked' : '' }}>
+                                value="{{ $subgenre }}" data-genre="{{ 'All ' . $genre['name'] }}"
+                                {{ in_array($subgenre, $promoter->genre) ? 'checked' : '' }}>
                               <label class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                                 for="subgenre-{{ $index }}-{{ $subIndex }}">{{ $subgenre }}</label>
                             </div>
@@ -217,83 +154,71 @@
                         </div>
                       </div>
                     </div>
-                  </div>
+                  @endif
                 @endforeach
               </div>
             </div>
 
+
             <div class="group relative z-0 mb-5 w-full">
-              <input type="text" name="floating_contact_name" id="floating_contact_name"
-                value="{{ old('floating_contact_name') }}"
+              <input type="text" name="promoter_contact_name" id="promoter_contact_name"
+                value="{{ $promoter->contact_name }}"
                 class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
                 placeholder=" " required />
-              <label for="floating_contact_name"
+              <label for="promoter_contact_name"
                 class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
                 Contact Name
               </label>
-              @error('floating_contact_name')
+              @error('promoter_contact_name')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
 
             <div class="group relative z-0 mb-5 w-full">
-              <input type="text" name="floating_contact_number" id="floating_contact_number"
-                value="{{ old('floating_contact_number') }}"
+              <input type="text" name="promoter_contact_number" id="promoter_contact_number"
+                value="{{ $promoter->contact_number }}"
                 class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-                placeholder=" " required />
-              <label for="floating_contact_number"
+                placeholder=" " />
+              <label for="promoter_contact_number"
                 class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
                 Contact Number
               </label>
-              @error('floating_contact_number')
+              @error('promoter_contact_number')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
 
             <div class="group relative z-0 mb-5 w-full">
-              <input type="text" name="floating_contact_email" id="floating_contact_email"
-                value="{{ old('floating_contact_email') }}"
+              <input type="text" name="promoter_contact_email" id="promoter_contact_email"
+                value="{{ $promoter->contact_email }}"
                 class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-                placeholder=" " required />
-              <label for="floating_contact_email"
+                placeholder=" " />
+              <label for="promoter_contact_email"
                 class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
                 Contact Email
               </label>
-              @error('floating_contact_email')
+              @error('promoter_contact_email')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
 
             <div class="group relative z-0 mb-5 w-full">
-              <input type="text" name="floating_contact_links" id="floating_contact_links"
-                value="{{ old('floating_contact_links') }}"
+              <input type="text" name="promoter_contact_links" id="promoter_contact_links"
+                value="{{ $promoter->contact_link }}"
                 class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
                 placeholder=" " required />
-              <label for="floating_contact_links"
+              <label for="promoter_contact_links"
                 class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
                 Contact Links (Separate by comma)
               </label>
-              @error('floating_contact_links')
-                <span class="text-danger">{{ $message }}</span>
-              @enderror
-            </div>
-
-            <div class="group relative z-0 mb-5 w-full">
-              <textarea type="text" name="extra_info" id="extra_info" value="{{ old('extra_info') }}"
-                class="venues-textarea peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-                placeholder=" " required></textarea>
-              <label for="extra_info"
-                class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
-                Extra Information
-              </label>
-              @error('extra_info')
+              @error('promoter_contact_links')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
 
             <div class="group relative z-0 mb-5 w-full">
               <button type="submit"
-                class="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 sm:w-auto">Submit</button>
+                class="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 sm:w-auto">Update</button>
             </div>
           </form>
         </div>
@@ -307,7 +232,6 @@
   async defer></script>
 <script>
   function initialize() {
-
     $('form').on('keyup keypress', function(e) {
       var keyCode = e.keyCode || e.which;
       if (keyCode === 13) {
@@ -315,21 +239,17 @@
         return false;
       }
     });
-    const locationInputs = document.getElementsByClassName("map-input");
 
+    const locationInputs = document.getElementsByClassName("map-input");
     const autocompletes = [];
     const geocoder = new google.maps.Geocoder;
     for (let i = 0; i < locationInputs.length; i++) {
-
       const input = locationInputs[i];
       const fieldKey = input.id.replace("-input", "");
-      const isEdit = document.getElementById(fieldKey + "-latitude").value != '' && document.getElementById(
-        fieldKey +
+      const isEdit = document.getElementById(fieldKey + "-latitude").value != '' && document.getElementById(fieldKey +
         "-longitude").value != '';
-
       const latitude = parseFloat(document.getElementById(fieldKey + "-latitude").value) || 59.339024834494886;
       const longitude = parseFloat(document.getElementById(fieldKey + "-longitude").value) || 18.06650573462189;
-
       const map = new google.maps.Map(document.getElementById(fieldKey + '-map'), {
         center: {
           lat: latitude,
@@ -344,7 +264,6 @@
           lng: longitude
         },
       });
-
       marker.setVisible(isEdit);
 
       const autocomplete = new google.maps.places.Autocomplete(input);
@@ -404,7 +323,6 @@
         }
         marker.setPosition(place.geometry.location);
         marker.setVisible(true);
-
       });
     }
   }
@@ -441,19 +359,37 @@
 
     // Event handler for "All Genres" checkbox
     document.getElementById('all-genres').addEventListener('change', function() {
-      var checkboxes = document.querySelectorAll('.genre-checkbox');
+      var checkboxes = document.querySelectorAll('.genre-checkbox, .subgenre-checkbox');
       checkboxes.forEach(function(checkbox) {
         checkbox.checked = this.checked;
-      }, this); // Added 'this' as the second argument to maintain the correct context
+      }, this);
     });
+
+
+    // Event handler for individual genre checkboxes
+    var checkedSubGenre = document.querySelectorAll('.subgenre-checkbox:checked');
+    document.querySelectorAll('.genre-checkbox').forEach(function(genreCheckbox) {
+      genreCheckbox.addEventListener('change', function() {
+        var genre = this.value;
+        var subGenreCheckboxes = document.querySelectorAll('.subgenre-checkbox[data-genre="' + genre +
+          '"]');
+        subGenreCheckboxes.forEach(function(subGenreCheckbox) {
+          var isChecked = Array.from(checkedSubGenre).includes(subGenreCheckbox);
+          subGenreCheckbox.checked = isChecked || genreCheckbox.checked;
+        });
+      });
+    });
+
+
+
   });
 
-  document.addEventListener('DOMContentLoaded', function() {
-    var dropdownButton = document.getElementById('dropdownDefaultButton');
-    var dropdownMenu = document.getElementById('dropdown');
+  // document.addEventListener('DOMContentLoaded', function() {
+  //   var dropdownButton = document.getElementById('dropdownDefaultButton');
+  //   var dropdownMenu = document.getElementById('dropdown');
 
-    dropdownButton.addEventListener('click', function() {
-      dropdownMenu.classList.toggle('hidden');
-    });
-  });
+  //   dropdownButton.addEventListener('click', function() {
+  //     dropdownMenu.classList.toggle('hidden');
+  //   });
+  // });
 </script>

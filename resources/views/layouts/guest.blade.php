@@ -78,8 +78,7 @@
       </div>
     </nav>
   @endif
-  <div
-    class="bg-hero-bg grid h-[calc(100vh-96px)] w-full items-center justify-center overflow-auto px-2 backdrop-brightness-50">
+  <div class="grid h-[calc(100vh-96px)] w-full items-center justify-center px-2 backdrop-brightness-50">
     {{ $slot }}
   </div>
   @stack('scripts')

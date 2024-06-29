@@ -12,14 +12,25 @@ class OtherServiceController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Retrieve all OtherService records
+        $searchQuery = $request->input('search_query');
+
         $otherServices = OtherService::with('otherServiceList')
             ->select('other_service_id')
             ->whereNull('deleted_at')
+            ->when($searchQuery, function ($query, $searchQuery) {
+                return $query->where('postal_town', 'like', "%$searchQuery%");
+            })
             ->groupBy('other_service_id')
-            ->get();
+            ->paginate(10);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'otherServices' => $otherServices,
+                'view' => view('partials.other-service-list', compact('otherServices'))->render()
+            ]);
+        }
 
         return view('other', compact('otherServices'));
     }

@@ -847,7 +847,7 @@
         <input
           class="search map-input sm:w-100 flex justify-center border-b-2 border-l-2 border-r-0 border-t-2 border-white bg-opacBlack font-sans text-xl focus:border-white md:w-4/6"
           type="search" id="address-input" name="search_query" placeholder="Search..." />
-        <button type="submit"
+        <button type="submit" id="search-button"
           class="search-button border-b-2 border-r-2 border-t-2 border-white bg-black p-4 text-white hover:bg-gray-800 hover:text-white">
           <span class="fas fa-search"></span>
         </button>
@@ -873,8 +873,26 @@
   async defer></script>
 
 <script>
-  function initialize() {
+  document.addEventListener("DOMContentLoaded", function() {
+    const searchInput = document.getElementById("address-input");
+    const searchButton = document.getElementById("search-button");
 
+    searchInput.addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        event.preventDefault(); // Prevent default action of Enter key
+        searchButton.click(); // Trigger the search button click
+      }
+    });
+  });
+
+  document.addEventListener("keydown", function(event) {
+    if (event.key === "/") {
+      event.preventDefault(); // Prevent default action of / key
+      searchInput.focus(); // Move cursor to search input
+    }
+  });
+
+  function initialize() {
     $('form').on('keyup keypress', function(e) {
       var keyCode = e.keyCode || e.which;
       if (keyCode === 13) {

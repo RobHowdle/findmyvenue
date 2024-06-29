@@ -186,10 +186,6 @@ body {
         color: var(--color-white)
     }
 
-table {
-    background-color: var(--color-blue);
-}
-
 .modal {
     background-color: var(--color-blue);
     display: none;
@@ -234,7 +230,7 @@ table {
 .promoter-wrapper {
     background-color: var(--color-blue);
     color: var(--color-white);
-    max-width: 1508px;
+    /* max-width: 1508px; */
     margin-inline: auto;
     max-height: 75vh;
     overflow: auto;
@@ -463,6 +459,35 @@ background-color: black;
 .venues-textarea {
     height: 150px;
 }
+
+/* Dashboard */
+  .collapsible-container {
+    overflow-x: auto;
+    border-radius: 0.5rem;
+  }
+
+  .collapsible-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .collapsible-content {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.3s ease-out;
+  }
+
+  .collapsible-content.show {
+    max-height: 1000px; /* Adjust as needed */
+    transition: max-height 0.3s ease-in;
+  }
+
+  /* Rotate icon for animation */
+  .rotate-180 {
+    transform: rotate(180deg);
+  }
 
 
 /* @media only screen and (max-width: 1920px) {} */

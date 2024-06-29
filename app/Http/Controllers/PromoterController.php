@@ -14,12 +14,29 @@ class PromoterController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $searchQuery = $request->input('search_query');
+
         $promoters = Promoter::whereNull('deleted_at')
-        ->with('venues')
-        ->get();
-        
+            ->with('venues')
+            ->when($searchQuery, function ($query, $searchQuery) {
+                return $query->where('postal_town', 'like', "%$searchQuery%");
+            })
+            ->paginate(10);
+
+        // Fetch genres for initial page load
+        $genreList = file_get_contents(storage_path('app/public/text/genre_list.json'));
+        $data = json_decode($genreList, true);
+        $genres = $data['genres'];
+
+        if ($request->ajax()) {
+            return response()->json([
+                'promoters' => $promoters,
+                'view' => view('partials.promoter-list', compact('promoters', 'genres'))->render()
+            ]);
+        }
+
         // Process each promoter
         foreach ($promoters as $promoter) {
             // Split the field containing multiple URLs into an array
@@ -32,7 +49,7 @@ class PromoterController extends Controller
                 $matchedPlatform = 'Unknown';
 
                 // Check if the URL contains platform names
-                $platformsToCheck = ['facebook', 'twitter', 'instagram'];
+                $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
                 foreach ($platformsToCheck as $platform) {
                     if (stripos($url, $platform) !== false) {
                         $matchedPlatform = $platform;
@@ -50,52 +67,51 @@ class PromoterController extends Controller
             // Add the processed data to the venue
             $promoter->platforms = $platforms;
         }
-        return view('promoters', compact('promoters'));
-        // return $dataTable->render('venues');
+        return view('promoters', compact('promoters', 'genres'));
     }
 
-        /**
+    /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
         $promoter = Promoter::where('id', $id)->first();
-            // Split the field containing multiple URLs into an array
-            $urls = explode(',', $promoter->contact_link);
-            $platforms = [];
+        // Split the field containing multiple URLs into an array
+        $urls = explode(',', $promoter->contact_link);
+        $platforms = [];
 
-            // // Check each URL against the platforms
-            foreach ($urls as $url) {
-                // Initialize the platform as unknown
-                $matchedPlatform = 'Unknown';
+        // // Check each URL against the platforms
+        foreach ($urls as $url) {
+            // Initialize the platform as unknown
+            $matchedPlatform = 'Unknown';
 
-                // Check if the URL contains platform names
-                $platformsToCheck = ['facebook', 'twitter', 'instagram'];
-                foreach ($platformsToCheck as $platform) {
-                    if (stripos($url, $platform) !== false) {
-                        $matchedPlatform = $platform;
-                        break; // Stop checking once a platform is found
-                    }
+            // Check if the URL contains platform names
+            $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+            foreach ($platformsToCheck as $platform) {
+                if (stripos($url, $platform) !== false) {
+                    $matchedPlatform = $platform;
+                    break; // Stop checking once a platform is found
                 }
-
-                // Store the platform information for each URL
-                $platforms[] = [
-                    'url' => $url,
-                    'platform' => $matchedPlatform
-                ];
             }
 
-            // Add the processed data to the venue
-            $promoter->platforms = $platforms;
-            $promoter->recentReviews = PromoterReview::getRecentReviewsForPromoter($id);
+            // Store the platform information for each URL
+            $platforms[] = [
+                'url' => $url,
+                'platform' => $matchedPlatform
+            ];
+        }
 
-            // Get Review Scores
-            $overallReview = PromoterReview::calculateOverallScore($id);
-            $averageCommunicationRating = PromoterReview::calculateAverageScore($id, 'communication_rating');
-            $averageRopRating = PromoterReview::calculateAverageScore($id, 'rop_rating');
-            $averagePromotionRating = PromoterReview::calculateAverageScore($id, 'promotion_rating');
-            $averageQualityRating = PromoterReview::calculateAverageScore($id, 'quality_rating');
-            $reviewCount = PromoterReview::getReviewCount($id);
+        // Add the processed data to the venue
+        $promoter->platforms = $platforms;
+        $promoter->recentReviews = PromoterReview::getRecentReviewsForPromoter($id);
+
+        // Get Review Scores
+        $overallReview = PromoterReview::calculateOverallScore($id);
+        $averageCommunicationRating = PromoterReview::calculateAverageScore($id, 'communication_rating');
+        $averageRopRating = PromoterReview::calculateAverageScore($id, 'rop_rating');
+        $averagePromotionRating = PromoterReview::calculateAverageScore($id, 'promotion_rating');
+        $averageQualityRating = PromoterReview::calculateAverageScore($id, 'quality_rating');
+        $reviewCount = PromoterReview::getReviewCount($id);
 
         return view('promoter', compact('promoter', 'overallReview', 'averageCommunicationRating', 'averageRopRating', 'averagePromotionRating', 'averageQualityRating', 'reviewCount'));
     }
@@ -134,5 +150,52 @@ class PromoterController extends Controller
             // Optionally, you can return an error response or redirect to an error page
             return back()->with('error', 'An error occurred while submitting the review. Please try again later.')->withInput();
         }
+    }
+
+    public function filterCheckboxesSearch(Request $request)
+    {
+        $query = Promoter::query();
+
+        // Search Results
+        $searchQuery = $request->input('search_query');
+        if ($searchQuery) {
+            $query->where('postal_town', 'LIKE', "%$searchQuery%");
+        }
+
+        // Band Type Filter
+        if ($request->has('band_type')) {
+            $bandType = $request->input('band_type');
+            if (!empty($bandType)) {
+                $query->where(function ($query) use ($bandType) {
+                    foreach ($bandType as $type) {
+                        $query->orWhereJsonContains('band_type', $type);
+                    }
+                });
+            }
+        }
+
+        // Genre Filter
+        if ($request->has('genres')) {
+            $genres = $request->input('genres');
+            if (!empty($genres)) {
+                $query->where(function ($query) use ($genres) {
+                    foreach ($genres as $genre) {
+                        $query->orWhereJsonContains('genre', $genre);
+                    }
+                });
+            }
+        }
+
+        $promoters = $query->paginate(10);
+
+        $transformedData = [
+            'promoters' => $promoters->items(),
+            'pagination' => [
+                'current_page' => $promoters->currentPage(),
+                'last_page' => $promoters->lastPage(),
+            ]
+        ];
+
+        return response()->json($transformedData);
     }
 }

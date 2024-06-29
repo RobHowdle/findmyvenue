@@ -1,10 +1,10 @@
-@props(['venues', 'genres'])
+@props(['promoters', 'genres'])
 
-<div class="mx-auto w-full max-w-screen-xl">
-  <h1 class="mb-4 mt-6 text-center font-heading text-6xl text-white">Venues</h1>
+<div class="mx-auto w-full">
+  <h1 class="mt-6 text-center font-heading text-6xl text-white">Promoters</h1>
   <div class="relative shadow-md sm:rounded-lg">
     <div class="search-wrapper flex justify-center border-2 border-white dark:bg-black">
-      <form class="filter-search flex items-center sm:p-1 md:p-3" action="{{ route('venues.filterCheckboxesSearch') }}"
+      <form class="filter-search flex items-center sm:p-1 md:p-3" action="{{ route('promoters.filterCheckboxesSearch') }}"
         method="GET">
         <div class="filters relative flex items-center">
           <div id="accordion-collapse" class="w-full" data-accordion="collapse">
@@ -23,7 +23,7 @@
             </h2>
             <div id="accordion-collapse-body-1" class="absolute hidden" aria-labelledby="accordion-collapse-heading-1">
               <div
-                class="filter-content max-h-40rem overflow-y-auto border-2 border-gray-100 p-5 dark:border-gray-300 dark:bg-gray-900">
+                class="filter-content max-h-40rem overflow-y-auto border border-b-0 border-gray-200 p-5 dark:border-gray-700 dark:bg-gray-900">
                 <div class="group relative z-0 mb-5 w-full">
                   <label class="text-sm font-medium text-gray-900 dark:text-gray-300">Preferred Band Types</label>
                   <div class="sm-gap:3 mt-4 grid sm:grid-cols-2 lg:grid-cols-3 lg:gap-4">
@@ -123,13 +123,15 @@
         <!-- Table headers -->
         <thead class="text-white underline dark:bg-black">
           <tr>
-            <th scope="col" class="md-text-2xl sm:px-2 sm:py-2 sm:text-xl md:px-6 md:py-3 lg:px-8 lg:py-4">Venue
+            <th scope="col" class="md-text-2xl sm:px-2 sm:py-2 sm:text-xl md:px-6 md:py-3 lg:px-8 lg:py-4">Name
+            </th>
+            <th scope="col" class="md-text-2xl sm:px-2 sm:py-2 sm:text-xl md:px-6 md:py-3 lg:px-8 lg:py-4">Rating
             </th>
             <th scope="col" class="md-text-2xl sm:px-2 sm:py-2 sm:text-xl md:px-6 md:py-3 lg:px-8 lg:py-4">Location
             </th>
             <th scope="col" class="md-text-2xl sm:px-2 sm:py-2 sm:text-xl md:px-6 md:py-3 lg:px-8 lg:py-4">Contact
             </th>
-            <th scope="col" class="md-text-2xl sm:px-2 sm:py-2 sm:text-xl md:px-6 md:py-3 lg:px-8 lg:py-4">Promoter
+            <th scope="col" class="md-text-2xl sm:px-2 sm:py-2 sm:text-xl md:px-6 md:py-3 lg:px-8 lg:py-4">Venue(s)
             </th>
           </tr>
         </thead>
@@ -141,9 +143,9 @@
     </div>
     <!-- Pagination links -->
     <div class="mt-4 px-6 py-3">
-      {{-- @if ($venues->count() >= 10) --}}
-      {{ $venues->links() }}
-      {{-- @endif --}}
+      @if ($promoters->count() >= 10)
+        {{ $promoters->links() }}
+      @endif
     </div>
   </div>
 </div>

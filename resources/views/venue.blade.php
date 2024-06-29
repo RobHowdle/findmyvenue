@@ -114,7 +114,7 @@
 
       <div class="venue-tab-content mt-4 overflow-auto font-sans text-lg text-white">
         <div id="about">
-          @if (!$venue->decription)
+          @if (!$venue->description)
             <p>We're still working on this! Come back later to read about us!</p>
           @else
             <p>{{ $venue->description }}</p>
@@ -131,19 +131,21 @@
             </p>
             <div class="gear-block flex flex-col">
               <p class="text-base text-white">
-                <pre>{{ $venue->in_house_gear }}</pre>
+                {{ $venue->in_house_gear }}
               </p>
             </div>
           @endif
         </div>
 
         <div id="band-types">
-          @php $bandTypes = json_decode($venue->band_type); @endphp
+          @php
+            $bandTypes = json_decode($venue->band_type);
+          @endphp
           @if (!$bandTypes)
             <p>We don't have any specific band types listed, please contact us if you would like to enquire about
               booking your band.</p>
           @else
-            <p>The band types that we usually have at {{ $venue->name }} are:</p>
+            <p>The band types that we usually have at <span class="bold">{{ $venue->name }}</span> are:</p>
             <ul class="band-types-list mb-2">
               @foreach ($bandTypes as $type)
                 @switch($type)

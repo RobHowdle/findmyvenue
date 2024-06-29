@@ -2,14 +2,17 @@
 
 namespace Tests\Feature\Auth;
 
+use Tests\TestCase;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Illuminate\Foundation\Testing\WithoutMiddleware;
 
 class AuthenticationTest extends TestCase
 {
     use RefreshDatabase;
+    use WithoutMiddleware; // Disables all middleware, including CSRF protection
+
 
     public function test_login_screen_can_be_rendered(): void
     {
@@ -24,7 +27,7 @@ class AuthenticationTest extends TestCase
 
         $response = $this->post('/login', [
             'email' => $user->email,
-            'password' => 'password',
+            'password' => $user->password,
         ]);
 
         $this->assertAuthenticated();

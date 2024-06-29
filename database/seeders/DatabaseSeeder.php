@@ -5,6 +5,7 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Database\Seeders\RoleSeeder;
+use Database\Seeders\VenuesSeeder;
 use Database\Seeders\AdminUserSeeder;
 use Database\Seeders\VenueTestSeeder;
 use Database\Seeders\PermissionsSeeder;
@@ -25,9 +26,11 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AdminUserSeeder::class,
             PermissionsSeeder::class,
-            VenueTestSeeder::class,
-            VenueExtraInfoSeeder::class,
-            PromoterTestSeeder::class,
+            // VenueTestSeeder::class, // For Testing Data
+            VenuesSeeder::class,
+            // VenueExtraInfoSeeder::class, // For Testing Data
+            // PromoterTestSeeder::class,
+            PromoterSeeder::class,
             PromoterVenueTestPivotSeeder::class,
             PromoterReviewTestSeeder::class,
             RoleSeeder::class,

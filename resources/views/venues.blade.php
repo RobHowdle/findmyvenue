@@ -8,17 +8,14 @@
       <tr class="border-b odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
         <th scope="row"
           class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
-          <!-- Venue name -->
           <a href="{{ route('venue', $venue->id) }}" class="venue-link hover:text-gray-400">{{ $venue->name }}</a>
         </th>
         <td
           class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
-          <!-- Location -->
           {{ $venue->postal_town }}
         </td>
         <td
           class="flex gap-4 whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
-          <!-- Contact links -->
           @if ($venue->contact_number)
             <a class="hover:text-gray-400" href="tel:{{ $venue->contact_number }}"><span class="fas fa-phone"></span></a>
           @endif
@@ -26,28 +23,35 @@
             <a class="hover:text-gray-400" href="mailto:{{ $venue->contact_email }}"><span
                 class="fas fa-envelope"></span></a>
           @endif
-          <!-- Additional processing for contact links -->
           @if ($venue->platforms)
             @foreach ($venue->platforms as $platform)
               @if ($platform['platform'] == 'facebook')
-                <a href="{{ $platform['url'] }}" target=_blank><span class="fab fa-facebook"></span></a>
+                <a class="hover:text-gray-400" href="{{ $platform['url'] }}" target=_blank><span
+                    class="fab fa-facebook"></span></a>
               @elseif($platform['platform'] == 'twitter')
-                <a href="{{ $platform['url'] }}" target=_blank><span class="fab fa-twitter"></span></a>
+                <a class="hover:text-gray-400" href="{{ $platform['url'] }}" target=_blank><span
+                    class="fab fa-twitter"></span></a>
               @elseif($platform['platform'] == 'instagram')
-                <a href="{{ $platform['url'] }}" target=_blank><span class="fab fa-instagram"></span></a>
+                <a class="hover:text-gray-400" href="{{ $platform['url'] }}" target=_blank><span
+                    class="fab fa-instagram"></span></a>
               @elseif($platform['platform'] == 'snapchat')
-                <a href="{{ $platform['url'] }}" target=_blank><span class="fab fa-snapchat-ghost"></span></a>
+                <a class="hover:text-gray-400" href="{{ $platform['url'] }}" target=_blank><span
+                    class="fab fa-snapchat-ghost"></span></a>
               @elseif($platform['platform'] == 'tiktok')
-                <a href="{{ $platform['url'] }}" target=_blank><span class="fab fa-tiktok"></span></a>
+                <a class="hover:text-gray-400" href="{{ $platform['url'] }}" target=_blank><span
+                    class="fab fa-tiktok"></span></a>
               @elseif($platform['platform'] == 'youtube')
-                <a href="{{ $platform['url'] }}" target=_blank><span class="fab fa-youtube"></span></a>
+                <a class="hover:text-gray-400" href="{{ $platform['url'] }}" target=_blank><span
+                    class="fab fa-youtube"></span></a>
+              @else
+                <a class="hover:text-gray-400" href="{{ $platform['url'] }}" target=_blank><span
+                    class="fas fa-globe"></span></a>
               @endif
             @endforeach
           @endif
         </td>
         <td
           class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
-          <!-- Promoter names -->
           @if ($venue->promoters)
             @foreach ($venue->promoters as $promoter)
               <a class="hover:text-gray-400" href="{{ url('promoters', $promoter->id) }}">{{ $promoter['name'] }}</a>
@@ -56,8 +60,8 @@
         </td>
       </tr>
     @empty
-      <tr>
-        <td colspan="4" class="text-center text-2xl text-white">No venues found</td>
+      <tr class="border-b odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+        <td colspan="4" class="text-center text-2xl text-white dark:bg-gray-900">No venues found</td>
       </tr>
     @endforelse
   </x-venue-table>
@@ -330,17 +334,17 @@
                     ${venue.platforms ? venue.platforms.map(function(platform) {
                         switch (platform.platform) {
                             case 'facebook':
-                                return '<a href="' + platform.url + '" target=_blank><span class="fab fa-facebook"></span></a>';
+                                return '<a class="hover:text-gray-400" href="' + platform.url + '" target=_blank><span class="fab fa-facebook"></span></a>';
                             case 'twitter':
-                                return '<a href="' + platform.url + '" target=_blank><span class="fab fa-twitter"></span></a>';
+                                return '<a class="hover:text-gray-400" href="' + platform.url + '" target=_blank><span class="fab fa-twitter"></span></a>';
                             case 'instagram':
-                                return '<a href="' + platform.url + '" target=_blank><span class="fab fa-instagram"></span></a>';
+                                return '<a class="hover:text-gray-400" href="' + platform.url + '" target=_blank><span class="fab fa-instagram"></span></a>';
                             case 'snapchat':
-                                return '<a href="' + platform.url + '" target=_blank><span class="fab fa-snapchat-ghost"></span></a>';
+                                return '<a class="hover:text-gray-400" href="' + platform.url + '" target=_blank><span class="fab fa-snapchat-ghost"></span></a>';
                             case 'tiktok':
-                                return '<a href="' + platform.url + '" target=_blank><span class="fab fa-tiktok"></span></a>';
+                                return '<a class="hover:text-gray-400" href="' + platform.url + '" target=_blank><span class="fab fa-tiktok"></span></a>';
                             case 'youtube':
-                                return '<a href="' + platform.url + '" target=_blank><span class="fab fa-youtube"></span></a>';
+                                return '<a class="hover:text-gray-400" href="' + platform.url + '" target=_blank><span class="fab fa-youtube"></span></a>';
                             default:
                                 return '';
                         }
@@ -372,7 +376,7 @@
     } else {
       // Display message if no venues found
       var noVenuesRow = `
-            <tr>
+            <tr class="border-b odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
                 <td colspan="4" class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4 uppercase text-center">No venues found</td>
             </tr>
         `;

@@ -9,7 +9,8 @@
     <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
         <div class="count-wrapper p-6 text-gray-900 dark:text-gray-100">
-          <p class="text-2xl">Active Promoters: <span>{{ $promoterCount }}</span></p>
+          <a class="text-2xl underline" href="{{ route('admin.promoter-list') }}">View Active Promoters:
+            <span>{{ $promoterCount }}</span></a>
           <p class="mt-4 text-xl">Create New Promoter</p>
           <span class="text-sm">Due to the large amounts of information, we suggest typing your information in a notes
             app and pasting

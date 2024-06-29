@@ -13,7 +13,7 @@ class OtherServiceSeeder extends Seeder
      */
     public function run(): void
     {
-        $photographerId = DB::table('other_services_list')->where('service_name', 'Photographer')->value('id');
+        $photographerId = DB::table('other_services_list')->where('service_name', 'Photography')->value('id');
         DB::table('other_services')->insert([
             'name' => 'Howdle Photography',
             'logo_url' => '',
