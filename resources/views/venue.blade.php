@@ -317,10 +317,8 @@
   <!-- Main modal -->
   <div id="review-modal" tabindex="-1" aria-hidden="true"
     class="max-h-full fixed left-0 right-0 top-0 z-50 flex hidden h-[calc(100%-1rem)] w-full items-center justify-center overflow-y-auto overflow-x-hidden md:inset-0">
-    <div class="max-h-full relative m-4 mx-auto w-full max-w-2xl border border-white">
-      <!-- Modal content -->
-      <div class="review-popup relative rounded-lg">
-        <!-- Modal header -->
+    <div class="max-h-full relative m-4 mx-auto w-full max-w-4xl border border-white">
+      <div class="review-popup relative rounded-lg bg-white dark:bg-black">
         <div class="dark:white flex items-center justify-between rounded-t border-b p-4 md:p-5">
           <h3 class="text-xl font-semibold">
             Leave a review for {{ $venue->name }}
@@ -398,6 +396,18 @@
             </div>
 
             <div class="review-block mt-4">
+              <div class="group relative z-0 mb-5 hidden w-full">
+                <input type="text" name="reviewer_ip" id="reviewer_ip" value="{{ old('reviewer_ip') }}"
+                  class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
+                  placeholder=" " required readonly />
+                <label for="reviewer_ip"
+                  class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
+                  IP
+                </label>
+                @error('reviewer_ip')
+                  <span class="text-danger">{{ $message }}</span>
+                @enderror
+              </div>
               <div class="group relative z-0 mb-5 w-full">
                 <input type="text" name="review_author" id="review_author" value="{{ old('review_author') }}"
                   class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
@@ -520,5 +530,21 @@
       // Handle errors
       console.error(xhr.responseText);
     }
+  });
+</script>
+
+<script>
+  $(document).ready(function() {
+    $.getJSON('https://api.ipify.org?format=json', function(data) {
+      var userIP = data.ip;
+      // Verify the element exists before setting the value
+      var reviewerIpField = $('#reviewer_ip');
+      if (reviewerIpField.length) {
+        reviewerIpField.val(userIP);
+      }
+    }).fail(function(jqxhr, textStatus, error) {
+      var err = textStatus + ", " + error;
+      console.error("Request Failed: " + err);
+    });
   });
 </script>

@@ -2,7 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PromoterController;
 use App\Http\Controllers\VenueApiController;
+use App\Http\Controllers\PromoterReviewsController;
 
 /*
 |--------------------------------------------------------------------------

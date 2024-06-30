@@ -233,8 +233,6 @@ class VenueController extends Controller
         ]);
     }
 
-
-
     public function filterCheckboxesSearch(Request $request)
     {
         $query = Venue::query();
@@ -291,7 +289,8 @@ class VenueController extends Controller
                 'promotion-rating' => 'required',
                 'quality-rating' => 'required',
                 'review_author' => 'required',
-                'review_message' => 'required'
+                'review_message' => 'required',
+                'reviewer_ip' => 'required'
             ]);
 
             if ($validator->fails()) {
@@ -306,6 +305,7 @@ class VenueController extends Controller
                 'quality_rating' => $request->input('quality-rating'),
                 'author' => $request->input('review_author'),
                 'review' => $request->input('review_message'),
+                'reviewer_ip' => $request->input('reviewer_ip'),
             ]);
 
             return back()->with('success', 'Review submitted successfully.');
@@ -325,6 +325,8 @@ class VenueController extends Controller
 
         $location = $venue->postal_town;
         $promotersByLocation = Promoter::where('location', $location)->get();
+
+        dd($promotersByLocation);
 
         return view('components.promoter-suggestions', [
             'venueId' => $venueId,

@@ -6,7 +6,6 @@ use App\Models\Promoter;
 use Illuminate\Http\Request;
 use App\Models\PromoterReview;
 use Illuminate\Support\Facades\Log;
-use App\DataTables\PromotersDataTable;
 use Illuminate\Support\Facades\Validator;
 
 class PromoterController extends Controller
@@ -125,7 +124,8 @@ class PromoterController extends Controller
                 'promotion-rating' => 'required',
                 'quality-rating' => 'required',
                 'review_author' => 'required',
-                'review_message' => 'required'
+                'review_message' => 'required',
+                'reviewer_ip' => 'required'
             ]);
 
             if ($validator->fails()) {
@@ -140,6 +140,7 @@ class PromoterController extends Controller
                 'quality_rating' => $request->input('quality-rating'),
                 'author' => $request->input('review_author'),
                 'review' => $request->input('review_message'),
+                'reviewer_ip' => $request->input('reviewer_ip'),
             ]);
 
             return back()->with('success', 'Review submitted successfully.');

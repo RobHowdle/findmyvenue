@@ -409,11 +409,6 @@ background-color: black;
     color: red;
 }
 
-.review-popup {
-    background-color: var(--color-blue);
-    color: var(--color-white);
-}
-
 .rating input {
     width: 25px;
     height: 25px;
