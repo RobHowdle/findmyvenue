@@ -97,13 +97,28 @@
             </div>
 
             <div class="group relative z-0 mb-5 w-full">
-              <textarea name="promoter_my_venues" id="promoter_my_venues" value="{{ old('promoter_my_venues') }}"
-                class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-                placeholder=" " required></textarea>
               <label for="promoter_my_venues"
                 class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
                 My Venues<span class="required">*</span>
               </label>
+
+              <div class="flex flex-row gap-4">
+                <select multiple id="locationSelect"
+                  class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500">
+                  <option value="">Please Select Location</option>
+                  @foreach ($postalTown as $town)
+                    <option value="{{ $town->postal_town }}">{{ $town->postal_town }}</option>
+                  @endforeach
+                </select>
+                <select multiple id="venueSelect"
+                  class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500">
+                  {{-- <option value="">Please Select Venue</option> --}}
+                  @foreach ($venues as $venue)
+                    <option value="{{ $venue->id }}">{{ $venue->name }}</option>
+                  @endforeach
+                </select>
+              </div>
+
               @error('promoter_my_venues')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
@@ -185,7 +200,6 @@
               </div>
             </div>
 
-
             <div class="group relative z-0 mb-5 w-full">
               <label class="text-sm font-medium text-gray-900 dark:text-gray-300">Preferred Genre(s) - <span>Yes,
                   there
@@ -235,7 +249,6 @@
                 @endforeach
               </div>
             </div>
-
 
             <div class="group relative z-0 mb-5 w-full">
               <input type="text" name="promoter_contact_number" id="promoter_contact_number"
@@ -293,6 +306,8 @@
 <script
   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcMjlXwDOk74oMDPgOp4YWdWxPa5xtHGA&libraries=places&callback=initialize"
   async defer></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
 <script>
   function initialize() {
 
@@ -424,6 +439,45 @@
       var isChecked = $(this).prop('checked');
       var accordionContent = $(this).closest('.accordion-item').find('.accordion-content');
       accordionContent.find('.venue-checkbox').prop('checked', isChecked);
+    });
+  });
+
+  $(document).ready(function() {
+    $('#locationSelect').change(function() {
+      var selectedLocations = $(this).val();
+
+      // Make sure at least one location is selected
+      if (selectedLocations && selectedLocations.length > 0) {
+        $.ajax({
+          headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          },
+          url: '/admin/promoters/get-location-venues', // Your endpoint to get venues based on location
+          type: 'GET',
+          data: {
+            locations: selectedLocations
+          },
+          success: function(response) {
+            // Assuming response is an array of venues
+            var venueSelect = $('#venueSelect');
+            venueSelect.empty(); // Clear the existing options
+
+            // Add a placeholder option
+            venueSelect.append('<option value="">Please Select Venue</option>');
+
+            // Populate the select with new options
+            response.forEach(function(venue) {
+              venueSelect.append('<option value="' + venue.name + '">' + venue.name + '</option>');
+            });
+          },
+          error: function(xhr, status, error) {
+            console.error('An error occurred:', error);
+          }
+        });
+      } else {
+        // If no location is selected, clear the venues
+        $('#venueSelect').empty().append('<option value="">Please Select Venue</option>');
+      }
     });
   });
 </script>

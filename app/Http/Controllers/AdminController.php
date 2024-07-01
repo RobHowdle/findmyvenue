@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
+use function PHPSTORM_META\type;
+
 class AdminController extends Controller
 {
     public function getVenues()
@@ -277,8 +279,10 @@ class AdminController extends Controller
         $genreList = file_get_contents(storage_path('app/public/text/genre_list.json'));
         $data = json_decode($genreList, true);
         $genres = $data['genres'];
+        $venues = Venue::whereNull('deleted_at')->get();
+        $postalTown = Venue::whereNull('deleted_at')->select('postal_town')->groupBy('postal_town')->get();
 
-        return view('admin.promoters', compact('promoterCount', 'venuesByTown', 'genres'));
+        return view('admin.promoters', compact('promoterCount', 'venuesByTown', 'genres', 'venues', 'postalTown'));
     }
 
     public function saveNewPromoter(Request $request)
@@ -316,7 +320,7 @@ class AdminController extends Controller
             // Move the uploaded image to the specified directory
             $promoterLogoFile->move(public_path($destinationPath), $promoterLogoFilename);
 
-            // Construct the URL to the stored image
+            // Construct the URL to the stored i`mage
             $logoUrl = $destinationPath . '/' . $promoterLogoFilename;
 
 
@@ -560,5 +564,18 @@ class AdminController extends Controller
             // Optionally, you can return an error response or redirect to an error page
             return back()->with('error', 'An error occurred while saving the service. Please try again later.')->withInput();
         }
+    }
+
+
+    public function getVenuesBySelectedLocation(Request $request)
+    {
+        $location = $request->input('locations');
+
+        if (!is_array($location) || empty($location)) {
+            return response()->json([]);
+        }
+
+        $venues = Venue::whereIn('postal_town', $location)->get();
+        return response()->json($venues);
     }
 }

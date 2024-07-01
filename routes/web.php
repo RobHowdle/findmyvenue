@@ -64,6 +64,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/promoters/{promoterId}/edit', [AdminController::class, 'editPromoter'])->name('admin.edit-promoter');
     Route::post('/admin/promoters/{promoterId}', [AdminController::class, 'updatePromoter'])->name('admin.update-promoter');
     Route::delete('/admin/promoters/{promoterId}', [AdminController::class, 'deletePromoter'])->name('admin.delete-promoter');
+    Route::get('/admin/promoters/get-location-venues', [AdminController::class, 'getVenuesBySelectedLocation']);
 
     Route::get('/admin/create-other', [AdminController::class, 'createOtherService'])->name('admin.createOther');
     Route::post('/admin/save-other', [AdminController::class, 'saveNewOtherService'])->name('admin.save-other');

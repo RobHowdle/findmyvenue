@@ -4,9 +4,7 @@ namespace App\Models;
 
 use App\Models\Promoter;
 use App\Models\VenueReview;
-use App\Models\PromoterVenue;
 use App\Models\VenueExtraInfo;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
