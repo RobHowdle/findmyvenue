@@ -44,6 +44,7 @@ Route::post('/dashboard/approve-display-promoter/{reviewId}', [DashboardControll
 Route::post('/dashboard/approve-promoter/{$reviewId}', [DashboardController::class, 'approvePromoterReview'])->middleware(['auth', 'verified'])->name('pending-review-promoter.approve');
 Route::post('/dashboard/approve-display-venue/{reviewId}', [DashboardController::class, 'approveDisplayVenueReview'])->middleware(['auth', 'verified'])->name('pending-review-venue.approve-display');
 Route::post('/dashboard/approve-venue/{$reviewId}', [DashboardController::class, 'approveVenueReview'])->middleware(['auth', 'verified'])->name('pending-review-venue.approve');
+Route::post('/dashboard/user-service-link', [DashboardController::class, 'userServiceLink'])->middleware(['auth', 'verified'])->name('user-service-link');
 
 
 Route::middleware('auth')->group(function () {

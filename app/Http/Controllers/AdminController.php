@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Venue;
 use App\Models\Promoter;
 use Illuminate\Support\Str;
@@ -10,10 +11,9 @@ use Illuminate\Http\Request;
 use App\Models\PromoterVenue;
 use App\Models\OtherServiceList;
 use Illuminate\Support\Facades\DB;
+
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-
-use function PHPSTORM_META\type;
 
 class AdminController extends Controller
 {
@@ -565,7 +565,6 @@ class AdminController extends Controller
             return back()->with('error', 'An error occurred while saving the service. Please try again later.')->withInput();
         }
     }
-
 
     public function getVenuesBySelectedLocation(Request $request)
     {
