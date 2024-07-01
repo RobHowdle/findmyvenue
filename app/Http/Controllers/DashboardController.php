@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Models\PromoterReview;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 
 class DashboardController extends Controller
@@ -24,7 +25,24 @@ class DashboardController extends Controller
         $venues = Venue::whereNull('deleted_at')->get();
         $promoters = Promoter::whereNull('deleted_at')->get();
         $otherServices = OtherService::whereNull('deleted_at')->get();
-        return view('dashboard', compact('users', 'pendingPromoterReviews', 'pendingVenueReviews', 'venues', 'promoters', 'otherServices'));
+
+        // Promoter Dashboard
+        $user = auth()->user()->load('roles');
+        $userLinkPromoter = UserService::where('user_id', $user->id)
+            ->whereNotNull('promoters_id')
+            ->whereNull('deleted_at')
+            ->get();
+
+        if ($userLinkPromoter) {
+            foreach ($userLinkPromoter as $ulp) {
+                $promoterReviews = PromoterReview::with('promoter')
+                    ->where('promoter_id', $ulp->promoters_id)
+                    ->orderBy('review_approved', 'asc')
+                    ->get();
+            }
+        }
+
+        return view('dashboard', compact('users', 'pendingPromoterReviews', 'pendingVenueReviews', 'venues', 'promoters', 'otherServices', 'promoterReviews'));
     }
 
     public function editUser(Request $request)
@@ -45,6 +63,36 @@ class DashboardController extends Controller
         return redirect()->route('dashboard')->with('success', 'Review approved and set to display.');
     }
 
+    public function approvePromoterReview($reviewId)
+    {
+        $review = PromoterReview::findOrFail($reviewId);
+        $review->update([
+            'review_approved' => 1,
+        ]);
+
+        return redirect()->route('dashboard')->with('success', 'Review approved.');
+    }
+
+    public function displayPromoterReview($reviewId)
+    {
+        $review = PromoterReview::findOrFail($reviewId);
+        $review->update([
+            'display' => 1,
+        ]);
+
+        return redirect()->route('dashboard')->with('success', 'Review approved.');
+    }
+
+    public function hidePromoterReview($reviewId)
+    {
+        $review = PromoterReview::findOrFail($reviewId);
+        $review->update([
+            'display' => 0,
+        ]);
+
+        return redirect()->route('dashboard')->with('success', 'Review approved.');
+    }
+
     public function approveDisplayVenueReview($reviewId)
     {
         $review = VenueReview::findOrFail($reviewId);
@@ -55,6 +103,17 @@ class DashboardController extends Controller
         ]);
 
         return redirect()->route('dashboard')->with('success', 'Review approved and set to display.');
+    }
+
+    public function approveVenueReview($reviewId)
+    {
+        $review = VenueReview::findOrFail($reviewId);
+
+        $review->update([
+            'review_approved' => 1,
+        ]);
+
+        return redirect()->route('dashboard')->with('success', 'Review approved.');
     }
 
     public function userServiceLink(Request $request)

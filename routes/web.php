@@ -40,10 +40,12 @@ Route::get('/other/{serviceName}', [OtherServiceController::class, 'showGroup'])
 Route::get('/other/{serviceName}/{serviceId}', [OtherServiceController::class, 'show'])->name('singleService');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+Route::post('/dashboard/approve-promoter/{reviewId}', [DashboardController::class, 'approvePromoterReview'])->middleware(['auth', 'verified'])->name('pending-review-promoter.approve');
+Route::post('/dashboard/display-promoter/{reviewId}', [DashboardController::class, 'displayPromoterReview'])->middleware(['auth', 'verified'])->name('pending-review-promoter.display');
+Route::post('/dashboard/hide-promoter/{reviewId}', [DashboardController::class, 'hidePromoterReview'])->middleware(['auth', 'verified'])->name('pending-review-promoter.hide');
 Route::post('/dashboard/approve-display-promoter/{reviewId}', [DashboardController::class, 'approveDisplayPromoterReview'])->middleware(['auth', 'verified'])->name('pending-review-promoter.approve-display');
-Route::post('/dashboard/approve-promoter/{$reviewId}', [DashboardController::class, 'approvePromoterReview'])->middleware(['auth', 'verified'])->name('pending-review-promoter.approve');
 Route::post('/dashboard/approve-display-venue/{reviewId}', [DashboardController::class, 'approveDisplayVenueReview'])->middleware(['auth', 'verified'])->name('pending-review-venue.approve-display');
-Route::post('/dashboard/approve-venue/{$reviewId}', [DashboardController::class, 'approveVenueReview'])->middleware(['auth', 'verified'])->name('pending-review-venue.approve');
+Route::post('/dashboard/approve-venue/{reviewId}', [DashboardController::class, 'approveVenueReview'])->middleware(['auth', 'verified'])->name('pending-review-venue.approve');
 Route::post('/dashboard/user-service-link', [DashboardController::class, 'userServiceLink'])->middleware(['auth', 'verified'])->name('user-service-link');
 
 
