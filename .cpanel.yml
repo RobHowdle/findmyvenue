@@ -1,0 +1,5 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/robsr2d2/public_html/beta.yournextshow.co.uk
+    - /bin/cp -R * $DEPLOYPATH
