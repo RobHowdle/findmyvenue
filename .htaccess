@@ -1,0 +1,10 @@
+<VirtualHost *:80>
+    ServerName beta.yournextshow.co.uk
+    DocumentRoot /public_html/beta.yournextshow.co.uk/public
+
+    <Directory /public_html/beta.yournextshow.co.uk/public>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+</VirtualHost>
