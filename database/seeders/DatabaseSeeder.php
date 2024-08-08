@@ -32,7 +32,7 @@ class DatabaseSeeder extends Seeder
             // PromoterTestSeeder::class,
             PromoterSeeder::class,
             PromoterVenueTestPivotSeeder::class,
-            PromoterReviewTestSeeder::class,
+            // PromoterReviewTestSeeder::class,
             RoleSeeder::class,
             OtherServicesListSeeder::class,
             OtherServiceSeeder::class,
