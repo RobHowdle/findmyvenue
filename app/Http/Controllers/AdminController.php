@@ -22,7 +22,7 @@ class AdminController extends Controller
         $venueCount = Venue::whereNull('deleted_at')->count();
         $locationCount = Venue::whereNull('deleted_at')->distinct('postal_town')->count();
 
-        $genreList = file_get_contents(storage_path('app/public/text/genre_list.json'));
+        $genreList = file_get_contents(public_path('text/genre_list.json'));
         $data = json_decode($genreList, true);
         $promoters = Promoter::whereNull('deleted_at')->get();
 
@@ -122,7 +122,7 @@ class AdminController extends Controller
         $venue->load('promoters');
 
         // Load and decode the genre list
-        $genreList = file_get_contents(storage_path('app/public/text/genre_list.json'));
+        $genreList = file_get_contents(public_path('text/genre_list.json'));
         $genresData = json_decode($genreList, true);
 
         // Prepare genre names and subgenres
@@ -276,7 +276,7 @@ class AdminController extends Controller
             ->groupBy('postal_town')
             ->get();
 
-        $genreList = file_get_contents(storage_path('app/public/text/genre_list.json'));
+        $genreList = file_get_contents(public_path('text/genre_list.json'));
         $data = json_decode($genreList, true);
         $genres = $data['genres'];
         $venues = Venue::whereNull('deleted_at')->get();
@@ -368,7 +368,7 @@ class AdminController extends Controller
         $promoter->load('venues');
 
         // Load and decode the genre list
-        $genreList = file_get_contents(storage_path('app/public/text/genre_list.json'));
+        $genreList = file_get_contents(public_path('text/genre_list.json'));
         $genresData = json_decode($genreList, true);
 
         // Prepare genre names and subgenres

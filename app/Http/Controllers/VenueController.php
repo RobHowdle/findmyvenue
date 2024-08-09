@@ -222,7 +222,7 @@ class VenueController extends Controller
         }
 
         // Fetch genres for initial page load
-        $genreList = file_get_contents(storage_path('app/public/text/genre_list.json'));
+        $genreList = file_get_contents(public_path('text/genre_list.json'));
         $data = json_decode($genreList, true);
         $genres = $data['genres'];
 
