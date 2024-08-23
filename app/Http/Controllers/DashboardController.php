@@ -33,7 +33,8 @@ class DashboardController extends Controller
             ->whereNull('deleted_at')
             ->get();
 
-        if ($userLinkPromoter) {
+        $promoterReviews = collect();
+        if ($userLinkPromoter && !$userLinkPromoter->isEmpty()) {
             foreach ($userLinkPromoter as $ulp) {
                 $promoterReviews = PromoterReview::with('promoter')
                     ->where('promoter_id', $ulp->promoters_id)

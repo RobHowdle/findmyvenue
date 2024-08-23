@@ -17,6 +17,12 @@ export default {
             },
             colors: {
                 opacBlack: "rgba(255,255,255,0.4)",
+                ynsRed: "#EF3F38",
+                ynsPurple: "#9022BB",
+                ynsCyan: "#29C0D2",
+                ynsTeal: "#53E5D6",
+                ynsYellow: "#D59220",
+                ynsDarkOrange: "#F03F37",
             },
         },
         screens: {

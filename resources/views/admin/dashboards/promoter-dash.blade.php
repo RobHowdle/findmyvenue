@@ -1,4 +1,5 @@
 @role('promoter')
+  {{-- Reviews --}}
   <div
     class="collapsible-container mb-2 w-full max-w-7xl overflow-x-auto bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
     <div class="collapsible-header toggle-header p-6">
@@ -65,4 +66,7 @@
       </div>
     </div>
   </div>
+
+  {{-- Finances --}}
+
 @endrole
