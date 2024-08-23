@@ -11,6 +11,10 @@
     --color-black-light: rgba(0, 0, 0, 0.85);
 }
 
+[type='checkbox']:checked {
+    background-color: theme('colors.ynsRed');
+}
+
 /* Preloader */
 @keyframes music-first{
     0% {
