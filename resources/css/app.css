@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -11,12 +11,12 @@
     --color-black-light: rgba(0, 0, 0, 0.85);
 }
 
-[type='checkbox']:checked {
-    background-color: theme('colors.ynsRed');
+[type="checkbox"]:checked {
+    background-color: theme("colors.ynsRed");
 }
 
 /* Preloader */
-@keyframes music-first{
+@keyframes music-first {
     0% {
         height: 20px;
     }
@@ -24,7 +24,7 @@
         height: 70px;
     }
 }
-@keyframes music-sec{
+@keyframes music-sec {
     0% {
         height: 20px;
     }
@@ -32,7 +32,7 @@
         height: 90px;
     }
 }
-@keyframes music-third{
+@keyframes music-third {
     0% {
         height: 20px;
     }
@@ -40,7 +40,7 @@
         height: 100px;
     }
 }
-@keyframes blink{
+@keyframes blink {
     0% {
         opacity: 1;
     }
@@ -87,7 +87,7 @@
 
 #preloader.animation p {
     animation-name: blink;
-    animation-duration: .85s;
+    animation-duration: 0.85s;
     animation-iteration-count: infinite;
     animation-timing-function: ease-in;
     animation-direction: alternate;
@@ -144,13 +144,13 @@
     height: 70px;
     background-color: var(--color-white);
     left: 45px;
-    bottom:  0;
+    bottom: 0;
     position: absolute;
 }
 
 #preloader.animation .decor::after {
     animation-name: music-third;
-    animation-duration: .75s;
+    animation-duration: 0.75s;
     animation-iteration-count: infinite;
     animation-timing-function: ease;
     animation-direction: alternate;
@@ -160,9 +160,12 @@
     display: none;
 }
 
+.logo--503 img {
+    max-width: 150px;
+}
 
 body {
-    background-image: url('/public/images/hero-bg.jpg');
+    background-image: url("/public/images/hero-bg.jpg");
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
@@ -171,7 +174,7 @@ body {
 .overlay {
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
 .search {
@@ -187,8 +190,8 @@ body {
 }
 
 .search::placeholder {
-        color: var(--color-white)
-    }
+    color: var(--color-white);
+}
 
 .modal {
     background-color: var(--color-blue);
@@ -209,7 +212,7 @@ body {
 }
 
 .modal.modal-visible {
-    display:block;
+    display: block;
     overflow: visible;
     opacity: 1;
 }
@@ -228,7 +231,7 @@ body {
 
 .close:hover {
     background-color: transparent;
-    color: var(--color-white)
+    color: var(--color-white);
 }
 
 .promoter-wrapper {
@@ -308,41 +311,41 @@ body {
 
 .service-block {
     @supports not (aspect-ratio: 1/1) {
-       position: relative;
-       
-       &::before {
-         content: "";
-         display: block;
-         padding-top: calc((250/250) * 100%);
-       }
-       
-       img {
-           position: absolute;
-           width: 100%;
-           height: 100%;
-           inset: 0;
-           object-fit: cover;
-       }
+        position: relative;
+
+        &::before {
+            content: "";
+            display: block;
+            padding-top: calc((250 / 250) * 100%);
+        }
+
+        img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            inset: 0;
+            object-fit: cover;
+        }
     }
-    
+
     @supports (aspect-ratio: 1/1) {
-       img {
-           aspect-ratio: 250/250;
-           height: auto;
-           width: 100%;
-           object-fit: cover;
-       }
+        img {
+            aspect-ratio: 250/250;
+            height: auto;
+            width: 100%;
+            object-fit: cover;
+        }
     }
 }
 
 /* Styles for the navbar */
 #navbar {
-transition: background-color 0.3s;
+    transition: background-color 0.3s;
 }
 
 /* Styles for the navbar when scrolled */
 #navbar.scrolled {
-background-color: black;
+    background-color: black;
 }
 
 .search-wrapper {
@@ -389,7 +392,6 @@ background-color: black;
 .promoter-logo,
 .other-logo {
     max-width: 250px;
-    
 }
 
 .band-types-list,
@@ -460,33 +462,33 @@ background-color: black;
 }
 
 /* Dashboard */
-  .collapsible-container {
+.collapsible-container {
     overflow-x: auto;
     border-radius: 0.5rem;
-  }
+}
 
-  .collapsible-header {
+.collapsible-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
-  }
+}
 
-  .collapsible-content {
+.collapsible-content {
     overflow: hidden;
     max-height: 0;
     transition: max-height 0.3s ease-out;
-  }
+}
 
-  .collapsible-content.show {
+.collapsible-content.show {
     max-height: 1000px; /* Adjust as needed */
     transition: max-height 0.3s ease-in;
-  }
+}
 
-  /* Rotate icon for animation */
-  .rotate-180 {
+/* Rotate icon for animation */
+.rotate-180 {
     transform: rotate(180deg);
-  }
+}
 
 /* @media only screen and (max-width: 1920px) {} */
 
