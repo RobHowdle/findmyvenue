@@ -33,7 +33,7 @@
 
   <div class="flex h-screen w-full flex-col items-center justify-center gap-24 px-2 backdrop-brightness-50">
     <div class="logo--503 justify-self-center">
-      <img src="{{ asset('/images/yns_logo.png') }}" class="mb-4">
+      <img src="{{ asset('images/yns_logo.png') }}" class="mb-4">
       <a href="https://countdown.yournextshow.co.uk" class="text-white underline">Return To
         Countdown</a>
     </div>
