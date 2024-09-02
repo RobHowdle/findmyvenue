@@ -16,7 +16,10 @@ export default {
                 heading: ["Roboto", "sans-serif"],
             },
             colors: {
-                opacBlack: "rgba(255,255,255,0.4)",
+                opacBlack: "rgba(0,0,0,0.4)",
+                opac5Black: "rgba(0,0,0,0.5)",
+                opac8Black: "rgba(0,0,0,0.8)",
+                ynsLightGray: "rgba(217,217,217,0.5)",
                 ynsRed: "#EF3F38",
                 ynsPurple: "#9022BB",
                 ynsCyan: "#29C0D2",

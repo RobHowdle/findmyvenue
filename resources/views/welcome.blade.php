@@ -834,38 +834,76 @@
   </style>
 </head>
 
-
 <x-guest-layout>
-  <div class="home-search">
-    <h1 class="text-center font-heading text-4xl text-white md:text-5xl lg:text-6xl">Find Your Next Show!</h1>
-    <p class="text-center font-sans text-base capitalize text-white md:text-lg">search below to find a venue in your
-      desired area
-    </p>
-    <form action="{{ route('venues.filterByCoordinates') }}" method="GET">
-      @csrf
-      <div class="my-4 flex justify-center">
-        <input
-          class="search map-input sm:w-100 flex justify-center border-b-2 border-l-2 border-r-0 border-t-2 border-white bg-opacBlack font-sans text-xl focus:border-white md:w-4/6"
-          type="search" id="address-input" name="search_query" placeholder="Search..." />
-        <button type="submit" id="search-button"
-          class="search-button border-b-2 border-r-2 border-t-2 border-white bg-black p-4 text-white hover:bg-gray-800 hover:text-white">
-          <span class="fas fa-search"></span>
-        </button>
-      </div>
-      <div id="address-map-container" style="width: 100%; height: 400px; display: none;">
-        <div style="width: 100%; height: 100%;" id="address-map"></div>
-      </div>
+  <div class="container-main h-[calc(100vh-96px)] w-full place-content-center">
+    <div class="grid h-full grid-cols-[1fr,2fr,1fr]">
+      <div class="home-search col-start-2 col-end-3 row-start-1 row-end-1 flex flex-col justify-center px-24 py-16">
+        <h1 class="text-center font-heading text-4xl font-bold text-white md:text-5xl lg:text-6xl">
+          Find Your Next Show!
+        </h1>
+        <p class="my-2 text-center font-heading text-base capitalize text-white md:text-lg">
+          Search below to find a venue in your desired area
+        </p>
+        <form action="{{ route('venues.filterByCoordinates') }}" method="GET">
+          @csrf
+          <div class="my-4 flex justify-center">
+            <input
+              class="search map-input sm:w-100 flex justify-center rounded-bl rounded-tl border-b border-l border-r-0 border-t border-white bg-ynsLightGray font-sans text-xl focus:border-white md:w-4/6"
+              type="search" id="address-input" name="search_query" placeholder="Search..." />
+            <button type="submit" id="search-button"
+              class="search-button rounded-br rounded-tr border-b border-r border-t border-white bg-black p-4 text-white hover:bg-gray-800 hover:text-white">
+              <span class="fas fa-search"></span>
+            </button>
+          </div>
+          <div id="address-map-container" style="width: 100%; height: 400px; display: none;">
+            <div style="width: 100%; height: 100%;" id="address-map"></div>
+          </div>
 
-      <input style="display: none;" type="text" id="address-latitude" name="latitude" placeholder="Latitude">
-      <input style="display: none;" type="text" id="address-longitude" name="longitude" placeholder="Longitude">
-    </form>
+          <input style="display: none;" type="text" id="address-latitude" name="latitude" placeholder="Latitude">
+          <input style="display: none;" type="text" id="address-longitude" name="longitude" placeholder="Longitude">
+        </form>
 
-    <h2 class="text-center font-heading text-2xl text-white">Or</h2>
-    <a href="{{ url('/venues') }}"
-      class="flex justify-center font-heading text-2xl text-white underline dark:hover:text-gray-400">Browse
-      all
-      venues</a>
+        <h2 class="text-center font-heading text-white">Or</h2>
+        <a href="{{ url('/venues') }}"
+          class="flex justify-center font-heading text-xl text-white underline dark:hover:text-gray-400">
+          Browse all venues
+        </a>
+      </div>
+    </div>
   </div>
+
+  <div class="container-main flex h-[calc(100vh-96px)] w-full justify-center">
+    <!-- Text Block -->
+    <div class="relative flex w-1/3 items-center justify-end text-white">
+      <div class="relative z-10 -mr-40 max-w-3xl bg-opac8Black p-8">
+        <div class="wrapper">
+          <h2 class="mb-4 font-sans text-3xl underline">So...what is it?</h2>
+          <p class="mb-3 font-sans">
+            Your Next Show is a platform specifically designed and built for bands and artists to be able to find their
+            next show. Entering the location you want to search, setting your filters will return a list of venues in
+            that area you can perform at. The ability to add and link with promoters in that area and for your type of
+            music means that not only are you supporting local businesses, you are being paired with people have the
+            same tastes and interests - increasing the chances of you having a more successful show.
+          </p>
+          <p class="mb-3 font-sans">
+            We also give you the ability to have a custom dashboard designed and built specifically for you. Whether
+            you’re a promoter wanting to keep track of your events and budgets to a designer keep track of jobs you have
+            all the way to bands managing their gigs through a shareable calendar, you can do it all.
+          </p>
+          <p class="font-sans">
+            Oh and did we mention? It is 100% COST and AD FREE.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Image Block -->
+    <div class="relative flex-1 bg-cover bg-center"
+      style="background-image: url('{{ asset('storage/images/system/about.jpg') }}'); max-width:500px; aspect-ratio: 5/7;">
+    </div>
+  </div>
+
+
 </x-guest-layout>
 
 <script

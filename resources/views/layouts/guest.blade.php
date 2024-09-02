@@ -78,7 +78,7 @@
       </div>
     </nav>
   @endif
-  <div class="grid h-[calc(100vh-96px)] w-full items-center justify-center px-2 backdrop-brightness-50">
+  <div class="w-full items-center justify-center px-2 backdrop-brightness-50">
     {{ $slot }}
   </div>
   @stack('scripts')
@@ -98,7 +98,6 @@
       function checkLoadingTime() {
         var endTime = performance.now(); // Record the end time after the document is fully loaded
         var loadingTime = endTime - startTime; // Calculate the loading time in milliseconds
-
         // Check if the loading time exceeds a threshold (e.g., 1000 milliseconds)
         if (loadingTime > 1000) {
           // Show the loader if loading time exceeds the threshold
