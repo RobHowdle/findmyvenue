@@ -14,7 +14,7 @@
                 data-accordion-target="#accordion-collapse-body-1" aria-expanded="false"
                 aria-controls="accordion-collapse-body-1">
                 <span>Filters <span class="fas fa-filter"></span></span>
-                <svg data-accordion-icon class="rotate h-3 w-3 shrink-0 rotate-180" aria-hidden="true"
+                <svg data-accordion-icon class="icon h-3 w-3 shrink-0 rotate-180" aria-hidden="true"
                   xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M9 5 5 1 1 5" />

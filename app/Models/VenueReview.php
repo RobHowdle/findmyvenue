@@ -31,7 +31,7 @@ class VenueReview extends Model
         return $this->belongsTo(Venue::class, 'venue_id');
     }
 
-    public static function getRecentReviewsForPromoter($venueId)
+    public static function getRecentReviewsForVenue($venueId)
     {
         return self::where('venue_id', $venueId)
             ->whereNull('deleted_at')
@@ -75,8 +75,6 @@ class VenueReview extends Model
         $averageROP = $totalReviews > 0 ? $totalROP / $totalReviews : 0;
         $averagePromotion = $totalReviews > 0 ? $totalPromotion / $totalReviews : 0;
         $averageQuality = $totalReviews > 0 ? $totalQuality / $totalReviews : 0;
-
-
 
         // Calculate the overall score
         $overallScore = $totalReviews > 0 ? ($averageCommunication + $averageROP + $averagePromotion + $averageQuality) / 4 : 0;

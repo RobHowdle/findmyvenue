@@ -72,44 +72,6 @@
   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcMjlXwDOk74oMDPgOp4YWdWxPa5xtHGA&libraries=places&callback=initialize"
   async defer></script>
 <script>
-  $(document).ready(function() {
-    // Accordion functionality
-    $("[data-accordion-target]").click(function() {
-      const isExpanded = $(this).attr("aria-expanded") === "true";
-      const accordionBody = $(this).attr("data-accordion-target");
-
-      $(this).find('svg').toggleClass('rotate-180');
-
-      if (isExpanded) {
-        $(this).attr("aria-expanded", "false");
-        $(accordionBody).slideUp().addClass("hidden");
-      } else {
-        $(accordionBody).slideDown().removeClass("hidden");
-        $(this).attr("aria-expanded", "true");
-      }
-    });
-  });
-
-  $(document).ready(function() {
-    // Hide accordion content by default
-    $(".accordion-content").hide();
-
-    $(".accordion-item .accordion-title").click(function() {
-      // Toggle active class to show/hide accordion content
-      $(this).parent().toggleClass("active");
-      $(this).parent().find(".accordion-content").slideToggle();
-      $(".accordion-item")
-        .not($(this).parent())
-        .removeClass("active")
-        .find(".accordion-content")
-        .slideUp();
-
-      // Prevent checkbox from being checked/unchecked when clicking on label
-      var checkbox = $(this).siblings('input[type="checkbox"]');
-      checkbox.prop("checked", !checkbox.prop("checked"));
-    });;
-  });
-
   // Search Bar
   function initialize() {
     $('form').on('keyup keypress', function(e) {
@@ -240,7 +202,6 @@
     applyFilters();
   });
 
-
   // Attach event listener for subgenre checkboxes
   $('.subgenre-checkbox').change(function() {
     // If a subgenre checkbox is selected, deselect the "All Genres" checkbox
@@ -296,7 +257,6 @@
     var mergedGenres = selectedGenres.concat(selectedSubgenres)
 
     // Send AJAX request to fetch filtered data
-
     $.ajax({
       url: '/venues/filter',
       method: 'GET',
@@ -315,24 +275,31 @@
     });
   }
 
-  // Define the updateVenuesTable function outside of the updateTable function
   function updateVenuesTable(filteredVenues) {
+    if (!Array.isArray(filteredVenues)) {
+      console.error("filteredVenues is not an array:", filteredVenues);
+      return;
+    }
+
     // Generate HTML for the filtered venues
     var rowsHtml = filteredVenues.map(function(venue) {
       var venueRoute = "{{ route('venue', ':venueId') }}";
+      var ratingHtml = getRatingHtml(venue.average_rating); // Function to generate rating HTML
+
       return `
-            <tr class="border-b odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+            <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
                 <th scope="row" class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
                     <a href="${venueRoute.replace(':venueId', venue.id)}" class="venue-link hover:text-ynsYellow">${venue.name}</a>
                 </th>
+                <td class="rating-wrapper flex whitespace-nowrap sm:py-3 sm:text-base md:py-2 lg:py-4">
+                    ${ratingHtml}
+                </td>
                 <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
                     ${venue.postal_town}
                 </td>
                 <td class="flex gap-4 whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
-                    <!-- Contact links -->
-                    ${venue.contact_number ? '<a href="tel:' + venue.contact_number + '"><span class="fas fa-phone"></span></a>' : ''}
-                    ${venue.contact_email ? '<a href="mailto:' + venue.contact_email + '"><span class="fas fa-envelope"></span></a>' : ''}
-                    <!-- Additional processing for contact links -->
+                    ${venue.contact_number ? '<a href="tel:' + venue.contact_number + '" class="hover:text-ynsYellow"><span class="fas fa-phone"></span></a>' : ''}
+                    ${venue.contact_email ? '<a href="mailto:' + venue.contact_email + '" class="hover:text-ynsYellow"><span class="fas fa-envelope"></span></a>' : ''}
                     ${venue.platforms ? venue.platforms.map(function(platform) {
                         switch (platform.platform) {
                             case 'facebook':
@@ -353,7 +320,6 @@
                     }).join('') : ''}
                 </td>
                 <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
-                    <!-- Promoter names -->
                     ${venue.promoters ? venue.promoters.map(function(promoter) {
                         return '<a href="' + promoter.url + '">' + promoter.name + '</a>';
                     }).join('') : ''}
@@ -365,6 +331,48 @@
     // Replace the existing HTML content with the new HTML
     $('#venues tbody').html(rowsHtml);
   }
+
+  // Function to generate HTML for the rating
+  function getRatingHtml(rating) {
+    if (rating === undefined || rating === null) return ''; // Return empty if no rating
+
+    var ratingHtml = '';
+    var totalIcons = 5;
+    var fullIcons = Math.floor(rating);
+    var fraction = rating - fullIcons;
+    var emptyIcon = '/storage/images/system/ratings/empty.png';
+    var fullIcon = '/storage/images/system/ratings/full.png';
+    var hotIcon = '/storage/images/system/ratings/hot.png';
+
+    // Special case: all icons are hot
+    if (rating === totalIcons) {
+      ratingHtml = Array(totalIcons).fill('<img src="' + hotIcon + '" alt="Hot Icon" />').join('');
+    } else {
+      // Add full icons
+      for (var i = 0; i < fullIcons; i++) {
+        ratingHtml += '<img src="' + fullIcon + '" alt="Full Icon" />';
+      }
+
+      // Handle the fractional icon
+      if (fraction > 0) {
+        ratingHtml += '<div class="partially-filled-icon" style="width: ' + (fraction * 48) +
+          'px; overflow: hidden; display:inline-block;">' +
+          '<img src="' + fullIcon + '" alt="Partial Full Icon" />' +
+          '</div>';
+      }
+
+      // Add empty icons to fill the rest
+      var iconsDisplayed = fullIcons + (fraction > 0 ? 1 : 0);
+      var remainingIcons = totalIcons - iconsDisplayed;
+
+      for (var j = 0; j < remainingIcons; j++) {
+        ratingHtml += '<img src="' + emptyIcon + '" alt="Empty Icon" />';
+      }
+    }
+
+    return ratingHtml;
+  }
+
 
   // Update the updateTable function to pass the filtered venues to updateVenuesTable
   function updateTable(data) {
@@ -378,14 +386,13 @@
     } else {
       // Display message if no venues found
       var noVenuesRow = `
-            <tr class="border-b odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
-                <td colspan="4" class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4 uppercase text-center">No venues found</td>
+            <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+                <td colspan="5" class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4 uppercase text-center">No venues found</td>
             </tr>
         `;
       $('#venues tbody').html(noVenuesRow);
     }
   }
-
 
   function setLocationCoordinates(key, lat, lng) {
     const latitudeField = document.getElementById(key + "-" + "latitude");

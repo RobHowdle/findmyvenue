@@ -12,7 +12,7 @@
 }
 
 [type="checkbox"]:checked {
-    background-color: theme("colors.ynsRed");
+    background-color: theme("colors.ynsCyan");
 }
 
 /* Preloader */

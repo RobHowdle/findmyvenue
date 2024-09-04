@@ -113,19 +113,6 @@
         checkLoadingTime();
       });
     });
-
-    // Get the navbar element
-    const navbar = document.getElementById('navbar');
-
-    // Add a scroll event listener
-    window.addEventListener('scroll', () => {
-      // Add or remove the 'scrolled' class based on the scroll position
-      if (window.scrollY > 0) {
-        navbar.classList.add('scrolled');
-      } else {
-        navbar.classList.remove('scrolled');
-      }
-    });
   </script>
 </body>
 
