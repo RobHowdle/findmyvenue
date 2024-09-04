@@ -11,6 +11,9 @@ export default {
 
     theme: {
         extend: {
+            padding: {
+                yns25: "25rem",
+            },
             fontFamily: {
                 sans: ["Raleway", "sans-serif"],
                 heading: ["Roboto", "sans-serif"],
@@ -26,6 +29,9 @@ export default {
                 ynsTeal: "#53E5D6",
                 ynsYellow: "#D59220",
                 ynsDarkOrange: "#F03F37",
+            },
+            backgroundImage: {
+                "gradient-button": "linear-gradient(to top, #F03F37 , #D59220)",
             },
         },
         screens: {
