@@ -5,45 +5,13 @@
 
   <x-promoters-table :promoters="$promoters" :genres="$genres">
     @forelse ($promoters as $promoter)
-      <tr class="border-b odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+      <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
         <td
           class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
           <a href="{{ route('promoter', $promoter->id) }}"
-            class="promoter-link hover:text-gray-400">{{ $promoter->name }}</a>
+            class="promoter-link hover:text-ynsYellow">{{ $promoter->name }}</a>
         </td>
-        <td class="rating-wrapper flex whitespace-nowrap px-6 py-4 font-sans text-xl text-white">
-          @php
-            $overallScore = 0;
-            $reviewCount = 0;
-
-            // Loop through each review
-            foreach ($promoter->review as $review) {
-                // Calculate the overall score for each review
-                $overallScore += $review->calculateOverallScore($promoter->id);
-                $reviewCount++;
-            }
-
-            // Calculate the overall score by taking the average of all review scores
-            if ($reviewCount > 0) {
-                $overallScore /= $reviewCount;
-            }
-
-            // Calculate the number of full icons and the fraction
-            $fullIcons = floor($overallScore);
-            $fraction = $overallScore - $fullIcons;
-          @endphp
-
-          @for ($i = 0; $i < $fullIcons; $i++)
-            <img src="https://img.icons8.com/emoji/48/sign-of-the-horns-emoji.png" alt="sign-of-the-horns-emoji" />
-          @endfor
-
-          @if ($fraction > 0)
-            <div class="partially-filled-icon" style="width: {{ $fraction * 25 }}px; overflow: hidden;">
-              <img src="https://img.icons8.com/emoji/48/sign-of-the-horns-emoji.png" alt="sign-of-the-horns-emoji" />
-            </div>
-          @else
-            <p>N/R</p>
-          @endif
+        <td class="rating-wrapper flex whitespace-nowrap sm:py-3 sm:text-base md:py-2 lg:py-4">{!! $overallReviews[$promoter->id] !!}
         </td>
         <td
           class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
@@ -52,11 +20,11 @@
         <td
           class="flex gap-4 whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
           @if ($promoter->contact_number)
-            <a class="hover:text-gray-400" href="tel:{{ $promoter->contact_number }}"><span
+            <a class="hover:text-ynsYellow" href="tel:{{ $promoter->contact_number }}"><span
                 class="fas fa-phone"></span></a>
           @endif
           @if ($promoter->contact_email)
-            <a class="hover:text-gray-400" href="mailto:{{ $promoter->contact_email }}"><span
+            <a class="hover:text-ynsYellow" href="mailto:{{ $promoter->contact_email }}"><span
                 class="fas fa-envelope"></span></a>
           @endif
           @if ($promoter->platforms)
@@ -81,7 +49,7 @@
           class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
           @if ($promoter->venues)
             @foreach ($promoter->venues as $venue)
-              <a class="hover:text-gray-400"
+              <a class="hover:text-ynsYellow"
                 href="{{ url('venues', $venue->id) }}">{{ $venue->name }}</a>{{ !$loop->last ? ', ' : '' }}
             @endforeach
           @endif
@@ -348,7 +316,7 @@
       return `
             <tr class="border-b odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
                 <th scope="row" class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
-                    <a href="${promoterRoute.replace(':promoterId', promoter.id)}" class="promoter-link hover:text-gray-400">${promoter.name}</a>
+                    <a href="${promoterRoute.replace(':promoterId', promoter.id)}" class="promoter-link hover:text-ynsYellow">${promoter.name}</a>
                 </th>
                 <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
                     ${promoter.postal_town}

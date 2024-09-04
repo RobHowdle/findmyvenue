@@ -1,9 +1,9 @@
 @props(['promoters', 'genres'])
 
-<div class="mx-auto w-full">
-  <h1 class="mt-6 text-center font-heading text-6xl text-white">Promoters</h1>
+<div class="mx-auto w-full max-w-screen-2xl">
+  <h1 class="py-8 text-center font-heading text-6xl text-white">Promoters</h1>
   <div class="relative shadow-md sm:rounded-lg">
-    <div class="search-wrapper flex justify-center border-2 border-white dark:bg-black">
+    <div class="search-wrapper flex justify-center border border-white dark:bg-black">
       <form class="filter-search flex items-center sm:p-1 md:p-3" action="{{ route('promoters.filterCheckboxesSearch') }}"
         method="GET">
         <div class="filters relative flex items-center">
@@ -111,15 +111,14 @@
             </div>
           </div>
         </div>
-        <div class="search-bar flex items-center justify-end rounded border-2 border-white">
+        <div class="search-bar flex items-center justify-end rounded border border-white">
           <input class="search flex w-full justify-center bg-opacBlack font-sans text-xl text-white" type="search"
             id="address-input" name="search_query" placeholder="Search..." value="{{ $searchQuery ?? '' }}" />
         </div>
       </form>
     </div>
     <div class="relative z-0 overflow-x-auto">
-      <table class="w-full border-b-2 border-l-2 border-r-2 border-white text-left font-sans rtl:text-right"
-        id="venues">
+      <table class="w-full border border-white text-left font-sans rtl:text-right" id="venues">
         <!-- Table headers -->
         <thead class="text-white underline dark:bg-black">
           <tr>
@@ -136,16 +135,13 @@
           </tr>
         </thead>
         <tbody>
-          <!-- Table rows -->
           {{ $slot }}
         </tbody>
       </table>
     </div>
-    <!-- Pagination links -->
-    <div class="mt-4 px-6 py-3">
-      @if ($promoters->count() >= 10)
-        {{ $promoters->links() }}
-      @endif
-    </div>
   </div>
+</div>
+<!-- Pagination links -->
+<div class="mt-4 bg-ynsDarkGray px-yns22 py-6">
+  {{ $promoters->links() }}
 </div>
