@@ -13,6 +13,7 @@ export default {
         extend: {
             padding: {
                 yns25: "25rem",
+                yns22: "22rem",
             },
             fontFamily: {
                 sans: ["Raleway", "sans-serif"],
@@ -29,6 +30,7 @@ export default {
                 ynsTeal: "#53E5D6",
                 ynsYellow: "#D59220",
                 ynsDarkOrange: "#F03F37",
+                ynsDarkGray: "#1D232A",
             },
             backgroundImage: {
                 "gradient-button": "linear-gradient(to top, #F03F37 , #D59220)",

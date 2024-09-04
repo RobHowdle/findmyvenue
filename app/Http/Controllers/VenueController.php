@@ -15,6 +15,47 @@ use Illuminate\Pagination\LengthAwarePaginator;
 class VenueController extends Controller
 {
     /**
+     * Helper function to render rating icons
+     */
+    private function renderRatingIcons($overallScore)
+    {
+        $output = '';
+        $totalIcons = 5;
+        $fullIcons = floor($overallScore);
+        $fraction = $overallScore - $fullIcons;
+        $emptyIcon = asset('storage/images/system/ratings/empty.png');
+        $fullIcon = asset('storage/images/system/ratings/full.png');
+        $hotIcon = asset('storage/images/system/ratings/hot.png');
+
+        if ($overallScore == $totalIcons) {
+            // Display 5 hot icons when the score is 5/5
+            $output = str_repeat('<img src="' . $hotIcon . '" alt="Hot Icon" />', $totalIcons);
+        } else {
+            // Add full icons
+            for ($i = 0; $i < $fullIcons; $i++) {
+                $output .= '<img src="' . $fullIcon . '" alt="Full Icon" />';
+            }
+
+            // Handle the fractional icon
+            if ($fraction > 0) {
+                $output .= '<div class="partially-filled-icon" style="width: ' . ($fraction * 48) . 'px; overflow: hidden; display:inline-block;">';
+                $output .= '<img src="' . $fullIcon . '" alt="Partial Full Icon" />';
+                $output .= '</div>';
+            }
+
+            // Add empty icons to fill the rest
+            $iconsDisplayed = $fullIcons + ($fraction > 0 ? 1 : 0);
+            $remainingIcons = $totalIcons - $iconsDisplayed;
+
+            for ($i = 0; $i < $remainingIcons; $i++) {
+                $output .= '<img src="' . $emptyIcon . '" alt="Empty Icon" />';
+            }
+        }
+
+        return $output;
+    }
+
+    /**
      * Display a listing of the resource.
      */
 
@@ -72,8 +113,13 @@ class VenueController extends Controller
             $venue->platforms = $platforms;
         }
 
-        // Return the initial view
-        return view('venues', compact('venues', 'genres'));
+        $overallReviews = []; // Array to store overall reviews for each venue
+
+        foreach ($venues as $venue) {
+            $overallScore = VenueReview::calculateOverallScore($venue->id);
+            $overallReviews[$venue->id] = $this->renderRatingIcons($overallScore);
+        }
+        return view('venues', compact('venues', 'genres', 'overallReviews'));
     }
 
     /**

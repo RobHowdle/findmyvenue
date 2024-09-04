@@ -1,9 +1,9 @@
 @props(['venues', 'genres'])
 
-<div class="mx-auto w-full max-w-screen-xl">
-  <h1 class="mb-4 mt-6 text-center font-heading text-6xl text-white">Venues</h1>
+<div class="mx-auto w-full max-w-screen-2xl">
+  <h1 class="py-8 text-center font-heading text-6xl text-white">Venues</h1>
   <div class="relative shadow-md sm:rounded-lg">
-    <div class="search-wrapper flex justify-center border-2 border-white dark:bg-black">
+    <div class="search-wrapper flex justify-center border border-white dark:bg-black">
       <form class="filter-search flex items-center sm:p-1 md:p-3" action="{{ route('venues.filterCheckboxesSearch') }}"
         method="GET">
         <div class="filters relative flex items-center">
@@ -111,19 +111,19 @@
             </div>
           </div>
         </div>
-        <div class="search-bar flex items-center justify-end rounded border-2 border-white">
+        <div class="search-bar flex items-center justify-end rounded border border-white">
           <input class="search flex w-full justify-center bg-opacBlack font-sans text-xl text-white" type="search"
             id="address-input" name="search_query" placeholder="Search..." value="{{ $searchQuery ?? '' }}" />
         </div>
       </form>
     </div>
     <div class="relative z-0 overflow-x-auto">
-      <table class="w-full border-b-2 border-l-2 border-r-2 border-white text-left font-sans rtl:text-right"
-        id="venues">
-        <!-- Table headers -->
+      <table class="w-full border border-white text-left font-sans rtl:text-right" id="venues">
         <thead class="text-white underline dark:bg-black">
           <tr>
             <th scope="col" class="md-text-2xl sm:px-2 sm:py-2 sm:text-xl md:px-6 md:py-3 lg:px-8 lg:py-4">Venue
+            </th>
+            <th scope="col" class="md-text-2xl sm:px-2 sm:py-2 sm:text-xl md:px-6 md:py-3 lg:px-8 lg:py-4">Rating
             </th>
             <th scope="col" class="md-text-2xl sm:px-2 sm:py-2 sm:text-xl md:px-6 md:py-3 lg:px-8 lg:py-4">Location
             </th>
@@ -134,16 +134,13 @@
           </tr>
         </thead>
         <tbody>
-          <!-- Table rows -->
           {{ $slot }}
         </tbody>
       </table>
     </div>
-    <!-- Pagination links -->
-    <div class="mt-4 px-6 py-3">
-      {{-- @if ($venues->count() >= 10) --}}
-      {{ $venues->links() }}
-      {{-- @endif --}}
-    </div>
   </div>
+</div>
+<!-- Pagination links -->
+<div class="mt-4 bg-ynsDarkGray px-yns22 py-6">
+  {{ $venues->links() }}
 </div>
