@@ -77,8 +77,6 @@ class PromoterReview extends Model
         $averagePromotion = $totalReviews > 0 ? $totalPromotion / $totalReviews : 0;
         $averageQuality = $totalReviews > 0 ? $totalQuality / $totalReviews : 0;
 
-
-
         // Calculate the overall score
         $overallScore = $totalReviews > 0 ? ($averageCommunication + $averageROP + $averagePromotion + $averageQuality) / 4 : 0;
 

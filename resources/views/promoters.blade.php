@@ -6,11 +6,11 @@
   <x-promoters-table :promoters="$promoters" :genres="$genres">
     @forelse ($promoters as $promoter)
       <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
-        <td
+        <th scope="row"
           class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
           <a href="{{ route('promoter', $promoter->id) }}"
             class="promoter-link hover:text-ynsYellow">{{ $promoter->name }}</a>
-        </td>
+        </th>
         <td class="rating-wrapper flex whitespace-nowrap sm:py-3 sm:text-base md:py-2 lg:py-4">{!! $overallReviews[$promoter->id] !!}
         </td>
         <td
@@ -30,17 +30,23 @@
           @if ($promoter->platforms)
             @foreach ($promoter->platforms as $platform)
               @if ($platform['platform'] == 'facebook')
-                <a href="{{ $platform['url'] }}" target=_blank><span class="fab fa-facebook"></span></a>
+                <a class="mr-2 hover:text-ynsYellow" href="{{ $platform['url'] }}" target=_blank><span
+                    class="fab fa-facebook"></span></a>
               @elseif($platform['platform'] == 'twitter')
-                <a href="{{ $platform['url'] }}" target=_blank><span class="fab fa-twitter"></span></a>
+                <a class="mr-2 hover:text-ynsYellow" href="{{ $platform['url'] }}" target=_blank><span
+                    class="fab fa-twitter"></span></a>
               @elseif($platform['platform'] == 'instagram')
-                <a href="{{ $platform['url'] }}" target=_blank><span class="fab fa-instagram"></span></a>
+                <a class="mr-2 hover:text-ynsYellow" href="{{ $platform['url'] }}" target=_blank><span
+                    class="fab fa-instagram"></span></a>
               @elseif($platform['platform'] == 'snapchat')
-                <a href="{{ $platform['url'] }}" target=_blank><span class="fab fa-snapchat-ghost"></span></a>
+                <a class="mr-2 hover:text-ynsYellow" href="{{ $platform['url'] }}" target=_blank><span
+                    class="fab fa-snapchat-ghost"></span></a>
               @elseif($platform['platform'] == 'tiktok')
-                <a href="{{ $platform['url'] }}" target=_blank><span class="fab fa-tiktok"></span></a>
+                <a class="mr-2 hover:text-ynsYellow" href="{{ $platform['url'] }}" target=_blank><span
+                    class="fab fa-tiktok"></span></a>
               @elseif($platform['platform'] == 'youtube')
-                <a href="{{ $platform['url'] }}" target=_blank><span class="fab fa-youtube"></span></a>
+                <a class="mr-2 hover:text-ynsYellow" href="{{ $platform['url'] }}" target=_blank><span
+                    class="fab fa-youtube"></span></a>
               @endif
             @endforeach
           @endif
@@ -56,8 +62,8 @@
         </td>
       </tr>
     @empty
-      <tr>
-        <td colspan="4" class="text-center text-2xl text-white">No promoters found</td>
+      <tr class="border-b odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+        <td colspan="4" class="text-center text-2xl text-white dark:bg-gray-900">No promoters found</td>
       </tr>
     @endforelse
   </x-promoters-table>
@@ -66,44 +72,6 @@
   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcMjlXwDOk74oMDPgOp4YWdWxPa5xtHGA&libraries=places&callback=initialize"
   async defer></script>
 <script>
-  $(document).ready(function() {
-    // Accordion functionality
-    $("[data-accordion-target]").click(function() {
-      const isExpanded = $(this).attr("aria-expanded") === "true";
-      const accordionBody = $(this).attr("data-accordion-target");
-
-      $(this).find('svg').toggleClass('rotate-180');
-
-      if (isExpanded) {
-        $(this).attr("aria-expanded", "false");
-        $(accordionBody).slideUp().addClass("hidden");
-      } else {
-        $(accordionBody).slideDown().removeClass("hidden");
-        $(this).attr("aria-expanded", "true");
-      }
-    });
-  });
-
-  $(document).ready(function() {
-    // Hide accordion content by default
-    $(".accordion-content").hide();
-
-    $(".accordion-item .accordion-title").click(function() {
-      // Toggle active class to show/hide accordion content
-      $(this).parent().toggleClass("active");
-      $(this).parent().find(".accordion-content").slideToggle();
-      $(".accordion-item")
-        .not($(this).parent())
-        .removeClass("active")
-        .find(".accordion-content")
-        .slideUp();
-
-      // Prevent checkbox from being checked/unchecked when clicking on label
-      var checkbox = $(this).siblings('input[type="checkbox"]');
-      checkbox.prop("checked", !checkbox.prop("checked"));
-    });;
-  });
-
   // Search Bar
   function initialize() {
     $('form').on('keyup keypress', function(e) {
@@ -305,58 +273,104 @@
       error: function(err) {
         console.error('Error applying filters:', err);
       }
+
     });
   }
 
   // Define the updatepromotersTable function outside of the updateTable function
-  function updatepromotersTable(filteredpromoters) {
+  function updatePromotersTable(filteredPromoters) {
+    if (!Array.isArray(filteredPromoters)) {
+      console.error("filteredPromoters is not an array:", filteredPromoters);
+      return;
+    }
     // Generate HTML for the filtered promoters
-    var rowsHtml = filteredpromoters.map(function(promoter) {
+    var rowsHtml = filteredPromoters.map(function(promoter) {
       var promoterRoute = "{{ route('promoter', ':promoterId') }}";
+      var ratingHtml = getRatingHtml(promoter.average_rating);
       return `
-            <tr class="border-b odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+            <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
                 <th scope="row" class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
                     <a href="${promoterRoute.replace(':promoterId', promoter.id)}" class="promoter-link hover:text-ynsYellow">${promoter.name}</a>
                 </th>
+                <td class="rating-wrapper flex whitespace-nowrap sm:py-3 sm:text-base md:py-2 lg:py-4">
+                    ${ratingHtml}
+                </td>
                 <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
                     ${promoter.postal_town}
                 </td>
                 <td class="flex gap-4 whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
-                    <!-- Contact links -->
-                    ${promoter.contact_number ? '<a href="tel:' + promoter.contact_number + '"><span class="fas fa-phone"></span></a>' : ''}
-                    ${promoter.contact_email ? '<a href="mailto:' + promoter.contact_email + '"><span class="fas fa-envelope"></span></a>' : ''}
-                    <!-- Additional processing for contact links -->
+                    ${promoter.contact_number ? '<a href="tel:' + promoter.contact_number + '" class="hover:text-ynsYellow"><span class="fas fa-phone"></span></a>' : ''}
+                    ${promoter.contact_email ? '<a href="mailto:' + promoter.contact_email + '" class="hover:text-ynsYellow"><span class="fas fa-envelope"></span></a>' : ''}
                     ${promoter.platforms ? promoter.platforms.map(function(platform) {
                         switch (platform.platform) {
                             case 'facebook':
-                                return '<a href="' + platform.url + '" target=_blank><span class="fab fa-facebook"></span></a>';
+                                return '<a class="hover:text-ynsYellow" href="' + platform.url + '" target=_blank><span class="fab fa-facebook"></span></a>';
                             case 'twitter':
-                                return '<a href="' + platform.url + '" target=_blank><span class="fab fa-twitter"></span></a>';
+                                return '<a class="hover:text-ynsYellow" href="' + platform.url + '" target=_blank><span class="fab fa-twitter"></span></a>';
                             case 'instagram':
-                                return '<a href="' + platform.url + '" target=_blank><span class="fab fa-instagram"></span></a>';
+                                return '<a class="hover:text-ynsYellow" href="' + platform.url + '" target=_blank><span class="fab fa-instagram"></span></a>';
                             case 'snapchat':
-                                return '<a href="' + platform.url + '" target=_blank><span class="fab fa-snapchat-ghost"></span></a>';
+                                return '<a class="hover:text-ynsYellow" href="' + platform.url + '" target=_blank><span class="fab fa-snapchat-ghost"></span></a>';
                             case 'tiktok':
-                                return '<a href="' + platform.url + '" target=_blank><span class="fab fa-tiktok"></span></a>';
+                                return '<a class="hover:text-ynsYellow" href="' + platform.url + '" target=_blank><span class="fab fa-tiktok"></span></a>';
                             case 'youtube':
-                                return '<a href="' + platform.url + '" target=_blank><span class="fab fa-youtube"></span></a>';
+                                return '<a class="hover:text-ynsYellow" href="' + platform.url + '" target=_blank><span class="fab fa-youtube"></span></a>';
                             default:
                                 return '';
                         }
                     }).join('') : ''}
                 </td>
                 <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
-                    <!-- Promoter names -->
-                    ${promoter.promoters ? promoter.promoters.map(function(promoter) {
-                        return '<a href="' + promoter.url + '">' + promoter.name + '</a>';
+                    ${promoter.venues ? promoter.venues.map(function(venue) {
+                        return '<a href="' + venue.url + '">' + venue.name + '</a>';
                     }).join('') : ''}
                 </td>
             </tr>
         `;
     }).join('');
-
     // Replace the existing HTML content with the new HTML
     $('#promoters tbody').html(rowsHtml);
+  }
+
+  // Function to generate HTML for the rating
+  function getRatingHtml(rating) {
+    if (rating === undefined || rating === null) return '';
+
+    var ratingHtml = '';
+    var totalIcons = 5;
+    var fullIcons = Math.floor(rating);
+    var fraction = rating - fullIcons;
+    var emptyIcon = '/storage/images/system/ratings/empty.png';
+    var fullIcon = '/storage/images/system/ratings/full.png';
+    var hotIcon = '/storage/images/system/ratings/hot.png';
+
+    // Special case: all icons are hot
+    if (rating === totalIcons) {
+      ratingHtml = Array(totalIcons).fill('<img src="' + hotIcon + '" alt="Hot Icon" />').join('');
+    } else {
+      // Add full icons
+      for (var i = 0; i < fullIcons; i++) {
+        ratingHtml += '<img src="' + fullIcon + '" alt="Full Icon" />';
+      }
+
+      // Handle the fractional icon
+      if (fraction > 0) {
+        ratingHtml += '<div class="partially-filled-icon" style="width: ' + (fraction * 48) +
+          'px; overflow: hidden; display:inline-block;">' +
+          '<img src="' + fullIcon + '" alt="Partial Full Icon" />' +
+          '</div>';
+      }
+
+      // Add empty icons to fill the rest
+      var iconsDisplayed = fullIcons + (fraction > 0 ? 1 : 0);
+      var remainingIcons = totalIcons - iconsDisplayed;
+
+      for (var j = 0; j < remainingIcons; j++) {
+        ratingHtml += '<img src="' + emptyIcon + '" alt="Empty Icon" />';
+      }
+    }
+
+    return ratingHtml;
   }
 
   // Update the updateTable function to pass the filtered promoters to updatepromotersTable
@@ -367,15 +381,15 @@
     // Check if data is not null or empty array
     if (data.promoters && data.promoters.length > 0) {
       // Append new rows based on filtered data
-      updatepromotersTable(data.promoters);
+      updatePromotersTable(data.promoters);
     } else {
       // Display message if no promoters found
-      var nopromotersRow = `
-            <tr>
-                <td colspan="4" class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4 uppercase text-center">No promoters found</td>
+      var noPromotersRow = `
+            <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+                <td colspan="5" class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4 uppercase text-center">No promoters found</td>
             </tr>
         `;
-      $('#promoters tbody').html(nopromotersRow);
+      $('#promoters tbody').html(noPromotersRow);
     }
   }
 

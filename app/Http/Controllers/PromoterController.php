@@ -208,16 +208,21 @@ class PromoterController extends Controller
         // Search Results
         $searchQuery = $request->input('search_query');
         if ($searchQuery) {
-            $query->where('postal_town', 'LIKE', "%$searchQuery%");
+            $query->where(function ($query) use ($searchQuery) {
+                $query->where('postal_town', 'LIKE', "%$searchQuery%")
+                    ->orWhere('name', 'LIKE', "%$searchQuery%");
+            });
         }
 
         // Band Type Filter
         if ($request->has('band_type')) {
             $bandType = $request->input('band_type');
             if (!empty($bandType)) {
+                $bandType = array_map('trim', $bandType); // Ensure no extra spaces
                 $query->where(function ($query) use ($bandType) {
                     foreach ($bandType as $type) {
-                        $query->orWhereJsonContains('band_type', $type);
+                        // Ensure the type is properly formatted
+                        $query->orWhereRaw('JSON_CONTAINS(CAST(band_type AS JSON), ?)', [json_encode([$type])]);
                     }
                 });
             }
@@ -227,24 +232,70 @@ class PromoterController extends Controller
         if ($request->has('genres')) {
             $genres = $request->input('genres');
             if (!empty($genres)) {
+                $genres = array_map('trim', $genres); // Ensure no extra spaces
                 $query->where(function ($query) use ($genres) {
                     foreach ($genres as $genre) {
-                        $query->orWhereJsonContains('genre', $genre);
+                        // Ensure the genre is properly formatted
+                        $query->orWhereRaw('JSON_CONTAINS(CAST(genre AS JSON), ?)', [json_encode([$genre])]);
                     }
                 });
             }
         }
 
-        $promoters = $query->paginate(10);
+        $promoters = $query->with('venues')->paginate(10);
 
-        $transformedData = [
-            'promoters' => $promoters->items(),
+        // Process each venue
+        $transformedData = $promoters->getCollection()->map(function ($promoter) {
+            // Split the field containing multiple URLs into an array
+            $urls = explode(',', $promoter->contact_link);
+            $platforms = [];
+
+            // Check each URL against the platforms
+            foreach ($urls as $url) {
+                // Initialize the platform as unknown
+                $matchedPlatform = 'Unknown';
+
+                // Check if the URL contains platform names
+                $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+                foreach ($platformsToCheck as $platform) {
+                    if (stripos($url, $platform) !== false) {
+                        $matchedPlatform = $platform;
+                        break;
+                    }
+                }
+
+                // Store the platform information for each URL
+                $platforms[] = [
+                    'url' => $url,
+                    'platform' => $matchedPlatform
+                ];
+            }
+
+            // Use the static method to calculate the overall score
+            $overallScore = \App\Models\PromoterReview::calculateOverallScore($promoter->id);
+
+            return [
+                'id' => $promoter->id,
+                'name' => $promoter->name,
+                'postal_town' => $promoter->postal_town,
+                'contact_number' => $promoter->contact_number,
+                'contact_email' => $promoter->contact_email,
+                'platforms' => $platforms,
+                'promoters' => $promoter->venues, // Include venues
+                'average_rating' => $overallScore,
+            ];
+        });
+
+
+        // Return the transformed data with pagination info
+        return response()->json([
+            'promoters' => $transformedData,
             'pagination' => [
                 'current_page' => $promoters->currentPage(),
                 'last_page' => $promoters->lastPage(),
+                'total' => $promoters->total(),
+                'per_page' => $promoters->perPage(),
             ]
-        ];
-
-        return response()->json($transformedData);
+        ]);
     }
 }

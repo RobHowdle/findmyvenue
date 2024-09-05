@@ -24,9 +24,7 @@ $(document).ready(function () {
             $(this).attr("aria-expanded", "true");
         }
     });
-});
 
-$(document).ready(function () {
     // Hide accordion content by default
     $(".accordion-content").hide();
 
@@ -43,5 +41,27 @@ $(document).ready(function () {
         // Prevent checkbox from being checked/unchecked when clicking on label
         var checkbox = $(this).siblings('input[type="checkbox"]');
         checkbox.prop("checked", !checkbox.prop("checked"));
+    });
+
+    // Function to close all accordion items
+    function closeAllAccordions() {
+        $(".accordion-item").removeClass("active");
+        $(".accordion-content").slideUp().addClass("hidden");
+    }
+
+    // Click outside to close the accordion`
+    $(document).click(function (event) {
+        // Check if the click is outside the accordion
+        if (
+            !$(event.target).closest(".accordion-item, [data-accordion-target]")
+                .length
+        ) {
+            closeAllAccordions();
+        }
+    });
+
+    // Prevent clicks inside the accordion from closing it
+    $(".accordion-item").click(function (event) {
+        event.stopPropagation();
     });
 });
