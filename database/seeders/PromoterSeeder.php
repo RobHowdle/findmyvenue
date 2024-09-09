@@ -27,7 +27,7 @@ class PromoterSeeder extends Seeder
                     "about_me" => $data['6'],
                     "my_venues" => $data['7'],
                     "genre" => $data['8'],
-                    "band_types" => $data['9'],
+                    "band_type" => $data['9'],
                     "contact_name" => $data['10'],
                     "contact_number" => $data['11'],
                     "contact_email" => $data['12'],

@@ -1,10 +1,10 @@
-@props(['promoters', 'genres'])
+@props(['other', 'genres'])
 
 <div class="mx-auto w-full max-w-screen-xl">
-  <h1 class="mt-6 text-center font-heading text-6xl text-white">Promoters</h1>
+  <h1 class="mt-6 text-center font-heading text-6xl text-white">Photographers</h1>
   <div class="relative shadow-md sm:rounded-lg">
     <div class="search-wrapper flex justify-center border-2 border-white dark:bg-black">
-      <form class="filter-search flex items-center sm:p-1 md:p-3" action="{{ route('promoters.filterCheckboxesSearch') }}"
+      <form class="filter-search flex items-center sm:p-1 md:p-3" action="{{ route('other.filterCheckboxesSearch') }}"
         method="GET">
         <div class="filters relative flex items-center">
           <div id="accordion-collapse" class="w-full" data-accordion="collapse">
@@ -143,8 +143,8 @@
     </div>
     <!-- Pagination links -->
     <div class="mt-4 px-6 py-3">
-      @if ($promoters->count() >= 10)
-        {{ $promoters->links() }}
+      @if ($other->count() >= 10)
+        {{ $other->links() }}
       @endif
     </div>
   </div>

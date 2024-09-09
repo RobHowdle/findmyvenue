@@ -13,11 +13,11 @@ class OtherServiceList extends Model
     protected $table = "other_services_list";
 
     protected $fillable = [
-        'name',
+        'service_name',
     ];
 
     public function otherServices()
     {
-        return $this->hasMany(OtherService::class, 'other_service_id');
+        return $this->hasMany(OtherService::class);
     }
 }

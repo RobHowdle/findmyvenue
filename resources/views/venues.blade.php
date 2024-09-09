@@ -373,7 +373,6 @@
     return ratingHtml;
   }
 
-
   // Update the updateTable function to pass the filtered venues to updateVenuesTable
   function updateTable(data) {
     var venues = data.venues;

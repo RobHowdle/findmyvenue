@@ -13,19 +13,23 @@ class OtherServicesListSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('other_services_list')->insert(
+        DB::table('other_services_list')->insert([
             [
                 'service_name' => 'Photography',
+                'image_url' => asset('storage/images/system/photography.jpg'),
             ],
             [
                 'service_name' => 'Videography',
+                'image_url' => asset('storage/images/system/videography.jpg'),
             ],
             [
                 'service_name' => 'Designer',
+                'image_url' => asset('storage/images/system/designer.jpg'),
             ],
             [
                 'service_name' => 'Band',
-            ]
-        );
+                'image_url' => asset('storage/images/system/band.jpg'),
+            ],
+        ]);
     }
 }

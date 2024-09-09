@@ -7,6 +7,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PromoterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OtherServiceController;
+use App\Models\OtherService;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,9 +36,11 @@ Route::get('/promoters', [PromoterController::class, 'index'])->name('promoters'
 Route::get('/promoters/filter', [PromoterController::class, 'filterCheckboxesSearch'])->name('promoters.filterCheckboxesSearch');
 Route::get('/promoters/{id}', [PromoterController::class, 'show'])->name('promoter');
 Route::post('/promoters/{id}/submitReview', [PromoterController::class, 'submitPromoterReview'])->name('submit-promoter-review');
+
 Route::get('/other', [OtherServiceController::class, 'index'])->name('other');
 Route::get('/other/{serviceName}', [OtherServiceController::class, 'showGroup'])->name('singleServiceGroup');
 Route::get('/other/{serviceName}/{serviceId}', [OtherServiceController::class, 'show'])->name('singleService');
+Route::get('/other/filter', [OtherServiceController::class, 'filterCheckboxesSearch'])->name('other.filterCheckboxesSearch');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 Route::post('/dashboard/approve-promoter/{reviewId}', [DashboardController::class, 'approvePromoterReview'])->middleware(['auth', 'verified'])->name('pending-review-promoter.approve');
