@@ -30,6 +30,22 @@ class OtherService extends Model
         'services'
     ];
 
+    public static function getHighestRatedService($serviceType, $location)
+    {
+        return self::with('otherServiceList') // Eager load the related model
+            ->whereHas('otherServiceList', function ($query) use ($serviceType) {
+                $query->where('service_name', $serviceType);
+            })
+            ->where('postal_town', $location)
+            ->get()
+            ->map(function ($service) {
+                $service->overall_score = OtherServicesReview::calculateOverallScore($service->id);
+                return $service;
+            })
+            ->sortByDesc('overall_score')
+            ->first();
+    }
+
     public function otherServiceList()
     {
         return $this->belongsTo(OtherServiceList::class, 'other_service_id');

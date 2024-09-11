@@ -11,6 +11,10 @@ export default {
 
     theme: {
         extend: {
+            maxWidth: {
+                yns132: "132px",
+                yns250: "250px",
+            },
             padding: {
                 yns25: "25rem",
                 yns22: "22rem",

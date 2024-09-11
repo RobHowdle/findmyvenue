@@ -17,40 +17,7 @@
           {{ $venue->postal_town }}
         </td>
         <td class="whitespace-nowrap align-middle text-white sm:py-3 sm:text-base md:py-2 lg:py-4">
-          @if ($venue->contact_number)
-            <a class="mr-2 hover:text-ynsYellow" href="tel:{{ $venue->contact_number }}"><span
-                class="fas fa-phone"></span></a>
-          @endif
-          @if ($venue->contact_email)
-            <a class="mr-2 hover:text-ynsYellow" href="mailto:{{ $venue->contact_email }}"><span
-                class="fas fa-envelope"></span></a>
-          @endif
-          @if ($venue->platforms)
-            @foreach ($venue->platforms as $platform)
-              @if ($platform['platform'] == 'facebook')
-                <a class="mr-2 hover:text-ynsYellow" href="{{ $platform['url'] }}" target=_blank><span
-                    class="fab fa-facebook"></span></a>
-              @elseif($platform['platform'] == 'twitter')
-                <a class="mr-2 hover:text-ynsYellow" href="{{ $platform['url'] }}" target=_blank><span
-                    class="fab fa-twitter"></span></a>
-              @elseif($platform['platform'] == 'instagram')
-                <a class="mr-2 hover:text-ynsYellow" href="{{ $platform['url'] }}" target=_blank><span
-                    class="fab fa-instagram"></span></a>
-              @elseif($platform['platform'] == 'snapchat')
-                <a class="mr-2 hover:text-ynsYellow" href="{{ $platform['url'] }}" target=_blank><span
-                    class="fab fa-snapchat-ghost"></span></a>
-              @elseif($platform['platform'] == 'tiktok')
-                <a class="mr-2 hover:text-ynsYellow" href="{{ $platform['url'] }}" target=_blank><span
-                    class="fab fa-tiktok"></span></a>
-              @elseif($platform['platform'] == 'youtube')
-                <a class="mr-2 hover:text-ynsYellow" href="{{ $platform['url'] }}" target=_blank><span
-                    class="fab fa-youtube"></span></a>
-              @else
-                <a class="mr-2 hover:text-ynsYellow" href="{{ $platform['url'] }}" target=_blank><span
-                    class="fas fa-globe"></span></a>
-              @endif
-            @endforeach
-          @endif
+          <x-contact-and-social-links :item="$venue" />
         </td>
         <td
           class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">

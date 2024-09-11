@@ -64,4 +64,37 @@ $(document).ready(function () {
     $(".accordion-item").click(function (event) {
         event.stopPropagation();
     });
+
+    // Hide all tab contents except the first one
+    $(".venue-tab-content > div:not(:first)").hide();
+
+    // Add active class to the default tab link
+    $(".tabLinks:first").addClass(
+        "active text-ynsYellow border-b-2 border-ynsYellow rounded-t-lg group"
+    );
+
+    // Add click event to tab links
+    $(".tabLinks").click(function () {
+        // Get the tab ID from the data attribute
+        var tabId = $(this).data("tab");
+
+        // Hide all tab contents
+        $(".venue-tab-content > div").hide();
+
+        // Show the selected tab content
+        $("#" + tabId).fadeIn();
+
+        // Remove "active" class from all tab links
+        $(".tabLinks").removeClass(
+            "active text-ynsYellow border-b-2 border-ynsYellow rounded-t-lg group"
+        );
+
+        // Add "active" class to the clicked tab link
+        $(this).addClass(
+            "active text-ynsYellow border-b-2 border-ynsYellow rounded-t-lg group"
+        );
+
+        // Prevent default link behavior
+        return false;
+    });
 });

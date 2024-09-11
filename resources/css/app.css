@@ -164,6 +164,12 @@
     max-width: 150px;
 }
 
+.active {
+    color: theme("colors.ynsYellow");
+    border-bottom-color: theme("colors.ynsYellow");
+    border-bottom-width: 2px;
+}
+
 body {
     background-image: url("/public/images/hero-bg.jpg");
     background-repeat: no-repeat;
@@ -234,13 +240,6 @@ body {
     overflow: auto;
 }
 
-.venue-wrapper,
-.promoter-wrapper,
-.suggestion-wrapper,
-.other-wrapper {
-    background-color: var(--color-black-light);
-}
-
 .promoter-wrapper .wrapper,
 .venue-wrapper .wrapper {
     grid-template-columns: auto 400px;
@@ -302,35 +301,6 @@ body {
     object-position: center;
 }
 
-.service-block {
-    @supports not (aspect-ratio: 1/1) {
-        position: relative;
-
-        &::before {
-            content: "";
-            display: block;
-            padding-top: calc((250 / 250) * 100%);
-        }
-
-        img {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            inset: 0;
-            object-fit: cover;
-        }
-    }
-
-    @supports (aspect-ratio: 1/1) {
-        img {
-            aspect-ratio: 250/250;
-            height: auto;
-            width: 100%;
-            object-fit: cover;
-        }
-    }
-}
-
 /* Styles for the navbar */
 #navbar {
     transition: background-color 0.3s;
@@ -381,10 +351,13 @@ body {
     transition-timing-function: ease;
 }
 
-.venue-logo,
-.promoter-logo,
-.other-logo {
+._250img {
     max-width: 250px;
+    object-fit: contain;
+}
+
+.asr1 {
+    aspect-ratio: 1/1;
 }
 
 .band-types-list,

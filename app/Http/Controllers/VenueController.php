@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Venue;
 use App\Models\Promoter;
 use App\Models\VenueReview;
+use App\Models\OtherService;
 use Illuminate\Http\Request;
+use App\Models\PromoterReview;
 use Illuminate\Support\Facades\DB;
+use App\Models\OtherServicesReview;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -130,10 +133,29 @@ class VenueController extends Controller
         $venue = Venue::where('id', '=', $id)->with('extraInfo')->first();
         $venueId = $venue->id;
 
-        // Promoter Suggestion
+        // Promoter Block
         $existingPromoters = $venue->promoters()->get();
         $location = $venue->postal_town;
-        $promotersByLocation = Promoter::where('postal_town', $location)->take(min(3, Promoter::where('postal_town', $location)->count()))->get();
+        $promoterWithHighestRating = Promoter::where('postal_town', $location)
+            ->get()
+            ->map(function ($promoter) {
+                $promoter->overall_score = PromoterReview::calculateOverallScore($promoter->id);
+                return $promoter;
+            })
+            ->sortByDesc('overall_score')
+            ->first();
+
+        // Photographer Block
+        $photographerWithHighestRating = OtherService::getHighestRatedService('Photography', $location);
+
+        // Videographer Block
+        $videographerWithHighestRating = OtherService::getHighestRatedService('Videography', $location);
+
+        // Band Block
+        $bandWithHighestRating = OtherService::getHighestRatedService('Band', $location);
+
+        // Designer Block
+        $designerWithHighestRating = OtherService::getHighestRatedService('Designer', $location);
 
         // Split the field containing multiple URLs into an array
         if ($venue->contact_link) {
@@ -164,21 +186,40 @@ class VenueController extends Controller
 
         // Add the processed data to the venue
         $venue->platforms = $platforms;
-        $venue->recentReviews = VenueReview::getRecentReviewsForPromoter($id);
+        $recentReviews = VenueReview::getRecentReviewsForVenue($id);
+        $venue->recentReviews = $recentReviews->isNotEmpty() ? $recentReviews : null;
+
+        $overallScore = VenueReview::calculateOverallScore($id);
+        $overallReviews[$id] = $this->renderRatingIcons($overallScore);
+
 
         // Get Review Scores
-        $overallReview = VenueReview::calculateOverallScore($id);
         $averageCommunicationRating = VenueReview::calculateAverageScore($id, 'communication_rating');
         $averageRopRating = VenueReview::calculateAverageScore($id, 'rop_rating');
         $averagePromotionRating = VenueReview::calculateAverageScore($id, 'promotion_rating');
         $averageQualityRating = VenueReview::calculateAverageScore($id, 'quality_rating');
         $reviewCount = VenueReview::getReviewCount($id);
 
-
-
         $genres = json_decode($venue->genre);
 
-        return view('venue', compact('promotersByLocation', 'existingPromoters', 'venue', 'genres', 'overallReview', 'averageCommunicationRating', 'averageRopRating', 'averagePromotionRating', 'averageQualityRating', 'reviewCount', 'venueId'));
+        return view('venue', compact(
+            'promoterWithHighestRating',
+            'photographerWithHighestRating',
+            'videographerWithHighestRating',
+            'bandWithHighestRating',
+            'designerWithHighestRating',
+            'existingPromoters',
+            'venue',
+            'genres',
+            'overallScore',
+            'overallReviews',
+            'averageCommunicationRating',
+            'averageRopRating',
+            'averagePromotionRating',
+            'averageQualityRating',
+            'reviewCount',
+            'venueId'
+        ));
     }
 
     public function locations()
