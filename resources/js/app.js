@@ -98,3 +98,106 @@ $(document).ready(function () {
         return false;
     });
 });
+
+// Review Modal JS
+document.addEventListener("DOMContentLoaded", function () {
+    // Function to show the modal
+    function showModal(modalId) {
+        const modal = document.getElementById(modalId);
+        const backdrop = document.querySelector(".fixed");
+
+        if (modal && backdrop) {
+            modal.classList.remove("hidden");
+            backdrop.setAttribute("aria-hidden", "false");
+            modal.focus();
+        }
+    }
+
+    function hideModal(modalId) {
+        const modal = document.getElementById(modalId);
+        const backdrop = document.querySelector(".fixed");
+
+        if (modal && backdrop) {
+            modal.classList.add("hidden");
+            backdrop.setAttribute("aria-hidden", "true");
+        }
+    }
+    // Event listener for buttons to show the modal
+    document.querySelectorAll("[data-modal-toggle]").forEach((button) => {
+        button.addEventListener("click", function () {
+            const modalId = this.getAttribute("data-modal-toggle");
+            showModal(modalId);
+        });
+    });
+
+    // Event listener for modal close buttons
+    document.querySelectorAll("[data-modal-hide]").forEach((button) => {
+        button.addEventListener("click", function () {
+            const modalId = this.getAttribute("data-modal-hide");
+            hideModal(modalId);
+        });
+    });
+
+    // Close modal when clicking outside of it
+    document.addEventListener("click", function (event) {
+        if (event.target.classList.contains("fixed")) {
+            hideModal(event.target.id);
+        }
+    });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const checkboxes = document.querySelectorAll(
+        '.rating input[type="checkbox"]'
+    );
+
+    checkboxes.forEach((checkbox) => {
+        checkbox.addEventListener("change", function () {
+            const value = parseInt(this.value);
+            const group = this.name;
+
+            const checkboxesInGroup = document.querySelectorAll(
+                `input[name="${group}"]`
+            );
+
+            // Check if 5/5 is selected
+            if (value === 5) {
+                checkboxesInGroup.forEach((cb) => {
+                    if (parseInt(cb.value) === 5) {
+                        cb.checked = true;
+                    }
+                    cb.nextElementSibling.style.backgroundImage =
+                        "url('/storage/images/system/ratings/hot.png')";
+                });
+            } else {
+                // Update the checkboxes based on selected value
+                checkboxesInGroup.forEach((cb) => {
+                    if (parseInt(cb.value) <= value) {
+                        cb.checked = true;
+                        cb.nextElementSibling.style.backgroundImage =
+                            "url('/storage/images/system/ratings/full.png')";
+                    } else {
+                        cb.checked = false;
+                        cb.nextElementSibling.style.backgroundImage =
+                            "url('/storage/images/system/ratings/empty.png')";
+                    }
+                });
+            }
+        });
+    });
+});
+
+// Reviewer IP
+$(document).ready(function () {
+    $.getJSON("https://api.ipify.org?format=json", function (data) {
+        var userIP = data.ip;
+        // Verify the element exists before setting the value
+        var reviewerIpField = $("#reviewer_ip");
+        if (reviewerIpField.length) {
+            reviewerIpField.val(userIP);
+        }
+    }).fail(function (jqxhr, textStatus, error) {
+        var err = textStatus + ", " + error;
+        console.error("Request Failed: " + err);
+    });
+});

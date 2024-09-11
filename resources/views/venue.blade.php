@@ -25,11 +25,12 @@
               </div>
             </div>
             <div class="leave-review">
-              <button
-                class="rounded bg-gradient-to-t from-ynsDarkOrange to-ynsYellow px-6 py-2 text-sm text-black">Visited
-                us? <span data-modal-target="review-modal" data-modal-toggle="review-modal" type="button">Leave Us A
-                  Review</span></button>
+              <button class="rounded bg-gradient-to-t from-ynsDarkOrange to-ynsYellow px-6 py-2 text-sm text-black"
+                data-modal-toggle="review-modal" type="button">
+                Visited us? <span>Leave Us A Review</span>
+              </button>
             </div>
+
           </div>
         </div>
 
@@ -320,6 +321,8 @@
             @endif
           </div>
         </div>
+
+        <x-review-modal title="{{ $venue->name }}" route="submit-venue-review" profileId="{{ $venue->id }}" />
       </div>
     </div>
   </div>

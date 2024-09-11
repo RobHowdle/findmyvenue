@@ -381,31 +381,43 @@ body {
     color: red;
 }
 
-.rating input {
-    width: 25px;
-    height: 25px;
-    background-position: center;
-    background-size: contain;
-    background-color: transparent;
-    border: none;
+/* Hide default radio buttons */
+.rating-icon {
+    display: none;
 }
 
-.rating input[type="radio"]:checked {
-    width: 25px;
-    height: 25px;
-    background-position: center;
+/* Style for the custom radio button labels */
+.rating-label {
+    display: inline-block;
+    width: 30px; /* Adjust size as needed */
+    height: 30px;
     background-size: contain;
-    background-color: transparent;
-    border: none;
+    background-repeat: no-repeat;
+    cursor: pointer;
 }
 
-.rating input[type="radio"] {
-    width: 25px;
-    height: 25px;
-    background-position: center;
-    background-size: contain;
-    background-color: transparent;
-    border: none;
+.rating-label {
+    background-image: url("/storage/app/public/images/system/ratings/empty.png");
+}
+
+/* Normal horn icon for values less than 5 */
+.rating-1:checked ~ .rating-label.rating-1,
+.rating-2:checked ~ .rating-label.rating-2,
+.rating-3:checked ~ .rating-label.rating-3,
+.rating-4:checked ~ .rating-label.rating-4 {
+    background-image: url("/storage/app/public/images/system/ratings/full.png");
+}
+
+.rating-5:checked ~ .rating-label.rating-5 {
+    background-image: url("/storage/app/public/images/system/ratings/hot.png");
+}
+
+.rating-icon:checked + .rating-label {
+    background-image: url("/storage/app/public/images/system/ratings/full.png");
+}
+
+.rating-icon:checked + .rating-label.rating-5 {
+    background-image: url("/storage/app/public/images/system/ratings/hot.png");
 }
 
 .partially-filled-icon {
