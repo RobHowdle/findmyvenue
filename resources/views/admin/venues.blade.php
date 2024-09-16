@@ -94,26 +94,24 @@
             </div>
 
             <div class="group relative z-0 mb-5 w-full">
-              <textarea type="text" name="floating_description" id="floating_description"
-                value="{{ old('floating_description') }}"
-                class="venues-textarea peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-                placeholder=" " required></textarea>
               <label for="floating_description"
-                class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
+                class="absolute top-3 -z-10 origin-[0] transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
                 Description
               </label>
+              <textarea type="text" name="floating_description" id="floating_description"
+                value="{{ old('floating_description') }}"
+                class="summernote text-md block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
+                placeholder=" " required></textarea>
               @error('floating_description')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
 
             <div class="group relative z-0 mb-5 w-full">
-              <textarea type="text" name="floating_in_house_gear" id="floating_in_house_gear"
-                value="{{ old('floating_in_house_gear') }}"
-                class="venues-textarea peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-                placeholder=" " required></textarea>
+              <textarea type="text" name="floating_in_house_gear" id="floating_in_house_gear" class="summernote" placeholder=" "
+                required></textarea>
               <label for="floating_in_house_gear"
-                class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
+                class="absolute top-3 -z-10 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
                 In House Gear
               </label>
               @error('floating_in_house_gear')
@@ -135,7 +133,6 @@
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
-
 
             <div class="group relative z-0 mb-5 w-full">
               <label class="text-sm font-medium text-gray-900 dark:text-gray-300">Preferred Band Types</label>
@@ -279,13 +276,13 @@
             </div>
 
             <div class="group relative z-0 mb-5 w-full">
-              <textarea type="text" name="extra_info" id="extra_info" value="{{ old('extra_info') }}"
-                class="venues-textarea peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-                placeholder=" " required></textarea>
               <label for="extra_info"
-                class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
+                class="absolute top-3 -z-10 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500">
                 Extra Information
               </label>
+              <textarea type="text" name="extra_info" id="extra_info" value="{{ old('extra_info') }}"
+                class="venues-textarea summernote block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
+                required>{{ old('extra_info') }}</textarea>
               @error('extra_info')
                 <span class="text-danger">{{ $message }}</span>
               @enderror

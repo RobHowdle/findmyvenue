@@ -76,6 +76,7 @@ class AdminController extends Controller
             // Construct the URL to the stored image
             $logoUrl = $destinationPath . '/' . $venueLogoFilename;
 
+
             $newVenue = Venue::create([
                 'name' => $request->input('floating_name'),
                 'description' => $request->input('floating_description'),

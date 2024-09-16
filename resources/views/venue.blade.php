@@ -25,7 +25,8 @@
               </div>
             </div>
             <div class="leave-review">
-              <button class="rounded bg-gradient-to-t from-ynsDarkOrange to-ynsYellow px-6 py-2 text-sm text-black"
+              <button
+                class="rounded bg-gradient-to-t from-ynsDarkOrange to-ynsYellow px-6 py-2 text-sm text-black hover:bg-ynsYellow"
                 data-modal-toggle="review-modal" type="button">
                 Visited us? <span>Leave Us A Review</span>
               </button>
@@ -86,17 +87,18 @@
             </div>
 
             <div id="in-house-gear" class="max-h-80 flex h-full flex-col gap-4 overflow-auto">
-              @if (!$venue->in_house_gear)
+              @if (!$venue->in_house_gear || $venue->in_house_gear == 'None')
                 <p>We do not have any avaliable in house gear to use so you will be required to bring your own. Please
                   contact
                   us if you have any questions about what you can bring.</p>
               @else
-                <p>We have the following gear in house. If you require the use of anything imparticular please contact
-                  us.
+                <p>We have the following gear in house. If you require the use of anything imparticular please <a
+                    class="underline hover:text-ynsYellow" href="mailto:{{ $venue->contact_email }}">contact
+                    us.</a>
                 </p>
                 <div class="gear-block flex flex-col">
                   <p class="text-base text-white">
-                    {{ $venue->in_house_gear }}
+                    {!! $venue->in_house_gear !!}
                   </p>
                 </div>
               @endif
@@ -107,11 +109,13 @@
                 $bandTypes = json_decode($venue->band_type);
               @endphp
               @if (!$bandTypes)
-                <p>We don't have any specific band types listed, please contact us if you would like to enquire about
-                  booking your band.</p>
+                <p>We don't have any specific band types listed, please <a class="underline hover:text-ynsYellow"
+                    href="mailto:{{ $venue->contact_email }}">contact us.</a> if you would like to enquire about booking
+                  your band.</p>
               @else
-                <p>The band types that we usually have at <span class="bold">{{ $venue->name }}</span> are:</p>
-                <ul class="band-types-list mb-2">
+                <p class="mb-2">The band types that we usually have at <span class="bold">{{ $venue->name }}</span>
+                  are:</p>
+                <ul class="band-types-list">
                   @foreach ($bandTypes as $type)
                     @switch($type)
                       @case('original-bands')
@@ -126,7 +130,7 @@
                         <li class="ml-6">Tribute Bands</li>
                       @break
 
-                      @case('all-bands')
+                      @case('all')
                         <li class="ml-6">All Band Types</li>
                       @break
 
@@ -134,87 +138,48 @@
                     @endswitch
                   @endforeach
                 </ul>
-                <p>If you would like to enquire about a show, please contact us.</p>
+                <p class="mt-2">If you would like to enquire about a show, please <a
+                    class="underline hover:text-ynsYellow" href="mailto:{{ $venue->email }}">contact us.</a></p>
               @endif
-              <p>The genres that we usually have at {{ $venue->name }} are:</p>
-              @php $genres = json_decode($venue->genre); @endphp
-              <ul class="genre-list mb-2">
+
+              <p class="mt-4">The genres that we usually have at {{ $venue->name }} are:</p>
+
+              @php
+                $genres = json_decode($venue->genre);
+              @endphp
+
+              <!-- Split into 3 columns using Tailwind -->
+              <ul class="genre-list columns-3 gap-4">
                 @foreach ($genres as $genre)
                   <li class="ml-6">{{ $genre }}</li>
                 @endforeach
               </ul>
-              <p>If you would like to enquire about a show, please contact us.</p>
+
+              <p class="mt-4">If you would like to enquire about a show, please contact us.</p>
             </div>
+
 
             <div id="reviews">
               <p class="text-center">Want to know what we're like? Check out our reviews!</p>
               <div class="ratings-block mt-4 flex flex-col items-center gap-4">
                 <p class="grid grid-cols-2">Communication:
-                  <span class="flex flex-row gap-3">
-                    @php
-                      $fullIcons = floor($averageCommunicationRating); // Number of full icons
-                      $fraction = $averageCommunicationRating - $fullIcons; // Fractional part of the rating
-                    @endphp
-                    @for ($i = 0; $i < $fullIcons; $i++)
-                      <img src="https://img.icons8.com/emoji/48/sign-of-the-horns-emoji.png"
-                        alt="sign-of-the-horns-emoji" />
-                    @endfor
-                    @if ($fraction > 0)
-                      <img src="https://img.icons8.com/emoji/48/sign-of-the-horns-emoji.png"
-                        alt="sign-of-the-horns-emoji" class="partially-filled-icon"
-                        style="width: {{ $fraction * 32.16 }}px; overflow: hidden;" />
-                    @endif
+                  <span class="rating-wrapper flex flex-row gap-3">
+                    {!! $renderRatingIcons($averageCommunicationRating) !!}
                   </span>
                 </p>
                 <p class="grid grid-cols-2">Rate Of Pay:
-                  <span class="flex flex-row gap-3">
-                    @php
-                      $fullIcons = floor($averageRopRating); // Number of full icons
-                      $fraction = $averageRopRating - $fullIcons; // Fractional part of the rating
-                    @endphp
-                    @for ($i = 0; $i < $fullIcons; $i++)
-                      <img src="https://img.icons8.com/emoji/48/sign-of-the-horns-emoji.png"
-                        alt="sign-of-the-horns-emoji" />
-                    @endfor
-                    @if ($fraction > 0)
-                      <img src="https://img.icons8.com/emoji/48/sign-of-the-horns-emoji.png"
-                        alt="sign-of-the-horns-emoji" class="partially-filled-icon"
-                        style="width: {{ $fraction * 32.16 }}px; overflow: hidden;" />
-                    @endif
+                  <span class="rating-wrapper flex flex-row gap-3">
+                    {!! $renderRatingIcons($averageRopRating) !!}
                   </span>
                 </p>
                 <p class="grid grid-cols-2">Promotion:
-                  <span class="flex flex-row gap-3">
-                    @php
-                      $fullIcons = floor($averagePromotionRating); // Number of full icons
-                      $fraction = $averagePromotionRating - $fullIcons; // Fractional part of the rating
-                    @endphp
-                    @for ($i = 0; $i < $fullIcons; $i++)
-                      <img src="https://img.icons8.com/emoji/48/sign-of-the-horns-emoji.png"
-                        alt="sign-of-the-horns-emoji" />
-                    @endfor
-                    @if ($fraction > 0)
-                      <img src="https://img.icons8.com/emoji/48/sign-of-the-horns-emoji.png"
-                        alt="sign-of-the-horns-emoji" class="partially-filled-icon"
-                        style="width: {{ $fraction * 32.16 }}px; overflow: hidden;" />
-                    @endif
+                  <span class="rating-wrapper flex flex-row gap-3">
+                    {!! $renderRatingIcons($averagePromotionRating) !!}
                   </span>
                 </p>
                 <p class="grid grid-cols-2">Gig Quality:
-                  <span class="flex flex-row gap-3">
-                    @php
-                      $fullIcons = floor($averageQualityRating); // Number of full icons
-                      $fraction = $averageQualityRating - $fullIcons; // Fractional part of the rating
-                    @endphp
-                    @for ($i = 0; $i < $fullIcons; $i++)
-                      <img src="https://img.icons8.com/emoji/48/sign-of-the-horns-emoji.png"
-                        alt="sign-of-the-horns-emoji" />
-                    @endfor
-                    @if ($fraction > 0)
-                      <img src="https://img.icons8.com/emoji/48/sign-of-the-horns-emoji.png"
-                        alt="sign-of-the-horns-emoji" class="partially-filled-icon"
-                        style="width: {{ $fraction * 32.16 }}px; overflow: hidden;" />
-                    @endif
+                  <span class="rating-wrapper flex flex-row gap-3">
+                    {!! $renderRatingIcons($averageQualityRating) !!}
                   </span>
                 </p>
               </div>

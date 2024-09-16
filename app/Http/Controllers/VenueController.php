@@ -20,7 +20,7 @@ class VenueController extends Controller
     /**
      * Helper function to render rating icons
      */
-    private function renderRatingIcons($overallScore)
+    public function renderRatingIcons($overallScore)
     {
         $output = '';
         $totalIcons = 5;
@@ -39,11 +39,9 @@ class VenueController extends Controller
                 $output .= '<img src="' . $fullIcon . '" alt="Full Icon" />';
             }
 
-            // Handle the fractional icon
+            // Handle the fractional icon using clip-path
             if ($fraction > 0) {
-                $output .= '<div class="partially-filled-icon" style="width: ' . ($fraction * 48) . 'px; overflow: hidden; display:inline-block;">';
-                $output .= '<img src="' . $fullIcon . '" alt="Partial Full Icon" />';
-                $output .= '</div>';
+                $output .= '<img src="' . $fullIcon . '" alt="Partial Full Icon" style="clip-path: inset(0 ' . ((1 - $fraction) * 100) . '% 0 0);" />';
             }
 
             // Add empty icons to fill the rest
@@ -57,6 +55,7 @@ class VenueController extends Controller
 
         return $output;
     }
+
 
     /**
      * Display a listing of the resource.
@@ -190,7 +189,9 @@ class VenueController extends Controller
         $venue->recentReviews = $recentReviews->isNotEmpty() ? $recentReviews : null;
 
         $overallScore = VenueReview::calculateOverallScore($id);
+        // dd($overallScore);
         $overallReviews[$id] = $this->renderRatingIcons($overallScore);
+        // dd($overallReviews);
 
 
         // Get Review Scores
@@ -219,7 +220,7 @@ class VenueController extends Controller
             'averageQualityRating',
             'reviewCount',
             'venueId'
-        ));
+        ))->with('renderRatingIcons', [$this, 'renderRatingIcons']);
     }
 
     public function locations()
@@ -418,8 +419,6 @@ class VenueController extends Controller
             ]
         ]);
     }
-
-
 
     public function submitVenueReview(Request $request, Venue $id)
     {

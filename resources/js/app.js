@@ -1,11 +1,12 @@
 import $ from "jquery";
-import "./bootstrap";
+import "summernote/dist/summernote-lite.js"; // Non-Bootstrap version
+import "summernote/dist/summernote-lite.css"; // Include the CSS for this version
 
 import Alpine from "alpinejs";
 window.$ = $;
+window.jQuery = $;
 
 window.Alpine = Alpine;
-
 Alpine.start();
 
 $(document).ready(function () {
@@ -199,5 +200,23 @@ $(document).ready(function () {
     }).fail(function (jqxhr, textStatus, error) {
         var err = textStatus + ", " + error;
         console.error("Request Failed: " + err);
+    });
+});
+
+// Summernote
+$(document).ready(function () {
+    $(".summernote").summernote({
+        height: 300, // Set the height of the editor
+        toolbar: [
+            // Customize the toolbar
+            ["style", ["style"]],
+            ["font", ["bold", "italic", "underline", "clear"]],
+            ["fontname", ["fontname"]],
+            ["color", ["color"]],
+            ["para", ["ul", "ol", "paragraph"]],
+            ["table", ["table"]],
+            ["insert", ["link", "picture", "video"]],
+            ["view", ["fullscreen", "codeview", "help"]],
+        ],
     });
 });
