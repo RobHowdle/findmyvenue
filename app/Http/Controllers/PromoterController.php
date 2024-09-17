@@ -13,7 +13,7 @@ class PromoterController extends Controller
     /**
      * Helper function to render rating icons
      */
-    private function renderRatingIcons($overallScore)
+    public function renderRatingIcons($overallScore)
     {
         $output = '';
         $totalIcons = 5;
@@ -32,11 +32,9 @@ class PromoterController extends Controller
                 $output .= '<img src="' . $fullIcon . '" alt="Full Icon" />';
             }
 
-            // Handle the fractional icon
+            // Handle the fractional icon using clip-path
             if ($fraction > 0) {
-                $output .= '<div class="partially-filled-icon" style="width: ' . ($fraction * 48) . 'px; overflow: hidden; display:inline-block;">';
-                $output .= '<img src="' . $fullIcon . '" alt="Partial Full Icon" />';
-                $output .= '</div>';
+                $output .= '<img src="' . $fullIcon . '" alt="Partial Full Icon" style="clip-path: inset(0 ' . ((1 - $fraction) * 100) . '% 0 0);" />';
             }
 
             // Add empty icons to fill the rest
@@ -122,10 +120,17 @@ class PromoterController extends Controller
      */
     public function show(string $id)
     {
-        $promoter = Promoter::where('id', $id)->first();
+        $promoter = Promoter::where('id', $id)->with('venues')->first();
+        $promoterId = $promoter->id;
+        $existingVenues = $promoter->venues;
+
+        $suggestions = app('suggestions', ['promoter' => $promoter]);
+
         // Split the field containing multiple URLs into an array
-        $urls = explode(',', $promoter->contact_link);
-        $platforms = [];
+        if ($promoter->contact_link) {
+            $urls = explode(',', $promoter->contact_link);
+            $platforms = [];
+        }
 
         // // Check each URL against the platforms
         foreach ($urls as $url) {
@@ -150,17 +155,41 @@ class PromoterController extends Controller
 
         // Add the processed data to the venue
         $promoter->platforms = $platforms;
-        $promoter->recentReviews = PromoterReview::getRecentReviewsForPromoter($id);
+        $recentReviews = PromoterReview::getRecentReviewsForPromoter($id);
+        $promoter->recentReviews = $recentReviews->isNotEmpty() ? $recentReviews : null;
+
+        $overallScore = PromoterReview::calculateOverallScore($id);
+        $overallReviews[$id] = $this->renderRatingIcons($overallScore);
 
         // Get Review Scores
-        $overallReview = PromoterReview::calculateOverallScore($id);
         $averageCommunicationRating = PromoterReview::calculateAverageScore($id, 'communication_rating');
         $averageRopRating = PromoterReview::calculateAverageScore($id, 'rop_rating');
         $averagePromotionRating = PromoterReview::calculateAverageScore($id, 'promotion_rating');
         $averageQualityRating = PromoterReview::calculateAverageScore($id, 'quality_rating');
         $reviewCount = PromoterReview::getReviewCount($id);
 
-        return view('promoter', compact('promoter', 'overallReview', 'averageCommunicationRating', 'averageRopRating', 'averagePromotionRating', 'averageQualityRating', 'reviewCount'));
+        $genres = json_decode($promoter->genre);
+
+        return view('promoter', compact(
+            'promoter',
+            'promoterId',
+            'genres',
+            'overallScore',
+            'overallReviews',
+            'averageCommunicationRating',
+            'averageRopRating',
+            'averagePromotionRating',
+            'averageQualityRating',
+            'reviewCount'
+        ))->with([
+            'venueWithHighestRating' => $suggestions['venue'],
+            'photographerWithHighestRating' => $suggestions['photographer'],
+            'videographerWithHighestRating' => $suggestions['videographer'],
+            'bandWithHighestRating' => $suggestions['band'],
+            'designerWithHighestRating' => $suggestions['designer'],
+            'existingVenues' => $existingVenues,
+            'renderRatingIcons' => [$this, 'renderRatingIcons']
+        ]);
     }
 
     public function submitPromoterReview(Request $request, Promoter $id)

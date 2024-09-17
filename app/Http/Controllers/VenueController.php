@@ -56,7 +56,6 @@ class VenueController extends Controller
         return $output;
     }
 
-
     /**
      * Display a listing of the resource.
      */
@@ -131,30 +130,10 @@ class VenueController extends Controller
     {
         $venue = Venue::where('id', '=', $id)->with('extraInfo')->first();
         $venueId = $venue->id;
+        $existingPromoters = $venue->promoters;
 
-        // Promoter Block
-        $existingPromoters = $venue->promoters()->get();
-        $location = $venue->postal_town;
-        $promoterWithHighestRating = Promoter::where('postal_town', $location)
-            ->get()
-            ->map(function ($promoter) {
-                $promoter->overall_score = PromoterReview::calculateOverallScore($promoter->id);
-                return $promoter;
-            })
-            ->sortByDesc('overall_score')
-            ->first();
+        $suggestions = app('suggestions', ['venue' => $venue]);
 
-        // Photographer Block
-        $photographerWithHighestRating = OtherService::getHighestRatedService('Photography', $location);
-
-        // Videographer Block
-        $videographerWithHighestRating = OtherService::getHighestRatedService('Videography', $location);
-
-        // Band Block
-        $bandWithHighestRating = OtherService::getHighestRatedService('Band', $location);
-
-        // Designer Block
-        $designerWithHighestRating = OtherService::getHighestRatedService('Designer', $location);
 
         // Split the field containing multiple URLs into an array
         if ($venue->contact_link) {
@@ -189,10 +168,7 @@ class VenueController extends Controller
         $venue->recentReviews = $recentReviews->isNotEmpty() ? $recentReviews : null;
 
         $overallScore = VenueReview::calculateOverallScore($id);
-        // dd($overallScore);
         $overallReviews[$id] = $this->renderRatingIcons($overallScore);
-        // dd($overallReviews);
-
 
         // Get Review Scores
         $averageCommunicationRating = VenueReview::calculateAverageScore($id, 'communication_rating');
@@ -204,13 +180,8 @@ class VenueController extends Controller
         $genres = json_decode($venue->genre);
 
         return view('venue', compact(
-            'promoterWithHighestRating',
-            'photographerWithHighestRating',
-            'videographerWithHighestRating',
-            'bandWithHighestRating',
-            'designerWithHighestRating',
-            'existingPromoters',
             'venue',
+            'venueId',
             'genres',
             'overallScore',
             'overallReviews',
@@ -218,9 +189,17 @@ class VenueController extends Controller
             'averageRopRating',
             'averagePromotionRating',
             'averageQualityRating',
-            'reviewCount',
-            'venueId'
-        ))->with('renderRatingIcons', [$this, 'renderRatingIcons']);
+            'reviewCount'
+        ))
+            ->with([
+                'promoterWithHighestRating' => $suggestions['promoter'],
+                'photographerWithHighestRating' => $suggestions['photographer'],
+                'videographerWithHighestRating' => $suggestions['videographer'],
+                'bandWithHighestRating' => $suggestions['band'],
+                'designerWithHighestRating' => $suggestions['designer'],
+                'existingPromoters' => $existingPromoters,
+                'renderRatingIcons' => [$this, 'renderRatingIcons']
+            ]);
     }
 
     public function locations()

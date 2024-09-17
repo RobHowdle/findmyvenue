@@ -1,7 +1,7 @@
 <x-guest-layout>
   <x-slot name="header">
     <h1 class="text-center font-heading text-6xl text-white">
-      {{ __('Venues') }}
+      {{ __('Venue') }}
     </h1>
   </x-slot>
 
@@ -155,7 +155,8 @@
                 @endforeach
               </ul>
 
-              <p class="mt-4">If you would like to enquire about a show, please contact us.</p>
+              <p class="mt-4">If you would like to enquire about a show, please <a
+                  class="underline hover:text-ynsYellow" href="mailto:{{ $venue->contact_email }}">contact us.</a></p>
             </div>
 
 
