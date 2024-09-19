@@ -12,7 +12,7 @@
           @if ($promoter->logo_url)
             <img src="{{ asset($promoter->logo_url) }}" alt="{{ $promoter->name }} Logo" class="_250img">
           @endif
-          <div class="header-text flex flex-col justify-end gap-2">
+          <div class="header-text flex flex-col justify-center gap-2">
             <h1 class="text-sans text-4xl">{{ $promoter->name }}</h1>
             <p class="font-sans text-2xl">{{ $promoter->postal_town }}</p>
             <div>
@@ -27,11 +27,8 @@
             <div class="leave-review">
               <button
                 class="rounded bg-gradient-to-t from-ynsDarkOrange to-ynsYellow px-6 py-2 text-sm text-black hover:bg-ynsYellow"
-                data-modal-toggle="review-modal" type="button">
-                Visited us? <span>Leave Us A Review</span>
-              </button>
+                data-modal-toggle="review-modal" type="button">Leave a review</button>
             </div>
-
           </div>
         </div>
 
@@ -54,9 +51,8 @@
               <li class="tab me-2">
                 <a href="#" data-tab="bands-and-genres"
                   class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
-                  <svg
-                    class="me-2 h-4 w-4 text-white group-hover:text-white dark:text-white dark:group-hover:text-white"
-                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                  <svg class="me-2 h-4 w-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                    viewBox="0 0 20 20">
                     <path
                       d="M5 11.424V1a1 1 0 1 0-2 0v10.424a3.228 3.228 0 0 0 0 6.152V19a1 1 0 1 0 2 0v-1.424a3.228 3.228 0 0 0 0-6.152ZM19.25 14.5A3.243 3.243 0 0 0 17 11.424V1a1 1 0 0 0-2 0v10.424a3.227 3.227 0 0 0 0 6.152V19a1 1 0 1 0 2 0v-1.424a3.243 3.243 0 0 0 2.25-3.076Zm-6-9A3.243 3.243 0 0 0 11 2.424V1a1 1 0 0 0-2 0v1.424a3.228 3.228 0 0 0 0 6.152V19a1 1 0 1 0 2 0V8.576A3.243 3.243 0 0 0 13.25 5.5Z" />
                   </svg>Bands & Genres
@@ -81,6 +77,11 @@
             </div>
 
             <div id="my-venues" class="max-h-80 flex h-full flex-col gap-4 overflow-auto">
+              @if (!$promoter->my_venues)
+                <p>We're still working on this! Come back later to read about us!</p>
+              @else
+                <p>{{ $promoter->my_venues }}</p>
+              @endif
             </div>
 
             <div id="bands-and-genres">
@@ -88,55 +89,45 @@
                 $bandTypes = json_decode($promoter->band_type);
               @endphp
               @if (!$bandTypes)
-                <p>We don't have any specific band types listed, please <a class="underline hover:text-ynsYellow"
-                    href="mailto:{{ $promoter->contact_email }}">contact us.</a> if you would like to enquire about
-                  booking
-                  your band.</p>
+                <p class="mb-2">We don't have any specific band types that we prefer to work with, please <a
+                    class="underline hover:text-ynsYellow" href="mailto:{{ $promoter->contact_email }}">contact us.</a>
+                  if you would like to enquire about promoting your band.</p>
               @else
-                <p class="mb-2">The band types that we usually have at <span
-                    class="bold">{{ $promoter->name }}</span>
-                  are:</p>
-                <ul class="band-types-list">
+                <p class="mb-2"><span class="bold">{{ $promoter->name }}</span> specifically promotes
                   @foreach ($bandTypes as $type)
                     @switch($type)
                       @case('original-bands')
-                        <li class="ml-6">Original Bands</li>
+                        Original Bands
                       @break
 
                       @case('cover-bands')
-                        <li class="ml-6">Cover Bands</li>
+                        Cover Bands
                       @break
 
                       @case('tribute-bands')
-                        <li class="ml-6">Tribute Bands</li>
+                        Tribute Bands
                       @break
 
                       @case('all')
-                        <li class="ml-6">All Band Types</li>
+                        All Band Types
                       @break
 
                       @default
                     @endswitch
                   @endforeach
-                </ul>
-                <p class="mt-2">If you would like to enquire about a show, please <a
-                    class="underline hover:text-ynsYellow" href="mailto:{{ $promoter->email }}">contact us.</a></p>
               @endif
-
-              <p class="mt-4">The genres that we usually work with at {{ $promoter->name }} are:</p>
+              </p>
               @php
                 $genres = json_decode($promoter->genre);
               @endphp
-
-              <!-- Split into 3 columns using Tailwind -->
-              <ul class="genre-list columns-3 gap-4">
-                @foreach ($genres as $genre)
-                  <li class="ml-6">{{ $genre }}</li>
+              <p class="mb-2">
+                We like to work mostly with artists in the
+                @foreach ($genres as $index => $genre)
+                  {{ $genre }}@if ($index < count($genres) - 1)
+                    ,
+                  @endif
                 @endforeach
-              </ul>
-
-              <p class="mt-4">If you would like to enquire about a show, please <a
-                  class="underline hover:text-ynsYellow" href="mailto:{{ $promoter->contact_email }}">contact us.</a>
+                genres.
               </p>
             </div>
 

@@ -12,7 +12,7 @@
           @if ($venue->logo_url)
             <img src="{{ asset($venue->logo_url) }}" alt="{{ $venue->name }} Logo" class="_250img">
           @endif
-          <div class="header-text flex flex-col justify-end gap-2">
+          <div class="header-text flex flex-col justify-center gap-2">
             <h1 class="text-sans text-4xl">{{ $venue->name }}</h1>
             <p class="font-sans text-2xl">{{ $venue->postal_town }}</p>
             <div>
@@ -27,9 +27,7 @@
             <div class="leave-review">
               <button
                 class="rounded bg-gradient-to-t from-ynsDarkOrange to-ynsYellow px-6 py-2 text-sm text-black hover:bg-ynsYellow"
-                data-modal-toggle="review-modal" type="button">
-                Visited us? <span>Leave Us A Review</span>
-              </button>
+                data-modal-toggle="review-modal" type="button">Leave a review</button>
             </div>
 
           </div>
@@ -38,7 +36,7 @@
         <div class="body">
           <div class="h-auto py-4">
             <ul
-              class="flex flex-wrap border-b border-gray-200 text-center text-sm font-medium text-gray-500 dark:border-gray-700 dark:text-gray-400">
+              class="flex flex-wrap justify-between border-b border-gray-200 text-center text-sm font-medium text-gray-500 dark:border-gray-700 dark:text-gray-400">
               <li class="tab me-2 pl-0">
                 <a href="#" data-tab="about"
                   class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
@@ -54,9 +52,8 @@
               <li class="tab me-2">
                 <a href="#" data-tab="band-types-genres"
                   class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
-                  <svg
-                    class="me-2 h-4 w-4 text-white group-hover:text-white dark:text-white dark:group-hover:text-white"
-                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                  <svg class="me-2 h-4 w-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                    viewBox="0 0 20 20">
                     <path
                       d="M5 11.424V1a1 1 0 1 0-2 0v10.424a3.228 3.228 0 0 0 0 6.152V19a1 1 0 1 0 2 0v-1.424a3.228 3.228 0 0 0 0-6.152ZM19.25 14.5A3.243 3.243 0 0 0 17 11.424V1a1 1 0 0 0-2 0v10.424a3.227 3.227 0 0 0 0 6.152V19a1 1 0 1 0 2 0v-1.424a3.243 3.243 0 0 0 2.25-3.076Zm-6-9A3.243 3.243 0 0 0 11 2.424V1a1 1 0 0 0-2 0v1.424a3.228 3.228 0 0 0 0 6.152V19a1 1 0 1 0 2 0V8.576A3.243 3.243 0 0 0 13.25 5.5Z" />
                   </svg>Band Types & Genres
@@ -89,8 +86,9 @@
             <div id="in-house-gear" class="max-h-80 flex h-full flex-col gap-4 overflow-auto">
               @if (!$venue->in_house_gear || $venue->in_house_gear == 'None')
                 <p>We do not have any avaliable in house gear to use so you will be required to bring your own. Please
-                  contact
-                  us if you have any questions about what you can bring.</p>
+                  <a class="underline hover:text-ynsYellow" href="mailto:{{ $venue->contact_email }}">contact
+                    us.</a> if you have any questions about what you can bring.
+                </p>
               @else
                 <p>We have the following gear in house. If you require the use of anything imparticular please <a
                     class="underline hover:text-ynsYellow" href="mailto:{{ $venue->contact_email }}">contact
@@ -113,7 +111,8 @@
                     href="mailto:{{ $venue->contact_email }}">contact us.</a> if you would like to enquire about booking
                   your band.</p>
               @else
-                <p class="mb-2">The band types that we usually have at <span class="bold">{{ $venue->name }}</span>
+                <p class="mb-2">The band types that we usually have at <span
+                    class="bold">{{ $venue->name }}</span>
                   are:</p>
                 <ul class="band-types-list">
                   @foreach ($bandTypes as $type)

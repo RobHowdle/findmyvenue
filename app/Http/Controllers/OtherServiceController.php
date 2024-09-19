@@ -13,7 +13,7 @@ class OtherServiceController extends Controller
     /**
      * Helper function to render rating icons
      */
-    private function renderRatingIcons($overallScore)
+    public function renderRatingIcons($overallScore)
     {
         $output = '';
         $totalIcons = 5;
@@ -32,11 +32,9 @@ class OtherServiceController extends Controller
                 $output .= '<img src="' . $fullIcon . '" alt="Full Icon" />';
             }
 
-            // Handle the fractional icon
+            // Handle the fractional icon using clip-path
             if ($fraction > 0) {
-                $output .= '<div class="partially-filled-icon" style="width: ' . ($fraction * 48) . 'px; overflow: hidden; display:inline-block;">';
-                $output .= '<img src="' . $fullIcon . '" alt="Partial Full Icon" />';
-                $output .= '</div>';
+                $output .= '<img src="' . $fullIcon . '" alt="Partial Full Icon" style="clip-path: inset(0 ' . ((1 - $fraction) * 100) . '% 0 0);" />';
             }
 
             // Add empty icons to fill the rest
@@ -155,6 +153,37 @@ class OtherServiceController extends Controller
         $singleServiceTitle =
             OtherService::where('id', $serviceId)->with('otherServiceList')->first();
 
+        $customKeys = [
+            'Photography' => 'photography',
+            'Designer' => 'designer',
+            'Videography' => 'videography',
+            'Band' => 'band',
+        ];
+
+        $normalizedServiceName = ucfirst(strtolower(($serviceName)));
+        $key = $customKeys[$normalizedServiceName] ?? $normalizedServiceName;
+        $suggestions = app('suggestions', [$key => $serviceName]);
+
+        // Default empty suggestions array
+        $promoterWithHighestRating = $photographerWithHighestRating = $videographerWithHighestRating = $bandWithHighestRating = $designerWithHighestRating = null;
+
+        // Check if the relevant suggestions exist
+        if (isset($suggestions['promoter'])) {
+            $promoterWithHighestRating = $suggestions['promoter'];
+        }
+        if (isset($suggestions['photographer'])) {
+            $photographerWithHighestRating = $suggestions['photographer'];
+        }
+        if (isset($suggestions['videographer'])) {
+            $videographerWithHighestRating = $suggestions['videographer'];
+        }
+        if (isset($suggestions['band'])) {
+            $bandWithHighestRating = $suggestions['band'];
+        }
+        if (isset($suggestions['designer'])) {
+            $designerWithHighestRating = $suggestions['designer'];
+        }
+
         // Split the field containing multiple URLs into an array
         if ($singleService->contact_link) {
             $urls = explode(',', $singleService->contact_link);
@@ -167,7 +196,7 @@ class OtherServiceController extends Controller
             $matchedPlatform = 'Unknown';
 
             // Check if the URL contains platform names
-            $platformsToCheck = ['facebook', 'twitter', 'instagram'];
+            $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
             foreach ($platformsToCheck as $platform) {
                 if (stripos($url, $platform) !== false) {
                     $matchedPlatform = $platform;
@@ -183,9 +212,43 @@ class OtherServiceController extends Controller
         }
 
         $singleService->platforms = $platforms;
+        $recentReviews = OtherServicesReview::getRecentReviewsForOtherService($serviceId);
+        $singleService->recentReviews = $recentReviews->isNotEmpty() ? $recentReviews : null;
 
+        $overallScore = OtherServicesReview::calculateOverallScore($serviceId);
+        $overallReviews[$serviceId] = $this->renderRatingIcons($overallScore);
 
-        return view('single-service', compact('singleService', 'singleServiceTitle'));
+        // Get Review Scores
+        $averageCommunicationRating = OtherServicesReview::calculateAverageScore($serviceId, 'communication_rating');
+        $averageRopRating = OtherServicesReview::calculateAverageScore($serviceId, 'rop_rating');
+        $averagePromotionRating = OtherServicesReview::calculateAverageScore($serviceId, 'promotion_rating');
+        $averageQualityRating = OtherServicesReview::calculateAverageScore($serviceId, 'quality_rating');
+        $reviewCount = OtherServicesReview::getReviewCount($serviceId);
+
+        $genres = json_decode($singleService->genre);
+        $services = json_decode($singleService->packages);
+
+        return view('single-service', compact(
+            'singleService',
+            'singleServiceTitle',
+            'genres',
+            'services',
+            'overallScore',
+            'overallReviews',
+            'averageCommunicationRating',
+            'averageRopRating',
+            'averagePromotionRating',
+            'averageQualityRating',
+            'reviewCount'
+        ))
+            ->with([
+                'promoterWithHighestRating' => $promoterWithHighestRating,
+                'photographerWithHighestRating' => $photographerWithHighestRating,
+                'videographerWithHighestRating' => $videographerWithHighestRating,
+                'bandWithHighestRating' => $bandWithHighestRating,
+                'designerWithHighestRating' => $designerWithHighestRating,
+                'renderRatingIcons' => [$this, 'renderRatingIcons']
+            ]);
     }
 
     /**

@@ -27,6 +27,7 @@ class OtherService extends Model
         'contact_number',
         'contact_email',
         'contact_link',
+        'portfolio_link',
         'services'
     ];
 
