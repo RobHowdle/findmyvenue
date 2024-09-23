@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BandReviews;
 use App\Models\OtherService;
 use Illuminate\Http\Request;
 use App\Models\OtherServiceList;
@@ -225,8 +226,33 @@ class OtherServiceController extends Controller
         $averageQualityRating = OtherServicesReview::calculateAverageScore($serviceId, 'quality_rating');
         $reviewCount = OtherServicesReview::getReviewCount($serviceId);
 
+        $members = null;
+        $streamUrls = [];
+        $recentReviews = null;
+        $bandAverageCommunicationRating = null;
+        $bandAverageMusicRating = null;
+        $bandAveragePromotionRating = null;
+        $bandAverageGigQualityRating = null;
+        $bandReviewCount = 0;
+
+        if ($singleService->services == "Band") {
+            $members = json_decode($singleService->members);
+            $streamUrls = json_decode($singleService->stream_urls) ?? [];
+            $recentReviews = BandReviews::getRecentReviewsForBand($serviceId);
+            $singleService->recentReviews = $recentReviews->isNotEmpty() ? $recentReviews : null;
+            $overallScore = BandReviews::calculateOverallScore($serviceId);
+            $overallReviews[$serviceId] = $this->renderRatingIcons($overallScore);
+            $bandAverageCommunicationRating = BandReviews::calculateAverageScore($serviceId, 'communication_rating');
+            $bandAverageMusicRating = BandReviews::calculateAverageScore($serviceId, 'music_rating');
+            $bandAveragePromotionRating = BandReviews::calculateAverageScore($serviceId, 'promotion_rating');
+            $bandAverageGigQualityRating = BandReviews::calculateAverageScore($serviceId, 'gig_quality_rating');
+            $bandReviewCount = BandReviews::getReviewCount($serviceId);
+        }
+
         $genres = json_decode($singleService->genre);
         $services = json_decode($singleService->packages);
+        $bandType = json_decode($singleService->band_type);
+        $genre = json_decode($singleService->genre);
 
         return view('single-service', compact(
             'singleService',
@@ -239,7 +265,16 @@ class OtherServiceController extends Controller
             'averageRopRating',
             'averagePromotionRating',
             'averageQualityRating',
-            'reviewCount'
+            'reviewCount',
+            'members',
+            'streamUrls',
+            'bandType',
+            'genre',
+            'bandAverageCommunicationRating',
+            'bandAverageMusicRating',
+            'bandAveragePromotionRating',
+            'bandAverageGigQualityRating',
+            'bandReviewCount',
         ))
             ->with([
                 'promoterWithHighestRating' => $promoterWithHighestRating,

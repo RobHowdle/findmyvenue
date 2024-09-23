@@ -306,6 +306,23 @@ body {
     object-position: center;
 }
 
+#embed-iframe {
+    width: 100%;
+    height: 352px;
+}
+
+iframe {
+    border-radius: 12px;
+}
+
+.streaming-platform-logo {
+    width: 100%;
+    max-width: 124px;
+    height: auto;
+    object-fit: contain;
+    object-position: center;
+}
+
 /* Styles for the navbar */
 #navbar {
     transition: background-color 0.3s;

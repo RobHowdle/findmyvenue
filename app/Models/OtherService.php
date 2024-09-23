@@ -24,6 +24,8 @@ class OtherService extends Model
         'packages',
         'environment_type',
         'working_times',
+        'band_members',
+        'stream_urls',
         'contact_number',
         'contact_email',
         'contact_link',
