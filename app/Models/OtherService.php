@@ -33,6 +33,11 @@ class OtherService extends Model
         'services'
     ];
 
+    public function users()
+    {
+        return $this->morphToMany(User::class, 'serviceable');
+    }
+
     public static function getHighestRatedService($serviceType, $location)
     {
         return self::with('otherServiceList') // Eager load the related model

@@ -40,4 +40,9 @@ class Promoter extends Model
     {
         return $this->hasMany(PromoterReview::class);
     }
+
+    public function users()
+    {
+        return $this->morphToMany(User::class, 'serviceable', 'service_user', 'serviceable_id', 'user_id')->whereNull('service_user.deleted_at');
+    }
 }

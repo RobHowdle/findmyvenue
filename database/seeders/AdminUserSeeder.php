@@ -20,5 +20,12 @@ class AdminUserSeeder extends Seeder
             'email_verified_at' => now(),
             'password' => Hash::make('yfT11LpReC43(dV(U5'),
         ]);
+
+        DB::table('users')->insert([
+            'name' => 'Promoter',
+            'email' => 'robhowdle94@gmail.com',
+            'email_verified_at' => now(),
+            'password' => Hash::make('yfT11LpReC43(dV(U5'),
+        ]);
     }
 }

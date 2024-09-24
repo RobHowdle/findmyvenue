@@ -35,6 +35,11 @@ class Venue extends Model
         'additional_info'
     ];
 
+    public function users()
+    {
+        return $this->morphToMany(User::class, 'serviceable');
+    }
+
     public function extraInfo()
     {
         return $this->hasOne(VenueExtraInfo::class, 'venues_id');

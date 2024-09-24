@@ -49,5 +49,8 @@ class RoleSeeder extends Seeder
 
         $user = User::find(1);
         $user->assignRole('administrator');
+
+        $user = User::find(2);
+        $user->assignRole('promoter');
     }
 }

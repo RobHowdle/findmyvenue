@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\OtherService;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\VenueController;
@@ -7,7 +8,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PromoterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OtherServiceController;
-use App\Models\OtherService;
+use App\Http\Controllers\PromoterDashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,7 +23,7 @@ use App\Models\OtherService;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('welcome');
 
 Route::get('/venues', [VenueController::class, 'index'])->name('venues');
 Route::get('/venues/filter', [VenueController::class, 'filterCheckboxesSearch'])->name('venues.filterCheckboxesSearch');
@@ -42,15 +43,22 @@ Route::get('/other/{serviceName}', [OtherServiceController::class, 'showGroup'])
 Route::get('/other/{serviceName}/{serviceId}', [OtherServiceController::class, 'show'])->name('singleService');
 Route::get('/other/filter', [OtherServiceController::class, 'filterCheckboxesSearch'])->name('other.filterCheckboxesSearch');
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
-Route::post('/dashboard/approve-promoter/{reviewId}', [DashboardController::class, 'approvePromoterReview'])->middleware(['auth', 'verified'])->name('pending-review-promoter.approve');
-Route::post('/dashboard/display-promoter/{reviewId}', [DashboardController::class, 'displayPromoterReview'])->middleware(['auth', 'verified'])->name('pending-review-promoter.display');
-Route::post('/dashboard/hide-promoter/{reviewId}', [DashboardController::class, 'hidePromoterReview'])->middleware(['auth', 'verified'])->name('pending-review-promoter.hide');
-Route::post('/dashboard/approve-display-promoter/{reviewId}', [DashboardController::class, 'approveDisplayPromoterReview'])->middleware(['auth', 'verified'])->name('pending-review-promoter.approve-display');
-Route::post('/dashboard/approve-display-venue/{reviewId}', [DashboardController::class, 'approveDisplayVenueReview'])->middleware(['auth', 'verified'])->name('pending-review-venue.approve-display');
-Route::post('/dashboard/approve-venue/{reviewId}', [DashboardController::class, 'approveVenueReview'])->middleware(['auth', 'verified'])->name('pending-review-venue.approve');
-Route::post('/dashboard/user-service-link', [DashboardController::class, 'userServiceLink'])->middleware(['auth', 'verified'])->name('user-service-link');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/promoter', [PromoterDashboardController::class, 'index'])->name('promoter.dashboard');
+    Route::get('/dashboard/promoter/finances', [PromoterDashboardController::class, 'promoterFinances'])->name('promoter.dashboard.finances');
 
+
+
+
+    // Route::post('/dashboard/approve-promoter/{reviewId}', [DashboardController::class, 'approvePromoterReview'])->name('pending-review-promoter.approve');
+    // Route::post('/dashboard/display-promoter/{reviewId}', [DashboardController::class, 'displayPromoterReview'])->name('pending-review-promoter.display');
+    // Route::post('/dashboard/hide-promoter/{reviewId}', [DashboardController::class, 'hidePromoterReview'])->name('pending-review-promoter.hide');
+    // Route::post('/dashboard/approve-display-promoter/{reviewId}', [DashboardController::class, 'approveDisplayPromoterReview'])->name('pending-review-promoter.approve-display');
+    // Route::post('/dashboard/approve-display-venue/{reviewId}', [DashboardController::class, 'approveDisplayVenueReview'])->name('pending-review-venue.approve-display');
+    // Route::post('/dashboard/approve-venue/{reviewId}', [DashboardController::class, 'approveVenueReview'])->name('pending-review-venue.approve');
+    // Route::post('/dashboard/user-service-link', [DashboardController::class, 'userServiceLink'])->name('user-service-link');
+});
 
 Route::middleware('auth')->group(function () {
     Route::post('/profile/{user}', [ProfileController::class, 'edit'])->name('profile.edit');

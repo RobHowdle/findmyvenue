@@ -19,31 +19,27 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $users = User::with('roles')->get();
-        $pendingPromoterReviews = PromoterReview::with('promoter')->where('review_approved', '0')->whereNull('deleted_at')->get();
-        $pendingVenueReviews = VenueReview::with('venue')->where('review_approved', '0')->whereNull('deleted_at')->get();
-        $venues = Venue::whereNull('deleted_at')->get();
-        $promoters = Promoter::whereNull('deleted_at')->get();
-        $otherServices = OtherService::whereNull('deleted_at')->get();
+        $user = Auth::user()->load(['roles', 'promoters']);
+        $role = $user->roles->pluck('name');
+        $roleName = !empty($role) ? $role[0] : null;
 
-        // Promoter Dashboard
-        $user = auth()->user()->load('roles');
-        $userLinkPromoter = UserService::where('user_id', $user->id)
-            ->whereNotNull('promoters_id')
-            ->whereNull('deleted_at')
-            ->get();
+        $promotionsCompany = $user->promoters()->first();
 
-        $promoterReviews = collect();
-        if ($userLinkPromoter && !$userLinkPromoter->isEmpty()) {
-            foreach ($userLinkPromoter as $ulp) {
-                $promoterReviews = PromoterReview::with('promoter')
-                    ->where('promoter_id', $ulp->promoters_id)
-                    ->orderBy('review_approved', 'asc')
-                    ->get();
-            }
+        switch ($roleName) {
+            case 'promoter':
+                if (!$promotionsCompany) {
+                    return redirect()->route('welcome')->with('error', 'You need to be linked to a promotions company to access this dashboard.');
+                }
+                return redirect()->route('promoter.dashboard');
+            case 'artist':
+                return redirect()->route('artist.dashboard');
+            case 'venue':
+                return redirect()->route('venue.dashboard');
+            case 'admin':
+                return redirect()->route('admin.dashboard');
+            default:
+                return abort(403); // Forbidden access if role is not recognized
         }
-
-        return view('dashboard', compact('users', 'pendingPromoterReviews', 'pendingVenueReviews', 'venues', 'promoters', 'otherServices', 'promoterReviews'));
     }
 
     public function editUser(Request $request)

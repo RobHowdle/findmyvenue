@@ -1,72 +1,110 @@
-@role('promoter')
-  {{-- Reviews --}}
-  <div
-    class="collapsible-container mb-2 w-full max-w-7xl overflow-x-auto bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
-    <div class="collapsible-header toggle-header p-6">
-      <h2 class="text-xl text-gray-900 dark:text-gray-100">My Reviews</h2>
-      <svg class="toggle-icon h-6 w-6 fill-current text-gray-600 transition-transform" xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 20 20">
-        <path class="chevron-down" fill-rule="evenodd" clip-rule="evenodd"
-          d="M10 13.59l-5.3-5.3a1 1 0 011.4-1.42L10 11.76l4.9-4.89a1 1 0 111.4 1.42l-5.3 5.3a1 1 0 01-1.4 0z" />
-      </svg>
+<x-app-layout>
+  <x-slot name="header">
+    <div class="grid grid-cols-3 place-items-center text-white">
+      <div>Events YTD: 30</div>
+      <div>Total Proft YTD: £1000.00</div>
+      <div>Overall Rating: 5/5</div>
     </div>
-    <div class="collapsible-content">
-      <div class="p-6 text-xl text-gray-900 dark:text-gray-100">
-        <table class="w-full table-auto border border-gray-100 text-left dark:bg-gray-800">
-          <thead>
-            <tr class="whitespace-nowrap border-b px-6 py-4 text-center">
-              <th class="p-2">Author</th>
-              <th class="p-2">Communication</th>
-              <th class="p-2">Rate Of Pay</th>
-              <th class="p-2">Promotion</th>
-              <th class="p-2">Quality</th>
-              <th class="p-2">Review</th>
-              <th class="p-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            @foreach ($promoterReviews as $review)
-              <tr>
-                <td class="break-all p-2">{{ $review->author }}</td>
-                <td class="break-all p-2">{{ $review->communication_rating }}</td>
-                <td class="break-all p-2">{{ $review->rop_rating }}</td>
-                <td class="break-all p-2">{{ $review->promotion_rating }}</td>
-                <td class="break-all p-2">{{ $review->quality_rating }}</td>
-                <td class="break-all p-2">{{ $review->review }}</td>
-                @if ($review->review_approved == 0)
-                  <td class="collapsible-actions flex items-center justify-center p-2">
-                    <form action="{{ route('pending-review-promoter.approve-display', $review->id) }}" method="POST">
-                      @csrf
-                      <button type="submit" class="bg-yellow p-2">Approve & Display</button>
-                    </form>
-                    <form action="{{ route('pending-review-promoter.approve', $review->id) }}" method="POST">
-                      @csrf
-                      <button type="submit" class="bg-yellow p-2">Approve</button>
-                    </form>
-                  </td>
-                @elseif($review->review_approved == 1 && $review->display == 0)
-                  <td class="collapsible-actions flex items-center justify-center p-2">
-                    <form action="{{ route('pending-review-promoter.display', $review->id) }}" method="POST">
-                      @csrf
-                      <button type="submit" class="bg-yellow p-2">Display</button>
-                    </form>
-                  </td>
-                @elseif($review->review_approved == 1 && $review->display == 1)
-                  <td class="collapsible-actions flex items-center justify-center p-2">
-                    <form action="{{ route('pending-review-promoter.hide', $review->id) }}" method="POST">
-                      @csrf
-                      <button type="submit" class="bg-yellow p-2">Hide</button>
-                    </form>
-                  </td>
-                @endif
-              </tr>
-            @endforeach
-          </tbody>
-        </table>
+  </x-slot>
+
+  <div class="mx-auto w-full max-w-screen-2xl py-16">
+    <div class="relative mb-8 shadow-md sm:rounded-lg">
+      <div class="min-w-screen-xl mx-auto max-w-screen-xl rounded-lg bg-ynsDarkGray px-16 py-12 text-center text-white">
+        <x-greeting />
+        <p class="mb-12 font-heading text-xl">This week you have:</p>
+        <div class="grid grid-cols-4 items-center">
+          <a href="#"
+            class="flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-ynsYellow">
+            <span class="fas fa-calendar-alt mb-4 h-14 w-14"></span>
+            3 Events
+          </a>
+          <a href="#"
+            class="flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-ynsYellow">
+            <span class="fas fa-guitar mb-4 h-14 w-14"></span>
+            6 Aviliable Bands
+          </a>
+          <a href="#"
+            class="flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-ynsYellow">
+            <span class="fas fa-star mb-4 h-14 w-14"></span>
+            {{ $pendingReviews }} Pending Review{{ $pendingReviews > 1 ? 's' : '' }}
+          </a>
+          <a href="#"
+            class="flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-ynsYellow">
+            <span class="fas fa-list mb-4 h-14 w-14"></span>
+            10 Todo Items
+          </a>
+        </div>
       </div>
     </div>
+
+    <div class="relative shadow-md sm:rounded-lg">
+      <div class="min-w-screen-xl mx-auto max-w-screen-xl rounded-lg bg-ynsDarkGray px-16 py-12 text-center text-white">
+        <p class="mb-8 font-heading text-xl font-bold">Quick Links</p>
+        <div class="grid grid-cols-5 items-center gap-y-12">
+          <a href="#"
+            class="group flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-ynsYellow">
+            <span
+              class="fas fa-user mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-ynsYellow"></span>
+            New User
+          </a>
+          <a href="#"
+            class="group flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-ynsYellow">
+            <span
+              class="fas fa-calendar-alt mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-ynsYellow"></span>
+            New Event
+          </a>
+          <a href="#"
+            class="group flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-ynsYellow">
+            <span
+              class="fas fa-pound-sign mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-ynsYellow"></span>
+            New Budget
+          </a>
+          <a href="#"
+            class="group flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-ynsYellow">
+            <span
+              class="fas fa-sticky-note mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-ynsYellow"></span>
+            New Note
+          </a>
+          <a href="#"
+            class="group flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-ynsYellow">
+            <span
+              class="fas fa-list mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-ynsYellow"></span>
+            New Todo Item
+          </a>
+
+          <a href="#"
+            class="group flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-ynsYellow">
+            <span
+              class="fas fa-user mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-ynsYellow"></span>
+            Users
+          </a>
+          <a href="#"
+            class="group flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-ynsYellow">
+            <span
+              class="fas fa-calendar-alt mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-ynsYellow"></span>
+            Events
+          </a>
+          <a href="#"
+            class="group flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-ynsYellow">
+            <span
+              class="fas fa-pound-sign mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-ynsYellow"></span>
+            Budgets
+          </a>
+          <a href="#"
+            class="group flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-ynsYellow">
+            <span
+              class="fas fa-sticky-note mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-ynsYellow"></span>
+            Notes
+          </a>
+          <a href="#"
+            class="group flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-ynsYellow">
+            <span
+              class="fas fa-list mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-ynsYellow"></span>
+            Todo List
+          </a>
+        </div>
+      </div>
+    </div>
+
   </div>
-
-  {{-- Finances --}}
-
-@endrole
+</x-app-layout>

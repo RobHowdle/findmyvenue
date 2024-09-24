@@ -47,7 +47,6 @@ class PromoterReview extends Model
     {
         return self::where('promoter_id', $promoterId)
             ->whereNull('deleted_at')
-            ->where('display', 1)
             ->where('review_approved', 1)
             ->orderBy('created_at', 'desc')
             ->count();
