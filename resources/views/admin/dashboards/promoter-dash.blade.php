@@ -1,10 +1,6 @@
 <x-app-layout>
   <x-slot name="header">
-    <div class="grid grid-cols-3 place-items-center text-white">
-      <div>Events YTD: 30</div>
-      <div>Total Proft YTD: £1000.00</div>
-      <div>Overall Rating: 5/5</div>
-    </div>
+    <x-promoter-sub-nav :promoterId="$promoter->id" />
   </x-slot>
 
   <div class="mx-auto w-full max-w-screen-2xl py-16">

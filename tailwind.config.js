@@ -35,6 +35,8 @@ export default {
                 ynsYellow: "#D59220",
                 ynsDarkOrange: "#F03F37",
                 ynsDarkGray: "#1D232A",
+                ynsDarkBlue: "#111827",
+                ynsMedGray: "#D1D5DB",
             },
             backgroundImage: {
                 "gradient-button": "linear-gradient(to top, #F03F37 , #D59220)",

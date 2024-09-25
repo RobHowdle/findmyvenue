@@ -24,4 +24,21 @@ class PromoterDashboardController extends Controller
 
         return view('admin.dashboards.promoter.promoter-finances', compact('promoter'));
     }
+
+    public function createNewPromoterBudget()
+    {
+        $promoter = Auth::user();
+
+        return view('admin.dashboards.promoter.promoter-new-finance', compact('promoter'));
+    }
+
+    public function saveNewPromoterBudget(Request $request)
+    {
+        dd($request);
+        try {
+            //code...
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+    }
 }
