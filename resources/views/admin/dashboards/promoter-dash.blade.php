@@ -49,7 +49,7 @@
               class="fas fa-calendar-alt mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-ynsYellow"></span>
             New Event
           </a>
-          <a href="#"
+          <a href="{{ route('promoter.dashboard.finances.new') }}"
             class="group flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-ynsYellow">
             <span
               class="fas fa-pound-sign mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-ynsYellow"></span>
@@ -80,7 +80,7 @@
               class="fas fa-calendar-alt mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-ynsYellow"></span>
             Events
           </a>
-          <a href="#"
+          <a href="{{ route('promoter.dashboard.finances') }}"
             class="group flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-ynsYellow">
             <span
               class="fas fa-pound-sign mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-ynsYellow"></span>

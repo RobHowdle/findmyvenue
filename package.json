@@ -19,6 +19,7 @@
     },
     "dependencies": {
         "jquery": "^3.7.1",
-        "summernote": "^0.8.20"
+        "summernote": "^0.8.20",
+        "sweetalert2": "^11.14.1"
     }
 }

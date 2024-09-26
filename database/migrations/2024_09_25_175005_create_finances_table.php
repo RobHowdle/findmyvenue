@@ -25,11 +25,11 @@ return new class extends Migration
             $table->json('other_incoming')->nullable();
             $table->json('outgoing');
             $table->json('other_outgoing')->nullable();
-            $table->decimal('desired_profit', 10, 2);
-            $table->decimal('total_incoming', 10, 2);
-            $table->decimal('total_outgoing', 10, 2);
-            $table->decimal('total_profit', 10, 2);
-            $table->decimal('total_remaining_to_desired_profit', 10, 2);
+            $table->decimal('desired_profit', 10, 2)->default('0');
+            $table->decimal('total_incoming', 10, 2)->default('0');
+            $table->decimal('total_outgoing', 10, 2)->default('0');
+            $table->decimal('total_profit', 10, 2)->default('0');
+            $table->decimal('total_remaining_to_desired_profit', 10, 2)->default('0');
             $table->timestamps();
             $table->softDeletes();
 

@@ -1,6 +1,7 @@
 import $ from "jquery";
 import "summernote/dist/summernote-lite.js"; // Non-Bootstrap version
 import "summernote/dist/summernote-lite.css"; // Include the CSS for this version
+import Swal from "sweetalert2";
 
 import Alpine from "alpinejs";
 window.$ = $;
@@ -220,3 +221,32 @@ $(document).ready(function () {
         ],
     });
 });
+
+// Sweet Alert 2 Notifications
+window.showSuccessNotification = function (message) {
+    Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: message,
+        showConfirmButton: true,
+        timer: 3000,
+    });
+};
+
+window.showFailureNotification = function (message) {
+    Swal.fire({
+        showConfirmButton: false,
+        toast: true,
+        position: "top-end",
+        // timer: 3000,
+        timerProgressBar: true,
+        customClass: {
+            popup: "bg-ynsDarkGray !important rounded-lg font-heading",
+            title: "text-white",
+            html: "text-white",
+        },
+        icon: "error",
+        title: "Oops!",
+        text: message,
+    });
+};
