@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('finances', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->index(['serviceable_id', 'serviceable_type']);
+            $table->unsignedBigInteger('serviceable_id');
+            $table->string('serviceable_type');
             $table->string('finance_type');
             $table->string('name');
             $table->date('date_from');
