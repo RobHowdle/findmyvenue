@@ -3,7 +3,9 @@
 namespace App\View\Components;
 
 use Closure;
+use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Finance;
 use App\Models\PromoterReview;
 use Illuminate\View\Component;
 use Illuminate\Contracts\View\View;
@@ -11,7 +13,7 @@ use Illuminate\Contracts\View\View;
 class PromoterSubNav extends Component
 {
     public $eventsYtd;
-    public $totalProfitYtd;
+    public $totalProfits;
     public $promoterId;
     public $promoter;
     public $overallScore;
@@ -61,6 +63,7 @@ class PromoterSubNav extends Component
      */
     public function __construct(int $promoterId)
     {
+        // Overall Reviews
         $this->promoterId = $promoterId;
         $promoterUser = User::find($this->promoterId);
         if ($promoterUser) {
@@ -72,6 +75,32 @@ class PromoterSubNav extends Component
             }
         }
         $this->overallReviews = $this->renderRatingIcons($this->overallScore);
+
+        // Total Profit Year To Date
+        $this->totalProfits = $this->calculateTotalProfitsYTD($promoterUser);
+    }
+
+    public function calculateTotalProfitsYTD($promoterUser)
+    {
+        if ($promoterUser) {
+            $promoterCompany = $promoterUser->promoters()->first();
+
+            if ($promoterCompany) {
+                $startOfYear = Carbon::now()->startOfYear();
+                $endOfYear = Carbon::now()->endOfYear();
+
+                // Query the finances table for the current year's profits
+                $totalProfitsYTD = Finance::where('serviceable_id', $promoterCompany->id)
+                    ->where('serviceable_type', 'App\Models\Promoter')
+                    ->whereBetween('date_to', [$startOfYear, $endOfYear])
+                    ->sum('total_profit');
+
+                return $totalProfitsYTD;
+            }
+        }
+
+        // Return 0 if no promoter company or no profits found
+        return 0;
     }
 
     /**

@@ -3,14 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Venue;
-use App\Models\Promoter;
 use App\Models\UserService;
 use App\Models\VenueReview;
-use App\Models\OtherService;
 use Illuminate\Http\Request;
 use App\Models\PromoterReview;
-
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 

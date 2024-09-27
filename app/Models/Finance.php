@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Finance extends Model
 {
@@ -36,5 +37,71 @@ class Finance extends Model
     public function serviceable()
     {
         return $this->morphTo();
+    }
+
+    public static function getIncomingData($date)
+    {
+        return self::whereDate('date_from', $date)->sum('total_incoming');
+    }
+
+    public static function getOutgoingData($date)
+    {
+        return self::whereDate('date_from', $date)->sum('total_outgoing');
+    }
+
+    public static function getProfitData($date)
+    {
+        return self::whereDate('date_from', $date)->sum('total_profit');
+    }
+
+    public static function getIncomingDataForWeek($date)
+    {
+        return self::whereBetween('date_from', [Carbon::parse($date)->startOfWeek(), Carbon::parse($date)->endOfWeek()])->sum('total_incoming');
+    }
+
+    public static function getOutgoingDataForWeek($date)
+    {
+        return self::whereBetween('date_from', [Carbon::parse($date)->startOfWeek(), Carbon::parse($date)->endOfWeek()])->sum('total_outgoing');
+    }
+
+    public static function getProfitDateForWeek($date)
+    {
+        return self::whereBetween('date_from', [Carbon::parse($date)->startOfWeek(), Carbon::parse($date)->endOfWeek()])->sum('total_profit');
+    }
+
+    public static function getIncomingDataForMonth($date)
+    {
+        return self::whereMonth('date_from', Carbon::parse($date)->month)
+            ->whereYear('date_from', Carbon::parse($date)->year)
+            ->sum('total_incoming');
+    }
+
+    public static function getOutgoingDataForMonth($date)
+    {
+        return self::whereMonth('date_from', Carbon::parse($date)->month)
+            ->whereYear('date_from', Carbon::parse($date)->year)
+            ->sum('total_outgoing');
+    }
+
+    public static function getProftDataForMonth($date)
+    {
+        return self::whereMonth('date_from', Carbon::parse($date)->month)
+            ->whereYear('date_from', Carbon::parse($date)->year)
+            ->sum('total_profit');
+    }
+
+    public static function getIncomingDataForYear($date)
+    {
+        return self::whereYear('date_from', Carbon::parse($date)->year)->sum('total_incoming');
+    }
+
+    public static function getOutgoingDataForYear($date)
+    {
+        return self::whereYear('date_from', Carbon::parse($date)->year)->sum('total_outgoing');
+    }
+
+    public static function getProfitDataForYear($date)
+    {
+        return self::whereYear('date_from', Carbon::parse($date)->year)->sum('total_profit');
     }
 }

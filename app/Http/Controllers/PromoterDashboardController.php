@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Finance;
-use App\Models\Promoter;
 use Illuminate\Http\Request;
 use App\Models\PromoterReview;
 use Illuminate\Support\Facades\Log;
@@ -18,6 +18,10 @@ class PromoterDashboardController extends Controller
         $pendingReviews = PromoterReview::with('promoter')->where('review_approved', '0')->whereNull('deleted_at')->count();
         $promoter = Auth::user()->load('promoters');
 
+        if (!$promoter) {
+            return redirect()->back()->withErrors('No promoter company linked to this user.');
+        }
+
         return view('admin.dashboards.promoter-dash', compact([
             'pendingReviews',
             'promoter',
@@ -26,7 +30,7 @@ class PromoterDashboardController extends Controller
 
     public function promoterFinances()
     {
-        $promoter = Auth::user();
+        $promoter = Auth::user()->load('promoters');
 
         return view('admin.dashboards.promoter.promoter-finances', compact('promoter'));
     }
@@ -158,18 +162,60 @@ class PromoterDashboardController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Your Budget Saved!',
-                // 'view' => view(
-                //     'admin.dashboards.promoter.promoter-new-finance',
-                //     compact('promoter')
-                // )
+                'view' => view(
+                    'admin.dashboards.promoter.promoter-finances',
+                    compact('promoter')
+                )
             ]);
         } catch (\Exception $e) {
             Log::error('Error saving budget:', ['message' => $e->getMessage()]);
 
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(), // Send the error message directly
+                'message' => $e->getMessage(),
             ]);
         }
+    }
+
+    public function getFinanceData(Request $request)
+    {
+        $serviceableId = $request->input('serviceable_id');
+        $serviceableType = \App\Models\Promoter::class;;
+        $filter = $request->input('filter'); // day, week, month, year
+        $date = $request->input('date'); // the selected date
+
+        // Based on the filter, adjust query for finances table
+        $query = Finance::where('serviceable_id', $serviceableId)
+            ->where('serviceable_type', $serviceableType);
+
+        switch ($filter) {
+            case 'day':
+                $query->whereDate('date_from', $date);
+                break;
+            case 'week':
+                $query->whereBetween('date', [
+                    Carbon::parse($date)->startOfWeek(),
+                    Carbon::parse($date)->endOfWeek()
+                ]);
+                break;
+            case 'month':
+                $query->whereMonth('date_from', Carbon::parse($date)->month);
+                break;
+            case 'year':
+                $query->whereYear('date_from', Carbon::parse($date)->year);
+                break;
+        }
+        $finances = $query->get();
+
+        // Calculate totals
+        $totalIncome = $finances->sum('total_incoming');
+        $totalOutgoing = $finances->sum('total_outgoing');
+        $totalProfit = $finances->sum('total_profit');
+
+        return response()->json([
+            'totalIncome' => $totalIncome,
+            'totalOutgoing' => $totalOutgoing,
+            'totalProfit' => $totalProfit
+        ]);
     }
 }

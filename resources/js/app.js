@@ -10,6 +10,21 @@ window.jQuery = $;
 window.Alpine = Alpine;
 Alpine.start();
 
+// Format currency helper
+window.formatCurrency = function (value) {
+    return new Intl.NumberFormat("en-GB", {
+        style: "currency",
+        currency: "GBP",
+    }).format(value);
+};
+
+$(document).ready(function () {
+    var amount = window.amountValue || 0;
+    var formattedAmount = formatCurrency(amount);
+
+    $("#amountDisplay").text(formattedAmount);
+});
+
 $(document).ready(function () {
     // Accordion functionality
     $("[data-accordion-target]").click(function () {

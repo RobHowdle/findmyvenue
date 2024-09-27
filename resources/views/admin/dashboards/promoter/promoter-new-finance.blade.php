@@ -213,14 +213,6 @@
         numericValue); // Store numericValue in the form data for easy access later
     }
 
-    // Format currency helper
-    function formatCurrency(value) {
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'GBP',
-      }).format(value);
-    }
-
     // Recalculate on input changes
     $('#finances-form').on('input', 'input', function() {
       calculateTotals();
@@ -313,7 +305,7 @@
               });
             } else {
               showFailureNotification(response.message ||
-              'Something went wrong, please try again later!');
+                'Something went wrong, please try again later!');
             }
           }
         },

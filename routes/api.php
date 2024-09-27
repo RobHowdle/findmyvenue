@@ -2,9 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PromoterController;
 use App\Http\Controllers\VenueApiController;
-use App\Http\Controllers\PromoterReviewsController;
+use App\Http\Controllers\PromoterDashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,3 +21,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/venues/{id}', [VenueApiController::class, 'show']);
+Route::get('/dashboard/promoter/finances', [PromoterDashboardController::class, 'getFinanceData']);
