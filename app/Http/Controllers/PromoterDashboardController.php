@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use App\Models\Finance;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use App\Models\PromoterReview;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -181,8 +183,15 @@ class PromoterDashboardController extends Controller
     {
         $serviceableId = $request->input('serviceable_id');
         $serviceableType = \App\Models\Promoter::class;;
-        $filter = $request->input('filter'); // day, week, month, year
-        $date = $request->input('date'); // the selected date
+        $filter = $request->input('filter');
+        $date = $request->input('date');
+
+        // Initialize response arrays
+        $dates = [];
+        $totalIncome = [];
+        $totalOutgoing = [];
+        $totalProfit = [];
+        $financeRecords = [];
 
         // Based on the filter, adjust query for finances table
         $query = Finance::where('serviceable_id', $serviceableId)
@@ -190,19 +199,141 @@ class PromoterDashboardController extends Controller
 
         switch ($filter) {
             case 'day':
-                $query->whereDate('date_from', $date);
+                $finances = Finance::where('serviceable_id', $serviceableId)
+                    ->where('serviceable_type', $serviceableType)
+                    ->whereDate('date_from', $date)
+                    ->get();
+
+                // Get totals for a single day
+                $data = Finance::select(
+                    DB::raw('SUM(total_incoming) as totalIncome'),
+                    DB::raw('SUM(total_outgoing) as totalOutgoing'),
+                    DB::raw('SUM(total_profit) as totalProfit')
+                )
+                    ->where('serviceable_id', $serviceableId)
+                    ->where('serviceable_type', $serviceableType)
+                    ->whereDate('date_from', $date)
+                    ->first();
+
+                $financeRecords = $finances->map(function ($finance) {
+                    return [
+                        'id' => $finance->id,
+                        'name' => $finance->name,
+                        'link' => route('promoter.dashboard.finances.show', $finance->id),
+                    ];
+                });
+
+                // Format the data for response
+                $response = [
+                    'dates' => [$date], // Just the selected day
+                    'totalIncome' => [$data->totalIncome ?: 0], // Wrap in array to match structure
+                    'totalOutgoing' => [$data->totalOutgoing ?: 0],
+                    'totalProfit' => [$data->totalProfit ?: 0],
+                    'financeRecords' => $financeRecords,
+                ];
+                return response()->json($response);
                 break;
             case 'week':
-                $query->whereBetween('date', [
-                    Carbon::parse($date)->startOfWeek(),
-                    Carbon::parse($date)->endOfWeek()
+                $dates = explode(' to ', $date); // Split the date range
+
+                if (count($dates) === 2) {
+                    $startDate = Carbon::parse($dates[0])->startOfDay();
+                    $endDate = Carbon::parse($dates[1])->endOfDay();
+
+                    $query->where(function ($q) use ($startDate, $endDate) {
+                        $q->whereBetween('date_from', [$startDate, $endDate])
+                            ->orWhereBetween('date_to', [$startDate, $endDate]);
+                    });
+                }
+
+                $finances = $query->get();
+                $financeRecords = $finances->map(function ($finance) {
+                    return [
+                        'id' => $finance->id,
+                        'name' => $finance->name,
+                        'link' => route('promoter.dashboard.finances.show', $finance->id),
+                    ];
+                });
+
+                // Prepare the response with the appropriate data for your charts
+                return response()->json([
+                    'dates' => $finances->pluck('date_from'),
+                    'totalIncome' => $finances->pluck('total_incoming'),
+                    'totalOutgoing' => $finances->pluck('total_outgoing'),
+                    'totalProfit' => $finances->pluck('total_profit'),
+                    'financeRecords' => $financeRecords,
                 ]);
                 break;
             case 'month':
-                $query->whereMonth('date_from', Carbon::parse($date)->month);
+                // Gather data for each day of the month
+                $startOfMonth = Carbon::parse($date)->startOfMonth();
+                $endOfMonth = Carbon::parse($date)->endOfMonth();
+
+                // Fetch daily totals for the month
+                $data = Finance::select(DB::raw('DATE(date_from) as date, 
+                SUM(total_incoming) as totalIncome,
+                SUM(total_outgoing) as totalOutgoing,
+                SUM(total_profit) as totalProfit'))
+                    ->where('serviceable_id', $serviceableId)
+                    ->where('serviceable_type', $serviceableType)
+                    ->whereBetween('date_from', [$startOfMonth, $endOfMonth])
+                    ->groupBy(DB::raw('DATE(date_from)'))
+                    ->get();
+
+                $finances = Finance::where('serviceable_id', $serviceableId)
+                    ->where('serviceable_type', $serviceableType)
+                    ->whereBetween('date_from', [$startOfMonth, $endOfMonth])
+                    ->get();
+
+                $financeRecords = $finances->map(function ($finance) {
+                    return [
+                        'id' => $finance->id,
+                        'name' => $finance->name,
+                        'link' => route('promoter.dashboard.finances.show', $finance->id),
+                    ];
+                });
+
+                foreach ($data as $entry) {
+                    $dates[] = $entry->date;
+                    $totalIncome[] = $entry->totalIncome ?: 0; // Use 0 if null
+                    $totalOutgoing[] = $entry->totalOutgoing ?: 0; // Use 0 if null
+                    $totalProfit[] = $entry->totalProfit ?: 0; // Use 0 if null
+                }
+
+                // Format the data for response
+                $response = [
+                    'dates' => $data->pluck('date'),
+                    'totalIncome' => $data->pluck('totalIncome'),
+                    'totalOutgoing' => $data->pluck('totalOutgoing'),
+                    'totalProfit' => $data->pluck('totalProfit'),
+                    'financeRecords' => $financeRecords,
+                ];
+                return response()->json($response);
                 break;
             case 'year':
-                $query->whereYear('date_from', Carbon::parse($date)->year);
+                // Get start and end of the year
+                $startOfYear = Carbon::parse($date)->startOfYear();
+                $endOfYear = Carbon::parse($date)->endOfYear();
+
+                // Fetch monthly totals for the year
+                $data = Finance::select(DB::raw('MONTH(date_from) as month, 
+                        SUM(total_incoming) as totalIncome,
+                        SUM(total_outgoing) as totalOutgoing,
+                        SUM(total_profit) as totalProfit'))
+                    ->where('serviceable_id', $serviceableId)
+                    ->where('serviceable_type', $serviceableType)
+                    ->whereBetween('date_from', [$startOfYear, $endOfYear])
+                    ->groupBy(DB::raw('MONTH(date_from)'))
+                    ->get();
+
+                // Format the response
+                $response = [
+                    'dates' => $data->pluck('month'),
+                    'totalIncome' => $data->pluck('totalIncome'),
+                    'totalOutgoing' => $data->pluck('totalOutgoing'),
+                    'totalProfit' => $data->pluck('totalProfit'),
+                ];
+                return response()->json($response);
                 break;
         }
         $finances = $query->get();
@@ -212,10 +343,152 @@ class PromoterDashboardController extends Controller
         $totalOutgoing = $finances->sum('total_outgoing');
         $totalProfit = $finances->sum('total_profit');
 
+        // Getting list of finance data for link generation
+        $financeRecords = $finances->map(function ($finance) {
+            return [
+                'id' => $finance->id,
+                'name' => $finance->name,
+                'link' => route('promoter.dashboard.finances.show', $finance->id),
+            ];
+        });
+
         return response()->json([
             'totalIncome' => $totalIncome,
             'totalOutgoing' => $totalOutgoing,
-            'totalProfit' => $totalProfit
+            'totalProfit' => $totalProfit,
+            'financeRecords' => $financeRecords,
         ]);
+    }
+
+    public function exportFinances(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'date' => 'required|string',
+            'filter' => 'required|string',
+            'totalIncome' => 'required|string',
+            'totalOutgoing' => 'required|string',
+            'totalProfit' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Retrieve the data from the request
+        $dateRange = $request->input('date');
+        $filterValue = $request->input('filter');
+        $totalIncome = $request->input('totalIncome');
+        $totalOutgoing = $request->input('totalOutgoing');
+        $totalProfit = $request->input('totalProfit');
+
+        // Convert inputs to arrays if necessary
+        $totalIncome = is_array($totalIncome) ? $totalIncome : [$totalIncome];
+        $totalOutgoing = is_array($totalOutgoing) ? $totalOutgoing : [$totalOutgoing];
+        $totalProfit = is_array($totalProfit) ? $totalProfit : [$totalProfit];
+
+        // Prepare the data for the PDF
+        $data = [];
+
+        if ($filterValue === 'day') {
+            // Handle single day case
+            $data[] = [
+                'date' => $dateRange,
+                'totalIncome' => $totalIncome[0],
+                'totalOutgoing' => $totalOutgoing[0],
+                'totalProfit' => $totalProfit[0],
+            ];
+        } elseif ($filterValue === 'week') {
+            // Handle week case
+            $dates = explode(' to ', $dateRange);
+
+            if (count($dates) !== 2) {
+                return response()->json(['errors' => ['Invalid date range format']], 422);
+            }
+
+            list($startDate, $endDate) = $dates;
+
+            // Validate the dates
+            if (!strtotime($startDate) || !strtotime($endDate)) {
+                return response()->json(['errors' => ['Invalid date format']], 422);
+            }
+
+            $currentDate = strtotime($startDate);
+            $endDateTimestamp = strtotime($endDate);
+
+            while ($currentDate <= $endDateTimestamp) {
+                $formattedDate = date('Y-m-d', $currentDate);
+                $data[] = [
+                    'date' => $formattedDate,
+                    'totalIncome' => $totalIncome[0],
+                    'totalOutgoing' => $totalOutgoing[0],
+                    'totalProfit' => $totalProfit[0],
+                ];
+                $currentDate = strtotime('+1 day', $currentDate);
+            }
+        } elseif ($filterValue === 'month') {
+            // Handle month case
+            $month = $dateRange; // This should be in 'YYYY-MM' format
+            $year = substr($month, 0, 4);
+            $monthNumber = substr($month, 5, 2);
+
+            // Get the total days in the month
+            $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $monthNumber, $year);
+
+            for ($day = 1; $day <= $daysInMonth; $day++) {
+                $formattedDate = sprintf('%04d-%02d-%02d', $year, $monthNumber, $day);
+                $data[] = [
+                    'date' => $formattedDate,
+                    'totalIncome' => $totalIncome[0],
+                    'totalOutgoing' => $totalOutgoing[0],
+                    'totalProfit' => $totalProfit[0],
+                ];
+            }
+        } elseif ($filterValue === 'year') {
+            // Handle year case
+            $year = $dateRange; // This should be a year in 'YYYY' format
+
+            // Validate the year
+            if (!preg_match('/^\d{4}$/', $year)) {
+                return response()->json(['errors' => ['Invalid year format']], 422);
+            }
+
+            // Loop through each month of the year
+            for ($month = 1; $month <= 12; $month++) {
+                $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+                $totalIncomeForMonth = $totalIncome[0]; // Adjust if you want to calculate per month
+                $totalOutgoingForMonth = $totalOutgoing[0]; // Adjust if you want to calculate per month
+                $totalProfitForMonth = $totalProfit[0]; // Adjust if you want to calculate per month
+
+                for ($day = 1; $day <= $daysInMonth; $day++) {
+                    $formattedDate = sprintf('%04d-%02d-%02d', $year, $month, $day);
+                    $data[] = [
+                        'date' => $formattedDate,
+                        'totalIncome' => $totalIncomeForMonth,
+                        'totalOutgoing' => $totalOutgoingForMonth,
+                        'totalProfit' => $totalProfitForMonth,
+                    ];
+                }
+            }
+        }
+
+        // Generate the PDF
+        $pdf = Pdf::loadView('pdf.finances', compact('data'));
+        $pdfContent = $pdf->output();
+
+        // Return the PDF to the browser
+        return response()->stream(function () use ($pdfContent) {
+            echo $pdfContent;
+        }, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="finances_graph_data.pdf"',
+        ]);
+    }
+
+    public function showSingleFinance($id)
+    {
+        $promoter = Auth::user()->load('promoters');
+
+        $finance = Finance::findOrFail($id)->load('user', 'serviceable');
+        return view('admin.dashboards.promoter.show-single-finance', compact('finance', 'promoter'));
     }
 }

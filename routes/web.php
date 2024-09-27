@@ -49,7 +49,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard/promoter/finances', [PromoterDashboardController::class, 'promoterFinances'])->name('promoter.dashboard.finances');
     Route::get('/dashboard/promoter/finances/new-budget', [PromoterDashboardController::class, 'createNewPromoterBudget'])->name('promoter.dashboard.finances.new');
     Route::post('/dashboard/promoter/finances/save-budget', [PromoterDashboardController::class, 'saveNewPromoterBudget'])->name('promoter.dashboard.finances.saveNew');
-
+    Route::post('/dashboard/promoter/finances/export', [PromoterDashboardController::class, 'exportFinances'])->name('promoter.dashboard.finances.export');
+    Route::get('/dashboard/promoter/finances/{id}', [PromoterDashboardController::class, 'showSingleFinance'])->name('promoter.dashboard.finances.show');
 
 
 

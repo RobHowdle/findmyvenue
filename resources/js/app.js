@@ -19,13 +19,6 @@ window.formatCurrency = function (value) {
 };
 
 $(document).ready(function () {
-    var amount = window.amountValue || 0;
-    var formattedAmount = formatCurrency(amount);
-
-    $("#amountDisplay").text(formattedAmount);
-});
-
-$(document).ready(function () {
     // Accordion functionality
     $("[data-accordion-target]").click(function () {
         const isExpanded = $(this).attr("aria-expanded") === "true";

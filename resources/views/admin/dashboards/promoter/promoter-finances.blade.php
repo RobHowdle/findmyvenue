@@ -1,6 +1,6 @@
 <x-app-layout>
   <x-slot name="header">
-    <x-promoter-sub-nav :promoterId="$promoter->id" />
+    <x-promoter-sub-nav :promoter="$promoter" :promoterId="$promoter->id" />
   </x-slot>
 
   <div class="mx-auto w-full max-w-screen-2xl py-16">
@@ -9,7 +9,7 @@
         <div class="grid grid-cols-[1.25fr_1.75fr] rounded-lg border border-white">
           <div class="rounded-l-lg border-r border-r-white bg-ynsDarkBlue px-8 py-8">
             <div class="mb-8 flex flex-row justify-between">
-              <a
+              <a href="{{ route('promoter.dashboard.finances.export') }}" id="exportButton"
                 class="rounded-lg border bg-ynsLightGray px-4 py-2 font-bold text-black transition duration-150 ease-in-out hover:border-ynsYellow hover:text-ynsYellow">Export</a>
               <a href="{{ route('promoter.dashboard.finances.new') }}"
                 class="rounded-lg border bg-ynsLightGray px-4 py-2 font-bold text-black transition duration-150 ease-in-out hover:border-ynsYellow hover:text-ynsYellow">New
@@ -20,6 +20,8 @@
             <p class="font-heading text-xl text-ynsLightGray" id="totalIncoming">Total Incoming: £0.00</p>
             <p class="mb-4 font-heading text-xl text-ynsLightGray" id="totalOutgoing">Total Outgoing: £0.00</p>
             <p class="font-heading text-2xl font-bold text-white" id="totalProfit">Total Profit: £0.00</p>
+            <p class="mt-4 font-heading text-xl font-bold text-white">Avaliable Records:</p>
+            <ul class="list-disc" id="financeRecords"></ul>
           </div>
 
           <div class="px-8 py-8">
@@ -60,8 +62,23 @@
       defaultDate: new Date(),
     });
 
+    let datePicker = flatpickr("#date-picker", {
+      dateFormat: "Y-m-d",
+    });
+
     // Initialize chart variables
     let incomeChart, outgoingChart, profitChart;
+
+    // Initialize totals
+    let totalIncome = [];
+    let totalOutgoing = [];
+    let totalProfit = [];
+
+    // Listen for filter changes
+    $('#finance-filter').change(function() {
+      let filter = $(this).val();
+      adjustDatePicker(filter);
+    });
 
     // Fetch data when filters change
     $('#finance-filter, #date-picker').change(function() {
@@ -81,69 +98,257 @@
           // Update the charts with response data
           updateCharts(response);
 
-          $('#totalIncoming').text('Total Income: ' + formatCurrency(response.totalIncome));
-          $('#totalOutgoing').text('Total Outgoing: ' + formatCurrency(response.totalOutgoing));
-          $('#totalProfit').text('Total Profit: ' + formatCurrency(response.totalProfit));
+          // Update totals
+          totalIncome = response.totalIncome; // Update totals here
+          totalOutgoing = response.totalOutgoing;
+          totalProfit = response.totalProfit;
+
+          // Display totals
+          $('#totalIncoming').text('Total Income: ' + formatCurrency(sumArray(totalIncome)));
+          $('#totalOutgoing').text('Total Outgoing: ' + formatCurrency(sumArray(totalOutgoing)));
+          $('#totalProfit').text('Total Profit: ' + formatCurrency(sumArray(totalProfit)));
+
+          // Generate links for individual finance records
+          console.log(response.financeRecords);
+          let financeLinks = '';
+          response.financeRecords.forEach(record => {
+            financeLinks +=
+              `<li class="ml-4 my-2"><a href="${record.link}" class="hover:text-ynsYellow font-heading transition duration-150 ease-in-out">${record.name}</a></li>`;
+          });
+
+          // Display finance links in a specific element
+          $('#financeRecords').html(financeLinks);
         }
       });
     });
+
+    function adjustDatePicker(filter) {
+      if (filter === 'day') {
+        datePicker.set('dateFormat', 'Y-m-d');
+        datePicker.set('mode', 'single');
+      } else if (filter === 'week') {
+        datePicker.set('dateFormat', 'Y-m-d');
+        datePicker.set('mode', 'range');
+      } else if (filter === 'month') {
+        datePicker.set('dateFormat', 'Y-m');
+        datePicker.set('mode', 'single');
+        datePicker.set('onReady', function(selectedDates, dateStr, instance) {
+          instance.calendarContainer.querySelectorAll('.flatpickr-day').forEach(function(dayElem) {
+            dayElem.style.display = 'none';
+          });
+        });
+      } else if (filter === 'year') {
+        datePicker.set('dateFormat', 'Y');
+        datePicker.set('mode', 'single');
+        datePicker.set('onReady', function(selectedDates, dateStr, instance) {
+          instance.calendarContainer.querySelectorAll('.flatpickr-month, .flatpickr-day').forEach(function(
+            elem) {
+            elem.style.display = 'none';
+          });
+        });
+      }
+    }
+
+    function updateCharts(data) {
+      if (incomeChart instanceof Chart) {
+        incomeChart.destroy();
+      }
+      if (outgoingChart instanceof Chart) {
+        outgoingChart.destroy();
+      }
+      if (profitChart instanceof Chart) {
+        profitChart.destroy();
+      }
+
+      // Create new charts
+      let ctxIncome = document.getElementById('incomeChart').getContext('2d');
+      incomeChart = new Chart(ctxIncome, {
+        type: 'bar',
+        data: {
+          labels: data.dates,
+          datasets: [{
+            label: 'Income',
+            color: 'rgba(255,255,255,0.5)',
+            data: data.totalIncome,
+            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+          }]
+        },
+        options: {
+          plugins: {
+            legend: {
+              labels: {
+                color: 'white',
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: {
+                color: 'white'
+              },
+              border: {
+                color: 'rgba(255,255,255,0.5)',
+              },
+              grid: {
+                color: 'rgba(255,255,255,0.5)',
+              },
+            },
+            y: {
+              ticks: {
+                color: 'white'
+              },
+              border: {
+                color: 'rgba(255,255,255,0.5)',
+              },
+              grid: {
+                color: 'rgba(255,255,255,0.5)',
+
+              },
+            }
+          }
+        }
+      });
+
+      let ctxOutgoing = document.getElementById('outgoingChart').getContext('2d');
+      outgoingChart = new Chart(ctxOutgoing, {
+        type: 'bar',
+        data: {
+          labels: data.dates,
+          datasets: [{
+            label: 'Outgoing',
+            data: data.totalOutgoing,
+            backgroundColor: 'rgba(255, 99, 132, 0.6)'
+          }]
+        },
+        options: {
+          plugins: {
+            legend: {
+              labels: {
+                color: 'white',
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: {
+                color: 'white'
+              },
+              border: {
+                color: 'rgba(255,255,255,0.5)',
+              },
+              grid: {
+                color: 'rgba(255,255,255,0.5)',
+              },
+            },
+            y: {
+              ticks: {
+                color: 'white'
+              },
+              border: {
+                color: 'rgba(255,255,255,0.5)',
+              },
+              grid: {
+                color: 'rgba(255,255,255,0.5)',
+
+              },
+            }
+          }
+        }
+      });
+
+      let ctxProfit = document.getElementById('profitChart').getContext('2d');
+      profitChart = new Chart(ctxProfit, {
+        type: 'bar',
+        data: {
+          labels: data.dates,
+          datasets: [{
+            label: 'Profit',
+            data: data.totalProfit,
+            backgroundColor: 'rgba(153, 102, 255, 0.6)'
+          }]
+        },
+        options: {
+          plugins: {
+            legend: {
+              labels: {
+                color: 'white',
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: {
+                color: 'white'
+              },
+              border: {
+                color: 'rgba(255,255,255,0.5)',
+              },
+              grid: {
+                color: 'rgba(255,255,255,0.5)',
+              },
+            },
+            y: {
+              ticks: {
+                color: 'white'
+              },
+              border: {
+                color: 'rgba(255,255,255,0.5)',
+              },
+              grid: {
+                color: 'rgba(255,255,255,0.5)',
+
+              },
+            }
+          }
+        }
+      });
+    }
+
+    $('#exportButton').on('click', function() {
+      event.preventDefault();
+      let date = $('#date-picker').val();
+      let filter = $('#finance-filter').val();
+
+      // Gather the data from the graphs
+      const graphData = {
+        date: date,
+        filter: filter,
+        totalIncome: totalIncome[0] || '0.00',
+        totalOutgoing: totalOutgoing[0] || '0.00',
+        totalProfit: totalProfit[0] || '0.00',
+      };
+
+      // Make the AJAX request to export the data
+      $.ajax({
+        url: '/dashboard/promoter/finances/export',
+        method: 'POST',
+        data: graphData,
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Include CSRF token
+        },
+        xhrFields: {
+          responseType: 'blob' // Set response type to blob for binary data
+        },
+        success: function(blob) {
+          // Create a URL for the blob and trigger a download
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'finances_graph_data.pdf'; // Set the file name
+          document.body.appendChild(a);
+          a.click(); // Trigger the download
+          a.remove(); // Clean up
+          window.URL.revokeObjectURL(url); // Release the Blob URL
+        },
+        error: function(error) {
+          console.error("Export error:", error);
+        }
+      });
+    });
+
+    function sumArray(array) {
+      return array.reduce((acc, curr) => acc + parseFloat(curr || 0), 0);
+    }
   });
-
-  function updateCharts(data) {
-    console.log('Destroying charts if they exist:', {
-      incomeChart,
-      outgoingChart,
-      profitChart
-    });
-
-    if (incomeChart instanceof Chart) {
-      incomeChart.destroy();
-    }
-    if (outgoingChart instanceof Chart) {
-      outgoingChart.destroy();
-    }
-    if (profitChart instanceof Chart) {
-      profitChart.destroy();
-    }
-
-    // Create new charts
-    let ctxIncome = document.getElementById('incomeChart').getContext('2d');
-    incomeChart = new Chart(ctxIncome, {
-      type: 'bar',
-      data: {
-        labels: ['Total Income'],
-        datasets: [{
-          label: 'Income',
-          data: [data.totalIncome],
-          backgroundColor: 'rgba(75, 192, 192, 0.6)'
-        }]
-      }
-    });
-
-    let ctxOutgoing = document.getElementById('outgoingChart').getContext('2d');
-    outgoingChart = new Chart(ctxOutgoing, {
-      type: 'bar',
-      data: {
-        labels: ['Total Outgoing'],
-        datasets: [{
-          label: 'Outgoing',
-          data: [data.totalOutgoing],
-          backgroundColor: 'rgba(255, 99, 132, 0.6)'
-        }]
-      }
-    });
-
-    let ctxProfit = document.getElementById('profitChart').getContext('2d');
-    profitChart = new Chart(ctxProfit, {
-      type: 'bar',
-      data: {
-        labels: ['Total Profit'],
-        datasets: [{
-          label: 'Profit',
-          data: [data.totalProfit],
-          backgroundColor: 'rgba(153, 102, 255, 0.6)'
-        }]
-      }
-    });
-  }
 </script>

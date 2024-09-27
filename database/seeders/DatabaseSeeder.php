@@ -12,6 +12,7 @@ use Database\Seeders\PermissionsSeeder;
 use Database\Seeders\OtherServiceSeeder;
 use Database\Seeders\PromoterTestSeeder;
 use Database\Seeders\VenueExtraInfoSeeder;
+use Database\Seeders\FinanceTestDataSeeder;
 use Database\Seeders\OtherServicesListSeeder;
 use Database\Seeders\PromoterReviewTestSeeder;
 use Database\Seeders\PromoterVenueTestPivotSeeder;
@@ -36,6 +37,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             OtherServicesListSeeder::class,
             OtherServiceSeeder::class,
+            FinanceTestDataSeeder::class,
         ]);
     }
 }
