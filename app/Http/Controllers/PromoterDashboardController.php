@@ -491,4 +491,78 @@ class PromoterDashboardController extends Controller
         $finance = Finance::findOrFail($id)->load('user', 'serviceable');
         return view('admin.dashboards.promoter.show-single-finance', compact('finance', 'promoter'));
     }
+
+    public function editSingleFinance($id)
+    {
+        $promoter = Auth::user()->load('promoters');
+        $finance = Finance::findOrFail($id)->load('user', 'serviceable');
+
+        return view('admin.dashboards.promoter.edit-single-finance', compact('finance', 'promoter'));
+    }
+
+    public function updateSingleFinance(Request $request, $id)
+    {
+        try {
+            $promoter = Auth::user()->load('promoters');
+            $finance = Finance::findOrFail($id)->load('user', 'serviceable');
+
+            // Validate the input
+            $validator = Validator::make($request->all(), [
+                'desired_profit' => 'nullable|numeric|regex:/^\d+(\.\d{1,2})?$/',
+                'name' => 'required|string',
+                'date_from' => 'required|date',
+                'date_to' => 'required|date',
+                'external_link' => 'nullable|url',
+                'income_presale' => 'required|numeric|regex:/^\d+(\.\d{1,2})?$/',
+                'income_otd' => 'required|numeric|regex:/^\d+(\.\d{1,2})?$/',
+                'income_other' => 'array|nullable',
+                'income_other.*' => 'nullable|numeric|regex:/^\d+(\.\d{1,2})?$/',
+                'outgoing_venue' => 'required|numeric|regex:/^\d+(\.\d{1,2})?$/',
+                'outgoing_band' => 'required|numeric|regex:/^\d+(\.\d{1,2})?$/',
+                'outgoing_promotion' => 'required|numeric|regex:/^\d+(\.\d{1,2})?$/',
+                'outgoing_rider' => 'required|numeric|regex:/^\d+(\.\d{1,2})?$/',
+                'outgoing_other' => 'array|nullable',
+                'outgoing_other.*' => 'nullable|numeric|regex:/^\d+(\.\d{1,2})?$/',
+                'income_total' => 'required|numeric|regex:/^\d+(\.\d{1,2})?$/',
+                'outgoing_total' => 'required|numeric|regex:/^\d+(\.\d{1,2})?$/',
+                'profit_total' => 'required|numeric',
+                'desired_profit_remaining' => 'nullable|numeric',
+            ]);
+
+            if ($validator->fails()) {
+                Log::warning('Validation failed', $validator->errors()->toArray());
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors(),
+                ], 422);
+            }
+
+            // Update the record with validated data
+            $finance->update($validator);
+
+            // Redirect back to the view page or another location
+            return redirect()
+                ->route('finances.show', $finance->id)
+                ->with('success', 'Finance record updated successfully!')
+                ->with('promoter', $promoter);
+        } catch (\Exception $e) {
+            Log::error('Error updating budget:', ['message' => $e->getMessage()]);
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function exportSingleFinanceRecord($id)
+    {
+        $financeRecord = Finance::findOrFail($id);
+
+        // Generate the PDF
+        $pdf = PDF::loadView('pdf.finances-single', ['finance' => $financeRecord]);
+
+        // Download the PDF file
+        return $pdf->download('finance_record_' . $id . '.pdf');
+    }
 }

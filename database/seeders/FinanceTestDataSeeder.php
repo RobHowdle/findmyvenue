@@ -58,9 +58,16 @@ class FinanceTestDataSeeder extends Seeder
                     return ['field' => $field, 'value' => rand(1, 500)];
                 }, $outgoingFields));
 
-                // Optional fields: other_incoming and other_outgoing (can be null or have values)
-                $otherIncoming = rand(0, 1) ? json_encode([rand(100, 1000)]) : null;
-                $otherOutgoing = rand(0, 1) ? json_encode([rand(100, 1000)]) : null;
+                // Optional fields: other_incoming and other_outgoing (JSON format)
+                $otherIncomingCount = rand(1, 3); // Randomly choose between 1 to 3 other incoming entries
+                $otherIncoming = json_encode(array_map(function () {
+                    return ['field' => 'Other', 'value' => rand(100, 1000)];
+                }, range(1, $otherIncomingCount)));
+
+                $otherOutgoingCount = rand(1, 3); // Randomly choose between 1 to 3 other outgoing entries
+                $otherOutgoing = json_encode(array_map(function () {
+                    return ['field' => 'Other', 'value' => rand(100, 1000)];
+                }, range(1, $otherOutgoingCount)));
 
                 // Create the finance record
                 Finance::create([
@@ -73,8 +80,8 @@ class FinanceTestDataSeeder extends Seeder
                     'date_to' => $dateTo,
                     'external_link' => 'https://example.com',
                     'incoming' => $incoming,
-                    'other_incoming' => $otherIncoming,
                     'outgoing' => $outgoing,
+                    'other_incoming' => $otherIncoming,
                     'other_outgoing' => $otherOutgoing,
                     'desired_profit' => $desiredProfit,
                     'total_incoming' => $totalIncoming,

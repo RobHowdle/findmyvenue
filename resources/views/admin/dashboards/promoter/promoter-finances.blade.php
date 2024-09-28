@@ -113,7 +113,7 @@
           let financeLinks = '';
           response.financeRecords.forEach(record => {
             financeLinks +=
-              `<li class="ml-4 my-2"><a href="${record.link}" class="hover:text-ynsYellow font-heading transition duration-150 ease-in-out">${record.name}</a></li>`;
+              `<li class="ml-4 my-2"><a href="${record.link}" target="_blank" class="hover:text-ynsYellow font-heading transition duration-150 ease-in-out">${record.name}</a></li>`;
           });
 
           // Display finance links in a specific element

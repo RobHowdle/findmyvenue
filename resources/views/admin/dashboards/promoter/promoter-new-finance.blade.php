@@ -209,8 +209,7 @@
       $('#desired_profit_remaining').text(remainingDesiredProfit);
 
       // Prepare for form submission
-      $('#finances-form').data('numericValue',
-        numericValue); // Store numericValue in the form data for easy access later
+      $('#finances-form').data('numericValue', numericValue);
     }
 
     // Recalculate on input changes

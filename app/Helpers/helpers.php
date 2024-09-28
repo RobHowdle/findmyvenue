@@ -14,6 +14,15 @@ if (!function_exists('a0rAn')) {
 if (!function_exists('formatCurrency')) {
     function formatCurrency($amount)
     {
-        return '£' . number_format($amount, 2, '.', ',');
+        // Check if the amount is an array
+        if (is_array($amount)) {
+            // Format each value in the array, casting to float, and join with a comma
+            return implode(', ', array_map(function ($value) {
+                return '£' . number_format((float)$value, 2, '.', ',');
+            }, $amount));
+        }
+
+        // Format the single amount, casting to float
+        return '£' . number_format((float)$amount, 2, '.', ',');
     }
 }
