@@ -17,6 +17,7 @@
   <script src="https://kit.fontawesome.com/dd6bff54df.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
 
   <!-- Scripts -->
   @vite(['resources/css/app.css', 'resources/js/app.js'])

@@ -54,4 +54,9 @@ class Venue extends Model
     {
         return $this->hasMany(VenueReview::class);
     }
+
+    public function todos()
+    {
+        return $this->morphMany(Todo::class, 'serviceable');
+    }
 }

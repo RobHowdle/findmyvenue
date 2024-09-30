@@ -70,4 +70,9 @@ class User extends Authenticatable
     {
         return $this->morphedByMany(OtherService::class, 'serviceable', 'service_user', 'user_id', 'serviceable_id')->whereNull('service_user.deleted_at');
     }
+
+    public function todos()
+    {
+        return $this->morphMany(Todo::class, 'serviceable');
+    }
 }

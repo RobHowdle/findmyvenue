@@ -293,10 +293,8 @@
         contentType: false,
         processData: false,
         success: function(response) {
-          console.log(response.success);
           if (response.success === true) {
             showSuccessNotification(response.message);
-            console.log(response.message);
           } else {
             if (Array.isArray(response.message)) {
               response.message.forEach(function(error) {

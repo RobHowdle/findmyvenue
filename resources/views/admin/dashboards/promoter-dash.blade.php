@@ -68,7 +68,7 @@
             New Todo Item
           </a>
 
-          <a href="#"
+          <a href="{{ route('promter.dashboard.users') }}"
             class="group flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-ynsYellow">
             <span
               class="fas fa-user mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-ynsYellow"></span>
@@ -92,7 +92,7 @@
               class="fas fa-sticky-note mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-ynsYellow"></span>
             Notes
           </a>
-          <a href="#"
+          <a href="{{ route('promoter.dashboard.todolist') }}"
             class="group flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-ynsYellow">
             <span
               class="fas fa-list mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-ynsYellow"></span>

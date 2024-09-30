@@ -20,7 +20,10 @@ class ProfileController extends Controller
     {
         $roles = Role::where('name', '!=', 'administrator')->get();
         $userRole = $user->roles;
-        return view('profile.edit', compact('user', 'roles', 'userRole'));
+        $name = $user->name;
+        $email = $user->email;
+
+        return view('profile.edit', compact('user', 'roles', 'userRole', 'name', 'email'));
     }
 
     /**

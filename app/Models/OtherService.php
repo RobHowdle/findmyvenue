@@ -58,4 +58,9 @@ class OtherService extends Model
     {
         return $this->belongsTo(OtherServiceList::class, 'other_service_id');
     }
+
+    public function todos()
+    {
+        return $this->morphMany(Todo::class, 'serviceable');
+    }
 }

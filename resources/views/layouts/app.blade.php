@@ -21,6 +21,7 @@
 
   <!-- Include Summernote CSS -->
   <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
 
   <!-- Scripts -->
   @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -39,7 +40,8 @@
       </header>
     @endif
 
-    <div class="w-full items-center justify-center px-2 backdrop-brightness-50">
+    <div
+      class="{{ request()->routeIs('profile.*') ? '' : 'px-2' }} w-full items-center justify-center backdrop-brightness-50">
       {{ $slot }}
     </div>
   </div>

@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
+use App\Models\Todo;
 use App\Models\Finance;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use App\Models\PromoterReview;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -30,6 +31,20 @@ class PromoterDashboardController extends Controller
         ]));
     }
 
+    /**
+     * Functions for the Users Module on the Promoter Dashboard
+     */
+    public function promoterUsers()
+    {
+        $promoter = Auth::user()->load('promoters');
+        $users = $promoter->users;
+
+        return view('admin.dashboards.promoter.promoter-users', compact('promoter', 'users'));
+    }
+
+    /**
+     * Functions for the Budget Module on the Promoter Dashboard
+     */
     public function promoterFinances()
     {
         $promoter = Auth::user()->load('promoters');
@@ -564,5 +579,20 @@ class PromoterDashboardController extends Controller
 
         // Download the PDF file
         return $pdf->download('finance_record_' . $id . '.pdf');
+    }
+
+    /**
+     * Functions for the Todo Module on the Promoter Dashboard
+     */
+    public function getPromoterTodos()
+    {
+        $promoter = Auth::user()->load('promoters');
+
+        $promoterCompany = $promoter->promoters;
+        $serviceableId = $promoterCompany->pluck('id');
+
+        $todoItems = Todo::where('serviceable_id', $serviceableId)->where('completed', false)->orderBy('created_at')->get();
+
+        return view('admin.dashboards.promoter.todo-list', compact('promoter', 'todoItems'));
     }
 }

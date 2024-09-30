@@ -233,11 +233,19 @@ $(document).ready(function () {
 // Sweet Alert 2 Notifications
 window.showSuccessNotification = function (message) {
     Swal.fire({
+        showConfirmButton: false,
+        toast: true,
+        position: "top-end",
+        timer: 3000,
+        timerProgressBar: true,
+        customClass: {
+            popup: "bg-ynsDarkGray !important rounded-lg font-heading",
+            title: "text-black",
+            html: "text-black",
+        },
         icon: "success",
         title: "Success!",
         text: message,
-        showConfirmButton: true,
-        timer: 3000,
     });
 };
 
@@ -246,12 +254,12 @@ window.showFailureNotification = function (message) {
         showConfirmButton: false,
         toast: true,
         position: "top-end",
-        // timer: 3000,
+        timer: 3000,
         timerProgressBar: true,
         customClass: {
             popup: "bg-ynsDarkGray !important rounded-lg font-heading",
-            title: "text-white",
-            html: "text-white",
+            title: "text-black",
+            html: "text-black",
         },
         icon: "error",
         title: "Oops!",

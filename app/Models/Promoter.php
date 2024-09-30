@@ -45,4 +45,9 @@ class Promoter extends Model
     {
         return $this->morphToMany(User::class, 'serviceable', 'service_user', 'serviceable_id', 'user_id')->whereNull('service_user.deleted_at');
     }
+
+    public function todos()
+    {
+        return $this->morphMany(Todo::class, 'serviceable', 'serviceable_id', 'serviceable_type');
+    }
 }

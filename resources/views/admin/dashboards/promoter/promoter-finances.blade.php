@@ -10,9 +10,9 @@
           <div class="rounded-l-lg border-r border-r-white bg-ynsDarkBlue px-8 py-8">
             <div class="mb-8 flex flex-row justify-between">
               <a href="{{ route('promoter.dashboard.finances.export') }}" id="exportButton"
-                class="rounded-lg border bg-ynsLightGray px-4 py-2 font-bold text-black transition duration-150 ease-in-out hover:border-ynsYellow hover:text-ynsYellow">Export</a>
+                class="rounded-lg border bg-ynsLightGray px-4 py-2 font-bold text-white transition duration-150 ease-in-out hover:border-ynsYellow hover:text-ynsYellow">Export</a>
               <a href="{{ route('promoter.dashboard.finances.new') }}"
-                class="rounded-lg border bg-ynsLightGray px-4 py-2 font-bold text-black transition duration-150 ease-in-out hover:border-ynsYellow hover:text-ynsYellow">New
+                class="rounded-lg border bg-ynsLightGray px-4 py-2 font-bold text-white transition duration-150 ease-in-out hover:border-ynsYellow hover:text-ynsYellow">New
                 Budget</a>
             </div>
 
@@ -109,7 +109,6 @@
           $('#totalProfit').text('Total Profit: ' + formatCurrency(sumArray(totalProfit)));
 
           // Generate links for individual finance records
-          console.log(response.financeRecords);
           let financeLinks = '';
           response.financeRecords.forEach(record => {
             financeLinks +=
@@ -330,7 +329,7 @@
         xhrFields: {
           responseType: 'blob' // Set response type to blob for binary data
         },
-        success: function(blob) {
+        success: function(blob, response) {
           // Create a URL for the blob and trigger a download
           const url = window.URL.createObjectURL(blob);
           const a = document.createElement('a');
@@ -340,9 +339,12 @@
           a.click(); // Trigger the download
           a.remove(); // Clean up
           window.URL.revokeObjectURL(url); // Release the Blob URL
+          showSuccessNotification(response.message);
+
         },
-        error: function(error) {
-          console.error("Export error:", error);
+        error: function(error, jqXHR, textStatus, errorThrown) {
+          const response = jqXHR.responseJSON;
+          showFailureNotification(response.message || 'An error occurred, please try again later.');
         }
       });
     });
