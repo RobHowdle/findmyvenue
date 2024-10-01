@@ -21,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if ($this->app->runningInConsole() || app()->environment('local')) {
+        if ($this->app->runningInConsole() || app()->environment('production')) {
             return;
         }
 
