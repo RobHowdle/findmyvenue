@@ -44,5 +44,6 @@ class AppServiceProvider extends ServiceProvider
                 Log::info('Access granted for IP: ' . $clientIp);
                 return; // Allow access to the application
             }
+        }
     }
 }
