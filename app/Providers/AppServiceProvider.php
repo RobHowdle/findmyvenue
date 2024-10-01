@@ -33,7 +33,7 @@ class AppServiceProvider extends ServiceProvider
             Log::info('Maintenance mode active for IP: ' . $ipAddress);
 
             // List of allowed IPs
-            $allowedIps = ['81.99.92.105']; // Add more IPs if needed
+            $allowedIps = ['192.168.0.33']; // Add more IPs if needed
 
             // If the IP is not allowed, throw an exception
             if (!in_array($ipAddress, $allowedIps)) {
