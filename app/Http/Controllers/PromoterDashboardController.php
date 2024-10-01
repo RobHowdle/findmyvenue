@@ -584,15 +584,120 @@ class PromoterDashboardController extends Controller
     /**
      * Functions for the Todo Module on the Promoter Dashboard
      */
-    public function getPromoterTodos()
+    public function showPromoterTodos(Request $request)
+    {
+        $promoter = Auth::user()->load('promoters');
+
+        // Get the promoter's company
+        $promoterCompany = $promoter->promoters;
+        $serviceableId = $promoterCompany->pluck('id');
+
+
+        $perPage = 6;
+        $page = $request->input('page', 1);
+
+        // Fetch the todo items
+        $todoItems = Todo::whereIn('serviceable_id', $serviceableId)
+            ->where('completed', false)
+            ->orderBy('created_at', 'DESC')
+            ->paginate(6);
+
+        return view('admin.dashboards.promoter.todo-list', compact('promoter', 'todoItems'));
+    }
+
+    public function getPromoterTodos(Request $request)
     {
         $promoter = Auth::user()->load('promoters');
 
         $promoterCompany = $promoter->promoters;
         $serviceableId = $promoterCompany->pluck('id');
 
-        $todoItems = Todo::where('serviceable_id', $serviceableId)->where('completed', false)->orderBy('created_at')->get();
+        if ($promoterCompany->isEmpty()) {
+            return response()->json([
+                'view' => view('components.todo-items', ['todoItems' => collect()])->render(),
+                'hasMore' => false,
+            ]);
+        }
 
-        return view('admin.dashboards.promoter.todo-list', compact('promoter', 'todoItems'));
+        $perPage = 6;
+        $page = $request->input('page', 1);
+
+        $todoItems = Todo::whereIn('serviceable_id', $serviceableId)
+            ->where('completed', false)
+            ->orderBy('created_at', 'DESC')
+            ->paginate(6);
+
+        return response()->json([
+            'view' => view('components.todo-items', compact('todoItems'))->render(),
+            'hasMore' => $todoItems->hasMorePages(),
+        ]);
+    }
+
+    public function addNewTodoItem(Request $request)
+    {
+        $request->validate([
+            'task' => 'required|string'
+        ]);
+
+        $todoItem = Todo::create([
+            'user_id' => Auth::user()->id,
+            'serviceable_id' => Auth::user()->promoters->first()->id,
+            'serviceable_type' => 'App\Models\Promoter',
+            'item' => $request->task,
+        ]);
+
+        return response()->json([
+            'message' => 'Item Added Successfully',
+            'todoItem' => $todoItem,
+        ]);
+    }
+
+    public function completeTodoItem($id)
+    {
+        // Find the todo item by ID
+        $todoItem = Todo::findOrFail($id);
+
+        // Mark the item as completed
+        $todoItem->completed = true;
+        $todoItem->completed_at = now();
+        $todoItem->save();
+
+        // Return a success response
+        return response()->json([
+            'message' => 'Todo item marked as completed!',
+            'todoItem' => $todoItem,
+        ]);
+    }
+
+    public function deleteTodoItem($id)
+    {
+        // Find the todo item by ID
+        $todoItem = Todo::findOrFail($id);
+
+        // Delete the todo item
+        $todoItem->delete();
+
+        // Return a success response
+        return response()->json([
+            'message' => 'Todo item deleted successfully!',
+        ]);
+    }
+
+    public function showCompletedTodoItems()
+    {
+        $promoter = Auth::user()->load('promoters');
+
+        $promoterCompany = $promoter->promoters;
+        $serviceableId = $promoterCompany->pluck('id');
+
+        $completedTodos = Todo::whereIn('serviceable_id', $serviceableId)
+            ->where('completed', true)
+            ->orderBy('created_at', 'DESC')
+            ->paginate(6);
+
+        return response()->json([
+            'view' => view('components.todo-items', ['todoItems' => $completedTodos])->render(),
+            'hasMore' => $completedTodos->hasMorePages(),
+        ]);
     }
 }

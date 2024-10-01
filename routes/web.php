@@ -55,7 +55,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard/promoter/finances/{id}/edit', [PromoterDashboardController::class, 'editSingleFinance'])->name('promoter.dashboard.finances.edit');
     Route::patch('/dashboard/promoter/finances/{finance}', [PromoterDashboardController::class, 'updateSingleFinance'])->name('promoter.dashboard.finances.update');
     Route::post('/dashboard/promoter/finances/{finance}', [PromoterDashboardController::class, 'exportSingleFinanceRecord'])->name('promoter.dashboard.finances.exportSingleFinanceRecord');
-    Route::get('/dashboard/promoter/todolist', [PromoterDashboardController::class, 'getPromoterTodos'])->name('promoter.dashboard.todolist');
+    Route::get('/dashboard/promoter/todo-list', [PromoterDashboardController::class, 'showPromoterTodos'])->name('promoter.dashboard.todo-list');
+    Route::get('/dashboard/promoter/todo-items', [PromoterDashboardController::class, 'getPromoterTodos'])->name('promoter.dashboard.todo-items');
+    Route::post('/dashboard/promoter/todolist/new', [PromoterDashboardController::class, 'addNewTodoItem'])->name('promoter.dashboard.new-todo-item');
+    Route::post('/dashboard/promoter/todo-item/{id}/complete', [PromoterDashboardController::class, 'completeTodoItem'])->name('promoter.dashboard.complete-todo-item');
+    Route::delete('/dashboard/promoter/todo-item/{id}', [PromoterDashboardController::class, 'deleteTodoItem'])->name('promoter.dashboard.delete-todo-item');
+    Route::get('/dashboard/promoter/todo-item/completed-items', [PromoterDashboardController::class, 'showCompletedTodoItems'])->name('promoter.dashboard.completed-todo-items');
 
 
 
