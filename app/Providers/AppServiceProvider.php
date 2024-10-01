@@ -32,17 +32,19 @@ class AppServiceProvider extends ServiceProvider
             $clientIp = Request::ip();
             Log::info('Maintenance mode active for IP: ' . $clientIp);
 
+            // Define the main domain to allow access
+            $allowedDomain = 'yournextshow.co.uk';
             // Define your allowed IP address
             $allowedIp = '81.99.92.105';
 
-            // Check if the request IP matches your allowed IP
-            if ($clientIp !== $allowedIp) {
-                // If not, throw an exception to show the maintenance page
-                throw new ServiceUnavailableHttpException();
-            } else {
-                // If it matches, log the access granted
-                Log::info('Access granted for IP: ' . $clientIp);
+            // Check if the request domain matches the allowed domain or the request IP matches
+            if (Request::getHost() === $allowedDomain || $clientIp === $allowedIp) {
+                Log::info('Access granted for IP: ' . $clientIp . ' or domain: ' . $allowedDomain);
                 return; // Allow access to the application
+            } else {
+                // If not, throw an exception to show the maintenance page
+                Log::info('Access denied for IP - PROBLEM!: ' . $clientIp);
+                throw new ServiceUnavailableHttpException();
             }
         }
     }
