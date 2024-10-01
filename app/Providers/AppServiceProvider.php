@@ -22,31 +22,27 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Allow Artisan commands to run
+        // Check if the application is running in console mode
         if ($this->app->runningInConsole()) {
-            return;
+            return; // Allow Artisan commands to run
         }
 
         // Check if the application is in maintenance mode
         if ($this->app->isDownForMaintenance()) {
-            $ipAddress = Request::ip();
-            Log::info('Maintenance mode active for IP: ' . $ipAddress);
+            $clientIp = Request::ip();
+            Log::info('Maintenance mode active for IP: ' . $clientIp);
 
-            // List of allowed IPs
-            $allowedIps = ['81.99.92.105']; // Your IP Address
+            // Define your allowed IP address
+            $allowedIp = '81.99.92.105';
 
-            // Log the allowed IPs for debugging
-            Log::info('Allowed IPs: ' . implode(', ', $allowedIps));
-
-            // If the IP is not allowed, throw an exception
-            if (!in_array($ipAddress, $allowedIps)) {
-                Log::warning('Access denied for IP: ' . $ipAddress);
+            // Check if the request IP matches your allowed IP
+            if ($clientIp !== $allowedIp) {
+                // If not, throw an exception to show the maintenance page
                 throw new ServiceUnavailableHttpException();
             } else {
-                Log::info('Access granted for IP: ' . $ipAddress);
+                // If it matches, log the access granted
+                Log::info('Access granted for IP: ' . $clientIp);
+                return; // Allow access to the application
             }
-        } else {
-            Log::info('Not Active! Problem!');
-        }
     }
 }
