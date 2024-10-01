@@ -45,6 +45,8 @@ class AppServiceProvider extends ServiceProvider
             } else {
                 Log::info('Access granted for IP: ' . $ipAddress);
             }
+        } else {
+            Log::info('Not Active! Problem!');
         }
     }
 }
