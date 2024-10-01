@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\ServiceProvider;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
@@ -20,19 +22,24 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Check if the application is running in console mode
+        // Allow Artisan commands to run
         if ($this->app->runningInConsole()) {
-            return; // Allow Artisan commands to run
+            return;
         }
 
         // Check if the application is in maintenance mode
         if ($this->app->isDownForMaintenance()) {
-            $request = request();
-            $allowedIp = '81.99.92.105';
+            $ipAddress = Request::ip();
+            Log::info('Maintenance mode active for IP: ' . $ipAddress);
 
-            // Check if the request IP matches your allowed IP
-            if ($request->ip() !== $allowedIp) {
+            // List of allowed IPs
+            $allowedIps = ['81.99.92.105']; // Add more IPs if needed
+
+            // If the IP is not allowed, throw an exception
+            if (!in_array($ipAddress, $allowedIps)) {
                 throw new ServiceUnavailableHttpException();
+            } else {
+                Log::info('Access granted for IP: ' . $ipAddress);
             }
         }
     }
