@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Database\Eloquent\Builder;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,21 +20,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if ($this->app->runningInConsole() || app()->environment('production')) {
-            return;
-        }
-
-        $request = request();
-        $allowedIp = '81.99.92.105';
-
-        // Check if the request IP matches your allowed IP
-        if ($request->ip() === $allowedIp) {
-            return; // Don't show maintenance mode for this IP
-        }
-
         // Check if the application is in maintenance mode
         if ($this->app->isDownForMaintenance()) {
-            throw new ServiceUnavailableHttpException();
+            $request = request();
+            $allowedIp = '81.99.92.105';
+
+            // Check if the request IP matches your allowed IP
+            if ($request->ip() !== $allowedIp) {
+                throw new ServiceUnavailableHttpException();
+            }
         }
     }
 }
