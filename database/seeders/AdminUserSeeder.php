@@ -23,7 +23,7 @@ class AdminUserSeeder extends Seeder
 
         DB::table('users')->insert([
             'name' => 'Promoter',
-            'email' => 'robhowdle94@gmail.com',
+            'email' => 'robhowdlemusic@gmail.com',
             'email_verified_at' => now(),
             'password' => Hash::make('yfT11LpReC43(dV(U5'),
         ]);
