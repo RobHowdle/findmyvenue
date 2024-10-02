@@ -20,14 +20,14 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(Request $request): void
+    public function boot(): void
     {
         // Check if the application is running in console mode
         if ($this->app->runningInConsole()) {
             return; // Allow Artisan commands to run
         }
 
-        $cloudFlareIp = $request->ip();
+        $cloudFlareIp = request()->header('CF-Connecting-IP') ?: request()->ip();
 
         // Check if the application is in maintenance mode
         if ($this->app->isDownForMaintenance()) {
