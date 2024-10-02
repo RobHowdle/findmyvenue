@@ -20,17 +20,20 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void
+    public function boot(Request $request): void
     {
         // Check if the application is running in console mode
         if ($this->app->runningInConsole()) {
             return; // Allow Artisan commands to run
         }
 
+        $cloudFlareIp = $request->ip();
+
         // Check if the application is in maintenance mode
         if ($this->app->isDownForMaintenance()) {
             $clientIp = Request::ip();
             Log::info('Maintenance mode active for IP: ' . $clientIp);
+            Log::info('Clouflare IP: ' . $cloudFlareIp);
 
             // Define your allowed IP address
             $allowedIp = '81.99.92.105';
