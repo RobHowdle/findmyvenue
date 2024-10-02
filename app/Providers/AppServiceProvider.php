@@ -23,9 +23,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Check if the application is running in console mode
-        // if ($this->app->runningInConsole()) {
-        //     return; // Allow Artisan commands to run
-        // }
+        if ($this->app->runningInConsole()) {
+            return; // Allow Artisan commands to run
+        }
 
         // Check if the application is in maintenance mode
         if ($this->app->isDownForMaintenance()) {
