@@ -31,7 +31,7 @@ class DashboardController extends Controller
                 return redirect()->route('artist.dashboard');
             case 'venue':
                 return redirect()->route('venue.dashboard');
-            case 'admin':
+            case 'administrator':
                 return redirect()->route('admin.dashboard');
             default:
                 return abort(403); // Forbidden access if role is not recognized

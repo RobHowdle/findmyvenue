@@ -9,6 +9,7 @@ use Database\Seeders\VenuesSeeder;
 use Database\Seeders\AdminUserSeeder;
 use Database\Seeders\VenueTestSeeder;
 use Database\Seeders\PermissionsSeeder;
+use Database\Seeders\UserServiceSeeder;
 use Database\Seeders\OtherServiceSeeder;
 use Database\Seeders\PromoterTestSeeder;
 use Database\Seeders\TodoTestDataSeeder;
@@ -40,6 +41,7 @@ class DatabaseSeeder extends Seeder
             OtherServiceSeeder::class,
             FinanceTestDataSeeder::class,
             TodoTestDataSeeder::class,
+            UserServiceSeeder::class
         ]);
     }
 }
