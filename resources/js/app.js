@@ -213,22 +213,22 @@ $(document).ready(function () {
 });
 
 // Summernote
-$(document).ready(function () {
-    $(".summernote").summernote({
-        height: 300, // Set the height of the editor
-        toolbar: [
-            // Customize the toolbar
-            ["style", ["style"]],
-            ["font", ["bold", "italic", "underline", "clear"]],
-            ["fontname", ["fontname"]],
-            ["color", ["color"]],
-            ["para", ["ul", "ol", "paragraph"]],
-            ["table", ["table"]],
-            ["insert", ["link", "picture", "video"]],
-            ["view", ["fullscreen", "codeview", "help"]],
-        ],
-    });
-});
+// $(document).ready(function () {
+//     $(".summernote").summernote({
+//         height: 300, // Set the height of the editor
+//         toolbar: [
+//             // Customize the toolbar
+//             ["style", ["style"]],
+//             ["font", ["bold", "italic", "underline", "clear"]],
+//             ["fontname", ["fontname"]],
+//             ["color", ["color"]],
+//             ["para", ["ul", "ol", "paragraph"]],
+//             ["table", ["table"]],
+//             ["insert", ["link", "picture", "video"]],
+//             ["view", ["fullscreen", "codeview", "help"]],
+//         ],
+//     });
+// });
 
 // Sweet Alert 2 Notifications
 window.showSuccessNotification = function (message) {
