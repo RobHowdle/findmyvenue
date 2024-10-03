@@ -311,6 +311,9 @@
     var fullIcon = "{{ asset('storage/images/system/ratings/full.png') }}";
     var hotIcon = "{{ asset('storage/images/system/ratings/hot.png') }}";
 
+    console.log(emptyIcon); // Check the generated URL
+
+
 
     // Special case: all icons are hot
     if (rating === totalIcons) {
