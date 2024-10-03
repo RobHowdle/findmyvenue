@@ -2,16 +2,18 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\Finance;
 use Carbon\Carbon;
+use App\Models\User;
+use App\Models\Finance;
+use Illuminate\Database\Seeder;
 
 class FinanceTestDataSeeder extends Seeder
 {
     public function run()
     {
         // User-specific data
-        $userId = 4;
+        $user = User::where('name', 'Promoter')->firstOrFail();
+        $userId = $user->id;
         $serviceableId = 1;
         $serviceableType = 'App\Models\Promoter';
         $financeType = 'Budget';

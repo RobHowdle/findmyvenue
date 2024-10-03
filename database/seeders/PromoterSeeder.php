@@ -24,7 +24,7 @@ class PromoterSeeder extends Seeder
                     "latitude" => $data['3'],
                     "longitude" => $data['4'],
                     "logo_url" => $data['5'],
-                    "about_me" => $data['6'],
+                    "description" => $data['6'],
                     "my_venues" => $data['7'],
                     "genre" => $data['8'],
                     "band_type" => $data['9'],

@@ -22,6 +22,9 @@ class PromoterReviewTestSeeder extends Seeder
             'review' => 'Jamie and Shadowfest have been really good to all my bands that have played there  joy to play for.',
             'author' => 'Alex Grey',
             'display' => 1,
+            'reviewer_ip' => '000.000.000.000',
+            'review_approved' => 1,
+            'display' => 1
         ]);
     }
 }

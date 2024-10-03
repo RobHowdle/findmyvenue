@@ -27,7 +27,7 @@ class PromoterDashboardController extends Controller
 
         return view('admin.dashboards.promoter-dash', compact([
             'pendingReviews',
-            'promoter',
+            'promoter'
         ]));
     }
 

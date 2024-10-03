@@ -307,9 +307,13 @@
     var totalIcons = 5;
     var fullIcons = Math.floor(rating);
     var fraction = rating - fullIcons;
-    var emptyIcon = '/storage/images/system/ratings/empty.png';
-    var fullIcon = '/storage/images/system/ratings/full.png';
-    var hotIcon = '/storage/images/system/ratings/hot.png';
+    var emptyIcon = "{{ asset('storage/images/system/ratings/empty.png') }}";
+    var fullIcon = "{{ asset('storage/images/system/ratings/full.png') }}";
+    var hotIcon = "{{ asset('storage/images/system/ratings/hot.png') }}";
+
+    console.log(emptyIcon); // Check the generated URL
+
+
 
     // Special case: all icons are hot
     if (rating === totalIcons) {

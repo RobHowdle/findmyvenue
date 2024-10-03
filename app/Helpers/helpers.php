@@ -1,4 +1,6 @@
 <?php
+
+use Illuminate\Support\Facades\Log;
 // Checks if word requires 'an' or 'a'
 if (!function_exists('a0rAn')) {
     function a0rAn($word)
@@ -25,4 +27,6 @@ if (!function_exists('formatCurrency')) {
         // Format the single amount, casting to float
         return '£' . number_format((float)$amount, 2, '.', ',');
     }
+} else {
+    Log::error('formatCurrency function is not defined');
 }

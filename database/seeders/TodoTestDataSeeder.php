@@ -2,14 +2,16 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Todo;
+use App\Models\User;
 use Faker\Factory as Faker;
+use Illuminate\Database\Seeder;
 
 class TodoTestDataSeeder extends Seeder
 {
     public function run()
     {
+
         $faker = Faker::create();
 
         // Create 12 todo items with serviceable_id = 1
@@ -24,6 +26,8 @@ class TodoTestDataSeeder extends Seeder
 
     private function createTodoItems($faker, $serviceableId, $completedCount)
     {
+        $user = User::where('name', 'Promoter')->firstOrFail();
+        $userId = $user->id;
         // Create 12 todo items
         for ($i = 0; $i < 12; $i++) {
             // Randomly determine if the item should be completed
@@ -31,7 +35,7 @@ class TodoTestDataSeeder extends Seeder
 
             // Create a Todo item
             Todo::create([
-                'user_id' => 4,
+                'user_id' => $userId,
                 'serviceable_id' => $serviceableId,
                 'serviceable_type' => 'App\Models\Promoter',
                 'item' => $faker->sentence(6), // Random todo item
@@ -43,9 +47,11 @@ class TodoTestDataSeeder extends Seeder
 
     private function createDeletedTodoItem($faker, $serviceableId)
     {
+        $user = User::where('name', 'Promoter')->firstOrFail();
+        $userId = $user->id;
         // Create 1 deleted todo item
         Todo::create([
-            'user_id' => 4,
+            'user_id' => $userId,
             'serviceable_id' => $serviceableId,
             'serviceable_type' => 'App\Models\Promoter',
             'item' => $faker->sentence(6), // Random todo item
