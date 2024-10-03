@@ -40,8 +40,8 @@ class DatabaseSeeder extends Seeder
             OtherServicesListSeeder::class,
             OtherServiceSeeder::class,
             FinanceTestDataSeeder::class,
+            UserServiceSeeder::class,
             TodoTestDataSeeder::class,
-            UserServiceSeeder::class
         ]);
     }
 }
