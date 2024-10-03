@@ -157,6 +157,10 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
+    const emptyIcon = "{{ asset('storage/images/system/ratings/empty.png') }}";
+    const fullIcon = "{{ asset('storage/images/system/ratings/full.png') }}";
+    const hotIcon = "{{ asset('storage/images/system/ratings/hot.png') }}";
+
     const checkboxes = document.querySelectorAll(
         '.rating input[type="checkbox"]'
     );
@@ -176,20 +180,17 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (parseInt(cb.value) === 5) {
                         cb.checked = true;
                     }
-                    cb.nextElementSibling.style.backgroundImage =
-                        "url('/storage/images/system/ratings/hot.png')";
+                    cb.nextElementSibling.style.backgroundImage = `url('${hotIcon}')`;
                 });
             } else {
                 // Update the checkboxes based on selected value
                 checkboxesInGroup.forEach((cb) => {
                     if (parseInt(cb.value) <= value) {
                         cb.checked = true;
-                        cb.nextElementSibling.style.backgroundImage =
-                            "url('/storage/images/system/ratings/full.png')";
+                        cb.nextElementSibling.style.backgroundImage = `url('${fullIcon}')`;
                     } else {
                         cb.checked = false;
-                        cb.nextElementSibling.style.backgroundImage =
-                            "url('/storage/images/system/ratings/empty.png')";
+                        cb.nextElementSibling.style.backgroundImage = `url('${emptyIcon}')`;
                     }
                 });
             }
