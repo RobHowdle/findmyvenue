@@ -5,7 +5,7 @@
     </h1>
   </x-slot>
 
-  <div class="mx-auto min-h-screen w-full max-w-screen-2xl">
+  <div class="mx-auto min-h-screen w-full max-w-screen-2xl pt-32">
     <h1 class="py-8 text-center font-heading text-6xl text-white">{{ $serviceName }}
     </h1>
     <div class="relative shadow-md sm:rounded-lg">
@@ -169,22 +169,22 @@
                   @if ($service->platforms)
                     @foreach ($service->platforms as $platform)
                       @if ($platform['platform'] == 'facebook')
-                        <a class="hover:text-yns_yellow mr-2" href="{{ $platform['url'] }}" target=_blank><span
+                        <a class="mr-2 hover:text-yns_yellow" href="{{ $platform['url'] }}" target=_blank><span
                             class="fab fa-facebook"></span></a>
                       @elseif($platform['platform'] == 'twitter')
-                        <a class="hover:text-yns_yellow mr-2" href="{{ $platform['url'] }}" target=_blank><span
+                        <a class="mr-2 hover:text-yns_yellow" href="{{ $platform['url'] }}" target=_blank><span
                             class="fab fa-twitter"></span></a>
                       @elseif($platform['platform'] == 'instagram')
-                        <a class="hover:text-yns_yellow mr-2" href="{{ $platform['url'] }}" target=_blank><span
+                        <a class="mr-2 hover:text-yns_yellow" href="{{ $platform['url'] }}" target=_blank><span
                             class="fab fa-instagram"></span></a>
                       @elseif($platform['platform'] == 'snapchat')
-                        <a class="hover:text-yns_yellow mr-2" href="{{ $platform['url'] }}" target=_blank><span
+                        <a class="mr-2 hover:text-yns_yellow" href="{{ $platform['url'] }}" target=_blank><span
                             class="fab fa-snapchat-ghost"></span></a>
                       @elseif($platform['platform'] == 'tiktok')
-                        <a class="hover:text-yns_yellow mr-2" href="{{ $platform['url'] }}" target=_blank><span
+                        <a class="mr-2 hover:text-yns_yellow" href="{{ $platform['url'] }}" target=_blank><span
                             class="fab fa-tiktok"></span></a>
                       @elseif($platform['platform'] == 'youtube')
-                        <a class="hover:text-yns_yellow mr-2" href="{{ $platform['url'] }}" target=_blank><span
+                        <a class="mr-2 hover:text-yns_yellow" href="{{ $platform['url'] }}" target=_blank><span
                             class="fab fa-youtube"></span></a>
                       @endif
                     @endforeach

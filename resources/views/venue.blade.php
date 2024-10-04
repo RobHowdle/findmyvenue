@@ -5,7 +5,7 @@
     </h1>
   </x-slot>
 
-  <div class="mx-auto w-full max-w-screen-2xl py-16">
+  <div class="mx-auto my-6 w-full max-w-screen-2xl pt-32">
     <div class="relative shadow-md sm:rounded-lg">
       <div class="min-w-screen-xl mx-auto max-w-screen-xl bg-opac_8_black px-16 py-12 text-white">
         <div class="header flex gap-4">
@@ -19,14 +19,14 @@
               <x-contact-and-social-links :item="$venue" />
             </div>
             <div class="rating-wrapper flex flex-row items-center gap-2">
-              <p>Overall Rating ({{ $reviewCount }}): </p>
+              <p class="h-full place-content-end font-sans">Overall Rating ({{ $reviewCount }}): </p>
               <div class="ratings flex">
                 {!! $overallReviews[$venue->id] !!}
               </div>
             </div>
             <div class="leave-review">
               <button
-                class="from-yns_dark_orange rounded bg-gradient-to-t to-yns_yellow px-6 py-2 text-sm text-black hover:bg-yns_yellow"
+                class="rounded bg-gradient-to-t from-yns_dark_orange to-yns_yellow px-6 py-2 text-sm text-black transition duration-150 ease-in-out hover:bg-yns_yellow"
                 data-modal-toggle="review-modal" type="button">Leave a review</button>
             </div>
 

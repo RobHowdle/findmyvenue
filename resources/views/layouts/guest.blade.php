@@ -84,7 +84,7 @@
     </nav>
   @endif
   <div class="flex min-h-screen flex-col">
-    <div class="flex-grow">
+    <div class="flex-grow backdrop-brightness-50">
       {{ $slot }}
     </div>
 

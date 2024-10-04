@@ -1,6 +1,6 @@
 @props(['venues', 'genres'])
 
-<div class="mx-auto w-full max-w-screen-2xl">
+<div class="mx-auto min-h-screen w-full max-w-screen-2xl pt-32">
   <h1 class="py-8 text-center font-heading text-6xl text-white">Venues</h1>
   <div class="relative shadow-md sm:rounded-lg">
     <div class="search-wrapper flex justify-center border border-white dark:bg-black">
