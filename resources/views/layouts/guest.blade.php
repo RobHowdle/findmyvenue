@@ -81,7 +81,7 @@
       </div>
     </nav>
   @endif
-  <div class="w-full items-center justify-center px-2 backdrop-brightness-50">
+  <div class="flex h-[calc(100vh-128px)] w-full items-center justify-center px-2 backdrop-brightness-50">
     {{ $slot }}
   </div>
   @stack('scripts')
