@@ -13,7 +13,7 @@
         <!-- Navigation Links -->
         <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
           <a href="{{ route('dashboard') }}"
-            class="{{ request()->is('dashboard/promoter') ? ' border-b-ynsYellow' : '' }} inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:border-b-ynsYellow hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-ynsYellow">Dashboard</a>
+            class="{{ request()->is('dashboard/promoter') ? ' border-b-yns_yellow' : '' }} hover:border-b-yns_yellow dark:hover:text-yns_yellow inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white">Dashboard</a>
 
           @can('manage_venue')
             <x-nav-link :href="route('admin.venues')" :active="request()->routeIs('venues')">
@@ -23,7 +23,7 @@
 
           @can('manage_promoter')
             <a href="{{ route('promoter.dashboard.finances') }}"
-              class="{{ request()->is('dashboard/promoter/finances') ? ' border-b-ynsYellow' : '' }} inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:border-b-ynsYellow hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-ynsYellow">Finances</a>
+              class="{{ request()->is('dashboard/promoter/finances') ? ' border-b-yns_yellow' : '' }} hover:border-b-yns_yellow dark:hover:text-yns_yellow inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white">Finances</a>
           @endcan
 
           @can(['manage_band', 'manage_photographer', 'manage_designer'])
@@ -36,7 +36,7 @@
 
       <!-- Settings Dropdown -->
       <div class="hidden sm:ms-6 sm:flex sm:items-center">
-        <x-dropdown class="bg-opac8Black" align="right" width="48">
+        <x-dropdown class="bg-opac_8_black" align="right" width="48">
           <x-slot name="trigger">
             <button
               class="inline-flex items-center rounded-md border border-transparent px-3 py-2 font-heading font-medium text-white transition duration-150 ease-in-out focus:outline-none">

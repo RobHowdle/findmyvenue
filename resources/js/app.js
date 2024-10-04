@@ -80,7 +80,7 @@ $(document).ready(function () {
 
     // Add active class to the default tab link
     $(".tabLinks:first").addClass(
-        "active text-ynsYellow border-b-2 border-ynsYellow rounded-t-lg group"
+        "active text-yns_yellow border-b-2 border-yns_yellow rounded-t-lg group"
     );
 
     // Add click event to tab links
@@ -96,12 +96,12 @@ $(document).ready(function () {
 
         // Remove "active" class from all tab links
         $(".tabLinks").removeClass(
-            "active text-ynsYellow border-b-2 border-ynsYellow rounded-t-lg group"
+            "active text-yns_yellow border-b-2 border-yns_yellow rounded-t-lg group"
         );
 
         // Add "active" class to the clicked tab link
         $(this).addClass(
-            "active text-ynsYellow border-b-2 border-ynsYellow rounded-t-lg group"
+            "active text-yns_yellow border-b-2 border-yns_yellow rounded-t-lg group"
         );
 
         // Prevent default link behavior
@@ -240,7 +240,7 @@ window.showSuccessNotification = function (message) {
         timer: 3000,
         timerProgressBar: true,
         customClass: {
-            popup: "bg-ynsDarkGray !important rounded-lg font-heading",
+            popup: "bg-yns_dark_gray !important rounded-lg font-heading",
             title: "text-black",
             html: "text-black",
         },
@@ -258,7 +258,7 @@ window.showFailureNotification = function (message) {
         timer: 3000,
         timerProgressBar: true,
         customClass: {
-            popup: "bg-ynsDarkGray !important rounded-lg font-heading",
+            popup: "bg-yns_dark_gray !important rounded-lg font-heading",
             title: "text-black",
             html: "text-black",
         },

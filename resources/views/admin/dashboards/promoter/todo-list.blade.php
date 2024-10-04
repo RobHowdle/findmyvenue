@@ -5,7 +5,7 @@
 
   <div class="mx-auto w-full max-w-screen-2xl py-16">
     <div class="relative mb-8 shadow-md sm:rounded-lg">
-      <div class="min-w-screen-xl mx-auto max-w-screen-xl rounded-lg bg-ynsDarkGray text-white">
+      <div class="min-w-screen-xl mx-auto max-w-screen-xl rounded-lg bg-yns_dark_gray text-white">
         <div class="rounded-lg border border-white px-8 py-4">
           <p class="mb-4 font-heading text-4xl font-bold">Todo List</p>
           <form id="newTodoItem" method="POST">
@@ -16,7 +16,7 @@
                 <x-textarea-input class="mt-2 h-32 w-96" id="taskInput" name="task"></x-textarea-input>
               </div>
               <button type="submit" id="addTaskButton"
-                class="mt-8 h-10 w-40 rounded-lg border border-white bg-white px-4 py-2 font-heading font-bold text-black transition duration-150 ease-in-out hover:border-ynsYellow hover:text-ynsYellow">Add</button>
+                class="mt-8 h-10 w-40 rounded-lg border border-white bg-white px-4 py-2 font-heading font-bold text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">Add</button>
             </div>
           </form>
           <div class="grid grid-cols-3 gap-x-4 gap-y-6 pt-6" id="tasks">
@@ -27,13 +27,13 @@
           </div>
           <div class="mt-6 flex flex-row gap-4">
             <button id="load-more-btn"
-              class="h-10 w-40 rounded-lg border border-white bg-white px-4 py-2 font-heading font-bold text-black transition duration-150 ease-in-out hover:border-ynsYellow hover:text-ynsYellow">Load
+              class="h-10 w-40 rounded-lg border border-white bg-white px-4 py-2 font-heading font-bold text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">Load
               More</button>
             <button id="complete-task-btn"
-              class="h-10 w-40 rounded-lg border border-white bg-white px-4 py-2 font-heading font-bold text-black transition duration-150 ease-in-out hover:border-ynsYellow hover:text-ynsYellow">View
+              class="h-10 w-40 rounded-lg border border-white bg-white px-4 py-2 font-heading font-bold text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">View
               Completed</button>
             <button id="uncomplete-task-btn" style="display: none;"
-              class="w-50 h-10 rounded-lg border border-white bg-white px-4 py-2 font-heading font-bold text-black transition duration-150 ease-in-out hover:border-ynsYellow hover:text-ynsYellow">View
+              class="w-50 h-10 rounded-lg border border-white bg-white px-4 py-2 font-heading font-bold text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">View
               Uncompleted</button>
           </div>
         </div>

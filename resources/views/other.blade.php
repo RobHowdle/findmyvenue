@@ -20,7 +20,7 @@
             </a>
           </div>
         @empty
-          <div class="col-start-1 col-end-5 bg-opac8Black p-20 text-center text-2xl text-white">
+          <div class="bg-opac_8_black col-start-1 col-end-5 p-20 text-center text-2xl text-white">
             <p>Sorry! We don't have anything here yet. Come back later and try again.</p>
           </div>
         @endforelse

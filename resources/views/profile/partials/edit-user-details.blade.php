@@ -41,7 +41,7 @@
     <div class="mt-4">
       <x-input-label for="role" :value="__('Role')" />
       <select id="role" name="role"
-        class="mt-1 block w-full rounded-md border-ynsRed capitalize shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-indigo-600 dark:focus:ring-indigo-600"
+        class="mt-1 block w-full rounded-md border-yns_red capitalize shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-indigo-600 dark:focus:ring-indigo-600"
         autofocus autocomplete="role">
         @foreach ($roles as $role)
           <option value="{{ $role->id }}" {{ $userRole->first()->id == $role->id ? 'selected' : '' }}>
@@ -53,7 +53,7 @@
 
     <div class="flex items-center gap-4">
       <button type="submit"
-        class="mt-8 rounded-lg border border-white bg-white px-4 py-2 font-heading font-bold text-black transition duration-150 ease-in-out hover:border-ynsYellow hover:text-ynsYellow">Save</button>
+        class="hover:border-yns_yellow hover:text-yns_yellow mt-8 rounded-lg border border-white bg-white px-4 py-2 font-heading font-bold text-black transition duration-150 ease-in-out">Save</button>
       @if (session('status') === 'profile-updated')
         <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
           class="text-sm text-gray-600 dark:text-gray-400">{{ __('Saved.') }}</p>

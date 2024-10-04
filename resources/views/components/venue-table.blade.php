@@ -112,7 +112,7 @@
           </div>
         </div>
         <div class="search-bar flex items-center justify-end rounded border border-white">
-          <input class="search flex w-full justify-center bg-opacBlack font-sans text-xl text-white" type="search"
+          <input class="search flex w-full justify-center bg-opac_black font-sans text-xl text-white" type="search"
             id="address-input" name="search_query" placeholder="Search..." value="{{ $searchQuery ?? '' }}" />
         </div>
       </form>
@@ -141,6 +141,6 @@
   </div>
 </div>
 <!-- Pagination links -->
-<div class="mt-4 bg-ynsDarkGray px-yns22 py-6">
+<div class="mt-4 bg-yns_dark_gray px-yns22 py-6">
   {{ $venues->links() }}
 </div>

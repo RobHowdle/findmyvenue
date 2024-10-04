@@ -5,8 +5,8 @@
 
   <div class="mx-auto w-full max-w-screen-2xl py-16">
     <div class="relative mb-8 shadow-md sm:rounded-lg">
-      <div class="min-w-screen-xl mx-auto max-w-screen-xl rounded-lg bg-ynsDarkGray text-white">
-        <div class="rounded-l-lg bg-ynsDarkBlue px-8 py-8">
+      <div class="min-w-screen-xl mx-auto max-w-screen-xl rounded-lg bg-yns_dark_gray text-white">
+        <div class="bg-yns_dark_blue rounded-l-lg px-8 py-8">
           <div class="mb-8 flex flex-col justify-between text-white">
             <form id="finances-form" action="{{ route('promoter.dashboard.finances.update', $finance->id) }}"
               method="POST">
@@ -107,7 +107,7 @@
               </div>
 
               <button id="add-income-row"
-                class="mt-8 rounded-lg border border-white bg-white px-4 py-2 font-heading text-black transition duration-150 ease-in-out hover:border-ynsYellow hover:text-ynsYellow">Add
+                class="mt-8 rounded-lg border border-white bg-white px-4 py-2 font-heading text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">Add
                 Row <span class="fas fa-plus"></span></button>
 
               <p class="my-4 text-xl font-bold">Outgoings</p>
@@ -157,7 +157,7 @@
               </div>
 
               <button id="add-outgoing-row"
-                class="mt-8 rounded-lg border border-white bg-white px-4 py-2 font-heading text-black transition duration-150 ease-in-out hover:border-ynsYellow hover:text-ynsYellow">Add
+                class="mt-8 rounded-lg border border-white bg-white px-4 py-2 font-heading text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">Add
                 Row <span class="fas fa-plus"></span></button>
 
               <div class="grid grid-cols-3 px-8 py-8">
@@ -189,7 +189,7 @@
               </div>
 
               <button type="submit"
-                class="mt-8 flex w-full justify-center rounded-lg border border-ynsCyan bg-ynsCyan px-4 py-2 font-heading text-xl text-black transition duration-150 ease-in-out hover:border-ynsYellow hover:text-ynsYellow">Save</button>
+                class="mt-8 flex w-full justify-center rounded-lg border border-yns_cyan bg-yns_cyan px-4 py-2 font-heading text-xl text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">Save</button>
             </form>
           </div>
         </div>
@@ -277,7 +277,7 @@
             <x-input-label-dark>Other Income</x-input-label-dark>
             <x-number-input-pound class="income_other" name="other_income[${incomeCount}]"></x-number-input-pound>
         </div>
-        <button class="remove-other-income-row rounded-lg h-10 bg-ynsDarkOrange px-4 py-2 font-heading text-black border border-ynsDarkOrange hover:text-white hover:border-white transition duration-150 ease-in-out">Remove <span class="fas fa-minus"></span></button>
+        <button class="remove-other-income-row rounded-lg h-10 bg-yns_dark_orange px-4 py-2 font-heading text-black border border-yns_dark_orange hover:text-white hover:border-white transition duration-150 ease-in-out">Remove <span class="fas fa-minus"></span></button>
       `;
       incomeCount++; // Increment the counter
       this.parentNode.insertBefore(newRow, this);
@@ -297,7 +297,7 @@
             <x-input-label-dark>Other Outgoing</x-input-label-dark>
             <x-number-input-pound class="outgoing_other" name="other_outgoing[${outgoingCount}]"></x-number-input-pound>
         </div>
-        <button class="remove-other-outgoing-row rounded-lg h-10 bg-ynsDarkOrange px-4 py-2 font-heading text-black border border-ynsDarkOrange hover:text-white hover:border-white transition duration-150 ease-in-out">Remove <span class="fas fa-minus"></span></button>
+        <button class="remove-other-outgoing-row rounded-lg h-10 bg-yns_dark_orange px-4 py-2 font-heading text-black border border-yns_dark_orange hover:text-white hover:border-white transition duration-150 ease-in-out">Remove <span class="fas fa-minus"></span></button>
       `;
       outgoingCount++; // Increment the counter
       this.parentNode.insertBefore(newRow, this);

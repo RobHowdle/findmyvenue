@@ -6,7 +6,7 @@
   </x-slot>
   <div class="mx-auto w-full max-w-screen-2xl py-16">
     <div class="relative shadow-md sm:rounded-lg">
-      <div class="min-w-screen-xl mx-auto max-w-screen-xl bg-opac8Black px-16 py-12 text-white">
+      <div class="min-w-screen-xl mx-auto max-w-screen-xl bg-opac_8_black px-16 py-12 text-white">
         <div class="header flex gap-4">
           @if ($singleService->logo_url)
             <img src="{{ asset($singleService->logo_url) }}" alt="{{ $singleService->name }} Logo" class="_250img">
@@ -31,7 +31,7 @@
             </div>
             <div class="leave-review">
               <button
-                class="rounded bg-gradient-to-t from-ynsDarkOrange to-ynsYellow px-6 py-2 text-sm text-black hover:bg-ynsYellow"
+                class="from-yns_dark_orange rounded bg-gradient-to-t to-yns_yellow px-6 py-2 text-sm text-black hover:bg-yns_yellow"
                 data-modal-toggle="review-modal" type="button">Leave a review</button>
             </div>
 
@@ -45,31 +45,31 @@
                 class="flex flex-wrap justify-between border-b border-gray-200 text-center text-sm font-medium text-gray-500 dark:border-gray-700 dark:text-gray-400">
                 <li class="tab me-2 pl-0">
                   <a href="#" data-tab="about"
-                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
+                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
                     <span class="fas fa-info-circle mr-2"></span>About
                   </a>
                 </li>
                 <li class="tab me-2">
                   <a href="#" data-tab="members"
-                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
+                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
                     <span class="fas fa-cog mr-2"></span>Members
                   </a>
                 </li>
                 <li class="tab me-2">
                   <a href="#" data-tab="music"
-                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
+                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
                     <span class="fas fa-cog mr-2"></span>Music
                   </a>
                 </li>
                 <li class="tab me-2">
                   <a href="#" data-tab="reviews"
-                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
+                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
                     <span class="fas fa-star mr-2"></span> Reviews
                   </a>
                 </li>
                 <li class="tab me-2">
                   <a href="#" data-tab="socials"
-                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
+                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
                     <span class="fas fa-plus mr-2"></span> Socials
                   </a>
                 </li>
@@ -84,25 +84,25 @@
                 class="flex flex-wrap justify-between border-b border-gray-200 text-center text-sm font-medium text-gray-500 dark:border-gray-700 dark:text-gray-400">
                 <li class="tab me-2 pl-0">
                   <a href="#" data-tab="overview"
-                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
+                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
                     <span class="fas fa-info-circle mr-2"></span>Overview
                   </a>
                 </li>
                 <li class="tab me-2">
                   <a href="#" data-tab="services"
-                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
+                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
                     <span class="fas fa-cog mr-2"></span>Services
                   </a>
                 </li>
                 <li class="tab me-2">
                   <a href="#" data-tab="reviews"
-                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
+                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
                     <span class="fas fa-star mr-2"></span> Reviews
                   </a>
                 </li>
                 <li class="tab me-2">
                   <a href="#" data-tab="socials"
-                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
+                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
                     <span class="fas fa-plus mr-2"></span> Socials
                   </a>
                 </li>
@@ -196,7 +196,7 @@
                   class="streaming-platforms grid-cols-{{ $linkCount }} grid place-items-center items-center gap-4">
                   @foreach ($otherLinks as $link)
                     <a href="{{ $link->url }}" target="_blank"
-                      class="streaming-platforms transition hover:bg-ynsYellow" rel="noopener noreferrer">
+                      class="streaming-platforms transition hover:bg-yns_yellow" rel="noopener noreferrer">
                       <img src="{{ asset('storage/images/system/streaming/' . strtolower($link->host) . '.png') }}"
                         alt="{{ $link->host }} Streaming Link" class="streaming-platform-logo">
                     </a>
@@ -244,32 +244,32 @@
                 @if ($singleService->platforms)
                   @foreach ($singleService->platforms as $platform)
                     @if ($platform['platform'] == 'facebook')
-                      <a class="mb-4 mr-2 flex items-center hover:text-ynsYellow" href="{{ $platform['url'] }}"
+                      <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
                         <span class="fab fa-facebook mr-4 h-10"></span> {{ $platform['url'] }}
                       </a>
                     @elseif($platform['platform'] == 'twitter')
-                      <a class="mb-4 mr-2 flex items-center hover:text-ynsYellow" href="{{ $platform['url'] }}"
+                      <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
                         <span class="fab fa-twitter mr-4 h-10"></span> {{ $platform['url'] }}
                       </a>
                     @elseif($platform['platform'] == 'instagram')
-                      <a class="mb-4 mr-2 flex items-center hover:text-ynsYellow" href="{{ $platform['url'] }}"
+                      <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
                         <span class="fab fa-instagram mr-4 h-10"></span> {{ $platform['url'] }}
                       </a>
                     @elseif($platform['platform'] == 'snapchat')
-                      <a class="mb-4 mr-2 flex items-center hover:text-ynsYellow" href="{{ $platform['url'] }}"
+                      <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
                         <span class="fab fa-snapchat-ghost mr-4 h-10"></span> {{ $platform['url'] }}
                       </a>
                     @elseif($platform['platform'] == 'tiktok')
-                      <a class="mb-4 mr-2 flex items-center hover:text-ynsYellow" href="{{ $platform['url'] }}"
+                      <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
                         <span class="fab fa-tiktok mr-4 h-10"></span> {{ $platform['url'] }}
                       </a>
                     @elseif($platform['platform'] == 'youtube')
-                      <a class="mb-4 mr-2 flex items-center hover:text-ynsYellow" href="{{ $platform['url'] }}"
+                      <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
                         <span class="fab fa-youtube mr-4 h-10"></span> {{ $platform['url'] }}
                       </a>
@@ -308,12 +308,12 @@
                     </div>
                   @endforeach
                   <p class="mt-4">All services are subject to location and travel costs. Please <a
-                      class="underline hover:text-ynsYellow"
+                      class="underline hover:text-yns_yellow"
                       href="mailto:{{ $singleService->contact_email }}">contact
                       us</a> with any
                     queries.</p>
                   @if ($singleService->portfolio_link)
-                    <p class="mt-2">You can view our portfolio by <a class="underline hover:text-ynsYellow"
+                    <p class="mt-2">You can view our portfolio by <a class="underline hover:text-yns_yellow"
                         href="{{ $singleService->portfolio_link }}" target="_blank">clicking here.</a></p>
                   @endif
                 @else
@@ -361,32 +361,32 @@
                 @if ($singleService->platforms)
                   @foreach ($singleService->platforms as $platform)
                     @if ($platform['platform'] == 'facebook')
-                      <a class="mb-4 mr-2 flex items-center hover:text-ynsYellow" href="{{ $platform['url'] }}"
+                      <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
                         <span class="fab fa-facebook mr-4 h-10"></span> {{ $platform['url'] }}
                       </a>
                     @elseif($platform['platform'] == 'twitter')
-                      <a class="mb-4 mr-2 flex items-center hover:text-ynsYellow" href="{{ $platform['url'] }}"
+                      <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
                         <span class="fab fa-twitter mr-4 h-10"></span> {{ $platform['url'] }}
                       </a>
                     @elseif($platform['platform'] == 'instagram')
-                      <a class="mb-4 mr-2 flex items-center hover:text-ynsYellow" href="{{ $platform['url'] }}"
+                      <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
                         <span class="fab fa-instagram mr-4 h-10"></span> {{ $platform['url'] }}
                       </a>
                     @elseif($platform['platform'] == 'snapchat')
-                      <a class="mb-4 mr-2 flex items-center hover:text-ynsYellow" href="{{ $platform['url'] }}"
+                      <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
                         <span class="fab fa-snapchat-ghost mr-4 h-10"></span> {{ $platform['url'] }}
                       </a>
                     @elseif($platform['platform'] == 'tiktok')
-                      <a class="mb-4 mr-2 flex items-center hover:text-ynsYellow" href="{{ $platform['url'] }}"
+                      <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
                         <span class="fab fa-tiktok mr-4 h-10"></span> {{ $platform['url'] }}
                       </a>
                     @elseif($platform['platform'] == 'youtube')
-                      <a class="mb-4 mr-2 flex items-center hover:text-ynsYellow" href="{{ $platform['url'] }}"
+                      <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
                         <span class="fab fa-youtube mr-4 h-10"></span> {{ $platform['url'] }}
                       </a>

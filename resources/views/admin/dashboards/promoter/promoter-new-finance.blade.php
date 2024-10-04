@@ -6,7 +6,7 @@
   <div class="mx-auto w-full max-w-screen-2xl py-16">
     <div class="relative mb-8 shadow-md sm:rounded-lg">
       <div class="grid grid-cols-[1.75fr_1.25fr] rounded-lg border border-white">
-        <div class="rounded-l-lg border-r border-r-white bg-ynsDarkGray px-8 py-8">
+        <div class="rounded-l-lg border-r border-r-white bg-yns_dark_gray px-8 py-8">
           <p class="mb-10 text-4xl font-bold text-white">New Budget</p>
           <form id="finances-form" method="POST">
             @csrf
@@ -73,7 +73,7 @@
             </div>
 
             <button id="add-income-row"
-              class="mt-8 rounded-lg border border-white bg-white px-4 py-2 font-heading text-black transition duration-150 ease-in-out hover:border-ynsYellow hover:text-ynsYellow">Add
+              class="mt-8 rounded-lg border border-white bg-white px-4 py-2 font-heading text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">Add
               Row <span class="fas fa-plus"></span></button>
 
             <p class="my-4 text-xl font-bold">Outgoings</p>
@@ -112,16 +112,16 @@
             </div>
 
             <button id="add-outgoing-row"
-              class="mt-8 rounded-lg border border-white bg-white px-4 py-2 font-heading text-black transition duration-150 ease-in-out hover:border-ynsYellow hover:text-ynsYellow">Add
+              class="mt-8 rounded-lg border border-white bg-white px-4 py-2 font-heading text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">Add
               Row
               <span class="fas fa-plus"></span></button>
             <button type="submit"
-              class="mt-8 flex w-full justify-center rounded-lg border border-ynsCyan bg-ynsCyan px-4 py-2 font-heading text-xl text-black transition duration-150 ease-in-out hover:border-ynsYellow hover:text-ynsYellow">Save</button>
+              class="mt-8 flex w-full justify-center rounded-lg border border-yns_cyan bg-yns_cyan px-4 py-2 font-heading text-xl text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">Save</button>
           </form>
         </div>
-        <div class="bg-ynsDarkBlue px-8 py-8">
+        <div class="bg-yns_dark_blue px-8 py-8">
           <p class="mb-6 text-4xl font-bold text-white">Preview</p>
-          <div class="border-b-2 border-b-ynsLightGray">
+          <div class="border-b-2 border-b-yns_light_gray">
             <p class="py-4 font-heading text-xl font-bold">Incoming</p>
             <p>Presale Tickets: <span id="preview_income_presale"></span></p>
             <p>On The Door Tickets: <span id="preview_income_otd"></span></p>
@@ -140,7 +140,7 @@
           <p class="mt-4 text-lg"><span id="desired_profit_remaining" name="desired_profit_remaining"></span></p>
 
           <button
-            class="mt-8 rounded-lg border border-white bg-white px-4 py-2 font-heading text-black transition duration-150 ease-in-out hover:border-ynsYellow hover:text-ynsYellow">Export
+            class="mt-8 rounded-lg border border-white bg-white px-4 py-2 font-heading text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">Export
             To PDF <span class="fas fa-file-export"></span></button>
         </div>
       </div>
@@ -227,7 +227,7 @@
             <x-input-label-dark>Other Income</x-input-label-dark>
             <x-number-input-pound class="income_other" name="income_other"></x-number-input-pound>
         </div>
-        <button class="remove-other-income-row rounded-lg h-10 bg-ynsDarkOrange px-4 py-2 font-heading text-black border border-ynsDarkOrange hover:text-white hover:border-white transition duration-150 ease-in-out">Remove <span class="fas fa-minus"></span></button>
+        <button class="remove-other-income-row rounded-lg h-10 bg-yns_dark_orange px-4 py-2 font-heading text-black border border-yns_dark_orange hover:text-white hover:border-white transition duration-150 ease-in-out">Remove <span class="fas fa-minus"></span></button>
       `;
       this.parentNode.insertBefore(newRow, this);
       newRow.querySelector('.remove-other-income-row').addEventListener('click', function() {
@@ -246,7 +246,7 @@
               <x-input-label-dark>Other Outgoing</x-input-label-dark>
               <x-number-input-pound class="outgoing_other" name="outgoing_other"></x-number-input-pound>
           </div>
-          <button class="remove-other-outgoing-row rounded-lg h-10 bg-ynsDarkOrange px-4 py-2 font-heading text-black border border-ynsDarkOrange hover:text-white hover:border-white transition duration-150 ease-in-out">Remove <span class="fas fa-minus"></span></button>
+          <button class="remove-other-outgoing-row rounded-lg h-10 bg-yns_dark_orange px-4 py-2 font-heading text-black border border-yns_dark_orange hover:text-white hover:border-white transition duration-150 ease-in-out">Remove <span class="fas fa-minus"></span></button>
       `;
       this.parentNode.insertBefore(newRow, this);
       newRow.querySelector('.remove-other-outgoing-row').addEventListener('click', function() {

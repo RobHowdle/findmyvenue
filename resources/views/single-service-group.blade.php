@@ -119,7 +119,7 @@
             </div>
           </div>
           <div class="search-bar flex items-center justify-end rounded border border-white">
-            <input class="search flex w-full justify-center bg-opacBlack font-sans text-xl text-white" type="search"
+            <input class="search flex w-full justify-center bg-opac_black font-sans text-xl text-white" type="search"
               id="address-input" name="search_query" placeholder="Search..." value="{{ $searchQuery ?? '' }}" />
           </div>
         </form>
@@ -146,7 +146,7 @@
                 <th scope="row"
                   class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
                   <a href="{{ route('singleService', ['serviceName' => $service->services, 'serviceId' => $service->id]) }}"
-                    class="hover:text-ynsYellow">{{ $service->name }}</a>
+                    class="hover:text-yns_yellow">{{ $service->name }}</a>
                 </th>
                 <td class="rating-wrapper flex whitespace-nowrap sm:py-3 sm:text-base md:py-2 lg:py-4">
                   {!! $overallReviews[$service->id] !!}
@@ -159,32 +159,32 @@
                 <td
                   class="flex gap-4 whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
                   @if ($service->contact_number)
-                    <a class="hover:text-ynsYellow" href="tel:{{ $service->contact_number }}"><span
+                    <a class="hover:text-yns_yellow" href="tel:{{ $service->contact_number }}"><span
                         class="fas fa-phone"></span></a>
                   @endif
                   @if ($service->contact_email)
-                    <a class="hover:text-ynsYellow" href="mailto:{{ $service->contact_email }}"><span
+                    <a class="hover:text-yns_yellow" href="mailto:{{ $service->contact_email }}"><span
                         class="fas fa-envelope"></span></a>
                   @endif
                   @if ($service->platforms)
                     @foreach ($service->platforms as $platform)
                       @if ($platform['platform'] == 'facebook')
-                        <a class="mr-2 hover:text-ynsYellow" href="{{ $platform['url'] }}" target=_blank><span
+                        <a class="hover:text-yns_yellow mr-2" href="{{ $platform['url'] }}" target=_blank><span
                             class="fab fa-facebook"></span></a>
                       @elseif($platform['platform'] == 'twitter')
-                        <a class="mr-2 hover:text-ynsYellow" href="{{ $platform['url'] }}" target=_blank><span
+                        <a class="hover:text-yns_yellow mr-2" href="{{ $platform['url'] }}" target=_blank><span
                             class="fab fa-twitter"></span></a>
                       @elseif($platform['platform'] == 'instagram')
-                        <a class="mr-2 hover:text-ynsYellow" href="{{ $platform['url'] }}" target=_blank><span
+                        <a class="hover:text-yns_yellow mr-2" href="{{ $platform['url'] }}" target=_blank><span
                             class="fab fa-instagram"></span></a>
                       @elseif($platform['platform'] == 'snapchat')
-                        <a class="mr-2 hover:text-ynsYellow" href="{{ $platform['url'] }}" target=_blank><span
+                        <a class="hover:text-yns_yellow mr-2" href="{{ $platform['url'] }}" target=_blank><span
                             class="fab fa-snapchat-ghost"></span></a>
                       @elseif($platform['platform'] == 'tiktok')
-                        <a class="mr-2 hover:text-ynsYellow" href="{{ $platform['url'] }}" target=_blank><span
+                        <a class="hover:text-yns_yellow mr-2" href="{{ $platform['url'] }}" target=_blank><span
                             class="fab fa-tiktok"></span></a>
                       @elseif($platform['platform'] == 'youtube')
-                        <a class="mr-2 hover:text-ynsYellow" href="{{ $platform['url'] }}" target=_blank><span
+                        <a class="hover:text-yns_yellow mr-2" href="{{ $platform['url'] }}" target=_blank><span
                             class="fab fa-youtube"></span></a>
                       @endif
                     @endforeach

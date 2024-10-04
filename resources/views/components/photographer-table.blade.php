@@ -112,7 +112,7 @@
           </div>
         </div>
         <div class="search-bar flex items-center justify-end rounded border-2 border-white">
-          <input class="search flex w-full justify-center bg-opacBlack font-sans text-xl text-white" type="search"
+          <input class="search bg-opac_black flex w-full justify-center font-sans text-xl text-white" type="search"
             id="address-input" name="search_query" placeholder="Search..." value="{{ $searchQuery ?? '' }}" />
         </div>
       </form>

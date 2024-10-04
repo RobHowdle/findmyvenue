@@ -12,7 +12,7 @@
 }
 
 [type="checkbox"]:checked {
-    background-color: theme("colors.ynsCyan");
+    background-color: theme("colors.yns_cyan");
 }
 
 /* Preloader */
@@ -165,8 +165,8 @@
 }
 
 .active {
-    color: theme("colors.ynsYellow");
-    border-bottom-color: theme("colors.ynsYellow");
+    color: theme("colors.yns_yellow");
+    border-bottom-color: theme("colors.yns_yellow");
     border-bottom-width: 2px;
 }
 
@@ -179,14 +179,6 @@
 .note-editor.note-frame {
     padding-top: 3rem;
     color: var(--color-white);
-}
-
-body {
-    background-image: url("/public/images/hero-bg.jpg");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: cover;
-    background-attachment: fixed;
 }
 
 .search {

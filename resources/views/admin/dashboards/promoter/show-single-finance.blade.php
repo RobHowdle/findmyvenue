@@ -5,20 +5,20 @@
 
   <div class="mx-auto w-full max-w-screen-2xl py-16">
     <div class="relative mb-8 shadow-md sm:rounded-lg">
-      <div class="min-w-screen-xl mx-auto max-w-screen-xl rounded-lg bg-ynsDarkGray text-white">
-        <div class="rounded-l-lg bg-ynsDarkBlue px-8 py-8">
+      <div class="min-w-screen-xl mx-auto max-w-screen-xl rounded-lg bg-yns_dark_gray text-white">
+        <div class="bg-yns_dark_blue rounded-l-lg px-8 py-8">
           <div class="mb-8 flex flex-col justify-between text-white">
             <div class="mb-8 flex flex-row items-center justify-between">
               <p class="font-heading text-3xl font-bold">Finance Record: #{{ $finance->id }}</p>
               <div class="group flex gap-4">
                 <a href="{{ route('promoter.dashboard.finances.edit', $finance->id) }}"
-                  class="rounded-lg border bg-white px-4 py-2 font-bold text-black transition duration-150 ease-in-out hover:border-ynsYellow hover:text-ynsYellow">Edit<span
+                  class="rounded-lg border bg-white px-4 py-2 font-bold text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">Edit<span
                     class="fas fa-edit ml-2"></span></a>
                 <form action="{{ route('promoter.dashboard.finances.exportSingleFinanceRecord', $finance->id) }}"
                   method="POST">
                   @csrf
                   <button type="submit"
-                    class="rounded-lg border bg-white px-4 py-2 font-bold text-black transition duration-150 ease-in-out hover:border-ynsYellow hover:text-ynsYellow">Export<span
+                    class="rounded-lg border bg-white px-4 py-2 font-bold text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">Export<span
                       class="fas fa-file-download ml-2"></span></button>
                 </form>
               </div>

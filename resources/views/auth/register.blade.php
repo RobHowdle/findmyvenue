@@ -40,7 +40,7 @@
           <div class="mt-4">
             <x-input-label for="role" :value="__('Select User Role')" />
             <select id="role" name="role"
-              class="mt-1 block w-full rounded-md border-ynsRed shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-indigo-600 dark:focus:ring-indigo-600"
+              class="mt-1 block w-full rounded-md border-yns_red shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-indigo-600 dark:focus:ring-indigo-600"
               required autofocus autocomplete="role">
               @foreach ($roles as $role)
                 <option value="{{ $role->id }}">{{ $role->name }}</option>
@@ -55,7 +55,7 @@
               {{ __('Already registered?') }}
             </a>
 
-            <x-primary-button class="ms-4 bg-gradient-to-t from-ynsDarkOrange to-ynsYellow text-white">
+            <x-primary-button class="from-yns_dark_orange ms-4 bg-gradient-to-t to-yns_yellow text-white">
               {{ __('Register') }}
             </x-primary-button>
           </div>

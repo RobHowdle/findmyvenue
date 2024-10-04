@@ -25,7 +25,7 @@
           <div class="mt-4 block">
             <label for="remember_me" class="inline-flex items-center">
               <input id="remember_me" type="checkbox"
-                class="rounded border-ynsRed shadow-sm focus:ring-indigo-500 dark:bg-gray-900 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800"
+                class="rounded border-yns_red shadow-sm focus:ring-indigo-500 dark:bg-gray-900 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800"
                 name="remember">
               <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
             </label>
@@ -39,7 +39,7 @@
               </a>
             @endif
 
-            <x-primary-button class="ms-3 bg-gradient-to-t from-ynsDarkOrange to-ynsYellow text-white">
+            <x-primary-button class="from-yns_dark_orange ms-3 bg-gradient-to-t to-yns_yellow text-white">
               {{ __('Log in') }}
             </x-primary-button>
           </div>

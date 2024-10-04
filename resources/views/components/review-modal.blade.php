@@ -5,7 +5,7 @@
         <h3 class="text-xl font-semibold">
           Leave a review
         </h3>
-        <button type="button" data-modal-hide="review-modal" class="text-white hover:text-ynsLightGray">
+        <button type="button" data-modal-hide="review-modal" class="text-white hover:text-yns_light_gray">
           <span class="fas fa-times"></span>
           <span class="sr-only">Close modal</span>
         </button>
@@ -37,7 +37,7 @@
             <x-textarea-input name="review_message" id="review_message" class="mt-1 block w-full" required required />
           </div>
           <button type="submit"
-            class="mt-4 rounded bg-gradient-to-t from-ynsDarkOrange to-ynsYellow px-6 py-2 text-white">Submit
+            class="from-yns_dark_orange mt-4 rounded bg-gradient-to-t to-yns_yellow px-6 py-2 text-white">Submit
             Review</button>
         </form>
       </div>

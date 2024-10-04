@@ -23,7 +23,9 @@
   @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans antialiased">
+<body class="relative font-sans antialiased">
+  <div class="absolute inset-0 bg-cover bg-fixed bg-center bg-no-repeat"
+    style="background-image: url('{{ asset('storage/images/system/hero-bg.jpg') }}'); z-index: -1;"></div>
   <div id="preloader" class="animation">
     <div class="decor">
       <div class="bar"></div>
@@ -34,8 +36,8 @@
   <div class="pre-overlay o-1"></div>
   <div class="pre-overlay o-2"></div>
   @if (Route::has('login'))
-    <nav class="border-gray-200 bg-white dark:bg-gray-900">
-      <div class="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between px-2 py-4 md:px-4 md:py-8">
+    <nav class="fixed z-10 w-full bg-yns_dark_blue">
+      <div class="mx-auto flex max-w-screen-2xl flex-wrap items-center justify-between px-2 py-4 md:px-4 md:py-8">
         <a href="{{ url('/') }}" class="flex items-center space-x-3 rtl:space-x-reverse">
           <img src="{{ asset('images/yns_logo.png') }}" class="h-16" alt="{{ config('app.name', 'Laravel') }} Logo" />
           <span
@@ -55,25 +57,25 @@
             class="mt-4 flex flex-col rounded-lg border border-gray-100 bg-gray-50 p-4 font-medium rtl:space-x-reverse dark:border-gray-700 dark:bg-gray-800 md:mt-0 md:flex-row md:space-x-8 md:border-0 md:bg-white md:p-0 md:dark:bg-gray-900">
             <li>
               <a href="{{ url('/venues') }}"
-                class="{{ request()->is('venues*') ? 'dark:text-ynsYellow' : '' }} font-heading text-2xl font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-ynsYellow">Venues</a>
+                class="{{ request()->is('venues*') ? 'dark:text-yns_yellow' : '' }} font-heading text-2xl font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Venues</a>
             </li>
             <li>
               <a href="{{ url('/promoters') }}"
-                class="{{ request()->is('promoters*') ? 'dark:text-ynsYellow' : '' }} font-heading text-2xl font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-ynsYellow">Promoters</a>
+                class="{{ request()->is('promoters*') ? 'dark:text-yns_yellow' : '' }} font-heading text-2xl font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Promoters</a>
             </li>
             <li>
               <a href="{{ url('/other') }}"
-                class="{{ request()->is('other*') ? 'dark:text-ynsYellow' : '' }} font-heading text-2xl font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-ynsYellow">Other</a>
+                class="{{ request()->is('other*') ? 'dark:text-yns_yellow' : '' }} font-heading text-2xl font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Other</a>
             </li>
             @auth
               <li>
                 <a href="{{ url('/dashboard') }}"
-                  class="font-heading text-2xl font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-ynsYellow">Dashboard</a>
+                  class="font-heading text-2xl font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Dashboard</a>
               </li>
             @else
               <li>
                 <a href="{{ url('/login') }}"
-                  class="font-heading text-2xl font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-ynsYellow">Login</a>
+                  class="font-heading text-2xl font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Login</a>
               </li>
             @endauth
           </ul>
@@ -81,8 +83,51 @@
       </div>
     </nav>
   @endif
-  <div class="flex h-[calc(100vh-128px)] w-full items-center justify-center px-2 backdrop-brightness-50">
-    {{ $slot }}
+  <div class="flex min-h-screen flex-col">
+    <div class="flex-grow">
+      {{ $slot }}
+    </div>
+
+    <footer class="w-full text-white transition duration-150 ease-in-out hover:text-yns_yellow">
+      <div class="w-full bg-yns_dark_blue px-2 py-4">
+        <div class="mx-auto flex max-w-screen-2xl flex-wrap items-center justify-between">
+          <a href="{{ url('/') }}"
+            class="flex items-center space-x-3 transition duration-150 ease-in-out hover:text-yns_yellow rtl:space-x-reverse">
+            <img src="{{ asset('images/yns_logo.png') }}" class="h-16"
+              alt="{{ config('app.name', 'Laravel') }} Logo" />
+            <span
+              class="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">{{ config('app.name') }}</span>
+          </a>
+          <ul class="flex flex-row gap-2 font-heading">
+            <li>
+              <a href="#" class="text-white transition duration-150 ease-in-out hover:text-yns_yellow">About</a>
+            </li>
+            <li>
+              <a href="#" class="text-white transition duration-150 ease-in-out hover:text-yns_yellow">Credits</a>
+            </li>
+
+            <li>
+              <a href="#" class="text-white transition duration-150 ease-in-out hover:text-yns_yellow">Contact</a>
+            </li>
+          </ul>
+          <ul class="flex flex-col gap-2 font-heading">
+            <li>
+              <a href="#" class="text-white transition duration-150 ease-in-out hover:text-yns_yellow">Privacy
+                Policy</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="w-full bg-black px-2 py-2">
+        <div class="mx-auto flex max-w-screen-2xl flex-wrap items-center justify-between">
+          <a href="#" class="text-white transition duration-150 ease-in-out hover:text-yns_yellow">Privacy
+            Policy</a>
+          <p class="text-yns_med_gray">&copy; {{ env('APP_NAME') }} All Rights Reserved {{ date('Y') }}</p>
+          <a href="#" class="text-white transition duration-150 ease-in-out hover:text-yns_yellow">Terms &
+            Conditions</a>
+        </div>
+      </div>
+    </footer>
   </div>
   @stack('scripts')
   <script>
