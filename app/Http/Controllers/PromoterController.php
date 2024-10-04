@@ -159,7 +159,6 @@ class PromoterController extends Controller
         $promoter->recentReviews = $recentReviews->isNotEmpty() ? $recentReviews : null;
 
         $overallScore = PromoterReview::calculateOverallScore($id);
-        dd($overallScore);
         $overallReviews[$id] = $this->renderRatingIcons($overallScore);
 
         // Get Review Scores
