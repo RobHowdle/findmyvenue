@@ -11,6 +11,8 @@ class Greeting extends Component
 {
     public $greeting;
     public $userName;
+    public $promoterCompany;
+
     /**
      * Create a new component instance.
      */
@@ -29,6 +31,15 @@ class Greeting extends Component
         }
 
         $this->userName = Auth::check() ? Auth::user()->name : 'User';
+
+        // Retrieve the promoter company name
+        if (Auth::check()) {
+            // Get the user's promoter service if it exists
+            $promoter = Auth::user()->services()->where('pivot.serviceable_type', 'App\Models\Promoter')->first();
+            $this->promoterCompany = $promoter ? $promoter->name : null;  // Access the name attribute
+        } else {
+            $this->promoterCompany = null;  // Default to null if not authenticated
+        }
     }
 
     /**

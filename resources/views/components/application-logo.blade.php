@@ -1,1 +1,1 @@
-<img src="{{ asset('images/yns_logo.png') }}" alt="Your Next Show Logo" class="h-12">
+<img src="{{ asset('images/system/yns_logo.png') }}" alt="Your Next Show Logo" class="h-12">

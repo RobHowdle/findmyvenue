@@ -51,9 +51,21 @@ class User extends Authenticatable
         'last_logged_in',
     ];
 
-    public function services(): MorphToMany
+
+    public function services()
     {
-        return $this->morphedByMany(Serviceable::class, 'serviceable', 'service_user', 'user_id', 'serviceable_id')->whereNull('service_user.deleted_at');
+        // Get all associated promoters
+        $promoters = $this->morphedByMany(Promoter::class, 'serviceable', 'service_user', 'user_id', 'serviceable_id')
+            ->select('promoters.*', 'service_user.user_id as pivot_user_id', 'service_user.serviceable_id as pivot_serviceable_id', 'service_user.serviceable_type as pivot_serviceable_type')
+            ->get();
+
+        // Get all associated venues
+        $venues = $this->morphedByMany(Venue::class, 'serviceable', 'service_user', 'user_id', 'serviceable_id')
+            ->select('venues.*', 'service_user.user_id as pivot_user_id', 'service_user.serviceable_id as pivot_serviceable_id', 'service_user.serviceable_type as pivot_serviceable_type')
+            ->get();
+
+        // Combine both collections
+        return $promoters->merge($venues);
     }
 
     public function promoters(): MorphToMany

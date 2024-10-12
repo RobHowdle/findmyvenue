@@ -8,6 +8,7 @@ use App\Models\VenueExtraInfo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class Venue extends Model
 {
@@ -35,9 +36,9 @@ class Venue extends Model
         'additional_info'
     ];
 
-    public function users()
+    public function users(): MorphToMany
     {
-        return $this->morphToMany(User::class, 'serviceable');
+        return $this->morphToMany(User::class, 'serviceable', 'service_user', 'serviceable_id', 'user_id');
     }
 
     public function extraInfo()
@@ -47,7 +48,7 @@ class Venue extends Model
 
     public function promoters()
     {
-        return $this->belongsToMany(Promoter::class, 'promoter_venue_pivot', 'venues_id', 'promoters_id');
+        return $this->belongsToMany(Promoter::class, 'promoter_venue_pivot', 'promoters_id', 'venues_id');
     }
 
     public function review()
@@ -58,5 +59,10 @@ class Venue extends Model
     public function todos()
     {
         return $this->morphMany(Todo::class, 'serviceable');
+    }
+
+    public function events()
+    {
+        return $this->belongsToMany(Event::class, 'event_venue');
     }
 }

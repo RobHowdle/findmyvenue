@@ -6,7 +6,7 @@
   <div class="mx-auto w-full max-w-screen-2xl py-16">
     <div class="relative mb-8 shadow-md sm:rounded-lg">
       <div
-        class="min-w-screen-xl bg-yns_dark_gray mx-auto max-w-screen-xl rounded-lg px-16 py-12 text-center text-white">
+        class="min-w-screen-xl mx-auto max-w-screen-xl rounded-lg bg-yns_dark_gray px-16 py-12 text-center text-white">
         <x-greeting />
         <p class="mb-12 font-heading text-xl">This week you have:</p>
         <div class="grid grid-cols-4 items-center">
@@ -28,7 +28,7 @@
           <a href="#"
             class="flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-yns_yellow">
             <span class="fas fa-list mb-4 h-14 w-14"></span>
-            10 Todo Items
+            {{ $todoItemsCount }} Todo Item{{ $todoItemsCount > 1 ? 's' : '' }}
           </a>
         </div>
       </div>
@@ -36,10 +36,10 @@
 
     <div class="relative shadow-md sm:rounded-lg">
       <div
-        class="min-w-screen-xl bg-yns_dark_gray mx-auto max-w-screen-xl rounded-lg px-16 py-12 text-center text-white">
+        class="min-w-screen-xl mx-auto max-w-screen-xl rounded-lg bg-yns_dark_gray px-16 py-12 text-center text-white">
         <p class="mb-8 font-heading text-xl font-bold">Quick Links</p>
         <div class="grid grid-cols-5 items-center gap-y-12">
-          <a href="#"
+          <a href="{{ route('promoter.dashboard.users.new') }}"
             class="group flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-yns_yellow">
             <span
               class="fas fa-user mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-yns_yellow"></span>
@@ -76,7 +76,7 @@
               class="fas fa-user mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-yns_yellow"></span>
             Users
           </a>
-          <a href="#"
+          <a href="{{ route('admin.dashboard.promoter.show-events') }}"
             class="group flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-yns_yellow">
             <span
               class="fas fa-calendar-alt mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-yns_yellow"></span>

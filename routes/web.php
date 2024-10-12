@@ -61,6 +61,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/dashboard/promoter/todo-item/{id}/complete', [PromoterDashboardController::class, 'completeTodoItem'])->name('promoter.dashboard.complete-todo-item');
     Route::delete('/dashboard/promoter/todo-item/{id}', [PromoterDashboardController::class, 'deleteTodoItem'])->name('promoter.dashboard.delete-todo-item');
     Route::get('/dashboard/promoter/todo-item/completed-items', [PromoterDashboardController::class, 'showCompletedTodoItems'])->name('promoter.dashboard.completed-todo-items');
+    Route::get('/dashboard/promoter/search', [PromoterDashboardController::class, 'searchExistingPromoters'])->name('admin.dashboard.promoter.search');
+    Route::post('/dashboard/promoter/link', [PromoterDashboardController::class, 'linkToExistingPromoter'])->name('admin.dashboard.promoter.link');
+    Route::post('/dashboard/promoter/store', [PromoterDashboardController::class, 'storeNewPromoter'])->name('admin.dashboard.promoter.store');
+    Route::get('/dashboard/promoter/users/new-user', [PromoterDashboardController::class, 'newUser'])->name('promoter.dashboard.users.new');
+    Route::get('/dashboard/promoter/users/search-users', [PromoterDashboardController::class, 'searchUsers'])->name('admin.dashboard.promoter.search-users');
+    Route::post('/dashboard/promoter/users/add-user', [PromoterDashboardController::class, 'addUserToCompany'])->name('admin.dashboard.promoter.add-user-to-company');
+    Route::delete('/dashboard/promoter/delete-user', [PromoterDashboardController::class, 'deleteUserFromCompany'])->name('admin.dashboard.promoter.delete-user');
+    Route::get('/dashboard/promoter/events', [PromoterDashboardController::class, 'showPromoterEvents'])->name('admin.dashboard.promoter.show-events');
+    Route::get('/dashboard/promoter/events/create-event', [PromoterDashboardController::class, 'createNewPromoterEvent'])->name('admin.dashboard.promoter.create-new-event');
+    Route::get('/dashboard/promoter/events/search-venues', [PromoterDashboardController::class, 'eventSelectVenue'])->name('admin.dashboard.promoter.search-venues');
+    Route::post('/dashboard/promoter/events/store-event', [PromoterDashboardController::class, 'storeNewPromoterEvent'])->name('admin.dashboard.promoter.store-new-event');
+    Route::get('/dashboard/promoter/events/{id}', [PromoterDashboardController::class, 'showSinglePromoterEvent'])->name('admin.dashboard.promoter.show-single-event');
+    Route::delete('/dashboard/promoter/events/{id}', [PromoterDashboardController::class, 'deleteSinglePromoterEvent'])->name('admin.dashboard.promoter.delete-single-event');
+    Route::get('/dashboard/promoter/events/load-more-upcoming', [PromoterDashboardController::class, 'loadMoreUpcomingEvents'])->name('admin.dashboard.promoter.load-more-upcoming-events');
+    Route::get('/dashboard/promoter/events/load-more-past', [PromoterDashboardController::class, 'loadMorePastEvents'])->name('admin.dashboard.promoter.load-more-past-events');
 
 
 

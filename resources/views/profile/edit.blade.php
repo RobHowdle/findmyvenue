@@ -18,13 +18,22 @@
             <span class="relative z-10">User</span>
           </button>
 
-          <div class="mx-auto w-full max-w-md">
+          <div class="w-full">
             <button @click="open = !open"
               class="group relative w-full bg-yns_dark_gray px-8 py-2 text-left text-white transition duration-150 ease-in-out">
               <span
                 class="absolute inset-0 bg-gradient-button opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-100"></span>
-              <span class="relative z-10">Public Profile</span>
-            </button>
+              <span class="relative z-10 flex items-center justify-between">
+                <span>Public Profile</span>
+                <svg x-show="!open" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-200"
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+                <svg x-show="open" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-200"
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                </svg>
+              </span> </button>
 
             <div x-show="open" x-transition class="mt-4">
               <div class="flex flex-col items-start gap-4">
@@ -88,31 +97,26 @@
           </div>
         </div>
         <div x-show="selectedTab === 2" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
-          <div class="max-w-xl">
-            2
-            @include('profile.partials.edit-user-details', [
-                'userRole' => $userRole,
+          <div class="w-full">
+            @include('profile.partials.basic-information-form', [
                 'name' => $name,
+                'promoterName' => $promoterName,
             ]) </div>
         </div>
         <div x-show="selectedTab === 3" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
-          <div class="max-w-xl">
-            3
-            @include('profile.partials.edit-user-details', [
-                'userRole' => $userRole,
-                'name' => $name,
+          <div class="w-full">
+            @include('profile.partials.about-information', [
+                'about' => $about,
             ]) </div>
         </div>
         <div x-show="selectedTab === 4" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
-          <div class="max-w-xl">
-            4
-            @include('profile.partials.edit-user-details', [
-                'userRole' => $userRole,
-                'name' => $name,
+          <div class="w-full">
+            @include('profile.partials.my-venues-information', [
+                'myVenues' => $myVenues,
             ]) </div>
         </div>
         <div x-show="selectedTab === 5" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
-          <div class="max-w-xl">
+          <div class="w-full">
             5
             @include('profile.partials.edit-user-details', [
                 'userRole' => $userRole,
@@ -120,7 +124,7 @@
             ]) </div>
         </div>
         <div x-show="selectedTab === 6" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
-          <div class="max-w-xl">
+          <div class="w-full">
             6
             @include('profile.partials.edit-user-details', [
                 'userRole' => $userRole,
@@ -128,7 +132,7 @@
             ]) </div>
         </div>
         <div x-show="selectedTab === 7" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
-          <div class="max-w-xl">
+          <div class="w-full">
             7
             @include('profile.partials.edit-user-details', [
                 'userRole' => $userRole,

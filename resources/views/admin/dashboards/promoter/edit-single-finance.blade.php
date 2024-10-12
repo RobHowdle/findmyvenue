@@ -6,7 +6,7 @@
   <div class="mx-auto w-full max-w-screen-2xl py-16">
     <div class="relative mb-8 shadow-md sm:rounded-lg">
       <div class="min-w-screen-xl mx-auto max-w-screen-xl rounded-lg bg-yns_dark_gray text-white">
-        <div class="bg-yns_dark_blue rounded-l-lg px-8 py-8">
+        <div class="rounded-l-lg bg-yns_dark_blue px-8 py-8">
           <div class="mb-8 flex flex-col justify-between text-white">
             <form id="finances-form" action="{{ route('promoter.dashboard.finances.update', $finance->id) }}"
               method="POST">
@@ -23,7 +23,7 @@
                   <x-number-input-pound id="desired_profit" name="desired_profit"
                     value="{{ $finance->desired_profit }}"></x-number-input-pound>
                   @error('desired_profit')
-                    <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                    <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                   @enderror
                 </div>
               </div>
@@ -32,7 +32,7 @@
                   <x-input-label-dark>Budget Name</x-input-label-dark>
                   <x-text-input id="name" name="name" value="{{ $finance->name }}"></x-text-input>
                   @error('budget_name')
-                    <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                    <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                   @enderror
                 </div>
 
@@ -40,7 +40,7 @@
                   <x-input-label-dark>Date From</x-input-label-dark>
                   <x-date-input id="date_from" name="date_from" value="{{ $finance->date_from }}"></x-date-input>
                   @error('date_from')
-                    <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                    <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                   @enderror
                 </div>
 
@@ -48,7 +48,7 @@
                   <x-input-label-dark>Date To</x-input-label-dark>
                   <x-date-input id="date_to" name="date_to" value="{{ $finance->date_to }}"></x-date-input>
                   @error('date_to')
-                    <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                    <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                   @enderror
                 </div>
 
@@ -57,7 +57,7 @@
                   <x-text-input id="external_link" name="external_link"
                     value="{{ $finance->external_link }}"></x-text-input>
                   @error('link_to_event')
-                    <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                    <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                   @enderror
                 </div>
               </div>
@@ -84,7 +84,7 @@
                       value="{{ $incomingValues[$key] ?? 0 }}"></x-number-input-pound>
                   </div>
                   @error('incoming.' . $key)
-                    <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                    <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                   @enderror
                 @endforeach
               </div>
@@ -100,7 +100,7 @@
                     <x-number-input-pound id="other[{{ $index }}]" name="other[{{ $index }}]"
                       value="{{ $item['value'] ?? 0 }}"></x-number-input-pound>
                     @error('other.' . $index)
-                      <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                      <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                     @enderror
                   </div>
                 @endforeach
@@ -134,7 +134,7 @@
                       value="{{ $outgoingValues[$key] ?? 0 }}"></x-number-input-pound>
                   </div>
                   @error('outgoing.' . $key)
-                    <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                    <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                   @enderror
                 @endforeach
               </div>
@@ -150,7 +150,7 @@
                     <x-number-input-pound id="other[{{ $index }}]" name="other[{{ $index }}]"
                       value="{{ $item['value'] ?? 0 }}"></x-number-input-pound>
                     @error('other.' . $index)
-                      <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                      <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                     @enderror
                   </div>
                 @endforeach

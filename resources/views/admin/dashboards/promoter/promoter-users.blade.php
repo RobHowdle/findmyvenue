@@ -40,11 +40,11 @@
                   </td>
                   <td
                     class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
-                    //
+                    {{ ucfirst($user->pivot->role) }}
                   </td>
                   <td
                     class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
-                    //
+                    {{ $user->pivot->created_at->format('d-m-Y') }}
                   </td>
 
                   <td

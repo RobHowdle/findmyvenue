@@ -126,35 +126,39 @@ class PromoterController extends Controller
 
         $suggestions = app('suggestions', ['promoter' => $promoter]);
 
-        // Split the field containing multiple URLs into an array
         if ($promoter->contact_link) {
-            $urls = explode(',', $promoter->contact_link);
-            $platforms = [];
-        }
-
-        // // Check each URL against the platforms
-        foreach ($urls as $url) {
-            // Initialize the platform as unknown
-            $matchedPlatform = 'Unknown';
-
-            // Check if the URL contains platform names
-            $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
-            foreach ($platformsToCheck as $platform) {
-                if (stripos($url, $platform) !== false) {
-                    $matchedPlatform = $platform;
-                    break; // Stop checking once a platform is found
-                }
+            // Split the field containing multiple URLs into an array
+            if ($promoter->contact_link) {
+                $urls = explode(',', $promoter->contact_link);
+                $platforms = [];
             }
 
-            // Store the platform information for each URL
-            $platforms[] = [
-                'url' => $url,
-                'platform' => $matchedPlatform
-            ];
+
+            // Check each URL against the platforms
+            foreach ($urls as $url) {
+                // Initialize the platform as unknown
+                $matchedPlatform = 'Unknown';
+
+                // Check if the URL contains platform names
+                $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+                foreach ($platformsToCheck as $platform) {
+                    if (stripos($url, $platform) !== false) {
+                        $matchedPlatform = $platform;
+                        break; // Stop checking once a platform is found
+                    }
+                }
+
+                // Store the platform information for each URL
+                $platforms[] = [
+                    'url' => $url,
+                    'platform' => $matchedPlatform
+                ];
+            }
+
+            $promoter->platforms = $platforms;
         }
 
         // Add the processed data to the venue
-        $promoter->platforms = $platforms;
         $recentReviews = PromoterReview::getRecentReviewsForPromoter($id);
         $promoter->recentReviews = $recentReviews->isNotEmpty() ? $recentReviews : null;
 

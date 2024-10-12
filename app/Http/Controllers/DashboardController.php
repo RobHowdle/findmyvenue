@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Venue;
 use App\Models\UserService;
 use App\Models\VenueReview;
 use Illuminate\Http\Request;
@@ -13,18 +14,26 @@ use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user()->load(['roles', 'promoters']);
         $role = $user->roles->pluck('name');
         $roleName = !empty($role) ? $role[0] : null;
+        $venues = Venue::all();
 
         $promotionsCompany = $user->promoters()->first();
+
+        $genreList = file_get_contents(public_path('text/genre_list.json'));
+        $data = json_decode($genreList, true);
+        $genres = $data['genres'];
 
         switch ($roleName) {
             case 'promoter':
                 if (!$promotionsCompany) {
-                    return redirect()->route('welcome')->with('error', 'You need to be linked to a promotions company to access this dashboard.');
+                    return view('admin.dashboards.promoter.new-promoter-service', compact([
+                        'venues',
+                        'genres'
+                    ]));
                 }
                 return redirect()->route('promoter.dashboard');
             case 'artist':

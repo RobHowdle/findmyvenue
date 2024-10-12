@@ -4,7 +4,12 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use App\Models\Todo;
+use App\Models\User;
+use App\Models\Event;
+use App\Models\Venue;
 use App\Models\Finance;
+use App\Models\Promoter;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\PromoterReview;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -12,22 +17,393 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 
 class PromoterDashboardController extends Controller
 {
+    /**
+     * Checking if the user is linked to a promotions record
+     */
+    public function searchExistingPromoters(Request $request)
+    {
+        $query = $request->input('query');
+        $promoters = Promoter::where('name', 'LIKE', '%' . $query . '%')->get();
+
+        return response()->json([
+            'results' => $promoters,
+            'count' => $promoters->count()
+        ]);
+    }
+
+    public function linkToExistingPromoter(Request $request)
+    {
+        $serviceableId = $request->input('serviceable_id');
+        $serviceableType = 'App\Models\Promoter';
+
+        $user = auth()->user();
+        $promoter = Promoter::find($serviceableId);
+
+        if (!$promoter) {
+            return response()->json(['error' => 'Promoter not found'], 404);
+        }
+
+        $existingUsersCount = DB::table('service_user')
+            ->where('serviceable_id', $serviceableId)
+            ->where('serviceable_type', $serviceableType)
+            ->count();
+
+        DB::table('service_user')->insert([
+            'user_id' => $user->id,
+            'serviceable_id' => $serviceableId,
+            'serviceable_type' => $serviceableType,
+            'role' => ($existingUsersCount == 0) ? 'Owner' : 'Standard',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $user->load('roles');
+        $userRole = $user->roles->first();
+
+
+        if (!$userRole) {
+            return response()->json(['error' => 'User role not found'], 404);
+        }
+
+
+        return response()->json(['redirect_url' => route($userRole->name . '.dashboard'), 'message' => 'Successfully linked! Hold tight whilst we redirect you']);
+    }
+
+    /**
+     * Adding New User to promotion company
+     */
+    public function newUser()
+    {
+        $promoter = Auth::user()->promoters()->first();
+
+        return view('admin.dashboards.promoter.promoter-new-user', compact('promoter'));
+    }
+
+    public function searchUsers(Request $request)
+    {
+        $query = $request->input('query');
+
+        // Adjust this query to fit your database schema
+        $users = User::where('name', 'LIKE', "%{$query}%")
+            // ->orWhere('email', 'LIKE', "%{$query}%")
+            ->get();
+
+        $promoterId = Auth::user()->promoters()->first()->id;
+
+        $userLinks = DB::table('service_user')
+            ->where('serviceable_id', $promoterId)
+            ->where('serviceable_type', 'App\Models\Promoter')
+            ->pluck('user_id')
+            ->toArray();
+
+        // Add linked status to each user
+        $result = $users->map(function ($user) use ($userLinks) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'linked' => in_array($user->id, $userLinks),
+            ];
+        });
+
+        return response()->json($result);
+    }
+
+    public function addUserToCompany(Request $request)
+    {
+        $userId = $request->input('user_id');
+        $role = $request->input('role');
+        $promoterId = $request->input('promoter_id');
+
+        $validatedData = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'role' => 'required|string',
+            'promoter_id' => 'required|exists:promoters,id',
+        ]);
+
+        // Assuming you have a method to link the user to the promoter
+        DB::table('service_user')->insert([
+            'user_id' => $userId,
+            'serviceable_id' => $promoterId,
+            'serviceable_type' => 'App\Models\Promoter',
+            'role' => $role,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Return a success response with an appropriate HTTP status code
+        return response()->json(['message' => 'User successfully added to the promotion company.'], 200);
+    }
+
+    public function deleteUserFromCompany(Request $request)
+    {
+        $validatedData = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'promoter_id' => 'required|exists:promoters,id',
+        ]);
+
+        DB::table('service_user')
+            ->where('user_id', $validatedData['user_id'])
+            ->where('serviceable_id', $validatedData['promoter_id'])
+            ->update(['deleted_at' => now()]); // Soft delete
+
+        return response()->json(['message' => 'User successfully removed from the promotion company.']);
+    }
+
+    /**
+     * Events
+     */
+    public function showPromoterEvents()
+    {
+        $promoter = Auth::user()->promoters()->first();
+        $totalUpcomingCount = Event::where('event_date', '>', now())->count();
+        $totalPastCount = Event::where('event_date', '<=', now())->count();
+
+        $upcomingEvents = Event::where('event_date', '>', now())
+            ->orderBy('event_date', 'asc')
+            ->paginate(3);
+
+        $pastEvents = Event::where('event_date', '<=', now())
+            ->orderBy('event_date', 'desc')
+            ->paginate(3);
+
+        $showLoadMoreUpcoming = $upcomingEvents->count() === 3;
+        $hasMorePast = $totalPastCount > 3;
+
+        return view('admin.dashboards.promoter.promoter-events', compact('promoter', 'upcomingEvents', 'pastEvents', 'showLoadMoreUpcoming', 'hasMorePast'));
+    }
+
+    public function loadMoreUpcomingEvents(Request $request)
+    {
+        \Log::error('Load More Upcoming Events called.'); // Check if the method is hit
+
+        $currentPage = $request->input('page', 1);
+        $offset = ($currentPage - 1) * 3;
+        $upcomingEvents = Event::where('event_date', '>', now())
+            ->orderBy('event_date')
+            ->skip($offset)
+            ->take(3)
+            ->get();
+
+        \Log::error('Upcoming Events Count: ' . $upcomingEvents->count()); // Log the number of events returned
+
+
+        $hasMorePages = $upcomingEvents->count() === 3;
+
+        $html = '';
+        foreach ($upcomingEvents as $event) {
+            $html .= view('admin.dashboards.promoter.partials.event_card', ['event' => $event])->render();
+        }
+
+        $html = view('admin.dashboards.promoter.partials.event_card', ['event' => $event]);
+
+        return response()->json([
+            'html' => $html,
+            'hasMorePages' => $hasMorePages
+        ]);
+    }
+
+    public function loadMorePastEvents(Request $request)
+    {
+        $offset = $request->input('offset', 0);
+        $pastEvents = Event::where('event_date', '<=', now())
+            ->orderBy('event_date', 'desc')
+            ->skip($offset)
+            ->take(3)
+            ->get();
+
+        $html = '';
+        foreach ($pastEvents as $event) {
+            $html .= view('admin.dashboards.promoter.partials.event_card', ['event' => $event])->render();
+        }
+        return response()->json([
+            'html' => $html,
+            'hasMorePages' => $pastEvents->count() === 3
+        ]);
+    }
+
+    public function showSinglePromoterEvent($id)
+    {
+        $promoter = Auth::user()->promoters()->first();
+        $event = Event::with(['bands', 'promoters', 'venues'])->findOrFail($id);
+
+        $bandRolesArray = json_decode($event->band_ids, true);
+
+        $headliner = null;
+        $mainSupport = null;
+        $otherBands = [];
+        $opener = null;
+
+        $bandRoles = $event->bands()->get();
+
+        foreach ($bandRolesArray as $bandRole) {
+            $band = $bandRoles->firstWhere('id', $bandRole['band_id']);
+            if ($band) {
+                switch ($bandRole['role']) {
+                    case 'Headliner':
+                        $headliner = $band;
+                        break;
+                    case 'Main Support':
+                        $mainSupport = $band;
+                        break;
+                    case 'Band':
+                        $otherBands[] = $band;
+                        break;
+                    case 'Opener':
+                        $opener = $band;
+                        break;
+                }
+            }
+        }
+        return view('admin.dashboards.promoter.promoter-show-single-event', compact('promoter', 'event', 'headliner', 'mainSupport', 'otherBands', 'opener'));
+    }
+
+    public function createNewPromoterEvent()
+    {
+        $promoter = Auth::user()->promoters()->first();
+
+        return view('admin.dashboards.promoter.promoter-new-event', compact('promoter'));
+    }
+
+    public function storeNewPromoterEvent(Request $request)
+    {
+        $promoter = Auth::user()->promoters()->first();
+        \Log::info($request->all());
+
+        try {
+            $validatedData = $request->validate([
+                'event_name' => 'required|string',
+                'event_date' => 'required|date_format:d-m-Y',
+                'event_start_time' => 'required|date_format:H:i',
+                'event_end_time' => 'nullable|date_format:H:i',
+                'facebook_event_url' => 'nullable|url',
+                'ticket_url' => 'nullable|url',
+                'otd_ticket_price' => 'required|numeric',
+                'venue_id' => 'required|integer|exists:venues,id',
+                'headliner' => 'required|string',
+                'mainSupport' => 'required|string',
+                'bands' => 'nullable|array',
+                'bands.*' => 'nullable|string',
+                'opener' => 'nullable|string',
+                'poster_url' => 'required|image|mimes:jpeg,jpg,png,webp,svg|max:5120'
+            ]);
+
+            // dd($validatedData);
+            $bandsArray = [];
+
+            if (!empty($request->headliner)) {
+                $bandsArray[] = ['role' => 'Headline', 'band_id' => $request->headliner];
+            }
+
+            if (!empty($request->mainSupport)) {
+                $bandsArray[] = ['role' => 'Main Support', 'band_id' => $request->mainSupport];
+            }
+
+            if (!empty($request->bands)) {
+                foreach ($request->bands as $bandId) {
+                    if (!empty($bandId)) {
+                        $bandsArray[] = ['role' => 'Band', 'band_id' => $bandId];
+                    }
+                }
+            }
+
+            if (!empty($request->opener)) {
+                $bandsArray[] = ['role' => 'Opener', 'band_id' => $request->opener];
+            }
+
+            // Main Event Creation
+            if (isset($validatedData['bands']) && is_array($validatedData['bands'])) {
+                $bandsArray = $validatedData['bands'];
+            }
+
+            $event_date = Carbon::createFromFormat('d-m-Y H:i:s', $validatedData['event_date'] . ' 00:00:00')->format('Y-m-d H:i:s');
+
+            // dd($event_date);
+
+            $event = Event::create([
+                'name' => $validatedData['event_name'],
+                'event_date' => $event_date,
+                'event_start_time' => $validatedData['event_start_time'],
+                'event_end_time' => $validatedData['event_end_time'],
+                'facebook_event_url' => $validatedData['facebook_event_url'],
+                'poster_url' => $validatedData['poster_url'],
+                'band_ids' => json_encode($bandsArray),
+                'ticket_url' => $validatedData['ticket_url'],
+                'on_the_door_ticket_price' => $validatedData['otd_ticket_price'],
+            ]);
+
+            // Event Band Creation
+            if (!empty($bandsArray)) {
+                foreach ($bandsArray as $bandId) {
+                    $event->services()->attach($bandId, ['event_id' => $event->id]);
+                }
+            }
+
+            // Event Venue Creation
+            if (isset($validatedData['venue_id'])) {
+                $event->venues()->attach($validatedData['venue_id'], ['event_id' => $event->id]);
+            }
+
+            // Event Promoter Creation
+            if (isset($promoter)) {
+                $event->promoters()->attach($promoter->id, ['event_id' => $event->id]);
+            }
+
+            return redirect()->route('promoter-show-single-event', [
+                'success' => true,
+                'message' => 'Event created successfully',
+                'id' => $event->id,
+                'promoter' => $promoter->id
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error('Error creating event: ' . $e->getMessage(), [
+                'success' => false,
+                'message' => 'Error creating event. Please try again.',
+                'request' => $request->all(),
+                'exception' => $e,
+            ]);
+
+            // Redirect back with an error message (optional)
+            return response()->json([
+                'success' => false,
+                'message' => 'There was an error creating the event. Please try again.',
+                'request' => $request->all(),
+                'exception' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function eventSelectVenue(Request $request)
+    {
+        $query = $request->input('query');
+
+        if (!is_string($query) || strlen($query) < 3) {
+            return response()->json([], 400); // Optionally return an empty array if query is too short
+        }
+
+        // Use the query builder to search directly in the database
+        $venues = Venue::where('name', 'like', '%' . $query . '%')->get();
+
+        return response()->json($venues);
+    }
+
+
+
     public function index()
     {
         $pendingReviews = PromoterReview::with('promoter')->where('review_approved', '0')->whereNull('deleted_at')->count();
         $promoter = Auth::user()->load('promoters');
-
-        if (!$promoter) {
-            return redirect()->back()->withErrors('No promoter company linked to this user.');
-        }
+        $todoItemsCount = $promoter->promoters->load('todos')->count();
 
         return view('admin.dashboards.promoter-dash', compact([
             'pendingReviews',
-            'promoter'
+            'promoter',
+            'todoItemsCount'
         ]));
     }
 
@@ -36,8 +412,13 @@ class PromoterDashboardController extends Controller
      */
     public function promoterUsers()
     {
-        $promoter = Auth::user()->load('promoters');
-        $users = $promoter->users;
+        $promoter = Auth::user()->promoters()->first();
+        if ($promoter) {
+            $promoter->load('users');
+            $users = $promoter->users;
+        } else {
+            dd('No promoter associated with that use');
+        }
 
         return view('admin.dashboards.promoter.promoter-users', compact('promoter', 'users'));
     }
@@ -699,5 +1080,147 @@ class PromoterDashboardController extends Controller
             'view' => view('components.todo-items', ['todoItems' => $completedTodos])->render(),
             'hasMore' => $completedTodos->hasMorePages(),
         ]);
+    }
+
+    /**
+     * Creating New Promoter
+     */
+    public function storeNewPromoter(Request $request)
+    {
+        try {
+            // Validation
+            $validatedData = $request->validate([
+                'name' => 'required|string|max:255',
+                'address-input' => 'required',
+                'postal-town-input' => 'required',
+                'latitude' => 'required',
+                'longitude' => 'required',
+                'promoter_logo' => 'nullable|mimes:jpeg,jpg,png,webp,svg|max:2048',
+                'description' => 'required',
+                'my_venues' => 'nullable',
+                'genres' => 'required|array',
+                'band_type' => 'required|array',
+                'contact_name' => 'required_if:is_main_contact,false',
+                'contact_number' => 'numeric|digits:11',
+                'contact_email' => 'email|max:255',
+                'contact_link' => 'nullable',
+                'is_main_contact' => 'required|string'
+            ]);
+
+            $logoUrl = null; // Initialize logo URL
+
+            if ($request->hasFile('promoter_logo')) {
+                // Get the uploaded image file
+                $promoterLogoFile = $request->file('promoter_logo');
+
+                // Generate a unique filename based on the promoter's name and extension
+                $promoterName = $request->input('name');
+                $promoterLogoExtension = $promoterLogoFile->getClientOriginalExtension() ?: $promoterLogoFile->guessExtension();
+                $promoterLogoFilename = Str::slug($promoterName) . '.' . $promoterLogoExtension;
+
+                // Specify the destination directory within the public folder
+                $destinationPath = 'images/promoters_logos';
+
+                // Move the uploaded image to the specified directory
+                $promoterLogoFile->move(public_path($destinationPath), $promoterLogoFilename);
+
+                // Construct the URL to the stored image
+                $logoUrl = $destinationPath . '/' . $promoterLogoFilename;
+            }
+
+            // Create or update the promoter
+            if ($validatedData['is_main_contact'] == "true") {
+                $user = Auth::user();
+                $contactName = $user->name;
+            } else {
+                $contactName = $validatedData['contact_name'];
+            }
+
+            if (is_null($logoUrl)) {
+                $logoUrl = asset('storage/images/system/yns_logo.png');
+            }
+
+            $contactLinks = explode(',', $validatedData['contact_link']);
+            $contactLinks = array_map('trim', $contactLinks);
+            $platformLinks = [];
+
+            $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+
+            foreach ($contactLinks as $link) {
+                $matchedPlatform = 'Unknown';
+
+                foreach ($platformsToCheck as $platform) {
+                    if (stripos($link, $platform) !== false) {
+                        $matchedPlatform = $platform;
+                        break;
+                    }
+                }
+
+                if ($matchedPlatform === 'Unknown') {
+                    $matchedPlatform = 'website';
+                }
+
+                $platformLinks[$matchedPlatform][] = trim($link);
+            }
+
+            // Save the promoter data to the database
+            $promoter = Promoter::create([
+                'name' => $validatedData['name'],
+                'location' => $validatedData['address-input'],
+                'postal_town' => $validatedData['postal-town-input'],
+                'longitude' => $validatedData['longitude'],
+                'latitude' => $validatedData['latitude'],
+                'logo_url' => $logoUrl,
+                'description' => $validatedData['description'],
+                'my_venues' => json_encode($validatedData['my_venues']),
+                'genre' => json_encode($validatedData['genres']),
+                'band_type' => json_encode($validatedData['band_type']),
+                'contact_name' => $contactName,
+                'contact_number' => $validatedData['contact_number'],
+                'contact_email' => $validatedData['contact_email'],
+                'contact_link' => json_encode($platformLinks),
+            ]);
+
+            // Log success
+            Log::info('Promoter created successfully', [
+                'promoter_id' => $promoter->id,
+                'name' => $validatedData['name'],
+                'contact_name' => $contactName
+            ]);
+
+            $serviceableId = $promoter->id;
+            $serviceableType = 'App\Models\Promoter';
+
+            DB::table('service_user')->insert([
+                'user_id' => $user->id,
+                'serviceable_id' => $serviceableId,
+                'serviceable_type' => $serviceableType,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            Log::info('Promoter Link created successfully');
+
+            // Redirect to the promoter dashboard with success message
+            return redirect()->route('promoter.dashboard', compact('promoter'))
+                ->with('success', 'Promoter created successfully.');
+        } catch (ValidationException $e) {
+            // Handle validation exceptions
+            Log::error('Validation failed for promoter creation', [
+                'errors' => $e->validator->errors(),
+                'request_data' => $request->all()
+            ]);
+
+            return back()->withErrors($e->validator)->withInput();
+        } catch (\Exception $e) {
+            // Handle other exceptions
+            Log::error('Failed to create promoter', [
+                'error' => $e->getMessage(),
+                'request_data' => $request->all()
+            ]);
+
+            return back()->with('error', 'Failed to create promoter. Please try again.')
+                ->withInput();
+        }
     }
 }

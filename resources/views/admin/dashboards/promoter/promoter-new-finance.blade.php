@@ -15,7 +15,7 @@
                 <x-input-label-dark>Desired Profit</x-input-label-dark>
                 <x-number-input-pound id="desired_profit" name="desired_profit"></x-number-input-pound>
                 @error('desired_profit')
-                  <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                  <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                 @enderror
               </div>
             </div>
@@ -24,7 +24,7 @@
                 <x-input-label-dark>Budget Name</x-input-label-dark>
                 <x-text-input id="budget_name" name="budget_name"></x-text-input>
                 @error('budget_name')
-                  <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                  <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                 @enderror
               </div>
 
@@ -32,7 +32,7 @@
                 <x-input-label-dark>Date From</x-input-label-dark>
                 <x-date-input id="date_from" name="date_from"></x-date-input>
                 @error('date_from')
-                  <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                  <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                 @enderror
               </div>
 
@@ -40,7 +40,7 @@
                 <x-input-label-dark>Date To</x-input-label-dark>
                 <x-date-input id="date_to" name="date_to"></x-date-input>
                 @error('date_to')
-                  <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                  <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                 @enderror
               </div>
 
@@ -48,7 +48,7 @@
                 <x-input-label-dark>Link To Event</x-input-label-dark>
                 <x-text-input id="link_to_event" name="link_to_event"></x-text-input>
                 @error('link_to_event')
-                  <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                  <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                 @enderror
               </div>
             </div>
@@ -59,7 +59,7 @@
                 <x-input-label-dark>Presale Tickets</x-input-label-dark>
                 <x-number-input-pound id="income_presale" name="income_presale"></x-number-input-pound>
                 @error('income_presale')
-                  <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                  <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                 @enderror
               </div>
 
@@ -67,7 +67,7 @@
                 <x-input-label-dark>On The Door Tickets</x-input-label-dark>
                 <x-number-input-pound id="income_otd" name="income_otd"></x-number-input-pound>
                 @error('income_otd')
-                  <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                  <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                 @enderror
               </div>
             </div>
@@ -82,7 +82,7 @@
                 <x-input-label-dark>Venue</x-input-label-dark>
                 <x-number-input-pound id="outgoing_venue" name="outgoing_venue"></x-number-input-pound>
                 @error('outgoing_venue')
-                  <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                  <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                 @enderror
               </div>
 
@@ -90,7 +90,7 @@
                 <x-input-label-dark>Band (s)</x-input-label-dark>
                 <x-number-input-pound id="outgoing_band" name="outgoing_band"></x-number-input-pound>
                 @error('outgoing_band')
-                  <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                  <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                 @enderror
               </div>
 
@@ -98,7 +98,7 @@
                 <x-input-label-dark>Promotion</x-input-label-dark>
                 <x-number-input-pound id="outgoing_promotion" name="outgoing_promotion"></x-number-input-pound>
                 @error('outgoing_promotion')
-                  <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                  <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                 @enderror
               </div>
 
@@ -106,7 +106,7 @@
                 <x-input-label-dark>Rider</x-input-label-dark>
                 <x-number-input-pound id="outgoing_rider" name="outgoing_rider"></x-number-input-pound>
                 @error('outgoing_rider')
-                  <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                  <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                 @enderror
               </div>
             </div>

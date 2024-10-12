@@ -177,8 +177,28 @@
 }
 
 .note-editor.note-frame {
-    padding-top: 3rem;
     color: var(--color-white);
+}
+
+.note-editing-area {
+    border-color: theme("colors.yns_red");
+}
+
+.note-toolbar {
+    border-left-color: theme("colors.yns_red") !important;
+    border-left-width: 1px;
+    border-left-style: solid;
+    border-top-color: theme("colors.yns_red") !important;
+    border-top-width: 1px;
+    border-top-style: solid;
+    border-right-color: theme("colors.yns_red") !important;
+    border-right-width: 1px;
+    border-right-style: solid;
+}
+
+.highlight {
+    background-color: theme("colors.yns_yellow");
+    /* padding: 0.5rem; */
 }
 
 .search {

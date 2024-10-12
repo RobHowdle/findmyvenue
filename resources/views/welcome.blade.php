@@ -894,7 +894,6 @@
   </div>
 
   <div class="flex min-h-screen flex-col items-center justify-center backdrop-brightness-50">
-    <!-- First Section: Image on the left, Text on the right -->
     <div class="flex flex-row items-center justify-center gap-14">
       <img src="{{ asset('storage/images/system/idea.jpg') }}" alt="Idea Image"
         class="h-[500px] w-[500px] object-contain" />
@@ -915,7 +914,6 @@
       </div>
     </div>
 
-    <!-- Second Section: Text on the left, Image on the right -->
     <div class="flex flex-row-reverse items-center justify-center gap-14">
       <img src="{{ asset('storage/images/system/bug.jpg') }}" alt="Bug Image"
         class="h-[500px] w-[500px] object-contain" />

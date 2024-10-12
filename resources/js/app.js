@@ -1,6 +1,6 @@
 import $ from "jquery";
-// import "summernote/dist/summernote-lite.js"; // Non-Bootstrap version
-// import "summernote/dist/summernote-lite.css"; // Include the CSS for this version
+import "summernote/dist/summernote-lite.js"; // Non-Bootstrap version
+import "summernote/dist/summernote-lite.css"; // Include the CSS for this version
 import Swal from "sweetalert2";
 
 import Alpine from "alpinejs";
@@ -9,6 +9,13 @@ window.jQuery = $;
 
 window.Alpine = Alpine;
 Alpine.start();
+
+window.initialize = initialize;
+
+// Initialize Google Maps after the page is loaded
+document.addEventListener("DOMContentLoaded", function () {
+    initialize(); // Call here if needed
+});
 
 // Format currency helper
 window.formatCurrency = function (value) {
@@ -213,23 +220,82 @@ $(document).ready(function () {
     });
 });
 
-// Summernote
-// $(document).ready(function () {
-//     $(".summernote").summernote({
-//         height: 300, // Set the height of the editor
-//         toolbar: [
-//             // Customize the toolbar
-//             ["style", ["style"]],
-//             ["font", ["bold", "italic", "underline", "clear"]],
-//             ["fontname", ["fontname"]],
-//             ["color", ["color"]],
-//             ["para", ["ul", "ol", "paragraph"]],
-//             ["table", ["table"]],
-//             ["insert", ["link", "picture", "video"]],
-//             ["view", ["fullscreen", "codeview", "help"]],
-//         ],
-//     });
-// });
+// Function to initialize Summernote
+window.initialiseSummernote = function (selector, initialContent) {
+    console.log("Initializing summernote..."); // Debug line
+    $(selector).summernote({
+        height: 300,
+        toolbar: [
+            ["style", ["style"]],
+            ["font", ["bold", "italic", "underline", "clear"]],
+            ["fontname", ["fontname"]],
+            ["fontsize", ["fontsize"]],
+            ["fontSizeUnits", ["px", "pt"]],
+            ["color", ["color"]],
+            ["para", ["ul", "ol", "paragraph"]],
+            ["table", ["table"]],
+            ["insert", ["link", "picture", "video"]],
+            ["view", ["fullscreen", "help"]],
+        ],
+        callbacks: {
+            onInit: function () {
+                $(this).summernote("code", initialContent); // Set the initial content
+            },
+            onKeyup: function () {
+                var editor = $(this);
+                var content = editor.summernote("code");
+
+                // Analyze and get the highlighted content
+                var highlightedContent = analyzeText(content);
+
+                // Update only if the content has changed
+                if (highlightedContent !== content) {
+                    // Get the current selection before updating the content
+                    var selection = window.getSelection();
+                    var range = selection.getRangeAt(0);
+
+                    // Update the content directly
+                    editor.summernote("code", highlightedContent);
+
+                    // Restore the selection
+                    setTimeout(function () {
+                        // Get the editable area
+                        var $editable = editor.summernote("editable")[0];
+
+                        // Set the cursor position back to where it was
+                        selection.removeAllRanges(); // Clear existing selections
+                        selection.addRange(range); // Set the new range
+
+                        // Refocus on the editor
+                        $editable.focus(); // Focus the editable area
+                    }, 0); // Use a small delay to ensure the content is rendered before moving the cursor
+                }
+            },
+        },
+    });
+};
+
+// Function to analyze text for venue names
+function analyzeText(inputText) {
+    const venues = [
+        {
+            name: "The Forum",
+            link: "https://www.google.com/theforummusiccenter",
+        },
+        { name: "The Turks Head", link: "https://www.google.com/theturkshead" },
+    ];
+
+    let highlightedContent = inputText; // Start with the original input text
+
+    venues.forEach((venue) => {
+        const regex = new RegExp(`\\b(${venue.name})\\b`, "gi");
+        highlightedContent = highlightedContent.replace(
+            regex,
+            `<span class="highlight" data-link="${venue.link}">$1</span>`
+        );
+    });
+    return highlightedContent; // Return the modified content
+}
 
 // Sweet Alert 2 Notifications
 window.showSuccessNotification = function (message) {
@@ -267,3 +333,121 @@ window.showFailureNotification = function (message) {
         text: message,
     });
 };
+
+// Address Input
+function initialize() {
+    // All your Google Maps initialization code
+    $("form").on("keyup keypress", function (e) {
+        var keyCode = e.keyCode || e.which;
+        if (keyCode === 13) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    const locationInputs = document.getElementsByClassName("map-input");
+    const autocompletes = [];
+    const geocoder = new google.maps.Geocoder();
+
+    for (let i = 0; i < locationInputs.length; i++) {
+        const input = locationInputs[i];
+        const fieldKey = input.id.replace("-input", "");
+        const isEdit =
+            document.getElementById(fieldKey + "-latitude").value != "" &&
+            document.getElementById(fieldKey + "-longitude").value != "";
+
+        const latitude =
+            parseFloat(document.getElementById(fieldKey + "-latitude").value) ||
+            59.339024834494886;
+        const longitude =
+            parseFloat(
+                document.getElementById(fieldKey + "-longitude").value
+            ) || 18.06650573462189;
+
+        const map = new google.maps.Map(
+            document.getElementById(fieldKey + "-map"),
+            {
+                center: { lat: latitude, lng: longitude },
+                zoom: 13,
+            }
+        );
+
+        const marker = new google.maps.Marker({
+            map: map,
+            position: { lat: latitude, lng: longitude },
+        });
+
+        marker.setVisible(isEdit);
+
+        const autocomplete = new google.maps.places.Autocomplete(input);
+        autocomplete.key = fieldKey;
+        autocompletes.push({
+            input: input,
+            map: map,
+            marker: marker,
+            autocomplete: autocomplete,
+        });
+    }
+
+    // Set up listeners for each autocomplete
+    autocompletes.forEach(({ input, autocomplete, map, marker }) => {
+        google.maps.event.addListener(
+            autocomplete,
+            "place_changed",
+            function () {
+                marker.setVisible(false);
+                const place = autocomplete.getPlace();
+
+                let postalTown = "";
+                place.address_components.forEach((component) => {
+                    if (component.types.includes("postal_town")) {
+                        postalTown = component.long_name;
+                    }
+                });
+
+                const postalTownComponent = place.address_components.find(
+                    (component) => component.types.includes("postal_town")
+                );
+                if (postalTownComponent) {
+                    document.getElementById("postal-town-input").value =
+                        postalTownComponent.long_name;
+                }
+
+                geocoder.geocode(
+                    { placeId: place.place_id },
+                    function (results, status) {
+                        if (status === google.maps.GeocoderStatus.OK) {
+                            const lat = results[0].geometry.location.lat();
+                            const lng = results[0].geometry.location.lng();
+                            setLocationCoordinates(autocomplete.key, lat, lng);
+                        }
+                    }
+                );
+
+                if (!place.geometry) {
+                    window.alert(
+                        "No details available for input: '" + place.name + "'"
+                    );
+                    input.value = "";
+                    return;
+                }
+
+                if (place.geometry.viewport) {
+                    map.fitBounds(place.geometry.viewport);
+                } else {
+                    map.setCenter(place.geometry.location);
+                    map.setZoom(17);
+                }
+                marker.setPosition(place.geometry.location);
+                marker.setVisible(true);
+            }
+        );
+    });
+}
+
+function setLocationCoordinates(key, lat, lng) {
+    const latitudeField = document.getElementById(key + "-latitude");
+    const longitudeField = document.getElementById(key + "-longitude");
+    latitudeField.value = lat;
+    longitudeField.value = lng;
+}

@@ -22,9 +22,54 @@ class ProfileController extends Controller
         $userRole = $user->roles;
         $name = $user->name;
         $email = $user->email;
+        $promoter = $user->promoters()->first();
 
-        return view('profile.edit', compact('user', 'roles', 'userRole', 'name', 'email'));
+        $promoterName = $promoter ? $promoter->name : '';
+        $location = $promoter ? $promoter->location : '';
+        $logo = $promoter ? $promoter->logo_url : 'images/system/yns_logo.png';
+        $phone = $promoter ? $promoter->contact_number : '';
+        $email = $promoter ? $promoter->contact_email : '';
+
+        $contactLinks = json_decode($promoter->contact_link, true);
+        $platforms = [];
+
+        // Define the platforms to check against
+        $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+
+        // Initialize platform array
+        foreach ($platformsToCheck as $platform) {
+            $platforms[$platform] = [];
+        }
+
+        // Process contact links
+        if (is_array($contactLinks)) {
+            foreach ($contactLinks as $platform => $links) {
+                if (array_key_exists($platform, $platforms)) {
+                    $platforms[$platform] = array_merge($platforms[$platform], $links);
+                }
+            }
+        }
+
+        $about = $promoter ? $promoter->description : '';
+        $myVenues = $promoter ? $promoter->my_venues : '';
+
+        return view('profile.edit', compact([
+            'user',
+            'roles',
+            'userRole',
+            'name',
+            'email',
+            'promoter',
+            'promoterName',
+            'location',
+            'logo',
+            'phone',
+            'platforms',
+            'about',
+            'myVenues',
+        ]));
     }
+
 
     /**
      * Update the user's profile information.
@@ -43,8 +88,6 @@ class ProfileController extends Controller
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
         }
-
-        dd();
 
         $user->save();
 

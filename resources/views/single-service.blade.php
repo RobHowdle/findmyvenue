@@ -29,7 +29,7 @@
             </div>
             <div class="leave-review">
               <button
-                class="rounded bg-gradient-to-t from-yns_dark_orange to-yns_yellow px-6 py-2 text-sm text-black hover:bg-yns_yellow"
+                class="rounded-lg bg-gradient-to-t from-yns_dark_orange to-yns_yellow px-6 py-2 text-sm text-black hover:bg-yns_yellow"
                 data-modal-toggle="review-modal" type="button">Leave a review</button>
             </div>
 

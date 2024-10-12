@@ -28,6 +28,7 @@ export default {
                 opac_5_black: "rgba(0,0,0,0.5)",
                 opac_8_black: "rgba(0,0,0,0.8)",
                 yns_light_gray: "rgba(217,217,217,0.5)",
+                yns_light_gray1: "#D9D9D9",
                 yns_red: "#EF3F38",
                 yns_purple: "#9022BB",
                 yns_cyan: "#29C0D2",
@@ -40,6 +41,18 @@ export default {
             },
             backgroundImage: {
                 "gradient-button": "linear-gradient(to top, #F03F37 , #D59220)",
+            },
+            gap: {
+                275: "2.75rem", // You can name this anything you want
+            },
+            width: {
+                400: "25rem",
+            },
+            height: {
+                520: "32.5rem",
+            },
+            borderRadius: {
+                50: "50px",
             },
         },
         screens: {

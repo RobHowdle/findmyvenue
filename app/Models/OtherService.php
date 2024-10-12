@@ -63,4 +63,14 @@ class OtherService extends Model
     {
         return $this->morphMany(Todo::class, 'serviceable');
     }
+
+    public function events()
+    {
+        return $this->belongsToMany(Event::class, 'event_band', 'band_id', 'event_id');
+    }
+
+    public function bands()
+    {
+        return self::where('other_service_id', 4);
+    }
 }
