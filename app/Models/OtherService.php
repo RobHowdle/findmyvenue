@@ -73,4 +73,9 @@ class OtherService extends Model
     {
         return self::where('other_service_id', 4);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

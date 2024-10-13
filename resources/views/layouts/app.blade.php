@@ -69,6 +69,7 @@
       <div class="flex-grow backdrop-brightness-50">
         {{ $slot }}
       </div>
+      <x-notes></x-notes>
     </div>
   </div>
 

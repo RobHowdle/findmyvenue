@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Role;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
@@ -86,5 +87,27 @@ class User extends Authenticatable
     public function todos()
     {
         return $this->morphMany(Todo::class, 'serviceable');
+    }
+
+    public function getRoleType()
+    {
+        $excludedRoles = ['promoter', 'venue', 'standard', 'administrator'];
+
+        if ($this->hasRole('promoter')) {
+            return Promoter::class;
+        }
+
+        if ($this->hasRole('venue')) {
+            return Venue::class;
+        }
+
+        $userRoles = $this->getRoleNames()->toArray();
+        $filteredRoles = array_diff($userRoles, $excludedRoles);
+
+        if (!empty($filteredRoles)) {
+            return OtherService::class;
+        }
+
+        return null;
     }
 }

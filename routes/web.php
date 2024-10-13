@@ -7,6 +7,7 @@ use App\Http\Controllers\VenueController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PromoterController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\APIRequestsController;
 use App\Http\Controllers\OtherServiceController;
 use App\Http\Controllers\PromoterDashboardController;
 
@@ -45,6 +46,8 @@ Route::get('/other/filter', [OtherServiceController::class, 'filterCheckboxesSea
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/dashboard/notes/store-note', [DashboardController::class, 'storeNewNote'])->name('dashboard.store-new-note');
+
     Route::get('/dashboard/promoter', [PromoterDashboardController::class, 'index'])->name('promoter.dashboard');
     Route::get('/dashboard/promoter/users', [PromoterDashboardController::class, 'promoterUsers'])->name('promter.dashboard.users');
     Route::get('/dashboard/promoter/finances', [PromoterDashboardController::class, 'promoterFinances'])->name('promoter.dashboard.finances');
@@ -76,6 +79,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/dashboard/promoter/events/{id}', [PromoterDashboardController::class, 'deleteSinglePromoterEvent'])->name('admin.dashboard.promoter.delete-single-event');
     Route::get('/dashboard/promoter/events/load-more-upcoming', [PromoterDashboardController::class, 'loadMoreUpcomingEvents'])->name('admin.dashboard.promoter.load-more-upcoming-events');
     Route::get('/dashboard/promoter/events/load-more-past', [PromoterDashboardController::class, 'loadMorePastEvents'])->name('admin.dashboard.promoter.load-more-past-events');
+    Route::get('/dashboard/promoter/notes', [PromoterDashboardController::class, 'showPromoterNotes'])->name('admin.dashboard.promoter.show-notes');
+    Route::get('/dashboard/promoter/note-items', [PromoterDashboardController::class, 'getPromoterNotes'])->name('admin.promoter.dashboard.note-items');
+    Route::post('/dashboard/promoter/note-item/{id}/complete', [PromoterDashboardController::class, 'completeNoteItem'])->name('admin.promoter.dashboard.complete-note');
+    Route::delete('/dashboard/promoter/note-item/{id}', [PromoterDashboardController::class, 'deleteNoteItem'])->name('admin.promoter.dashboard.delete-note');
+    Route::get('/dashboard/promoter/note-item/completed-notes', [PromoterDashboardController::class, 'showCompletedNoteItems'])->name('admin.promoter.dashboard.completed-notes');
+
+
 
 
 

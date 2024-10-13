@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Note;
 use App\Models\User;
 use App\Models\Venue;
 use App\Models\UserService;
@@ -30,7 +31,7 @@ class DashboardController extends Controller
         switch ($roleName) {
             case 'promoter':
                 if (!$promotionsCompany) {
-                    return view('admin.dashboards.promoter.new-promoter-service', compact([
+                    return view('admin.dashboards.promoter.promoter-new-service', compact([
                         'venues',
                         'genres'
                     ]));
@@ -166,6 +167,56 @@ class DashboardController extends Controller
 
             // Redirect back with an error message
             return redirect()->back()->with('error', 'An error occurred while linking the user');
+        }
+    }
+
+    public function storeNewNote(Request $request)
+    {
+        Log::info('Request data:', $request->all());
+
+        try {
+            // Ensure the user has a promoter
+            $promoter = Auth::user()->promoters()->first();
+
+            if (!$promoter) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Promoter not found'
+                ], 404);
+            }
+
+            $promoterId = $promoter->id;
+            $serviceableType = Auth::user()->load('roles')->getRoleType();
+
+            // Validate the incoming request data
+            $validatedData = $request->validate([
+                'name' => 'required|string',
+                'text' => 'required|string',
+                'date' => 'required|date',
+                'isTodo' => 'boolean'
+            ]);
+
+            // Create the note
+            $note = Note::create([
+                'serviceable_id' => $promoterId,
+                'serviceable_type' => $serviceableType,
+                'name' => $validatedData['name'],
+                'text' => $validatedData['text'],
+                'date' => $validatedData['date'],
+                'is_todo' => $validatedData['isTodo'] ?? false,
+            ]);
+
+            // Return success response
+            return response()->json([
+                'success' => true,
+                'message' => 'Note Created Successfully'
+            ]);
+        } catch (\Exception $e) {
+            // Log the error message for debugging
+            Log::error('Error creating note:', ['message' => $e->getMessage()]);
+
+            // Return error response
+            return response()->json(['success' => false, 'message' => 'Error creating note: ' . $e->getMessage()], 400);
         }
     }
 }

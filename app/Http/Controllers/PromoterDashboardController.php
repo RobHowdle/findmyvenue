@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
+use App\Models\Note;
 use App\Models\Todo;
 use App\Models\User;
 use App\Models\Event;
@@ -440,10 +441,22 @@ class PromoterDashboardController extends Controller
         $promoter = Auth::user()->load('promoters');
         $todoItemsCount = $promoter->promoters->load('todos')->count();
 
+        $startOfWeek = Carbon::now()->startOfWeek();
+        $endOfWeek = Carbon::now()->endOfWeek();
+        $eventsCount = $promoter->promoters()
+            ->with(['events' => function ($query) use ($startOfWeek, $endOfWeek) {
+                $query->whereBetween('event_date', [$startOfWeek, $endOfWeek]);
+            }])
+            ->get()
+            ->pluck('events')
+            ->flatten()
+            ->count();
+
         return view('admin.dashboards.promoter-dash', compact([
             'pendingReviews',
             'promoter',
-            'todoItemsCount'
+            'todoItemsCount',
+            'eventsCount'
         ]));
     }
 
@@ -925,7 +938,7 @@ class PromoterDashboardController extends Controller
         $promoter = Auth::user()->load('promoters');
 
         $finance = Finance::findOrFail($id)->load('user', 'serviceable');
-        return view('admin.dashboards.promoter.show-single-finance', compact('finance', 'promoter'));
+        return view('admin.dashboards.promoter.promoter-show-single-finance', compact('finance', 'promoter'));
     }
 
     public function editSingleFinance($id)
@@ -1023,7 +1036,7 @@ class PromoterDashboardController extends Controller
             ->orderBy('created_at', 'DESC')
             ->paginate(6);
 
-        return view('admin.dashboards.promoter.todo-list', compact('promoter', 'todoItems'));
+        return view('admin.dashboards.promoter.promoter-todo-list', compact('promoter', 'todoItems'));
     }
 
     public function getPromoterTodos(Request $request)
@@ -1119,6 +1132,106 @@ class PromoterDashboardController extends Controller
         return response()->json([
             'view' => view('components.todo-items', ['todoItems' => $completedTodos])->render(),
             'hasMore' => $completedTodos->hasMorePages(),
+        ]);
+    }
+
+    /**
+     * Promoter Notes
+     */
+    public function showPromoterNotes(Request $request)
+    {
+        $promoter = Auth::user()->load(['promoters']);
+
+        // Get the promoter's company
+        $promoterCompany = $promoter->promoters;
+        $serviceableId = $promoterCompany->pluck('id');
+
+        $perPage = 6;
+        $page = $request->input('page', 1);
+
+        // Fetch the todo items
+        $notes = Note::whereIn('serviceable_id', $serviceableId)
+            ->where('completed', 0)
+            ->orderBy('created_at', 'DESC')
+            ->paginate(6);
+
+        return view('admin.dashboards.promoter.promoter-notes', compact('promoter', 'notes'));
+    }
+
+    public function getPromoterNotes(Request $request)
+    {
+        $promoter = Auth::user()->load(['promoters']);
+
+        $promoterCompany = $promoter->promoters;
+        $serviceableId = $promoterCompany->pluck('id');
+
+        if ($promoterCompany->isEmpty()) {
+            return response()->json([
+                'view' => view('components.note-items', ['notes' => collect()])->render(),
+                'hasMore' => false,
+            ]);
+        }
+
+        $perPage = 6;
+        $page = $request->input('page', 1);
+
+        $notes = Note::whereIn('serviceable_id', $serviceableId)
+            ->where('completed', false)
+            ->orderBy('created_at', 'DESC')
+            ->paginate(6);
+
+        return response()->json([
+            'view' => view('components.note-items', compact('notes'))->render(),
+            'hasMore' => $notes->hasMorePages(),
+        ]);
+    }
+
+    public function completeNoteItem($id)
+    {
+        // Find the todo item by ID
+        $note = Note::findOrFail($id);
+
+        // Mark the item as completed
+        $note->completed = true;
+        $note->completed_at = now();
+        $note->save();
+
+        // Return a success response
+        return response()->json([
+            'message' => 'Note marked as completed!',
+            'note' => $note,
+        ]);
+    }
+
+    public function deleteNoteItem($id)
+    {
+        // Find the todo item by ID
+        $note = Note::findOrFail($id);
+
+        // Delete the todo item
+        $note->delete();
+
+        // Return a success response
+        return response()->json([
+            'message' => 'Note deleted successfully!',
+        ]);
+    }
+
+    public function showCompletedNoteItems()
+    {
+        $promoter = Auth::user()->load(['promoters']);
+
+        $promoterCompany = $promoter->promoters;
+        $serviceableId = $promoterCompany->pluck('id');
+
+        $completedNotes = Note::whereIn('serviceable_id', $serviceableId)
+            ->where('completed', true)
+            ->orderBy('created_at', 'DESC')
+            ->paginate(6);
+
+        return response()->json([
+            'view' => view('components.note-items', ['notes' => $completedNotes])->render(),
+            'hasMore' => $completedNotes->hasMorePages(),
         ]);
     }
 

@@ -58,4 +58,9 @@ class Promoter extends Model
     {
         return $this->belongsToMany(Event::class, 'event_promoter');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

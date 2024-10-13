@@ -455,17 +455,17 @@ function setLocationCoordinates(key, lat, lng) {
 // Full Calendar
 document.addEventListener("DOMContentLoaded", function () {
     var calendarEl = document.getElementById("calendar");
-    var userId = calendarEl.getAttribute("data-user-id");
+    var userId = calendarEl.getAttribute("data-user-id"); // Get user ID from data attribute
 
     var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: "dayGridMonth",
         events: function (fetchInfo, successCallback, failureCallback) {
-            fetch(`/api/profile/${userId}/calendar`, {
+            fetch(`/api/profile/${userId}`, {
                 headers: {
                     "X-CSRF-TOKEN": document
                         .querySelector('meta[name="csrf-token"]')
                         .getAttribute("content"),
-                    Authorization: "Bearer " + localStorage.getItem("token"), // or however you store your token
+                    Authorization: "Bearer " + localStorage.getItem("token"), // Use your auth token
                 },
             })
                 .then((response) => {

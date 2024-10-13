@@ -10,10 +10,10 @@
         <x-greeting />
         <p class="mb-12 font-heading text-xl">This week you have:</p>
         <div class="grid grid-cols-4 items-center">
-          <a href="#"
+          <a href="{{ route('admin.dashboard.promoter.show-events') }}"
             class="flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-yns_yellow">
             <span class="fas fa-calendar-alt mb-4 h-14 w-14"></span>
-            3 Events
+            {{ $eventsCount }} Event{{ $eventsCount > 1 ? 's' : '' }}
           </a>
           <a href="#"
             class="flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-yns_yellow">
@@ -25,7 +25,7 @@
             <span class="fas fa-star mb-4 h-14 w-14"></span>
             {{ $pendingReviews }} Pending Review{{ $pendingReviews > 1 ? 's' : '' }}
           </a>
-          <a href="#"
+          <a href="{{ route('promoter.dashboard.todo-list') }}"
             class="flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-yns_yellow">
             <span class="fas fa-list mb-4 h-14 w-14"></span>
             {{ $todoItemsCount }} Todo Item{{ $todoItemsCount > 1 ? 's' : '' }}
@@ -57,12 +57,12 @@
               class="fas fa-pound-sign mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-yns_yellow"></span>
             New Budget
           </a>
-          <a href="#"
+          <button id="new-note-button"
             class="group flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-yns_yellow">
             <span
               class="fas fa-sticky-note mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-yns_yellow"></span>
             New Note
-          </a>
+          </button>
           <a href="{{ route('promoter.dashboard.todo-list') }}"
             class="group flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-yns_yellow">
             <span
@@ -88,7 +88,7 @@
               class="fas fa-pound-sign mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-yns_yellow"></span>
             Budgets
           </a>
-          <a href="#"
+          <a href="{{ route('admin.dashboard.promoter.show-notes') }}"
             class="group flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-yns_yellow">
             <span
               class="fas fa-sticky-note mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-yns_yellow"></span>

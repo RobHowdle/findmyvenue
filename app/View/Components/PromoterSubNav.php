@@ -8,11 +8,12 @@ use App\Models\User;
 use App\Models\Finance;
 use App\Models\PromoterReview;
 use Illuminate\View\Component;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\View\View;
 
 class PromoterSubNav extends Component
 {
-    public $eventsYtd;
+    public $eventsCountYTD;
     public $totalProfits;
     public $promoterId;
     public $promoter;
@@ -78,6 +79,7 @@ class PromoterSubNav extends Component
 
         // Total Profit Year To Date
         $this->totalProfits = $this->calculateTotalProfitsYTD($promoterUser);
+        $this->eventsCountYTD = $this->calculateEventsYTD($promoterUser);
     }
 
     public function calculateTotalProfitsYTD($promoterUser)
@@ -96,6 +98,30 @@ class PromoterSubNav extends Component
                     ->sum('total_profit');
 
                 return $totalProfitsYTD;
+            }
+        }
+
+        // Return 0 if no promoter company or no profits found
+        return 0;
+    }
+
+    public function calculateEventsYTD($promoterUser)
+    {
+        if ($promoterUser) {
+            $promoterCompany = $promoterUser->promoters()->first();
+
+            if ($promoterCompany) {
+                $startOfYear = Carbon::now()->startOfYear();
+                $endOfYear = Carbon::now()->endOfYear();
+
+                // Query the finances table for the current year's profits
+                $eventsCountYTD = DB::table('event_promoter')
+                    ->join('events', 'event_promoter.event_id', '=', 'events.id')
+                    ->where('promoter_id', $promoterCompany->id)
+                    ->whereBetween('events.event_date', [$startOfYear, $endOfYear])
+                    ->count();
+
+                return $eventsCountYTD;
             }
         }
 
