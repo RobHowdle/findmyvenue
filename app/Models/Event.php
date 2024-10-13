@@ -19,7 +19,7 @@ class Event extends Model
         'event_date',
         'event_start_time',
         'event_end_time',
-        'description',
+        'event_description',
         'facebook_event_url',
         'poster_url',
         'band_ids',

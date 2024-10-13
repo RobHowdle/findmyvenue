@@ -86,8 +86,7 @@
               </p>
             </div>
 
-            <div class="group mb-2 flex flex-row justify-between text-center">
-              {{-- <p class="font-bold">Pre Sale Tickets:</p> --}}
+            <div class="group mb-2 text-center">
               <p class="font-bold">On The Door Tickets: {{ formatCurrency($event->on_the_door_ticket_price) }}</p>
             </div>
             @if ($event->event_description)

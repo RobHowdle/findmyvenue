@@ -317,7 +317,7 @@ class PromoterDashboardController extends Controller
             $bandsArray = [];
 
             if (!empty($request->headliner)) {
-                $bandsArray[] = ['role' => 'Headlinee', 'band_id' => $request->headliner_id];
+                $bandsArray[] = ['role' => 'Headliner', 'band_id' => $request->headliner_id];
             }
 
             if (!empty($request->mainSupport)) {

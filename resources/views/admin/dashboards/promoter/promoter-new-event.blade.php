@@ -114,7 +114,7 @@
                 <ul id="venue-suggestions"
                   class="max-h-60 absolute z-10 hidden overflow-auto border border-gray-300 bg-white">
                 </ul>
-                <x-text-input id="venue_id" name="venue_id" class=""></x-text-input>
+                <x-text-input id="venue_id" name="venue_id" class="hidden"></x-text-input>
                 @error('venue_name')
                   <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                 @enderror
@@ -125,7 +125,7 @@
                   <x-text-input id="headliner-search" name="headliner" autocomplete="off"></x-text-input>
                   <ul id="headliner-suggestions"
                     class="max-h-60 absolute z-10 hidden overflow-auto border border-gray-300 bg-white"></ul>
-                  <x-text-input id="headliner_id" name="headliner_id" class=""></x-text-input>
+                  <x-text-input id="headliner_id" name="headliner_id" class="hidden"></x-text-input>
                   </ul>
                   @error('headliner')
                     <p class="yns_red mt-1 text-sm">{{ $message }}</p>
@@ -136,7 +136,7 @@
                   <x-text-input id="mainSupport-search" name="mainSupport" autocomplete="off"></x-text-input>
                   <ul id="mainSupport-suggestions"
                     class="max-h-60 absolute z-10 hidden overflow-auto border border-gray-300 bg-white"></ul>
-                  <x-text-input id="main_support_id" name="main_support_id" class=""></x-text-input>
+                  <x-text-input id="main_support_id" name="main_support_id" class="hidden"></x-text-input>
                   @error('mainSupport')
                     <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                   @enderror
@@ -150,7 +150,7 @@
                           autocomplete="off"></x-text-input>
                         <ul id="band-suggestions-1"
                           class="max-h-60 absolute z-10 hidden overflow-auto border border-gray-300 bg-white"></ul>
-                        <x-text-input id="band_id_1" name="band_id[]" class="" />
+                        <x-text-input id="band_id_1" name="band_id[]" class="hidden" />
                         @error('band')
                           <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                         @enderror
@@ -171,7 +171,7 @@
                   <x-text-input id="opener-search" name="opener" autocomplete="off"></x-text-input>
                   <ul id="opener-suggestions"
                     class="max-h-60 absolute z-10 hidden overflow-auto border border-gray-300 bg-white"></ul>
-                  <x-text-input id="opener_id" name="opener_id" class=""></x-text-input>
+                  <x-text-input id="opener_id" name="opener_id" class="hidden"></x-text-input>
                   @error('opener')
                     <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                   @enderror
@@ -403,7 +403,7 @@
         <x-input-label-dark>Band</x-input-label-dark>
         <x-text-input id="band_${bandRowCount}" name="band[]" class="band-input"></x-text-input>
         <ul id="band-suggestions-${bandRowCount}" class="hidden max-h-60 absolute z-10 overflow-auto border border-gray-300 bg-white"></ul>
-        <x-text-input id="band_id_${bandRowCount}" name="band_id[]" class="" />
+        <x-text-input id="band_id_${bandRowCount}" name="band_id[]" class="hidden"/>
       </div>
       <button type="button" class="mt-7 remove-band mt-7 rounded-lg border border-white bg-white px-4 py-2 font-heading text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow"><span class="fas fa-minus"></span></button>
     </div>
