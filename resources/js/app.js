@@ -451,3 +451,48 @@ function setLocationCoordinates(key, lat, lng) {
     latitudeField.value = lat;
     longitudeField.value = lng;
 }
+
+// Full Calendar
+document.addEventListener("DOMContentLoaded", function () {
+    var calendarEl = document.getElementById("calendar");
+    var userId = calendarEl.getAttribute("data-user-id");
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: "dayGridMonth",
+        events: function (fetchInfo, successCallback, failureCallback) {
+            fetch(`/api/profile/${userId}/calendar`, {
+                headers: {
+                    "X-CSRF-TOKEN": document
+                        .querySelector('meta[name="csrf-token"]')
+                        .getAttribute("content"),
+                    Authorization: "Bearer " + localStorage.getItem("token"), // or however you store your token
+                },
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok");
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    if (data.success) {
+                        successCallback(data.events); // Pass the events to the calendar
+                    } else {
+                        console.log("Error: ", data.message);
+                        failureCallback(data.message);
+                    }
+                })
+                .catch((error) => {
+                    console.error("Fetch error: ", error);
+                    failureCallback(error);
+                });
+        },
+        dateClick: function (info) {
+            alert("Date: " + info.dateStr);
+        },
+        eventClick: function (info) {
+            alert("Event: " + info.event.title);
+        },
+    });
+    calendar.render();
+});

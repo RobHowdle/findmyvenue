@@ -29,7 +29,7 @@
                 @enderror
               </div>
 
-              <div class="group mb-4">
+              <div class="group mb-4 hidden">
                 <x-input-label-dark>Date of Event</x-input-label-dark>
                 <span>This is supposed to be hidden...naughty naughty</span>
                 <x-date-input id="event_date" name="event_date"></x-date-input>
@@ -38,7 +38,7 @@
                 @enderror
               </div>
 
-              <div class="group mb-4">
+              <div class="group mb-4 hidden">
                 <x-input-label-dark>Start Time</x-input-label-dark>
                 <span>This is supposed to be hidden...naughty naughty</span>
                 <x-text-input class="w-auto" id="event_start_time" name="event_start_time"></x-text-input>
@@ -47,7 +47,7 @@
                 @enderror
               </div>
 
-              <div class="group mb-4">
+              <div class="group mb-4 hidden">
                 <x-input-label-dark>Promoter</x-input-label-dark>
                 <span>This is supposed to be hidden...naughty naughty</span>
                 <x-text-input class="w-auto" id="promoter_id" name="promoter_id"
@@ -61,6 +61,14 @@
                 <x-input-label-dark>End Time</x-input-label-dark>
                 <x-text-input class="w-auto" id="event_end_time" name="event_end_time"></x-text-input>
                 @error('event_end_time')
+                  <p class="yns_red mt-1 text-sm">{{ $message }}</p>
+                @enderror
+              </div>
+
+              <div class="group mb-4">
+                <x-input-label-dark>Description</x-input-label-dark>
+                <x-textarea-input id="event_description" name="event_description" class="w-full"></x-textarea-input>
+                @error('event_description')
                   <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                 @enderror
               </div>

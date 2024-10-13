@@ -24,3 +24,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('/venues/{id}', [VenueApiController::class, 'show']);
 Route::get('/dashboard/promoter/finances', [PromoterDashboardController::class, 'getFinanceData']);
 Route::get('/bands/search', [APIRequestsController::class, 'searchBands']);
+
+Route::middleware(['auth', 'verified'])->get('/profile/{$id}/calendar', [APIRequestsController::class, 'getUserCalendarEvents']);

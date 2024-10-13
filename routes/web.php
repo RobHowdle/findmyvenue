@@ -88,7 +88,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Route::post('/dashboard/user-service-link', [DashboardController::class, 'userServiceLink'])->name('user-service-link');
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile/{user}', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile/{user}', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

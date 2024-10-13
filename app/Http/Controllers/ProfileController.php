@@ -70,7 +70,6 @@ class ProfileController extends Controller
         ]));
     }
 
-
     /**
      * Update the user's profile information.
      */
@@ -93,7 +92,6 @@ class ProfileController extends Controller
 
         return redirect()->route('profile.edit', $user->id)->with('status', 'profile-updated');
     }
-
 
     /**
      * Delete the user's account.
