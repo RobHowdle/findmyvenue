@@ -84,15 +84,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/dashboard/promoter/note-item/{id}/complete', [PromoterDashboardController::class, 'completeNoteItem'])->name('admin.promoter.dashboard.complete-note');
     Route::delete('/dashboard/promoter/note-item/{id}', [PromoterDashboardController::class, 'deleteNoteItem'])->name('admin.promoter.dashboard.delete-note');
     Route::get('/dashboard/promoter/note-item/completed-notes', [PromoterDashboardController::class, 'showCompletedNoteItems'])->name('admin.promoter.dashboard.completed-notes');
+    Route::get('/dashboard/promoter/reviews', [PromoterDashboardController::class, 'showPendingPromoterReviews'])->name('admin.promoter.dashboard.show-reviews');
+    Route::post('/dashboard/promoter/approve-display-promoter/{reviewId}', [PromoterDashboardController::class, 'approveDisplayPromoterReview'])->name('admin.promoter.dashboard.approve-display-review');
+    Route::post('/dashboard/promoter/approve-promoter/{reviewId}', [PromoterDashboardController::class, 'approvePromoterReview'])->name('admin.promoter.dashboard.approve-pending-review');
+    Route::delete('/dashboard/promoter/delete-review/{reviewId}', [PromoterDashboardController::class, 'deletePromoterReview'])->name('admin.promoter.dashboard.delete-review');
 
 
 
 
 
-    // Route::post('/dashboard/approve-promoter/{reviewId}', [DashboardController::class, 'approvePromoterReview'])->name('pending-review-promoter.approve');
     // Route::post('/dashboard/display-promoter/{reviewId}', [DashboardController::class, 'displayPromoterReview'])->name('pending-review-promoter.display');
     // Route::post('/dashboard/hide-promoter/{reviewId}', [DashboardController::class, 'hidePromoterReview'])->name('pending-review-promoter.hide');
-    // Route::post('/dashboard/approve-display-promoter/{reviewId}', [DashboardController::class, 'approveDisplayPromoterReview'])->name('pending-review-promoter.approve-display');
     // Route::post('/dashboard/approve-display-venue/{reviewId}', [DashboardController::class, 'approveDisplayVenueReview'])->name('pending-review-venue.approve-display');
     // Route::post('/dashboard/approve-venue/{reviewId}', [DashboardController::class, 'approveVenueReview'])->name('pending-review-venue.approve');
     // Route::post('/dashboard/user-service-link', [DashboardController::class, 'userServiceLink'])->name('user-service-link');

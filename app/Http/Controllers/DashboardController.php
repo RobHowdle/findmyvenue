@@ -8,7 +8,6 @@ use App\Models\Venue;
 use App\Models\UserService;
 use App\Models\VenueReview;
 use Illuminate\Http\Request;
-use App\Models\PromoterReview;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
@@ -52,48 +51,6 @@ class DashboardController extends Controller
     {
         $user = User::findOrFail($request->user_id);
         dd($user);
-    }
-
-    public function approveDisplayPromoterReview($reviewId)
-    {
-        $review = PromoterReview::findOrFail($reviewId);
-
-        $review->update([
-            'review_approved' => 1,
-            'display' => 1
-        ]);
-
-        return redirect()->route('dashboard')->with('success', 'Review approved and set to display.');
-    }
-
-    public function approvePromoterReview($reviewId)
-    {
-        $review = PromoterReview::findOrFail($reviewId);
-        $review->update([
-            'review_approved' => 1,
-        ]);
-
-        return redirect()->route('dashboard')->with('success', 'Review approved.');
-    }
-
-    public function displayPromoterReview($reviewId)
-    {
-        $review = PromoterReview::findOrFail($reviewId);
-        $review->update([
-            'display' => 1,
-        ]);
-
-        return redirect()->route('dashboard')->with('success', 'Review approved.');
-    }
-
-    public function hidePromoterReview($reviewId)
-    {
-        $review = PromoterReview::findOrFail($reviewId);
-        $review->update([
-            'display' => 0,
-        ]);
-
-        return redirect()->route('dashboard')->with('success', 'Review approved.');
     }
 
     public function approveDisplayVenueReview($reviewId)

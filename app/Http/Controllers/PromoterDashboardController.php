@@ -946,7 +946,7 @@ class PromoterDashboardController extends Controller
         $promoter = Auth::user()->load('promoters');
         $finance = Finance::findOrFail($id)->load('user', 'serviceable');
 
-        return view('admin.dashboards.promoter.edit-single-finance', compact('finance', 'promoter'));
+        return view('admin.dashboards.promoter..promoter-edit-single-finance', compact('finance', 'promoter'));
     }
 
     public function updateSingleFinance(Request $request, $id)
@@ -1375,5 +1375,83 @@ class PromoterDashboardController extends Controller
             return back()->with('error', 'Failed to create promoter. Please try again.')
                 ->withInput();
         }
+    }
+
+    /**
+     * Promoter Reviews
+     */
+
+    public function showPendingPromoterReviews()
+    {
+        $promoter = Auth::user()->load(['promoters']);
+        $pendingReviews = PromoterReview::where('review_approved', 0)->get();
+
+        return view('admin.dashboards.promoter.promoter-reviews', compact('promoter', 'pendingReviews'));
+    }
+
+    public function approveDisplayPromoterReview($reviewId)
+    {
+        $review = PromoterReview::findOrFail($reviewId);
+
+        if ($review) {
+            $review->review_approved = true;
+            $review->display = true;
+            $review->save();
+
+            return response()->json(['success' => true, 'message' => 'Review displayed successfully']);
+        }
+        return response()->json(['success' => false, 'message' => 'Review not found']);
+    }
+
+    public function approvePromoterReview($reviewId)
+    {
+        $review = PromoterReview::findOrFail($reviewId);
+
+        if ($review) {
+            $review->review_approved = true;
+            $review->save();
+
+            return response()->json(['success' => true, 'message' => 'Review approved successfully']);
+        }
+        return response()->json(['success' => false, 'message' => 'Review not found']);
+    }
+
+    public function displayPromoterReview($reviewId)
+    {
+        $review = PromoterReview::findOrFail($reviewId);
+
+        if ($review) {
+            $review->display = true;
+            $review->save();
+
+            return response()->json(['success' => true, 'message' => 'Review displayed successfully']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Review not found']);
+    }
+
+    public function hidePromoterReview($reviewId)
+    {
+        $review = PromoterReview::findOrFail($reviewId);
+
+        if ($review) {
+            $review->display = false;
+            $review->save();
+
+            return response()->json(['success' => true, 'message' => 'Review hidden successfully']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Review not found']);
+    }
+
+    public function deletePromoterReview($reviewId)
+    {
+        $review = PromoterReview::find($reviewId);
+        if ($review) {
+            $review->delete();
+            return response()->json(['success' => true, 'message' => 'Review deleted successfully']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Review not found']);
     }
 }

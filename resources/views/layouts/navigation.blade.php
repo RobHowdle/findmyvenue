@@ -29,8 +29,8 @@
             <a href="{{ route('promoter.dashboard.todo-list') }}"
               class="{{ request()->is('dashboard/promoter/todo-list*') ? ' border-b-yns_yellow' : '' }} inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:border-b-yns_yellow hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Todo
               List</a>
-            {{-- <a href="{{ route('promoter.dashboard.reviews') }}"
-              class="{{ request()->is('dashboard/promoter/reviews*') ? ' border-b-yns_yellow' : '' }} hover:border-b-yns_yellow dark:hover:text-yns_yellow inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white">Finances</a> --}}
+            <a href="{{ route('admin.promoter.dashboard.show-reviews') }}"
+              class="{{ request()->is('dashboard/promoter/reviews*') ? ' border-b-yns_yellow' : '' }} inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:border-b-yns_yellow hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Reviews</a>
             <a href="{{ route('admin.dashboard.promoter.show-notes') }}"
               class="{{ request()->is('dashboard/promoter/notes*') ? ' border-b-yns_yellow' : '' }} inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:border-b-yns_yellow hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Notes</a>
           @endcan
