@@ -16,6 +16,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -260,7 +261,20 @@ class PromoterDashboardController extends Controller
                 }
             }
         }
-        return view('admin.dashboards.promoter.promoter-show-single-event', compact('promoter', 'event', 'headliner', 'mainSupport', 'otherBands', 'opener'));
+
+        $eventStartTime = $event->event_start_time ? Carbon::parse($event->event_start_time)->format('g:i A') : null;
+        $eventEndTime = $event->event_end_time ? Carbon::parse($event->event_end_time)->format('g:i A') : null;
+
+        return view('admin.dashboards.promoter.promoter-show-single-event', compact(
+            'promoter',
+            'event',
+            'headliner',
+            'mainSupport',
+            'otherBands',
+            'opener',
+            'eventStartTime',
+            'eventEndTime'
+        ));
     }
 
     public function createNewPromoterEvent()
@@ -286,26 +300,30 @@ class PromoterDashboardController extends Controller
                 'otd_ticket_price' => 'required|numeric',
                 'venue_id' => 'required|integer|exists:venues,id',
                 'headliner' => 'required|string',
+                'headliner_id' => 'required|integer',
                 'mainSupport' => 'required|string',
-                'bands' => 'nullable|array',
-                'bands.*' => 'nullable|string',
+                'main_support_id' => 'required|integer',
+                'band' => 'nullable|array',
+                'band.*' => 'nullable|string',
+                'band_id' => 'required|array',
+                'band_id.*' => 'required|integer',
                 'opener' => 'nullable|string',
+                'opener_id' => 'required|integer',
                 'poster_url' => 'required|image|mimes:jpeg,jpg,png,webp,svg|max:5120'
             ]);
 
-            // dd($validatedData);
             $bandsArray = [];
 
             if (!empty($request->headliner)) {
-                $bandsArray[] = ['role' => 'Headline', 'band_id' => $request->headliner];
+                $bandsArray[] = ['role' => 'Headlinee', 'band_id' => $request->headliner_id];
             }
 
             if (!empty($request->mainSupport)) {
-                $bandsArray[] = ['role' => 'Main Support', 'band_id' => $request->mainSupport];
+                $bandsArray[] = ['role' => 'Main Support', 'band_id' => $request->main_support_id];
             }
 
-            if (!empty($request->bands)) {
-                foreach ($request->bands as $bandId) {
+            if (!empty($request->band_id)) {
+                foreach ($request->band_id as $bandId) {
                     if (!empty($bandId)) {
                         $bandsArray[] = ['role' => 'Band', 'band_id' => $bandId];
                     }
@@ -313,25 +331,47 @@ class PromoterDashboardController extends Controller
             }
 
             if (!empty($request->opener)) {
-                $bandsArray[] = ['role' => 'Opener', 'band_id' => $request->opener];
+                $bandsArray[] = ['role' => 'Opener', 'band_id' => $request->opener_id];
+            }
+
+            // Correct Event Start Date/Time
+            $event_date = Carbon::createFromFormat('d-m-Y H:i:s', $validatedData['event_date'] . ' 00:00:00')->format('Y-m-d H:i:s');
+
+            // Poster Upload
+            $posterUrl = null;
+
+            if ($request->hasFile('poster_url')) {
+                // Get the uploaded image file
+                $eventPosterFile = $request->file('poster_url');
+
+                // Generate a unique filename based on the event name and extension
+                $eventName = $request->input('event_name');
+                $posterExtension = $eventPosterFile->getClientOriginalExtension() ?: $eventPosterFile->guessExtension();
+                $posterFilename = Str::slug($eventName) . '_poster.' . $posterExtension; // Adding '_poster' to the filename
+
+                // Specify the destination directory, ensure the correct folder structure
+                $destinationPath = public_path('images/event_posters/' . $promoter->id); // Create a folder for the promoter
+
+                // Check if the directory exists; if not, create it
+                if (!File::exists($destinationPath)) {
+                    File::makeDirectory($destinationPath, 0755, true); // Create directory with permissions
+                }
+
+                // Move the uploaded image to the specified directory
+                $eventPosterFile->move($destinationPath, $posterFilename);
+
+                // Construct the URL to the stored image
+                $posterUrl = 'images/event_posters/' . $promoter->id . '/' . $posterFilename;
             }
 
             // Main Event Creation
-            if (isset($validatedData['bands']) && is_array($validatedData['bands'])) {
-                $bandsArray = $validatedData['bands'];
-            }
-
-            $event_date = Carbon::createFromFormat('d-m-Y H:i:s', $validatedData['event_date'] . ' 00:00:00')->format('Y-m-d H:i:s');
-
-            // dd($event_date);
-
             $event = Event::create([
                 'name' => $validatedData['event_name'],
                 'event_date' => $event_date,
                 'event_start_time' => $validatedData['event_start_time'],
                 'event_end_time' => $validatedData['event_end_time'],
                 'facebook_event_url' => $validatedData['facebook_event_url'],
-                'poster_url' => $validatedData['poster_url'],
+                'poster_url' => $posterUrl,
                 'band_ids' => json_encode($bandsArray),
                 'ticket_url' => $validatedData['ticket_url'],
                 'on_the_door_ticket_price' => $validatedData['otd_ticket_price'],
@@ -339,8 +379,8 @@ class PromoterDashboardController extends Controller
 
             // Event Band Creation
             if (!empty($bandsArray)) {
-                foreach ($bandsArray as $bandId) {
-                    $event->services()->attach($bandId, ['event_id' => $event->id]);
+                foreach ($bandsArray as $band) {
+                    $event->services()->attach($band['band_id'], ['event_id' => $event->id]);
                 }
             }
 
@@ -354,7 +394,7 @@ class PromoterDashboardController extends Controller
                 $event->promoters()->attach($promoter->id, ['event_id' => $event->id]);
             }
 
-            return redirect()->route('promoter-show-single-event', [
+            return response()->json([
                 'success' => true,
                 'message' => 'Event created successfully',
                 'id' => $event->id,
@@ -391,8 +431,6 @@ class PromoterDashboardController extends Controller
 
         return response()->json($venues);
     }
-
-
 
     public function index()
     {

@@ -48,6 +48,16 @@
               </div>
 
               <div class="group mb-4">
+                <x-input-label-dark>Promoter</x-input-label-dark>
+                <span>This is supposed to be hidden...naughty naughty</span>
+                <x-text-input class="w-auto" id="promoter_id" name="promoter_id"
+                  value="{{ $promoter->id }}"></x-text-input>
+                @error('promoter_id')
+                  <p class="yns_red mt-1 text-sm">{{ $message }}</p>
+                @enderror
+              </div>
+
+              <div class="group mb-4">
                 <x-input-label-dark>End Time</x-input-label-dark>
                 <x-text-input class="w-auto" id="event_end_time" name="event_end_time"></x-text-input>
                 @error('event_end_time')
@@ -94,7 +104,8 @@
                 <x-input-label-dark>Venue</x-input-label-dark>
                 <x-text-input id="venue_name" name="venue_name" autocomplete="off"></x-text-input>
                 <ul id="venue-suggestions"
-                  class="max-h-60 absolute z-10 hidden overflow-auto border border-gray-300 bg-white"></ul>
+                  class="max-h-60 absolute z-10 hidden overflow-auto border border-gray-300 bg-white">
+                </ul>
                 <x-text-input id="venue_id" name="venue_id" class=""></x-text-input>
                 @error('venue_name')
                   <p class="yns_red mt-1 text-sm">{{ $message }}</p>
@@ -127,11 +138,11 @@
                     <div class="flex flex-row">
                       <div class="group w-full">
                         <x-input-label-dark>Band</x-input-label-dark>
-                        <x-text-input id="band-0" name="band[]" class="band-input"
+                        <x-text-input id="band_1" name="band[]" class="band-input"
                           autocomplete="off"></x-text-input>
-                        <ul id="band-suggestions-0"
+                        <ul id="band-suggestions-1"
                           class="max-h-60 absolute z-10 hidden overflow-auto border border-gray-300 bg-white"></ul>
-                        <x-text-input id="band_id_0" name="band_id[]" class="" />
+                        <x-text-input id="band_id_1" name="band_id[]" class="" />
                         @error('band')
                           <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                         @enderror
@@ -228,93 +239,7 @@
     }
   });
 
-  const bandsContainer = document.getElementById('bandsContainer');
-  const addBandRowButton = document.getElementById('add-band-row');
-
-  // Update Gap Class if there is more than 1 band row
-  function updateGapClass() {
-    const bandRows = bandsContainer.querySelectorAll('.band-input-row');
-    const parentDivs = bandsContainer.querySelectorAll('.band-input-row');
-    const removeButtons = bandsContainer.querySelectorAll('.remove-band');
-
-
-    if (parentDivs) {
-      parentDivs.forEach(parentDiv => {
-        const childDivs = parentDiv.querySelectorAll('.flex');
-
-        childDivs.forEach((childDiv) => {
-          if (bandRows.length === 1) {
-            childDiv.classList.add('gap-275');
-            childDiv.classList.remove('gap-1');
-          } else {
-            childDiv.classList.add('gap-1');
-            childDiv.classList.remove('gap-275');
-          }
-        });
-      });
-    }
-
-    if (bandRows.length > 1) {
-      removeButtons.forEach(button => button.classList.remove('hidden'));
-    } else {
-      // Hide the remove button if there's only one row
-      if (removeButtons.length > 0) {
-        removeButtons[0].classList.add('hidden');
-      }
-    }
-  };
-
-  // Initial class update
-  updateGapClass();
-
-  // Add New Band Row
-  addBandRowButton.addEventListener('click', function(event) {
-    event.preventDefault();
-
-    const newBandRow = document.createElement('div');
-    newBandRow.classList.add('flex', 'items-center', 'mt-4', 'band-input-row');
-    newBandRow.innerHTML = `
-    <div class="flex flex-row">
-      <div class="group w-full">
-        <x-input-label-dark>Band</x-input-label-dark>
-        <x-text-input name="band[]" class="band-input"></x-text-input>
-      </div>
-      <button type="button" class="mt-7 remove-band rounded-lg border border-white bg-white px-4 py-2 font-heading text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">
-        <span class="fas fa-minus"></span>
-      </button>
-      <button type="button" class="mt-7 add-band border border-white bg-white px-4 py-2 font-heading text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">
-        <span class="fas fa-plus"></span>
-      </button>
-    </div>
-  `;
-
-    bandsContainer.appendChild(newBandRow);
-    updateGapClass();
-
-    // Show the remove button for the previous row if there is more than one row
-    const previousRows = bandsContainer.querySelectorAll('.band-input-row');
-    const previousRowRemoveButton = previousRows[previousRows.length - 2]?.querySelector('.remove-band');
-
-    if (previousRowRemoveButton) {
-      previousRowRemoveButton.classList.remove('hidden');
-    }
-
-    // Handle removing the row
-    newBandRow.querySelector('.remove-band').addEventListener('click', function() {
-      newBandRow.remove();
-      updateGapClass();
-    });
-  });
-
-  // Using event delegation for dynamically added buttons
-  bandsContainer.addEventListener('click', function(event) {
-    if (event.target.classList.contains('add-band')) {
-      // Trigger the add band functionality
-      addBandRowButton.click();
-    }
-  });
-
-  // Ajax call for venue searching
+  // Venue Search
   const venueInput = document.getElementById('venue_name');
   const suggestionsList = document.getElementById('venue-suggestions');
 
@@ -371,7 +296,7 @@
       });
   });
 
-  // Hide suggestions when clicking outside
+  // Venue Hide suggestions when clicking outside
   document.addEventListener('click', function(event) {
     if (!venueInput.contains(event.target) && !suggestionsList.contains(event.target)) {
       suggestionsList.classList.add('hidden');
@@ -379,35 +304,125 @@
   });
 
   // Band Search
-  let bandRowCount = 1; // Start with one band row
+  const bandsContainer = document.getElementById('bandsContainer');
+  const addBandRowButton = document.getElementById('add-band-row');
+  let bandRowCount = 1;
 
-  function addBandRow() {
-    const bandRowsContainer = document.getElementById('band-rows');
-    const newBandRow = document.createElement('div');
-    newBandRow.classList.add('band-row', 'relative', 'mb-4');
-    newBandRow.setAttribute('data-index', bandRowCount);
-    newBandRow.innerHTML = `
-        <input-label-dark for="band_${bandRowCount}" value="Band" />
-        <x-text-input 
-          id="band_${bandRowCount}" 
-          name="band[]" 
-          placeholder="Search for Band" 
-          class="text-input" 
-          oninput="searchBand(this.value, 'band-suggestions-${bandRowCount}')" 
-          autocomplete="off" 
-        />
-        <ul id="band-suggestions-${bandRowCount}" class="max-h-60 absolute z-10 hidden overflow-auto border border-gray-300 bg-white"></ul>
-        <input type="hidden" id="band_id_${bandRowCount}" name="band_id[]">
-        <button type="button" class="remove-band-btn" onclick="removeBandRow(this)">Remove</button>
-    `;
-    bandRowsContainer.appendChild(newBandRow);
-    bandRowCount++;
+  // Update Gap Class if there is more than 1 band row
+  function updateGapClass() {
+    const bandRows = bandsContainer.querySelectorAll('.band-input-row');
+    const removeButtons = bandsContainer.querySelectorAll('.remove-band');
+
+    bandRows.forEach(row => {
+      const childDivs = row.querySelectorAll('.flex');
+
+      childDivs.forEach((childDiv) => {
+        if (bandRows.length === 1) {
+          childDiv.classList.add('gap-275');
+          childDiv.classList.remove('gap-1');
+        } else {
+          childDiv.classList.add('gap-1');
+          childDiv.classList.remove('gap-275');
+        }
+      });
+    });
+
+    // Show/Hide remove buttons
+    if (bandRows.length > 1) {
+      removeButtons.forEach(button => button.classList.remove('hidden'));
+    } else {
+      if (removeButtons.length > 0) {
+        removeButtons[0].classList.add('hidden');
+      }
+    }
+  };
+
+  // Initial class update
+  updateGapClass();
+
+  // Function to initialize event listeners for existing band inputs
+  function initializeExistingBandInputs() {
+    const existingBandInputs = document.querySelectorAll('.band-input');
+    existingBandInputs.forEach(input => {
+      const suggestionsList = input.nextElementSibling; // Assuming the next sibling is the <ul>
+
+      // Add input event listener to the band input
+      input.addEventListener('input', function() {
+        const query = this.value.trim();
+        if (query.length > 0) {
+          searchBand(query, `band-suggestions-${bandRowCount}`, 'band', `band_id_${bandRowCount}`,
+            bandRowCount);
+        } else {
+          suggestionsList.classList.add('hidden');
+          suggestionsList.innerHTML = ''; // Clear suggestions if the input is empty
+        }
+      });
+
+      // Add event listener for suggestion clicks
+      suggestionsList.addEventListener('click', function(event) {
+        if (event.target.tagName === 'LI') {
+          const band = {
+            id: event.target.dataset.id,
+            name: event.target.textContent
+          };
+          selectBand(band, suggestionsList, 'band', `band_id_${bandRowCount}`);
+        }
+      });
+    });
   }
 
-  // Function to remove a band row
-  function removeBandRow(button) {
-    const bandRow = button.parentElement;
-    bandRow.remove();
+  // Call the function after the DOM content is fully loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    initializeExistingBandInputs(); // Initialize existing inputs
+    const addBandRowButton = document.getElementById('add-band-row');
+
+    // Existing code for adding new band rows
+    addBandRowButton.addEventListener('click', function(event) {
+      event.preventDefault();
+      createBandRow();
+    });
+  });
+
+
+  // Function to create a new band row
+  function createBandRow() {
+    bandRowCount++;
+    const newBandRow = document.createElement('div');
+    newBandRow.classList.add('flex', 'items-center', 'mt-4', 'band-input-row');
+    newBandRow.innerHTML = `
+    <div class="flex flex-row">
+      <div class="group w-full">
+        <x-input-label-dark>Band</x-input-label-dark>
+        <x-text-input id="band_${bandRowCount}" name="band[]" class="band-input"></x-text-input>
+        <ul id="band-suggestions-${bandRowCount}" class="hidden max-h-60 absolute z-10 overflow-auto border border-gray-300 bg-white"></ul>
+        <x-text-input id="band_id_${bandRowCount}" name="band_id[]" class="" />
+      </div>
+      <button type="button" class="mt-7 remove-band mt-7 rounded-lg border border-white bg-white px-4 py-2 font-heading text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow"><span class="fas fa-minus"></span></button>
+    </div>
+  `;
+
+    bandsContainer.appendChild(newBandRow);
+    updateGapClass();
+
+    // Add event listener for the band input to handle searching
+    const bandInput = newBandRow.querySelector(`#band_${bandRowCount}`);
+    const suggestionsList = newBandRow.querySelector(`#band-suggestions-${bandRowCount}`);
+
+    bandInput.addEventListener('input', function() {
+      const query = this.value;
+      if (query.length > 0) {
+        searchBand(query, `band-suggestions-${bandRowCount}`, 'band', `band_id_${bandRowCount}`);
+      } else {
+        suggestionsList.classList.add('hidden');
+        suggestionsList.innerHTML = ''; // Clear previous suggestions
+      }
+    });
+
+    // Handle removing the row
+    newBandRow.querySelector('.remove-band').addEventListener('click', function() {
+      newBandRow.remove();
+      updateGapClass();
+    });
   }
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -432,11 +447,20 @@
       }
     ];
 
+    for (let i = 1; i <= bandRowCount; i++) {
+      bandFields.push({
+        inputId: `band_${i}`,
+        suggestionsId: `band-suggestions-${i}`,
+        hiddenInputId: `band_id_${i}`,
+        fieldType: 'band'
+      });
+    }
+
     bandFields.forEach(({
       inputId,
       suggestionsId,
       hiddenInputId,
-      fieldType
+      fieldType,
     }) => {
       const inputField = document.getElementById(inputId);
       const suggestionsList = document.getElementById(suggestionsId);
@@ -454,15 +478,17 @@
         });
       }
 
-      suggestionsList.addEventListener('click', (event) => {
-        if (event.target.tagName === 'LI') {
-          const band = {
-            id: event.target.dataset.id,
-            name: event.target.textContent
-          };
-          selectBand(band, suggestionsId, fieldType, hiddenInputId); // Pass hiddenInput directly
-        }
-      });
+      if (suggestionsList) {
+        suggestionsList.addEventListener('click', (event) => {
+          if (event.target.tagName === 'LI') {
+            const band = {
+              id: event.target.dataset.id,
+              name: event.target.textContent
+            };
+            selectBand(band, suggestionsId, fieldType, hiddenInputId); // Pass hiddenInput directly
+          }
+        });
+      }
     });
   });
 
@@ -478,19 +504,23 @@
       })
       .then(data => {
         const suggestionsList = document.getElementById(suggestionsId);
-        suggestionsList.innerHTML = '';
+        suggestionsList.innerHTML = ''; // Clear previous suggestions
 
         if (data.length) {
           suggestionsList.classList.remove('hidden');
           data.forEach(band => {
             const listItem = document.createElement('li');
             listItem.textContent = band.name;
-            listItem.setAttribute('data-id', band.id)
+            listItem.setAttribute('data-id', band.id);
             listItem.onclick = () => selectBand(band, suggestionsId, fieldType, hiddenInputId);
-            listItem.classList.add('cursor-pointer', 'hover:text-yns_yellow', 'px-4', 'py-2',
+            listItem.classList.add(
+              'cursor-pointer',
+              'hover:text-yns_yellow',
+              'px-4',
+              'py-2',
               'bg-opac_8_black',
-              'text-white');
-            console.log(listItem);
+              'text-white'
+            );
             suggestionsList.appendChild(listItem);
           });
         } else {
@@ -502,17 +532,15 @@
       });
   }
 
+
   // Select a band from suggestions
   function selectBand(band, suggestionsId, fieldType, hiddenInputId) {
-    const hiddenInput = document.getElementById(hiddenInputId); // Get the hidden input using its ID
-
+    const hiddenInput = document.getElementById(hiddenInputId);
     if (hiddenInput) {
       hiddenInput.value = band.id; // Set hidden input value
-    } else {
-      console.error(`Element with ID ${hiddenInputId} not found.`);
     }
 
-    // Select the correct input field based on fieldType
+    // Determine the input field for displaying the band name
     let inputFieldId = '';
     switch (fieldType) {
       case 'headliner':
@@ -521,26 +549,27 @@
       case 'main-support':
         inputFieldId = 'mainSupport-search';
         break;
+      case 'band':
+        const bandIndex = hiddenInputId.split('_')[2];
+        inputFieldId = `band_${bandIndex}`;
+        break;
       case 'opener':
         inputFieldId = 'opener-search';
         break;
       default:
-        inputFieldId = suggestionsId.replace('-suggestions', '');
+        console.error(`Unknown field type: ${fieldType}`);
     }
 
     const inputField = document.getElementById(inputFieldId);
-
     if (inputField) {
-      inputField.value = band.name; // Set input field value
-    } else {
-      console.error(`Input field for band name not found. Expected ID: ${inputFieldId}`);
+      inputField.value = band.name; // Set the input field value
     }
 
-    // Hide suggestions list after selection
+    // Hide suggestions after selection
     const suggestionsList = document.getElementById(suggestionsId);
     if (suggestionsList) {
-      suggestionsList.classList.add('hidden'); // Hide the suggestions list
-      suggestionsList.innerHTML = ''; // Clear the list to prevent lingering suggestions
+      suggestionsList.classList.add('hidden');
+      suggestionsList.innerHTML = ''; // Clear the suggestions
     }
   }
 
@@ -570,8 +599,6 @@
           // Handle successful submission, e.g., show a success message
           alert('Event created successfully!');
         } else {
-          // Handle validation errors
-          // Example: show errors returned from the server
           Object.keys(data.errors).forEach(key => {
             const error = data.errors[key];
             alert(`${key}: ${error}`);

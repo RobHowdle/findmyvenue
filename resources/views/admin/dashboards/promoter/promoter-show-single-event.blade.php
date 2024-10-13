@@ -37,37 +37,33 @@
           <div class="col px-8 pt-8">
             <div class="group border-b border-white">
               <div class="group mb-4 text-center">
-                <p class="flex flex-col text-2xl font-bold">Headliner<a
-                    href="{{ route('singleService', ['serviceName' => 'Band', 'serviceId' => $headliner->id]) }}"
-                    class="font-normal transition duration-150 ease-in-out hover:text-yns_yellow">{{ $headliner->name ?? 'No Headliner' }}</a>
-                </p>
+                <p class="flex flex-col text-2xl font-bold underline">Headliner</p>
+                <a href="{{ route('singleService', ['serviceName' => 'Band', 'serviceId' => $headliner->id]) }}"
+                  class="font-normal no-underline transition duration-150 ease-in-out hover:text-yns_yellow">{{ $headliner->name ?? 'No Headliner' }}</a>
               </div>
               <div class="group mb-4 text-center">
-                <p class="flex flex-col text-xl font-bold">Main Support<a
-                    href="{{ route('singleService', ['serviceName' => 'Band', 'serviceId' => $mainSupport->id]) }}"
-                    class="font-normal transition duration-150 ease-in-out hover:text-yns_yellow">{{ $mainSupport->name ?? 'No Main Support' }}</a>
-                </p>
+                <p class="flex flex-col text-xl font-bold underline">Main Support</p>
+                <a href="{{ route('singleService', ['serviceName' => 'Band', 'serviceId' => $mainSupport->id]) }}"
+                  class="font-normal no-underline transition duration-150 ease-in-out hover:text-yns_yellow">{{ $mainSupport->name ?? 'No Main Support' }}</a>
               </div>
               <div class="group mb-4 text-center">
                 @if (count($otherBands) > 0)
                   @foreach ($otherBands as $band)
-                    <p class="flex flex-col text-lg font-bold">Band<a
-                        href="{{ route('singleService', ['serviceName' => 'Band', 'serviceId' => $band->id]) }}"
-                        class="font-normal transition duration-150 ease-in-out hover:text-yns_yellow">{{ $band->name }}</a>
-                    </p>
+                    <p class="flex flex-col text-lg font-bold underline">Band</p>
+                    <a href="{{ route('singleService', ['serviceName' => 'Band', 'serviceId' => $band->id]) }}"
+                      class="font-normal no-underline transition duration-150 ease-in-out hover:text-yns_yellow">{{ $band->name }}</a>
                   @endforeach
                 @endif
               </div>
               <div class="group mb-4 text-center">
-                <p class="text-md flex flex-col font-bold">Opener<a
-                    href="{{ route('singleService', ['serviceName' => 'Band', 'serviceId' => $opener->id]) }}"
-                    class="font-normal transition duration-150 ease-in-out hover:text-yns_yellow">{{ $opener->name ?? 'No Opener' }}</a>
-                </p>
+                <p class="text-md flex flex-col font-bold underline">Opener</p>
+                <a href="{{ route('singleService', ['serviceName' => 'Band', 'serviceId' => $opener->id]) }}"
+                  class="font-normal no-underline transition duration-150 ease-in-out hover:text-yns_yellow">{{ $opener->name ?? 'No Opener' }}</a>
               </div>
             </div>
             <div class="group my-2 flex flex-row justify-between">
-              <p class="font-bold">Start Time:</p>
-              <p class="font-bold">End Time:</p>
+              <p class="font-bold">Start Time: {{ $eventStartTime }}</p>
+              <p class="font-bold">End Time: {{ $eventEndTime }}</p>
             </div>
             <div class="group mb-2 text-center">
               <p class="font-bold">Location:
@@ -92,7 +88,7 @@
 
             <div class="group mb-2 flex flex-row justify-between text-center">
               {{-- <p class="font-bold">Pre Sale Tickets:</p> --}}
-              <p class="font-bold">On The Door Tickets:</p>
+              <p class="font-bold">On The Door Tickets: {{ formatCurrency($event->on_the_door_ticket_price) }}</p>
             </div>
           </div>
           <div class="col relative place-content-center">
