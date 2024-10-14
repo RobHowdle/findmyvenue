@@ -28,4 +28,9 @@ class Todo extends Model
     {
         return $this->morphTo();
     }
+
+    public function promoters()
+    {
+        return $this->morphMany(Todo::class, 'serviceable');
+    }
 }

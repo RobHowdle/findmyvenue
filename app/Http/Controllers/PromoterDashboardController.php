@@ -439,7 +439,9 @@ class PromoterDashboardController extends Controller
     {
         $pendingReviews = PromoterReview::with('promoter')->where('review_approved', '0')->whereNull('deleted_at')->count();
         $promoter = Auth::user()->load('promoters');
-        $todoItemsCount = $promoter->promoters->load('todos')->count();
+        $todoItemsCount = $promoter->promoters()->with(['todos' => function ($query) {
+            $query->where('completed', 0)->whereNull('deleted_at');
+        }])->get()->pluck('todos')->flatten()->count();
 
         $startOfWeek = Carbon::now()->startOfWeek();
         $endOfWeek = Carbon::now()->endOfWeek();
