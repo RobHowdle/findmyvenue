@@ -16,7 +16,7 @@
             {{ $eventsCount }} Event{{ $eventsCount > 1 ? 's' : '' }}
           </a>
           <a href="#"
-            class="flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-yns_yellow">
+            class="pointer-events-none flex cursor-not-allowed flex-col items-center text-center opacity-disabled transition duration-150 ease-in-out hover:text-yns_yellow">
             <span class="fas fa-guitar mb-4 h-14 w-14"></span>
             6 Aviliable Bands
           </a>

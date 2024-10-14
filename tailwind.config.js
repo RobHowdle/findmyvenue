@@ -54,6 +54,15 @@ export default {
             borderRadius: {
                 50: "50px",
             },
+            opacity: {
+                disabled: "0.5", // or whatever opacity you want
+            },
+            cursor: {
+                "not-allowed": "not-allowed",
+            },
+            pointerEvents: {
+                none: "none",
+            },
         },
         screens: {
             sm: "320px",
