@@ -84,11 +84,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/dashboard/promoter/note-item/{id}/complete', [PromoterDashboardController::class, 'completeNoteItem'])->name('admin.promoter.dashboard.complete-note');
     Route::delete('/dashboard/promoter/note-item/{id}', [PromoterDashboardController::class, 'deleteNoteItem'])->name('admin.promoter.dashboard.delete-note');
     Route::get('/dashboard/promoter/note-item/completed-notes', [PromoterDashboardController::class, 'showCompletedNoteItems'])->name('admin.promoter.dashboard.completed-notes');
-    Route::get('/dashboard/promoter/reviews', [PromoterDashboardController::class, 'showPendingPromoterReviews'])->name('admin.promoter.dashboard.show-reviews');
+    Route::get('/dashboard/promoter/reviews/{filter?}', [PromoterDashboardController::class, 'getPromoterReviews'])->name('admin.promoter.dashboard.get-reviews');
+    Route::get('/dashboard/promoter/filtered-reviews/{filter?}', [PromoterDashboardController::class, 'fetchReviews'])->name('admin.promoter.dashboard.fetch-reviews');
+    Route::get('/dashboard/promoter/reviews/pending', [PromoterDashboardController::class, 'showPendingPromoterReviews'])->name('admin.promoter.dashboard.show-pending-reviews');
+    Route::get('/dashboard/promoter/reviews/all', [PromoterDashboardController::class, 'showAllPromoterReviews'])->name('admin.promoter.dashboard.show-all-reviews');
     Route::post('/dashboard/promoter/approve-display-promoter/{reviewId}', [PromoterDashboardController::class, 'approveDisplayPromoterReview'])->name('admin.promoter.dashboard.approve-display-review');
+    Route::post('/promoter/dashboard/hide-display-review/{reviewId}', [PromoterDashboardController::class, 'hidePromoterReview'])->name('admin.promoter.dashboard.hide-display-review');
     Route::post('/dashboard/promoter/approve-promoter/{reviewId}', [PromoterDashboardController::class, 'approvePromoterReview'])->name('admin.promoter.dashboard.approve-pending-review');
+    Route::post('/promoter/dashboard/unapprove-review/{reviewId}', [PromoterDashboardController::class, 'unapprovePromoterReview'])->name('admin.promoter.dashboard.unapprove-review');
     Route::delete('/dashboard/promoter/delete-review/{reviewId}', [PromoterDashboardController::class, 'deletePromoterReview'])->name('admin.promoter.dashboard.delete-review');
-
+    // Route::post('/promoter/dashboard/approve-display-review/{id}', [PromoterDashboardController::class, 'approveDisplayReview'])->name('admin.promoter.dashboard.approve-display-review');
+    // Route::post('/promoter/dashboard/approve-pending-review/{id}', [PromoterDashboardController::class, 'approvePendingReview'])->name('admin.promoter.dashboard.approve-pending-review');
 
 
 

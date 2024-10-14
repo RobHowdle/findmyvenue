@@ -1380,13 +1380,46 @@ class PromoterDashboardController extends Controller
     /**
      * Promoter Reviews
      */
+    public function getPromoterReviews($filter = 'all')
+    {
+        $promoter = Auth::user()->load(['promoters']);
+
+        switch ($filter) {
+            case 'pending':
+                $filter = 'pending';
+                break;
+            case 'all':
+                $filter = 'all';
+                break;
+
+                dd($filter);
+        }
+
+        return view('admin.dashboards.promoter.promoter-reviews', compact('promoter', 'filter'));
+    }
+
+    public function fetchReviews($filter = 'all')
+    {
+        // Fetch the reviews based on the filter
+        $reviews = ($filter === 'pending')
+            ? PromoterReview::where('review_approved', 0)->get()
+            : PromoterReview::all();
+
+        return response()->json(['reviews' => $reviews]);
+    }
+
+    public function showAllPromoterReviews()
+    {
+        $allReviews = PromoterReview::get();
+
+        return response()->json(['reviews' => $allReviews]);
+    }
 
     public function showPendingPromoterReviews()
     {
-        $promoter = Auth::user()->load(['promoters']);
         $pendingReviews = PromoterReview::where('review_approved', 0)->get();
 
-        return view('admin.dashboards.promoter.promoter-reviews', compact('promoter', 'pendingReviews'));
+        return response()->json(['reviews' => $pendingReviews]);
     }
 
     public function approveDisplayPromoterReview($reviewId)
@@ -1439,6 +1472,22 @@ class PromoterDashboardController extends Controller
             $review->save();
 
             return response()->json(['success' => true, 'message' => 'Review hidden successfully']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Review not found']);
+    }
+
+    public function unapprovePromoterReview($reviewId)
+    {
+
+        $review = PromoterReview::findOrFail($reviewId);
+
+        if ($review) {
+            $review->review_approved = false;
+            $review->display = false;
+            $review->save();
+
+            return response()->json(['success' => true, 'message' => 'Review unnapproved successfully']);
         }
 
         return response()->json(['success' => false, 'message' => 'Review not found']);

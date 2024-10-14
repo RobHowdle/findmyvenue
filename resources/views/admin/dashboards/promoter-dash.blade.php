@@ -20,7 +20,7 @@
             <span class="fas fa-guitar mb-4 h-14 w-14"></span>
             6 Aviliable Bands
           </a>
-          <a href="#"
+          <a href="{{ route('admin.promoter.dashboard.get-reviews', ['filter' => 'pending']) }}" data-filter="pending"
             class="flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-yns_yellow">
             <span class="fas fa-star mb-4 h-14 w-14"></span>
             {{ $pendingReviews }} Pending Review{{ $pendingReviews > 1 ? 's' : '' }}
