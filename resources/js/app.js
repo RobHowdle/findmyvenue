@@ -25,6 +25,16 @@ window.formatCurrency = function (value) {
     }).format(value);
 };
 
+// Format Dates
+window.formatDateToDMY = function (dateString) {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, "0"); // Pad with zero if needed
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+    const year = date.getFullYear();
+
+    return `${day}-${month}-${year}`; // Return in DMY format
+};
+
 $(document).ready(function () {
     // Accordion functionality
     $("[data-accordion-target]").click(function () {
@@ -331,6 +341,26 @@ window.showFailureNotification = function (message) {
         icon: "error",
         title: "Oops!",
         text: message,
+    });
+};
+
+window.showConfirmationNotification = function (options) {
+    return Swal.fire({
+        showConfirmButton: true,
+        confirmButtonText: "I understand",
+        showCancelButton: true,
+        toast: false,
+        // position: "top-end",
+        // timer: 3000,
+        // timerProgressBar: true,
+        customClass: {
+            popup: "bg-yns_dark_gray !important rounded-lg font-heading",
+            title: "text-white",
+            text: "text-white !important",
+        },
+        icon: "warning",
+        title: "Are you sure?",
+        text: options.text,
     });
 };
 

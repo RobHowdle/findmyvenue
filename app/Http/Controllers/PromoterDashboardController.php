@@ -77,87 +77,6 @@ class PromoterDashboardController extends Controller
     }
 
     /**
-     * Adding New User to promotion company
-     */
-    public function newUser()
-    {
-        $promoter = Auth::user()->promoters()->first();
-
-        return view('admin.dashboards.promoter.promoter-new-user', compact('promoter'));
-    }
-
-    public function searchUsers(Request $request)
-    {
-        $query = $request->input('query');
-
-        // Adjust this query to fit your database schema
-        $users = User::where('name', 'LIKE', "%{$query}%")
-            // ->orWhere('email', 'LIKE', "%{$query}%")
-            ->get();
-
-        $promoterId = Auth::user()->promoters()->first()->id;
-
-        $userLinks = DB::table('service_user')
-            ->where('serviceable_id', $promoterId)
-            ->where('serviceable_type', 'App\Models\Promoter')
-            ->pluck('user_id')
-            ->toArray();
-
-        // Add linked status to each user
-        $result = $users->map(function ($user) use ($userLinks) {
-            return [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'linked' => in_array($user->id, $userLinks),
-            ];
-        });
-
-        return response()->json($result);
-    }
-
-    public function addUserToCompany(Request $request)
-    {
-        $userId = $request->input('user_id');
-        $role = $request->input('role');
-        $promoterId = $request->input('promoter_id');
-
-        $validatedData = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'role' => 'required|string',
-            'promoter_id' => 'required|exists:promoters,id',
-        ]);
-
-        // Assuming you have a method to link the user to the promoter
-        DB::table('service_user')->insert([
-            'user_id' => $userId,
-            'serviceable_id' => $promoterId,
-            'serviceable_type' => 'App\Models\Promoter',
-            'role' => $role,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        // Return a success response with an appropriate HTTP status code
-        return response()->json(['message' => 'User successfully added to the promotion company.'], 200);
-    }
-
-    public function deleteUserFromCompany(Request $request)
-    {
-        $validatedData = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'promoter_id' => 'required|exists:promoters,id',
-        ]);
-
-        DB::table('service_user')
-            ->where('user_id', $validatedData['user_id'])
-            ->where('serviceable_id', $validatedData['promoter_id'])
-            ->update(['deleted_at' => now()]); // Soft delete
-
-        return response()->json(['message' => 'User successfully removed from the promotion company.']);
-    }
-
-    /**
      * Events
      */
     public function showPromoterEvents()
@@ -468,14 +387,114 @@ class PromoterDashboardController extends Controller
     public function promoterUsers()
     {
         $promoter = Auth::user()->promoters()->first();
-        if ($promoter) {
-            $promoter->load('users');
-            $users = $promoter->users;
-        } else {
-            dd('No promoter associated with that use');
-        }
 
-        return view('admin.dashboards.promoter.promoter-users', compact('promoter', 'users'));
+        return view('admin.dashboards.promoter.promoter-users', compact('promoter'));
+    }
+
+    public function getPromoterusers()
+    {
+        $promoter = Auth::user()->promoters()->first();
+
+        if ($promoter) {
+            $users = $promoter->users;
+
+            return response()->json($users);
+        } else {
+            return response()->json(['message' => 'No promoters associated with that user'], 404);
+        }
+    }
+
+    public function newUser()
+    {
+        $promoter = Auth::user()->promoters()->first();
+
+        return view('admin.dashboards.promoter.promoter-new-user', compact('promoter'));
+    }
+
+    public function searchUsers(Request $request)
+    {
+        $query = $request->input('query');
+
+        // Adjust this query to fit your database schema
+        $users = User::where('name', 'LIKE', "%{$query}%")
+            // ->orWhere('email', 'LIKE', "%{$query}%")
+            ->get();
+
+        $promoterId = Auth::user()->promoters()->first()->id;
+
+        $userLinks = DB::table('service_user')
+            ->where('serviceable_id', $promoterId)
+            ->where('serviceable_type', 'App\Models\Promoter')
+            ->pluck('user_id')
+            ->toArray();
+
+        // Add linked status to each user
+        $result = $users->map(function ($user) use ($userLinks) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'linked' => in_array($user->id, $userLinks),
+            ];
+        });
+
+        return response()->json($result);
+    }
+
+    public function addUserToCompany(Request $request)
+    {
+        $userId = $request->input('user_id');
+        $role = $request->input('role');
+        $promoterId = $request->input('promoter_id');
+
+        $validatedData = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'role' => 'required|string',
+            'promoter_id' => 'required|exists:promoters,id',
+        ]);
+
+        // Assuming you have a method to link the user to the promoter
+        DB::table('service_user')->insert([
+            'user_id' => $userId,
+            'serviceable_id' => $promoterId,
+            'serviceable_type' => 'App\Models\Promoter',
+            'role' => $role,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Return a success response with an appropriate HTTP status code
+        return response()->json(['message' => 'User successfully added to the promotion company.'], 200);
+    }
+
+    public function deleteUserFromCompany(Request $request)
+    {
+        try {
+            // Validate the incoming request data
+            $validatedData = $request->validate([
+                'user_id' => 'required|exists:users,id',
+                'promoter_id' => 'required|exists:promoters,id',
+            ]);
+
+            if ((int) $validatedData['user_id'] === (int) Auth::user()->id) {
+                return response()->json(['message' => 'You can\'t delete yourself. Please contact an administrator.'], 403);
+            }
+
+            // Perform the update operation
+            DB::table('service_user')
+                ->where('user_id', $validatedData['user_id'])
+                ->where('serviceable_id', $validatedData['promoter_id'])
+                ->update(['deleted_at' => now()]);
+
+
+            return response()->json(['message' => 'User successfully removed from the promotion company.']);
+        } catch (ValidationException $e) {
+
+            return response()->json(['message' => 'Validation failed.', 'errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+
+            return response()->json(['message' => 'An error occurred while removing the user.', 'error' => $e->getMessage()], 500);
+        }
     }
 
     /**

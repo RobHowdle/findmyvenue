@@ -46,7 +46,8 @@ class Promoter extends Model
     public function users(): MorphToMany
     {
         return $this->morphToMany(User::class, 'serviceable', 'service_user', 'serviceable_id', 'user_id')
-            ->withPivot('created_at', 'updated_at', 'role');
+            ->withPivot('created_at', 'updated_at', 'role')
+            ->whereNull('service_user.deleted_at');
     }
 
     public function todos()

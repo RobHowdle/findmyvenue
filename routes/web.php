@@ -49,7 +49,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/dashboard/notes/store-note', [DashboardController::class, 'storeNewNote'])->name('dashboard.store-new-note');
 
     Route::get('/dashboard/promoter', [PromoterDashboardController::class, 'index'])->name('promoter.dashboard');
-    Route::get('/dashboard/promoter/users', [PromoterDashboardController::class, 'promoterUsers'])->name('promter.dashboard.users');
     Route::get('/dashboard/promoter/finances', [PromoterDashboardController::class, 'promoterFinances'])->name('promoter.dashboard.finances');
     Route::get('/dashboard/promoter/finances/new-budget', [PromoterDashboardController::class, 'createNewPromoterBudget'])->name('promoter.dashboard.finances.new');
     Route::post('/dashboard/promoter/finances/save-budget', [PromoterDashboardController::class, 'saveNewPromoterBudget'])->name('promoter.dashboard.finances.saveNew');
@@ -67,6 +66,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard/promoter/search', [PromoterDashboardController::class, 'searchExistingPromoters'])->name('admin.dashboard.promoter.search');
     Route::post('/dashboard/promoter/link', [PromoterDashboardController::class, 'linkToExistingPromoter'])->name('admin.dashboard.promoter.link');
     Route::post('/dashboard/promoter/store', [PromoterDashboardController::class, 'storeNewPromoter'])->name('admin.dashboard.promoter.store');
+    Route::get('/dashboard/promoter/users', [PromoterDashboardController::class, 'promoterUsers'])->name('promter.dashboard.users');
+    Route::get('/dashboard/promoter/users/get', [PromoterDashboardController::class, 'getPromoterusers'])->name('admin.promoter.dashboard.get-users');
     Route::get('/dashboard/promoter/users/new-user', [PromoterDashboardController::class, 'newUser'])->name('promoter.dashboard.users.new');
     Route::get('/dashboard/promoter/users/search-users', [PromoterDashboardController::class, 'searchUsers'])->name('admin.dashboard.promoter.search-users');
     Route::post('/dashboard/promoter/users/add-user', [PromoterDashboardController::class, 'addUserToCompany'])->name('admin.dashboard.promoter.add-user-to-company');
