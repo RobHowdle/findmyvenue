@@ -604,15 +604,16 @@
       })
       .then(data => {
         if (data.success) {
-          // Handle successful submission, e.g., show a success message
-          alert('Event created successfully!');
+          showSuccessNotification(data.message)
         } else {
           Object.keys(data.errors).forEach(key => {
             const error = data.errors[key];
-            alert(`${key}: ${error}`);
+            showFailureNotification(error);
           });
         }
       })
-      .catch(error => console.error('Error:', error));
+      .catch(error => {
+        showFailureNotification(error);
+      });
   });
 </script>
