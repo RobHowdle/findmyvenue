@@ -11,6 +11,7 @@ use App\Models\Venue;
 use App\Models\Finance;
 use App\Models\Promoter;
 use Illuminate\Support\Str;
+use App\Models\OtherService;
 use Illuminate\Http\Request;
 use App\Models\PromoterReview;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -201,6 +202,170 @@ class PromoterDashboardController extends Controller
             'eventEndTime'
         ));
     }
+
+    public function editSinglePromoterEvent($id)
+    {
+        $promoter = Auth::user()->promoters()->first();
+
+        $event = Event::with(['promoters', 'venues', 'services'])->findOrFail($id);
+        $eventDate = Carbon::parse($event->event_date)->toDateString();
+        $eventTime = $event->event_start_time;
+        $combinedDateTime = Carbon::parse($eventDate . ' ' . $eventTime)->format('Y-m-d\TH:i');
+        $formattedEndTime = \Carbon\Carbon::parse($event->event_end_time)->format('H:i');
+        $formattedEventDate = \Carbon\Carbon::parse($event->event_date)->format('Y-m-d\TH:i');
+
+        $bandRoles = json_decode($event->band_ids, true);
+
+        $headlinerId = null;
+        $mainSupportId = null;
+        $openerId = null;
+        $bands = [];
+
+        // Iterate through the decoded roles and IDs
+        foreach ($bandRoles as $band) {
+            switch ($band['role']) {
+                case 'Headliner':
+                    $headlinerId = $band['band_id'];
+                    break;
+                case 'Main Support':
+                    $mainSupportId = $band['band_id'];
+                    break;
+                case 'Opener':
+                    $openerId = $band['band_id'];
+                    break;
+                case 'Band':
+                    $bands[] = $band['band_id'];
+                    break;
+            }
+        }
+
+        $headliner = $headlinerId ? OtherService::find($headlinerId) : null;
+        $mainSupport = $mainSupportId ? OtherService::find($mainSupportId) : null;
+        $opener = $openerId ? OtherService::find($openerId) : null;
+
+        $bandObjects = [];
+        foreach ($bands as $bandId) {
+            $band = OtherService::find($bandId);
+            if ($band) {
+                $bandObjects[] = $band;
+            }
+        }
+
+        return view('admin.dashboards.promoter.promoter-edit-event', [
+            'event' => $event,
+            'combinedDateTime' => $combinedDateTime,
+            'promoter' => $promoter,
+            'formattedEndTime' => $formattedEndTime,
+            'formattedEventDate' => $formattedEventDate,
+            'headliner' => $headliner,
+            'mainSupport' => $mainSupport,
+            'bandObjects' => $bandObjects,
+            'opener' => $opener
+        ]);
+    }
+
+    public function updateSinglePromoterEvent(Request $request, $id)
+    {
+        $promoter = Auth::user()->promoters()->first();
+
+        $request->validate([
+            'event_name' => 'required|string',
+            'event_date' => 'required|date_format:d-m-Y',
+            'event_start_time' => 'required|date_format:H:i',
+            'event_end_time' => 'nullable|date_format:H:i',
+            'event_description' => 'nullable',
+            'facebook_event_url' => 'nullable|url',
+            'ticket_url' => 'nullable|url',
+            'otd_ticket_price' => 'required|numeric',
+            'venue_id' => 'required|integer|exists:venues,id',
+            'headliner' => 'required|string',
+            'headliner_id' => 'required|integer',
+            'mainSupport' => 'required|string',
+            'main_support_id' => 'required|integer',
+            'band' => 'nullable|array',
+            'band.*' => 'nullable|string',
+            'band_id' => 'required|array',
+            'band_id.*' => 'required|integer',
+            'opener' => 'nullable|string',
+            'opener_id' => 'required|integer',
+            'poster_url' => 'required|image|mimes:jpeg,jpg,png,webp,svg|max:5120'
+        ]);
+
+        // Find the event to update
+        $event = Event::findOrFail($id);
+
+        // Only fill the fields that are present in the request
+        $event->fill($request->only([
+            'event_name',
+            'event_start_time',
+            'event_end_time',
+            'event_description',
+            'facebook_event_url',
+            'ticket_url',
+            'otd_ticket_price',
+            'venue_id',
+            'headliner',
+            'headliner_id',
+            'mainSupport',
+            'main_support_id',
+            'band',
+            'band.*',
+            'band_id',
+            'band_id.*',
+            'opener',
+            'opener_id',
+            'poster_url'
+        ]));
+
+        // Poster Upload
+        $posterUrl = null;
+
+        if ($request->hasFile('poster_url')) {
+            // Get the uploaded image file
+            $eventPosterFile = $request->file('poster_url');
+
+            // Generate a unique filename based on the event name and extension
+            $eventName = $request->input('event_name');
+            $posterExtension = $eventPosterFile->getClientOriginalExtension() ?: $eventPosterFile->guessExtension();
+            $posterFilename = Str::slug($eventName) . '_poster.' . $posterExtension; // Adding '_poster' to the filename
+
+            // Specify the destination directory
+            $destinationPath = public_path('images/event_posters/' . $promoter->id); // Create a folder for the promoter
+
+            // Check if the directory exists; if not, create it
+            if (!File::exists($destinationPath)) {
+                File::makeDirectory($destinationPath, 0755, true); // Create directory with permissions
+            }
+
+            // Check if there is an existing poster to replace
+            if ($event->poster_url) {
+                // Generate old filename with date suffix
+                $oldPosterFilename = pathinfo($event->poster_url, PATHINFO_FILENAME);
+                $oldPosterExtension = pathinfo($event->poster_url, PATHINFO_EXTENSION);
+                $dateSuffix = Carbon::now()->format('Y-m-d_H-i-s'); // Format: YYYY-MM-DD_HH-MM-SS
+                $archivedPosterFilename = "{$oldPosterFilename}_old_{$dateSuffix}.{$oldPosterExtension}";
+
+                // Move the old poster to the same directory with the new name
+                File::move(public_path($event->poster_url), public_path('images/event_posters/' . $promoter->id . '/' . $archivedPosterFilename));
+            }
+
+            // Move the uploaded image to the specified directory
+            $eventPosterFile->move($destinationPath, $posterFilename);
+
+            // Construct the URL to the stored image
+            $posterUrl = 'images/event_posters/' . $promoter->id . '/' . $posterFilename;
+        }
+
+        // Save the event only if there are changes
+        if ($event->isDirty()) { // Checks if any attributes have been changed
+            $event->save();
+        }
+
+        // Redirect back with a success message
+        return redirect()->route('admin.dashboard.promoter.single-event.edit', $event->id)
+            ->with('success', 'Event updated successfully!');
+    }
+
 
     public function deleteSinglePromoterEvent($id)
     {
