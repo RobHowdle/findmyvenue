@@ -1,4 +1,4 @@
-<div class="bg-yns_light_gray1 font-sans text-black shadow-md">
+<div class="event-card bg-yns_light_gray1 font-sans text-black shadow-md" data-id={{ $event->id }}>
   <img class="h-52 w-full object-cover"
     src="{{ asset($event->poster_url) ? asset($event->poster_url) : asset('images/system/yns_logo.png') }}"
     alt="{{ $event->name }}">
@@ -12,14 +12,14 @@
       <ul>
         @foreach ($event->venues as $venue)
           <li>
-            <p class="text-sm text-gray-600">
+            <p class="h-10 text-sm text-gray-600">
               <span class="fas fa-map-marker-alt mr-2"></span>{{ $venue->location }}
             </p>
           </li>
         @endforeach
       </ul>
     @else
-      <p class="text-sm text-gray-600">No venues assigned</p>
+      <p class="h-10 text-sm text-gray-600">No venues assigned</p>
     @endif
 
     <div class="mt-2">
@@ -69,12 +69,8 @@
       <a href="{{ route('admin.dashboard.promoter.show-single-event', $event->id) }}"
         class="mt-7 rounded-lg border border-white bg-white px-4 py-2 font-heading text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">View
         Details</a>
-      <form action="{{ route('admin.dashboard.promoter.delete-single-event', $event->id) }}" method="POST">
-        @csrf
-        @method('DELETE')
-        <button type="submit" onclick="return confirm('Are you sure?')"
-          class="mt-7 rounded-lg border border-white bg-white px-4 py-2 font-heading text-black transition duration-150 ease-in-out hover:border-yns_red hover:text-yns_red">Remove</button>
-      </form>
+      <button data-id="{{ $event->id }}"
+        class="delete-event mt-7 rounded-lg border border-white bg-white px-4 py-2 font-heading text-black transition duration-150 ease-in-out hover:border-yns_red hover:text-yns_red">Remove</button>
     </div>
   </div>
 </div>

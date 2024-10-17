@@ -49,6 +49,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/dashboard/notes/store-note', [DashboardController::class, 'storeNewNote'])->name('dashboard.store-new-note');
 
     Route::get('/dashboard/promoter', [PromoterDashboardController::class, 'index'])->name('promoter.dashboard');
+    // Finances
     Route::get('/dashboard/promoter/finances', [PromoterDashboardController::class, 'promoterFinances'])->name('promoter.dashboard.finances');
     Route::get('/dashboard/promoter/finances/new-budget', [PromoterDashboardController::class, 'createNewPromoterBudget'])->name('promoter.dashboard.finances.new');
     Route::post('/dashboard/promoter/finances/save-budget', [PromoterDashboardController::class, 'saveNewPromoterBudget'])->name('promoter.dashboard.finances.saveNew');
@@ -57,34 +58,40 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard/promoter/finances/{id}/edit', [PromoterDashboardController::class, 'editSingleFinance'])->name('promoter.dashboard.finances.edit');
     Route::patch('/dashboard/promoter/finances/{finance}', [PromoterDashboardController::class, 'updateSingleFinance'])->name('promoter.dashboard.finances.update');
     Route::post('/dashboard/promoter/finances/{finance}', [PromoterDashboardController::class, 'exportSingleFinanceRecord'])->name('promoter.dashboard.finances.exportSingleFinanceRecord');
+    // To Do List
     Route::get('/dashboard/promoter/todo-list', [PromoterDashboardController::class, 'showPromoterTodos'])->name('promoter.dashboard.todo-list');
     Route::get('/dashboard/promoter/todo-items', [PromoterDashboardController::class, 'getPromoterTodos'])->name('promoter.dashboard.todo-items');
     Route::post('/dashboard/promoter/todolist/new', [PromoterDashboardController::class, 'addNewTodoItem'])->name('promoter.dashboard.new-todo-item');
     Route::post('/dashboard/promoter/todo-item/{id}/complete', [PromoterDashboardController::class, 'completeTodoItem'])->name('promoter.dashboard.complete-todo-item');
     Route::delete('/dashboard/promoter/todo-item/{id}', [PromoterDashboardController::class, 'deleteTodoItem'])->name('promoter.dashboard.delete-todo-item');
     Route::get('/dashboard/promoter/todo-item/completed-items', [PromoterDashboardController::class, 'showCompletedTodoItems'])->name('promoter.dashboard.completed-todo-items');
+    // Link User To Promoter
     Route::get('/dashboard/promoter/search', [PromoterDashboardController::class, 'searchExistingPromoters'])->name('admin.dashboard.promoter.search');
     Route::post('/dashboard/promoter/link', [PromoterDashboardController::class, 'linkToExistingPromoter'])->name('admin.dashboard.promoter.link');
     Route::post('/dashboard/promoter/store', [PromoterDashboardController::class, 'storeNewPromoter'])->name('admin.dashboard.promoter.store');
+    // Users
     Route::get('/dashboard/promoter/users', [PromoterDashboardController::class, 'promoterUsers'])->name('promter.dashboard.users');
     Route::get('/dashboard/promoter/users/get', [PromoterDashboardController::class, 'getPromoterusers'])->name('admin.promoter.dashboard.get-users');
     Route::get('/dashboard/promoter/users/new-user', [PromoterDashboardController::class, 'newUser'])->name('promoter.dashboard.users.new');
     Route::get('/dashboard/promoter/users/search-users', [PromoterDashboardController::class, 'searchUsers'])->name('admin.dashboard.promoter.search-users');
     Route::post('/dashboard/promoter/users/add-user', [PromoterDashboardController::class, 'addUserToCompany'])->name('admin.dashboard.promoter.add-user-to-company');
     Route::delete('/dashboard/promoter/delete-user', [PromoterDashboardController::class, 'deleteUserFromCompany'])->name('admin.dashboard.promoter.delete-user');
+    // Events
     Route::get('/dashboard/promoter/events', [PromoterDashboardController::class, 'showPromoterEvents'])->name('admin.dashboard.promoter.show-events');
+    Route::get('/dashboard/promoter/events/load-more-upcoming', [PromoterDashboardController::class, 'loadMoreUpcomingEvents'])->name('admin.dashboard.promoter.load-more-upcoming-events');
+    Route::get('/dashboard/promoter/events/load-more-past', [PromoterDashboardController::class, 'loadMorePastEvents'])->name('admin.dashboard.promoter.load-more-past-events');
     Route::get('/dashboard/promoter/events/create-event', [PromoterDashboardController::class, 'createNewPromoterEvent'])->name('admin.dashboard.promoter.create-new-event');
     Route::get('/dashboard/promoter/events/search-venues', [PromoterDashboardController::class, 'eventSelectVenue'])->name('admin.dashboard.promoter.search-venues');
     Route::post('/dashboard/promoter/events/store-event', [PromoterDashboardController::class, 'storeNewPromoterEvent'])->name('admin.dashboard.promoter.store-new-event');
     Route::get('/dashboard/promoter/events/{id}', [PromoterDashboardController::class, 'showSinglePromoterEvent'])->name('admin.dashboard.promoter.show-single-event');
     Route::delete('/dashboard/promoter/events/{id}', [PromoterDashboardController::class, 'deleteSinglePromoterEvent'])->name('admin.dashboard.promoter.delete-single-event');
-    Route::get('/dashboard/promoter/events/load-more-upcoming', [PromoterDashboardController::class, 'loadMoreUpcomingEvents'])->name('admin.dashboard.promoter.load-more-upcoming-events');
-    Route::get('/dashboard/promoter/events/load-more-past', [PromoterDashboardController::class, 'loadMorePastEvents'])->name('admin.dashboard.promoter.load-more-past-events');
+    //Notes
     Route::get('/dashboard/promoter/notes', [PromoterDashboardController::class, 'showPromoterNotes'])->name('admin.dashboard.promoter.show-notes');
     Route::get('/dashboard/promoter/note-items', [PromoterDashboardController::class, 'getPromoterNotes'])->name('admin.promoter.dashboard.note-items');
     Route::post('/dashboard/promoter/note-item/{id}/complete', [PromoterDashboardController::class, 'completeNoteItem'])->name('admin.promoter.dashboard.complete-note');
     Route::delete('/dashboard/promoter/note-item/{id}', [PromoterDashboardController::class, 'deleteNoteItem'])->name('admin.promoter.dashboard.delete-note');
     Route::get('/dashboard/promoter/note-item/completed-notes', [PromoterDashboardController::class, 'showCompletedNoteItems'])->name('admin.promoter.dashboard.completed-notes');
+    // Reviews
     Route::get('/dashboard/promoter/reviews/{filter?}', [PromoterDashboardController::class, 'getPromoterReviews'])->name('admin.promoter.dashboard.get-reviews');
     Route::get('/dashboard/promoter/filtered-reviews/{filter?}', [PromoterDashboardController::class, 'fetchReviews'])->name('admin.promoter.dashboard.fetch-reviews');
     Route::get('/dashboard/promoter/reviews/pending', [PromoterDashboardController::class, 'showPendingPromoterReviews'])->name('admin.promoter.dashboard.show-pending-reviews');
@@ -94,17 +101,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/dashboard/promoter/approve-promoter/{reviewId}', [PromoterDashboardController::class, 'approvePromoterReview'])->name('admin.promoter.dashboard.approve-pending-review');
     Route::post('/promoter/dashboard/unapprove-review/{reviewId}', [PromoterDashboardController::class, 'unapprovePromoterReview'])->name('admin.promoter.dashboard.unapprove-review');
     Route::delete('/dashboard/promoter/delete-review/{reviewId}', [PromoterDashboardController::class, 'deletePromoterReview'])->name('admin.promoter.dashboard.delete-review');
-    // Route::post('/promoter/dashboard/approve-display-review/{id}', [PromoterDashboardController::class, 'approveDisplayReview'])->name('admin.promoter.dashboard.approve-display-review');
-    // Route::post('/promoter/dashboard/approve-pending-review/{id}', [PromoterDashboardController::class, 'approvePendingReview'])->name('admin.promoter.dashboard.approve-pending-review');
-
-
-
-
-    // Route::post('/dashboard/display-promoter/{reviewId}', [DashboardController::class, 'displayPromoterReview'])->name('pending-review-promoter.display');
-    // Route::post('/dashboard/hide-promoter/{reviewId}', [DashboardController::class, 'hidePromoterReview'])->name('pending-review-promoter.hide');
-    // Route::post('/dashboard/approve-display-venue/{reviewId}', [DashboardController::class, 'approveDisplayVenueReview'])->name('pending-review-venue.approve-display');
-    // Route::post('/dashboard/approve-venue/{reviewId}', [DashboardController::class, 'approveVenueReview'])->name('pending-review-venue.approve');
-    // Route::post('/dashboard/user-service-link', [DashboardController::class, 'userServiceLink'])->name('user-service-link');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {

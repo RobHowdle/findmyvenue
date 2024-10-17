@@ -26,7 +26,7 @@
                 class="mb-4 rounded-lg bg-white px-4 py-2 text-black transition duration-300 hover:bg-gradient-to-t hover:from-yns_dark_orange hover:to-yns_yellow">
                 Edit <span class="fas fa-edit ml-1"></span>
               </a>
-              <a href="#"
+              <a href="#" data-id="{{ $event->id }}" id="delete-event-btn"
                 class="mb-4 rounded-lg bg-white px-4 py-2 text-black transition duration-300 hover:bg-gradient-to-t hover:from-yns_dark_orange hover:to-yns_yellow">
                 Delete <span class="fas fa-trash ml-1"></span>
               </a>
@@ -46,10 +46,10 @@
                 <a href="{{ route('singleService', ['serviceName' => 'Band', 'serviceId' => $mainSupport->id]) }}"
                   class="font-normal no-underline transition duration-150 ease-in-out hover:text-yns_yellow">{{ $mainSupport->name ?? 'No Main Support' }}</a>
               </div>
-              <div class="group mb-4 text-center">
+              <div class="group mb-4 flex flex-col text-center">
                 @if (count($otherBands) > 0)
+                  <p class="text-lg font-bold underline">Band</p>
                   @foreach ($otherBands as $band)
-                    <p class="flex flex-col text-lg font-bold underline">Band</p>
                     <a href="{{ route('singleService', ['serviceName' => 'Band', 'serviceId' => $band->id]) }}"
                       class="font-normal no-underline transition duration-150 ease-in-out hover:text-yns_yellow">{{ $band->name }}</a>
                   @endforeach
@@ -61,39 +61,39 @@
                   class="font-normal no-underline transition duration-150 ease-in-out hover:text-yns_yellow">{{ $opener->name ?? 'No Opener' }}</a>
               </div>
             </div>
-            <div class="group my-2 flex flex-row justify-between">
-              <p class="font-bold">Start Time: {{ $eventStartTime }}</p>
-              <p class="font-bold">End Time: {{ $eventEndTime }}</p>
-            </div>
-            <div class="group mb-2 text-center">
-              <p class="font-bold">Location:
-                @forelse($event->venues as $venue)
-                  <a class="transition duration-150 ease-in-out hover:text-yns_yellow"
-                    href="{{ route('venues', $venue->id) }}">{{ $venue->location }}</a>
-                @empty
-                  No Venue Assigned
-                @endforelse
-              </p>
-            </div>
-            <div class="group mb-2 text-center">
-              <p class="font-bold">Promoter:
-                @forelse($event->promoters as $promoter)
-                  <a class="transition duration-150 ease-in-out hover:text-yns_yellow"
-                    href="{{ route('promoters', $promoter->id) }}">{{ $promoter->name }}</a>
-                @empty
-                  No Promoter Assigned
-                @endforelse
-              </p>
-            </div>
-
-            <div class="group mb-2 text-center">
-              <p class="font-bold">On The Door Tickets: {{ formatCurrency($event->on_the_door_ticket_price) }}</p>
-            </div>
             @if ($event->event_description)
-              <div class="group mb-2 text-center">
-                <p class="font-bold">Description: {{ $event->event_description }}</p>
+              <div class="group my-2 flex flex-row items-center justify-center text-center">
+                <span class="fas fa-tag mr-2"></span>{{ $event->event_description }}
               </div>
             @endif
+            <div class="group my-2 flex flex-row items-center justify-center">
+              <span class="fas fa-clock mr-2"></span>{{ $eventStartTime }} @if ($eventEndTime)
+                - {{ $eventEndTime }}
+              @endif
+            </div>
+            <div class="group mb-2 flex flex-row items-start justify-center text-center">
+              <span class="fas fa-map-marker-alt"></span>
+              @forelse($event->venues as $venue)
+                <a class="transition duration-150 ease-in-out hover:text-yns_yellow"
+                  href="{{ route('venues', $venue->id) }}">{{ $venue->location }}</a>
+              @empty
+                No Venue Assigned
+              @endforelse
+
+            </div>
+            <div class="group mb-2 flex flex-row items-start justify-center text-center">
+              <span class="fas fa-bullhorn mr-2"></span>
+              @forelse($event->promoters as $promoter)
+                <a class="transition duration-150 ease-in-out hover:text-yns_yellow"
+                  href="{{ route('promoters', $promoter->id) }}">{{ $promoter->name }}</a>
+              @empty
+                No Promoter Assigned
+              @endforelse
+            </div>
+
+            <div class="group mb-2 flex flex-row items-center justify-center text-center">
+              <span class="fas fa-ticket-alt mr-2"></span>{{ formatCurrency($event->on_the_door_ticket_price) }}
+            </div>
           </div>
           <div class="col relative place-content-center">
             <div
@@ -139,4 +139,34 @@
       modal.classList.add('hidden');
     }, 300);
   }
+
+  $(document).ready(function() {
+    $('#delete-event-btn').click(function(e) {
+      e.preventDefault();
+      let eventId = $(this).data('id');
+      showConfirmationNotification({
+        text: 'Are you sure you want to delete this event?'
+      }).then((result) => {
+        $.ajax({
+          url: `/dashboard/promoter/events/${eventId}`,
+          type: 'DELETE',
+          data: {
+            _token: '{{ csrf_token() }}', // Include CSRF token for Laravel
+          },
+          success: function(response) {
+            if (response.success) {
+              showSuccessNotification(response.message);
+              window.location.href = '/dashboard/promoter/events';
+            } else {
+              alert('Failed to delete the event.');
+            }
+          },
+          error: function(xhr) {
+            showFailureNotification(xhr.responseJSON.message ||
+              'An error occurred while deleting the event.');
+          }
+        });
+      });
+    });
+  });
 </script>

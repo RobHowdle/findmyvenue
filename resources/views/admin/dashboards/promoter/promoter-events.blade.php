@@ -29,8 +29,8 @@
         <div id="tab-content" class="px-8 pt-8">
           <div id="upcoming-events" class="event-grid">
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              @if ($upcomingEvents && $upcomingEvents->isNotEmpty())
-                @foreach ($upcomingEvents as $event)
+              @if ($initialUpcomingEvents && $initialUpcomingEvents->isNotEmpty())
+                @foreach ($initialUpcomingEvents as $event)
                   @include('admin.dashboards.promoter.partials.event_card', ['event' => $event])
                 @endforeach
               @else
@@ -61,15 +61,6 @@
           @else
             <button id="load-more-upcoming" class="hidden"></button>
           @endif
-
-          @if ($hasMorePast)
-            <button id="load-more-past"
-              class="mb-4 rounded-lg bg-white px-4 py-2 text-black transition duration-300 hover:bg-gradient-to-t hover:from-yns_dark_orange hover:to-yns_yellow">
-              Load More
-            </button>
-          @else
-            <button id="load-more-past" class="hidden"></button>
-          @endif
         </div>
       </div>
     </div>
@@ -77,8 +68,6 @@
   </div>
 </x-app-layout>
 <script>
-  let upcomingOffset = 3;
-  let pastOffset = 3;
   let upcomingPage = 1;
 
   document.getElementById('upcoming-tab').classList.add('border-b-yns_yellow', 'text-yns_yellow');
@@ -123,7 +112,11 @@
 
   // Load More Upcoming Events
   $('#load-more-upcoming').on('click', function(e) {
+    e.preventDefault(); // Prevent the default button action if it's a button
+
     upcomingPage++; // Increment the page number for the next load
+    console.log('Loading page:', upcomingPage);
+
     $.ajaxSetup({
       headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -134,45 +127,81 @@
       url: "{{ route('admin.dashboard.promoter.load-more-upcoming-events') }}",
       type: "GET",
       data: {
-        page: upcomingPage // Send the updated page number
+        page: upcomingPage
       },
       success: function(data) {
-        console.log(data);
-        $('#upcoming-events').append(data.html); // Append new events
-
-        // Hide button if no more events
+        $('#upcoming-events .grid').append(data.html);
         if (!data.hasMorePages) {
           $('#load-more-upcoming').hide();
         }
       },
       error: function(xhr) {
-        console.error(xhr);
-        alert("An error occurred while loading events.");
+        showFailureNotification("An error occurred while loading events.");
       }
     });
   });
 
-
   // Load More Past Events
-  $('#load-more-past').on('click', function() {
+  $('#load-more-past').on('click', function(e) {
+    e.preventDefault();
+    upcomingPage++;
+
+    $.ajaxSetup({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+    });
+
     $.ajax({
       url: "{{ route('admin.dashboard.promoter.load-more-past-events') }}",
       type: "GET",
       data: {
-        offset: pastOffset
+        page: upcomingPage
       },
       success: function(data) {
-        $('#past-events .grid').append(data.html); // Append to the grid
-        pastOffset += 3; // Increment offset for next request
+        $('#upcoming-events .grid').append(data.html);
 
-        // Hide button if no more events
         if (!data.hasMorePages) {
           $('#load-more-past').hide();
         }
       },
       error: function(xhr) {
-        console.error(xhr);
-        alert("An error occurred while loading events.");
+        showFailureNotification("An error occurred while loading events.");
+      }
+    });
+  });
+
+
+
+  // Delete Event
+  $(document).on('click', '.delete-event', function() {
+    const eventId = $(this).data('id'); // Get event ID from data attribute
+    console.log(eventId);
+    // Show confirmation notification
+    showConfirmationNotification({
+      text: 'Are you sure you want to delete this event?'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $.ajax({
+          url: `/dashboard/promoter/events/${eventId}`, // Your delete route
+          type: 'DELETE',
+          headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          },
+          success: function(response) {
+            showSuccessNotification(response.message); // Assuming response has a message property
+            console.log(eventId);
+            $(`.event-card[data-id="${eventId}"]`).remove(); // This line should work if the ID matches
+          },
+          error: function(xhr) {
+            showFailureNotification(xhr.responseJSON.message ||
+              'An error occurred while deleting the event.');
+          }
+        });
+
+        $(`.event-card[data-id="${eventId}"]`).fadeOut(300, function() {
+          $(this).remove(); // Remove the element after the fade-out effect
+        });
       }
     });
   });

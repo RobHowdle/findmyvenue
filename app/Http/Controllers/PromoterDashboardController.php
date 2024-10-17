@@ -82,46 +82,47 @@ class PromoterDashboardController extends Controller
     public function showPromoterEvents()
     {
         $promoter = Auth::user()->promoters()->first();
-        $totalUpcomingCount = Event::where('event_date', '>', now())->count();
-        $totalPastCount = Event::where('event_date', '<=', now())->count();
 
+        // Fetch all upcoming events
         $upcomingEvents = Event::where('event_date', '>', now())
             ->orderBy('event_date', 'asc')
-            ->paginate(3);
+            ->get(); // Get all upcoming events without pagination
 
+        // Set the initial count and check how many events there are
+        $totalUpcomingCount = $upcomingEvents->count();
+        $initialUpcomingEvents = $upcomingEvents->take(3); // Only take the first 3 for display
+
+        // Count past events
+        $totalPastCount = Event::where('event_date', '<=', now())->count();
+
+        // Fetch past events with pagination
         $pastEvents = Event::where('event_date', '<=', now())
             ->orderBy('event_date', 'desc')
             ->paginate(3);
 
-        $showLoadMoreUpcoming = $upcomingEvents->count() === 3;
-        $hasMorePast = $totalPastCount > 3;
+        // Show the "Load More" button if there are more than 3 upcoming events
+        $showLoadMoreUpcoming = $totalUpcomingCount > 3;
+        $hasMorePast = $totalPastCount > 3; // You can also check if there are more than 3 past events
 
-        return view('admin.dashboards.promoter.promoter-events', compact('promoter', 'upcomingEvents', 'pastEvents', 'showLoadMoreUpcoming', 'hasMorePast'));
+        return view('admin.dashboards.promoter.promoter-events', compact('promoter', 'initialUpcomingEvents', 'pastEvents', 'showLoadMoreUpcoming', 'hasMorePast', 'totalUpcomingCount'));
     }
 
     public function loadMoreUpcomingEvents(Request $request)
     {
-        \Log::error('Load More Upcoming Events called.'); // Check if the method is hit
+        $promoter = Auth::user()->promoters()->first();
 
         $currentPage = $request->input('page', 1);
-        $offset = ($currentPage - 1) * 3;
+
         $upcomingEvents = Event::where('event_date', '>', now())
             ->orderBy('event_date')
-            ->skip($offset)
-            ->take(3)
-            ->get();
+            ->paginate(3, ['*'], 'page', $currentPage);
 
-        \Log::error('Upcoming Events Count: ' . $upcomingEvents->count()); // Log the number of events returned
-
-
-        $hasMorePages = $upcomingEvents->count() === 3;
+        $hasMorePages = $upcomingEvents->hasMorePages();
 
         $html = '';
         foreach ($upcomingEvents as $event) {
-            $html .= view('admin.dashboards.promoter.partials.event_card', ['event' => $event])->render();
+            $html .= view('admin.dashboards.promoter.partials.event_card', ['promoter' => $promoter, 'event' => $event])->render();
         }
-
-        $html = view('admin.dashboards.promoter.partials.event_card', ['event' => $event]);
 
         return response()->json([
             'html' => $html,
@@ -131,20 +132,24 @@ class PromoterDashboardController extends Controller
 
     public function loadMorePastEvents(Request $request)
     {
-        $offset = $request->input('offset', 0);
-        $pastEvents = Event::where('event_date', '<=', now())
-            ->orderBy('event_date', 'desc')
-            ->skip($offset)
-            ->take(3)
-            ->get();
+        $promoter = Auth::user()->promoters()->first();
+
+        $currentPage = $request->input('page', 1);
+
+        $pastEvents = Event::where('event_date', '<', now())
+            ->orderBy('event_date')
+            ->paginate(3, ['*'], 'page', $currentPage);
+
+        $hasMorePages = $pastEvents->hasMorePages();
 
         $html = '';
         foreach ($pastEvents as $event) {
-            $html .= view('admin.dashboards.promoter.partials.event_card', ['event' => $event])->render();
+            $html .= view('admin.dashboards.promoter.partials.event_card', ['promoter' => $promoter, 'event' => $event])->render();
         }
+
         return response()->json([
             'html' => $html,
-            'hasMorePages' => $pastEvents->count() === 3
+            'hasMorePages' => $hasMorePages
         ]);
     }
 
@@ -195,6 +200,26 @@ class PromoterDashboardController extends Controller
             'eventStartTime',
             'eventEndTime'
         ));
+    }
+
+    public function deleteSinglePromoterEvent($id)
+    {
+        $promoter = Auth::user()->promoters()->first();
+        $event = Event::findOrFail($id);
+
+        if ($event) {
+            $event->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Event deleted successfully'
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Event not found.'
+        ], 404);
     }
 
     public function createNewPromoterEvent()
