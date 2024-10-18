@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
+use App\Models\User;
 use App\Models\Event;
 use App\Models\OtherService;
 use Illuminate\Http\Request;
@@ -28,35 +30,47 @@ class APIRequestsController extends Controller
      * Get Users Calendar Events
      */
 
-    public function getUserCalendarEvents(Request $request, $id)
+    public function getUserCalendarEvents(Request $request, $user)
     {
-        if (!Auth::check()) {
-            return response()->json(['success' => false, 'message' => 'User not authenticated.'], 401);
-        }
+        // Verify that a promoter exists for the logged-in user
+        $currentUser = Auth::user();  // Get the current user
+        $promoter = $currentUser->promoters()->first();  // Get the promoter for this user
 
-        // Get the authenticated user
-        $user = Auth::user();
-        $promoter = $user->promoters()->first();
+        \Log::info('Fetching events for promoter: ' . $promoter->id);  // Log promoter ID
+        \Log::info('Start: ' . $request->query('start') . ', End: ' . $request->query('end'));  // Log date range
 
         if (!$promoter) {
             return response()->json(['success' => false, 'message' => 'Promoter Not Found'], 404);
         }
 
-        // Check if the request wants calendar events
         if ($request->query('view') === 'calendar') {
-            // Fetch events as before
-            $events = Event::with(['bands', 'venues'])
+            $start = $request->query('start');
+            $end = $request->query('end');
+
+            // Fetch events based on the date range
+            $events = Event::with(['bands', 'services', 'venues'])
                 ->whereHas('promoters', function ($query) use ($promoter) {
                     $query->where('promoter_id', $promoter->id);
                 })
+                ->whereBetween('event_date', [$start, $end])
                 ->get();
 
             $formattedEvents = $events->map(function ($event) {
+                // Only use the event date
+                $eventDate = Carbon::parse($event->event_date)->format('Y-m-d');
+
                 return [
                     'title' => $event->name,
-                    'start' => $event->event_date . 'T' . $event->event_start_time,
-                    'end' => $event->event_date . 'T' . $event->event_end_time,
+                    'start' => $eventDate . 'T' . $event->event_start_time,
+                    'end' => $eventDate . 'T' . $event->event_end_time,
                     'description' => $event->event_description,
+                    'event_start_time' => $event->event_start_time,
+                    'bands' => $event->services->map(function ($band) {
+                        return $band->name;
+                    })->toArray(),
+                    'location' => $event->venues->first()->location,
+                    'ticket_url' => $event->ticket_url,
+                    'on_the_door_ticket_price' => $event->on_the_door_ticket_price,
                 ];
             });
 
@@ -65,5 +79,7 @@ class APIRequestsController extends Controller
                 'events' => $formattedEvents,
             ]);
         }
+
+        return response()->json(['success' => true, 'events' => []]);
     }
 }

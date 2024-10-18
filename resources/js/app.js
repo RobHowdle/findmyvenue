@@ -350,9 +350,6 @@ window.showConfirmationNotification = function (options) {
         confirmButtonText: "I understand",
         showCancelButton: true,
         toast: false,
-        // position: "top-end",
-        // timer: 3000,
-        // timerProgressBar: true,
         customClass: {
             popup: "bg-yns_dark_gray !important rounded-lg font-heading",
             title: "text-white",
@@ -361,6 +358,43 @@ window.showConfirmationNotification = function (options) {
         icon: "warning",
         title: "Are you sure?",
         text: options.text,
+    });
+};
+
+window.showEventBlock = function (info) {
+    const extendedProps = info.event._def.extendedProps;
+
+    const startTime = extendedProps.event_start_time || "N/A";
+    const description = extendedProps.description || "N/A";
+    const bands =
+        extendedProps.bands && extendedProps.bands.length > 0
+            ? extendedProps.bands.join(", ")
+            : "N/A";
+    const location = extendedProps.location || "N/A";
+    const ticketUrl = extendedProps.ticket_url || "N/A";
+    const onTheDoorPrice = extendedProps.on_the_door_ticket_price || "N/A";
+
+    return Swal.fire({
+        showConfirmButton: true,
+        confirmButtonText: "Got it!",
+        toast: false,
+        icon: "info",
+        title: info.event.title,
+        html: `
+            <strong>Description:</strong> ${description}<br>
+            <strong>Start Time:</strong> ${startTime}<br>
+            <strong>Bands:</strong> ${bands}<br>
+            <strong>Location:</strong> ${location}<br>
+            <strong>Ticket URL:</strong> <a href="${ticketUrl}" target="_blank">${
+            ticketUrl ? "View Tickets" : "N/A"
+        }</a><br>
+            <strong>On The Door Price:</strong> £${onTheDoorPrice}<br>
+        `,
+        customClass: {
+            popup: "bg-yns_dark_gray !important rounded-lg font-heading",
+            title: "text-white",
+            text: "text-white !important",
+        },
     });
 };
 
@@ -486,43 +520,66 @@ function setLocationCoordinates(key, lat, lng) {
 document.addEventListener("DOMContentLoaded", function () {
     var calendarEl = document.getElementById("calendar");
     var userId = calendarEl.getAttribute("data-user-id"); // Get user ID from data attribute
+    var calendar; // Declare calendar variable outside
 
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: "dayGridMonth",
-        events: function (fetchInfo, successCallback, failureCallback) {
-            fetch(`/api/profile/${userId}`, {
-                headers: {
-                    "X-CSRF-TOKEN": document
-                        .querySelector('meta[name="csrf-token"]')
-                        .getAttribute("content"),
-                    Authorization: "Bearer " + localStorage.getItem("token"), // Use your auth token
+    const calendarTabButton = document.querySelector(
+        'button[data-tab="calendar"]'
+    );
+
+    calendarTabButton.addEventListener("click", function () {
+        if (!calendar) {
+            // Only initialize if not already done
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: "dayGridMonth",
+                events: function (fetchInfo, successCallback, failureCallback) {
+                    fetch(
+                        `/profile/events/${userId}?view=calendar&start=${fetchInfo.startStr}&end=${fetchInfo.endStr}`
+                    )
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.success) {
+                                const eventsArray = data.events.map(
+                                    (event) => ({
+                                        title: event.title,
+                                        start: event.start,
+                                        end: event.end,
+                                        description: event.description,
+                                        event_start_time:
+                                            event.event_start_time,
+                                        bands: event.bands || [],
+                                        location: event.location || "N/A",
+                                        ticket_url: event.ticket_url || "N/A",
+                                        on_the_door_ticket_price:
+                                            event.on_the_door_ticket_price ||
+                                            "N/A",
+                                    })
+                                );
+                                console.log(
+                                    "Passing these events to the calendar:",
+                                    eventsArray
+                                );
+                                successCallback(eventsArray);
+                            } else {
+                                console.error(
+                                    "Error fetching events:",
+                                    data.message
+                                );
+                                failureCallback();
+                            }
+                        })
+                        .catch((error) => {
+                            console.error("Error fetching events:", error);
+                            failureCallback();
+                        });
                 },
-            })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error("Network response was not ok");
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    if (data.success) {
-                        successCallback(data.events); // Pass the events to the calendar
-                    } else {
-                        console.log("Error: ", data.message);
-                        failureCallback(data.message);
-                    }
-                })
-                .catch((error) => {
-                    console.error("Fetch error: ", error);
-                    failureCallback(error);
-                });
-        },
-        dateClick: function (info) {
-            alert("Date: " + info.dateStr);
-        },
-        eventClick: function (info) {
-            alert("Event: " + info.event.title);
-        },
+                eventClick: function (info) {
+                    showEventBlock(info);
+                },
+            });
+
+            calendar.render();
+        } else {
+            calendar.updateSize(); // Call updateSize if the calendar is already initialized
+        }
     });
-    calendar.render();
 });

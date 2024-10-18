@@ -18,7 +18,7 @@
                 class="mb-4 rounded-lg bg-white px-4 py-2 text-black transition duration-300 hover:bg-gradient-to-t hover:from-yns_dark_orange hover:to-yns_yellow">
                 Tickets <span class="fas fa-ticket-alt ml-1"></span>
               </a>
-              <a href="#"
+              <a href="#" id="addToCalendarButton"
                 class="mb-4 rounded-lg bg-white px-4 py-2 text-black transition duration-300 hover:bg-gradient-to-t hover:from-yns_dark_orange hover:to-yns_yellow">
                 Add To Calendar <span class="fas fa-calendar-alt ml-1"></span>
               </a>
@@ -169,4 +169,80 @@
       });
     });
   });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('addToCalendarButton').addEventListener('click', function(event) {
+      event.preventDefault(); // Prevent the default link behavior
+      checkCalendars(); // Call your function to check calendars
+    });
+  });
+
+  function checkCalendars() {
+    const userId = {{ Auth::user()->id }};
+
+    fetch(`/dashboard/promoter/events/${userId}/check-linked-calendars`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok: ' + response.statusText);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Data:', data);
+        if (data.hasGoogleCalendar) {
+          const calendarService = 'google';
+          addEventToGoogleCalendar(calendarService); // Call your function to add the event
+        } else {
+          alert('Please link a Google Calendar to use this feature.');
+        }
+      })
+      .catch(error => {
+        console.error('Error checking calendars:', error);
+      });
+  }
+
+  function addEventToGoogleCalendar(calendarService) {
+    const eventId = {{ $event->id }};
+    const eventName = @json($event->name);
+    const eventDate = '{{ $event->event_date }}';
+    const eventStartTime = '{{ $event->event_start_time }}';
+    const eventEndTime = '{{ $event->event_end_time }}';
+    const eventLocation = @json($event->venues->first()->location ?? '');
+    const eventDescription = @json($event->event_description ?? '');
+    const preSaleURL = @json($event->ticket_url ?? '');
+    const otdTicketPrice = {{ $event->on_the_door_ticket_price }};
+    console.log('Adding event to Google Calendar...');
+
+    fetch('/dashboard/promoter/events/add-to-calendar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': '{{ csrf_token() }}' // Include CSRF token
+        },
+        body: JSON.stringify({
+          event_id: eventId,
+          title: eventName,
+          date: eventDate,
+          start_time: eventStartTime,
+          end_time: eventEndTime,
+          location: eventLocation,
+          description: eventDescription,
+          ticket_url: preSaleURL,
+          on_the_door_ticket_price: otdTicketPrice,
+          calendar_service: calendarService,
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showSuccessNotification(data.message); // Show a success notification
+        } else {
+          showFailureNotification(data.message || 'Failed to add event to the calendar.');
+        }
+      })
+      .catch(error => {
+        console.error('Error adding event to calendar:', error);
+        showFailureNotification('An error occurred while adding the event.');
+      });
+  }
 </script>

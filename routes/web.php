@@ -1,8 +1,10 @@
+use App\Http\Controllers\CalendarController;
 \<?php
 
     use App\Models\OtherService;
     use Illuminate\Support\Facades\Route;
     use App\Http\Controllers\AdminController;
+    use App\Http\Controllers\CalendarController;
     use App\Http\Controllers\VenueController;
     use App\Http\Controllers\ProfileController;
     use App\Http\Controllers\PromoterController;
@@ -47,7 +49,6 @@
     Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::post('/dashboard/notes/store-note', [DashboardController::class, 'storeNewNote'])->name('dashboard.store-new-note');
-
         Route::get('/dashboard/promoter', [PromoterDashboardController::class, 'index'])->name('promoter.dashboard');
         // Finances
         Route::get('/dashboard/promoter/finances', [PromoterDashboardController::class, 'promoterFinances'])->name('promoter.dashboard.finances');
@@ -81,12 +82,13 @@
         Route::get('/dashboard/promoter/events/load-more-upcoming', [PromoterDashboardController::class, 'loadMoreUpcomingEvents'])->name('admin.dashboard.promoter.load-more-upcoming-events');
         Route::get('/dashboard/promoter/events/load-more-past', [PromoterDashboardController::class, 'loadMorePastEvents'])->name('admin.dashboard.promoter.load-more-past-events');
         Route::get('/dashboard/promoter/events/create-event', [PromoterDashboardController::class, 'createNewPromoterEvent'])->name('admin.dashboard.promoter.create-new-event');
+        Route::post('/dashboard/promoter/events/add-to-calendar', [CalendarController::class, 'addEventToCalendar'])->name('admin.dashboard.promoter.add-event-to-calendar');
+        Route::get('/dashboard/promoter/events/{user}/check-linked-calendars', [CalendarController::class, 'checkLinkedCalendars']);
         Route::get('/dashboard/promoter/events/search-venues', [PromoterDashboardController::class, 'eventSelectVenue'])->name('admin.dashboard.promoter.search-venues');
         Route::post('/dashboard/promoter/events/store-event', [PromoterDashboardController::class, 'storeNewPromoterEvent'])->name('admin.dashboard.promoter.store-new-event');
         Route::get('/dashboard/promoter/events/{id}', [PromoterDashboardController::class, 'showSinglePromoterEvent'])->name('admin.dashboard.promoter.show-single-event');
         Route::get('dashboard/promoter/events/{id}/edit', [PromoterDashboardController::class, 'editSinglePromoterEvent'])->name('admin.dashboard.promoter.single-event.edit');
         Route::put('dashboard/promoter/events/{id}/update', [PromoterDashboardController::class, 'updateSinglePromoterEvent'])->name('admin.dashboard.promoter.single-event.update');
-
         Route::delete('/dashboard/promoter/events/{id}', [PromoterDashboardController::class, 'deleteSinglePromoterEvent'])->name('admin.dashboard.promoter.delete-single-event');
         //Notes
         Route::get('/dashboard/promoter/notes', [PromoterDashboardController::class, 'showPromoterNotes'])->name('admin.dashboard.promoter.show-notes');
@@ -107,9 +109,16 @@
     });
 
     Route::middleware(['auth', 'verified'])->group(function () {
+        Route::get('/profile/events/{user}', [APIRequestsController::class, 'getUserCalendarEvents']);
         Route::get('/profile/{user}', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::put('/profile/{user}', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+        Route::get('auth/google', [CalendarController::class, 'redirectToGoogle'])->name('google.redirect');
+        Route::get('auth/google/callback', [CalendarController::class, 'handleGoogleCallback']);
+        Route::post('google/sync', [CalendarController::class, 'syncGoogleCalendar'])->name('google.sync');
+        Route::post('google/unlink', [CalendarController::class, 'unlinkGoogle'])->name('google.unlink');
+
 
         Route::get('/admin/venues', [AdminController::class, 'getVenues'])->name('admin.venues');
         Route::post('/admin/venues', [AdminController::class, 'saveNewVenue'])->name('admin.new-venue');

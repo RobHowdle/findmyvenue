@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\APIRequestsController;
+use App\Http\Controllers\CalendarController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VenueApiController;
@@ -24,4 +25,3 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('/venues/{id}', [VenueApiController::class, 'show']);
 Route::get('/dashboard/promoter/finances', [PromoterDashboardController::class, 'getFinanceData']);
 Route::get('/bands/search', [APIRequestsController::class, 'searchBands']);
-Route::middleware('auth:sanctum')->get('/profile/{user}', [APIRequestsController::class, 'getUserCalendarEvents']);

@@ -82,7 +82,7 @@
               </div>
             </div>
           </div>
-          <button @click="selected = 8; selectedTab = 8"
+          <button @click="selected = 8; selectedTab = 8" data-tab="calendar"
             :class="{ 'bg-gradient-button': selected === 8, 'bg-yns_dark_gray': selected !== 8 }"
             class="group relative w-full px-8 py-2 text-left text-white transition duration-150 ease-in-out">
             <span class="absolute inset-0 transition-opacity duration-300 ease-in-out"
@@ -148,6 +148,22 @@
         </div>
         <div x-show="selectedTab === 8" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
           <div class="w-full">
+            {{-- Check if the user has linked their Google Calendar --}}
+            @if (Auth::user()->google_access_token)
+              <p>Your Google Calendar is linked!</p>
+              {{-- Optionally, you can provide an option to unlink --}}
+              <form action="{{ route('google.unlink') }}" method="POST">
+                @csrf
+                <button type="submit" class="btn-danger btn">Unlink Google Calendar</button>
+              </form>
+            @else
+              {{-- Show the button to link Google Calendar --}}
+              <a href="{{ route('google.redirect') }}" class="btn btn-primary">Link Google Calendar</a>
+            @endif
+            <form action="{{ route('google.sync') }}" method="POST">
+              @csrf
+              <button type="submit" class="btn btn-success">Sync Google Calendar</button>
+            </form>
             <div id="calendar" data-user-id="{{ Auth::user()->id }}"></div>
           </div>
         </div>

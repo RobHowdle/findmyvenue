@@ -49,6 +49,13 @@
     }
 }
 
+/* Profile */
+#calendar {
+    width: 100%;
+    min-height: 500px;
+    height: auto;
+}
+
 /* Notes */
   @keyframes slideIn {
     0% {
