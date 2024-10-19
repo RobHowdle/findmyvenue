@@ -27,6 +27,7 @@ class User extends Authenticatable
         'email',
         'password',
         'date_of_birth',
+        'apple_calendar_synced',
         'google_access_token',
         'google_refresh_token',
         'token_expires_at'

@@ -148,22 +148,32 @@
         </div>
         <div x-show="selectedTab === 8" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
           <div class="w-full">
-            {{-- Check if the user has linked their Google Calendar --}}
-            @if (Auth::user()->google_access_token)
-              <p>Your Google Calendar is linked!</p>
-              {{-- Optionally, you can provide an option to unlink --}}
-              <form action="{{ route('google.unlink') }}" method="POST">
-                @csrf
-                <button type="submit" class="btn-danger btn">Unlink Google Calendar</button>
-              </form>
-            @else
-              {{-- Show the button to link Google Calendar --}}
-              <a href="{{ route('google.redirect') }}" class="btn btn-primary">Link Google Calendar</a>
-            @endif
-            <form action="{{ route('google.sync') }}" method="POST">
-              @csrf
-              <button type="submit" class="btn btn-success">Sync Google Calendar</button>
-            </form>
+            <div class="flex items-center justify-center">
+              <div class="group">
+                @if (Auth::user()->google_access_token)
+                  <p>Your Google Calendar is linked!</p>
+                  <form action="{{ route('google.unlink') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="btn-danger btn">Unlink Google Calendar</button>
+                  </form>
+                @else
+                  <a href="{{ route('google.redirect') }}" class="btn btn-primary">Link Google Calendar</a>
+                @endif
+              </div>
+              <div class="group">
+                <form action="{{ route('google.sync') }}" method="POST">
+                  @csrf
+                  <button type="submit" class="btn btn-success">Manual Google Sync</button>
+                </form>
+              </div>
+              <div class="group">
+                <button id="sync-all-events-apple"
+                  class="rounded bg-green-500 px-4 py-2 font-semibold text-white hover:bg-green-600"
+                  title="Sync All Events to Apple Calendar">
+                  Sync All Events to Apple Calendar
+                </button>
+              </div>
+            </div>
             <div id="calendar" data-user-id="{{ Auth::user()->id }}"></div>
           </div>
         </div>
@@ -178,3 +188,41 @@
     display: none;
   }
 </style>
+<script>
+  document.getElementById('sync-all-events-apple').addEventListener('click', function() {
+    var calendarEl = document.getElementById("calendar");
+    var userId = calendarEl.getAttribute("data-user-id");
+    const url = `/profile/events/${userId}/apple/sync`; // Define your route for syncing
+
+    // Show loading state if needed
+    this.textContent = 'Syncing...';
+
+    // Make an AJAX request to trigger the download
+    fetch(url)
+      .then(response => {
+        if (response.ok) {
+          return response.blob(); // Return blob data for the .ics file
+        }
+        throw new Error('Network response was not ok.');
+      })
+      .then(blob => {
+        // Create a link element to download the file
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'events.ics'; // Set a name for the file
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+
+        // Reset button text
+        this.textContent = 'Sync All Events to Apple Calendar';
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to sync events. Please try again.');
+        this.textContent = 'Sync All Events to Apple Calendar';
+      });
+  });
+</script>

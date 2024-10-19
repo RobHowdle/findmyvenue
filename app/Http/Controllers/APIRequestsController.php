@@ -36,9 +36,6 @@ class APIRequestsController extends Controller
         $currentUser = Auth::user();  // Get the current user
         $promoter = $currentUser->promoters()->first();  // Get the promoter for this user
 
-        \Log::info('Fetching events for promoter: ' . $promoter->id);  // Log promoter ID
-        \Log::info('Start: ' . $request->query('start') . ', End: ' . $request->query('end'));  // Log date range
-
         if (!$promoter) {
             return response()->json(['success' => false, 'message' => 'Promoter Not Found'], 404);
         }

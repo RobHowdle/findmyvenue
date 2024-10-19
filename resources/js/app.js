@@ -393,7 +393,7 @@ window.showEventBlock = function (info) {
         customClass: {
             popup: "bg-yns_dark_gray !important rounded-lg font-heading",
             title: "text-white",
-            text: "text-white !important",
+            hmtl: "text-white !important",
         },
     });
 };
@@ -519,8 +519,8 @@ function setLocationCoordinates(key, lat, lng) {
 // Full Calendar
 document.addEventListener("DOMContentLoaded", function () {
     var calendarEl = document.getElementById("calendar");
-    var userId = calendarEl.getAttribute("data-user-id"); // Get user ID from data attribute
-    var calendar; // Declare calendar variable outside
+    var userId = calendarEl.getAttribute("data-user-id");
+    var calendar;
 
     const calendarTabButton = document.querySelector(
         'button[data-tab="calendar"]'
@@ -579,7 +579,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             calendar.render();
         } else {
-            calendar.updateSize(); // Call updateSize if the calendar is already initialized
+            calendar.updateSize();
         }
     });
 });

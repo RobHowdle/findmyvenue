@@ -110,6 +110,7 @@ use App\Http\Controllers\CalendarController;
 
     Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/profile/events/{user}', [APIRequestsController::class, 'getUserCalendarEvents']);
+        Route::get('profile/events/{user}/apple/sync', [CalendarController::class, 'syncAllEventsToAppleCalendar'])->name('apple.sync');
         Route::get('/profile/{user}', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::put('/profile/{user}', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -118,7 +119,6 @@ use App\Http\Controllers\CalendarController;
         Route::get('auth/google/callback', [CalendarController::class, 'handleGoogleCallback']);
         Route::post('google/sync', [CalendarController::class, 'syncGoogleCalendar'])->name('google.sync');
         Route::post('google/unlink', [CalendarController::class, 'unlinkGoogle'])->name('google.unlink');
-
 
         Route::get('/admin/venues', [AdminController::class, 'getVenues'])->name('admin.venues');
         Route::post('/admin/venues', [AdminController::class, 'saveNewVenue'])->name('admin.new-venue');

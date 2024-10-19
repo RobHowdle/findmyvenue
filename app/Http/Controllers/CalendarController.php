@@ -6,8 +6,10 @@ use DateTime;
 use Carbon\Carbon;
 use Google_Client;
 use App\Models\User;
+use App\Models\Event;
 use Illuminate\Http\Request;
 use Google_Service_Calendar_Event;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Google\Service\Calendar\EventExtendedProperties;
@@ -30,10 +32,6 @@ class CalendarController extends Controller
 
     public function redirectToGoogle()
     {
-        \Log::info('Client ID: ' . env('GOOGLE_CLIENT_ID'));
-        \Log::info('Client SECRET: ' . env('GOOGLE_CLIENT_SECRET'));
-        \Log::info('Client URI: ' . env('GOOGLE_REDIRECT_URI'));
-
         $authUrl = $this->client->createAuthUrl();
         return redirect()->away($authUrl);
     }
@@ -41,7 +39,6 @@ class CalendarController extends Controller
     public function handleGoogleCallback(Request $request)
     {
         if (!$request) {
-            \Log::error('Request object is null.');
             return redirect('/')->with('error', 'Request object is null.');
         }
 
@@ -49,8 +46,6 @@ class CalendarController extends Controller
             $token = $this->client->fetchAccessTokenWithAuthCode($request->code);
             if (isset($token['access_token'])) {
                 $this->client->setAccessToken($token['access_token']);
-                \Log::error('User ID: ' . Auth::user()->id);
-
                 Auth::user()->update([
                     'google_access_token' => $token['access_token'],
                     'google_refresh_token' => $token['refresh_token'],
@@ -58,7 +53,6 @@ class CalendarController extends Controller
 
                 return redirect()->route('profile.edit', Auth::user()->id)->with('success', 'Google Calendar linked successfully!');
             } else {
-                \Log::error('Token fetching error: ' . json_encode($token));
                 return redirect('/')->with('error', 'Failed to link Google Calendar: invalid token.');
             }
         }
@@ -184,18 +178,14 @@ class CalendarController extends Controller
             'on_the_door_ticket_price' => 'nullable|numeric',
         ]);
 
-        \Log::info($validatedData);
-
         $client = new Google_Client();
         $client->setAccessToken($user->google_access_token);
-        \Log::info('Access Token: ' . $user->google_access_token);
 
         if ($client->isAccessTokenExpired()) {
             if ($user->google_refresh_token) {
                 $client->fetchAccessTokenWithRefreshToken($user->google_refresh_token);
                 $user->update(['google_access_token' => $client->getAccessToken()]);
             } else {
-                \Log::error('No refresh token available.');
                 return response()->json(['error' => 'No refresh token available.'], 401);
             }
         }
@@ -245,39 +235,69 @@ class CalendarController extends Controller
             $event = $service->events->insert('primary', $event);
             return response()->json(['success' => true, 'message' => 'Event added successfully!', 'eventId' => $event->id], 200);
         } catch (\Google_Service_Exception $e) {
-            \Log::error('Error adding event to Google Calendar: ' . $e->getMessage());
             return response()->json(['success' => false, 'error' => 'Failed to add event: ' . $e->getMessage()], 500);
         }
-    }
-    private function addEventToAppleCalendar(Request $request)
-    {
-        // Handle adding an event to Apple Calendar
-        // For Apple Calendar, you can create an .ics file for download
-        $event = sprintf(
-            "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nBEGIN:VEVENT\r\nSUMMARY:%s\r\nDTSTART:%s\r\nDTEND:%s\r\nEND:VEVENT\r\nEND:VCALENDAR",
-            $request->input('title'),
-            (new \DateTime($request->input('start_date')))->format('Ymd\THis\Z'),
-            (new \DateTime($request->input('end_date')))->format('Ymd\THis\Z')
-        );
-
-        return response($event)
-            ->header('Content-Type', 'text/calendar')
-            ->header('Content-Disposition', 'attachment; filename="event.ics"');
     }
 
     public function checkLinkedCalendars(Request $request, $userId)
     {
-        \Log::info('Checking linked calendars for user ID: ' . $userId);
         $user = User::find($userId);
 
         if (!$user) {
-            \Log::error('User not found: ' . $userId);
             return response()->json(['error' => 'User not found'], 404);
         }
 
         $hasGoogleCalendar = !is_null($user->google_access_token);
-        \Log::info('User has Google Calendar: ' . ($hasGoogleCalendar ? 'Yes' : 'No'));
+        $hasAppleCalendar = $user->apple_calendar_synced;
 
-        return response()->json(['hasGoogleCalendar' => $hasGoogleCalendar]);
+        return response()->json([
+            'hasGoogleCalendar' => $hasGoogleCalendar,
+            'hasAppleCalendar' => $hasAppleCalendar
+        ]);
+    }
+
+    public function syncAllEventsToAppleCalendar(Request $request, $eventId)
+    {
+        $userId = $request->user()->id;
+        $user = User::find($userId);
+        \Log::info("Syncing events for user ID: $user");
+
+        $event = Event::findOrFail($eventId);
+        $startTime = \Carbon\Carbon::parse($event->start_time)->format('Ymd\THis');
+        $endTime = \Carbon\Carbon::parse($event->end_time)->format('Ymd\THis');
+
+        if (!$event) {
+            return response()->json(['error' => 'Event not found'], 404);
+        }
+
+        // Create .ics file content
+        $icsContent = "
+        BEGIN:VCALENDAR
+        VERSION:2.0
+        PRODID:-//YourNextShow//NONSGML v1.0//EN
+        BEGIN:VEVENT
+        UID:" . uniqid() . "
+        DTSTAMP:" . now()->format('Ymd\THis') . "
+        DTSTART:{$startTime}
+        DTEND:{$endTime}
+        SUMMARY:{$event->name}
+        DESCRIPTION:{$event->description}
+        LOCATION:{$event->location}
+        END:VEVENT
+        END:VCALENDAR
+        ";
+
+        // Define headers for the file download
+        $headers = [
+            'Content-type' => 'text/calendar; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename="' . $event->title . '.ics"',
+        ];
+
+        if (!$user->apple_calendar_synced) {
+            $user->apple_calendar_synced = true;
+            $user->save();
+        }
+
+        return Response::make($icsContent, 200, $headers);
     }
 }

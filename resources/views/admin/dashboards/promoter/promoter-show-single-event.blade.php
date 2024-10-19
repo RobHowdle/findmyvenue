@@ -92,7 +92,7 @@
             </div>
 
             <div class="group mb-2 flex flex-row items-center justify-center text-center">
-              <span class="fas fa-ticket-alt mr-2"></span>{{ formatCurrency($event->on_the_door_ticket_price) }}
+              <span class="fas fa-ticket-alt mr-2"></span>{{ formatCurrency($event->on_the_door_ticket_price) }} O.T.D
             </div>
           </div>
           <div class="col relative place-content-center">
@@ -172,8 +172,8 @@
 
   document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('addToCalendarButton').addEventListener('click', function(event) {
-      event.preventDefault(); // Prevent the default link behavior
-      checkCalendars(); // Call your function to check calendars
+      event.preventDefault();
+      checkCalendars();
     });
   });
 
@@ -191,7 +191,7 @@
         console.log('Data:', data);
         if (data.hasGoogleCalendar) {
           const calendarService = 'google';
-          addEventToGoogleCalendar(calendarService); // Call your function to add the event
+          addEventToGoogleCalendar(calendarService);
         } else {
           alert('Please link a Google Calendar to use this feature.');
         }
@@ -235,7 +235,7 @@
       .then(response => response.json())
       .then(data => {
         if (data.success) {
-          showSuccessNotification(data.message); // Show a success notification
+          showSuccessNotification(data.message);
         } else {
           showFailureNotification(data.message || 'Failed to add event to the calendar.');
         }
