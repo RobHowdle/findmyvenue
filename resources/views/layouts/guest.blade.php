@@ -39,7 +39,8 @@
     <nav class="fixed z-10 w-full bg-yns_dark_blue">
       <div class="mx-auto flex max-w-screen-2xl flex-wrap items-center justify-between px-2 py-4 md:px-4 md:py-8">
         <a href="{{ url('/') }}" class="flex items-center space-x-3 rtl:space-x-reverse">
-          <img src="{{ asset('images/yns_logo.png') }}" class="h-16" alt="{{ config('app.name', 'Laravel') }} Logo" />
+          <img src="{{ asset('images/system/yns_logo.png') }}" class="h-16"
+            alt="{{ config('app.name', 'Laravel') }} Logo" />
           <span
             class="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">{{ config('app.name') }}</span>
         </a>
@@ -92,38 +93,45 @@
       <div class="w-full bg-yns_dark_blue px-2 py-4">
         <div class="mx-auto flex max-w-screen-2xl flex-wrap items-center justify-between">
           <a href="{{ url('/') }}"
-            class="flex items-center space-x-3 transition duration-150 ease-in-out hover:text-yns_yellow rtl:space-x-reverse">
-            <img src="{{ asset('images/yns_logo.png') }}" class="h-16"
+            class="flex w-60 items-center space-x-3 transition duration-150 ease-in-out hover:text-yns_yellow rtl:space-x-reverse">
+            <img src="{{ asset('images/system/yns_logo.png') }}" class="h-16"
               alt="{{ config('app.name', 'Laravel') }} Logo" />
             <span
               class="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">{{ config('app.name') }}</span>
           </a>
-          <ul class="flex flex-row gap-2 font-heading">
+          <ul class="flex w-60 flex-row gap-8 font-heading">
             <li>
-              <a href="#" class="text-white transition duration-150 ease-in-out hover:text-yns_yellow">About</a>
+              <a href="#"
+                class="text-white transition duration-150 ease-in-out hover:text-yns_yellow hover:underline">About</a>
             </li>
             <li>
-              <a href="#" class="text-white transition duration-150 ease-in-out hover:text-yns_yellow">Credits</a>
+              <a href="#"
+                class="text-white transition duration-150 ease-in-out hover:text-yns_yellow hover:underline">Credits</a>
             </li>
 
             <li>
-              <a href="#" class="text-white transition duration-150 ease-in-out hover:text-yns_yellow">Contact</a>
+              <a href="#"
+                class="text-white transition duration-150 ease-in-out hover:text-yns_yellow hover:underline">Contact</a>
             </li>
           </ul>
-          <ul class="flex flex-col gap-2 font-heading">
+          <ul class="flex w-60 flex-col gap-2 text-right font-heading">
             <li>
-              <a href="#" class="text-white transition duration-150 ease-in-out hover:text-yns_yellow">Privacy
-                Policy</a>
+              <a href="https://www.youtube.com/watch?v=Rs2z7OA3XKI" target="_blank"
+                class="text-white transition duration-150 ease-in-out hover:text-yns_yellow">We didn't know
+                what to put
+                here so here is a funny video</a>
             </li>
           </ul>
         </div>
       </div>
       <div class="w-full bg-black px-2 py-2">
         <div class="mx-auto flex max-w-screen-2xl flex-wrap items-center justify-between">
-          <a href="#" class="text-white transition duration-150 ease-in-out hover:text-yns_yellow">Privacy
+          <a href="#"
+            class="text-white transition duration-150 ease-in-out hover:text-yns_yellow hover:underline">Privacy
             Policy</a>
           <p class="text-yns_med_gray">&copy; {{ env('APP_NAME') }} All Rights Reserved {{ date('Y') }}</p>
-          <a href="#" class="text-white transition duration-150 ease-in-out hover:text-yns_yellow">Terms &
+          <a href="#"
+            class="text-white transition duration-150 ease-in-out hover:text-yns_yellow hover:underline">Terms &
             Conditions</a>
         </div>
       </div>
