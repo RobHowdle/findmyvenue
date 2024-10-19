@@ -15,6 +15,7 @@ class Todo extends Model
         'serviceable_id',
         'serviceable_type',
         'item',
+        'due_date',
         'completed',
         'completed_at'
     ];

@@ -1,7 +1,10 @@
 @foreach ($todoItems as $item)
   <div class="min-h-52 mx-auto w-full max-w-xs rounded-lg bg-yns_dark_blue text-white">
     <div class="flex h-full flex-col justify-between rounded-lg border border-yns_red px-4 py-4">
-      <p>Todo: {{ $item->item }}</p>
+      <p class="mb-4">Todo: {{ $item->item }}</p>
+      @if ($item->due_date)
+        <p class="mb-2">Due Date: {{ $item->due_date }}</p>
+      @endif
       <p class="mb-2">Created On: {{ $item->created_at->format('d-m-Y') }}</p>
       <div class="mt-1 flex flex-row justify-between">
         <button data-task-id="{{ $item->id }}" id="delete-task-btn"

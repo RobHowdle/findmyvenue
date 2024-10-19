@@ -8,12 +8,20 @@ use App\Models\Venue;
 use App\Models\UserService;
 use App\Models\VenueReview;
 use Illuminate\Http\Request;
+use App\Services\TodoService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
 
 class DashboardController extends Controller
 {
+    protected $todoService;
+
+    public function __construct(TodoService $todoService)
+    {
+        $this->todoService = $todoService;
+    }
+
     public function index(Request $request)
     {
         $user = Auth::user()->load(['roles', 'promoters']);
@@ -119,20 +127,13 @@ class DashboardController extends Controller
 
             return redirect()->route('dashboard')->with('success', 'User successfully linked');
         } catch (\Exception $e) {
-            // Log the error
-            Log::error('Error linking user: ' . $e->getMessage());
-
-            // Redirect back with an error message
             return redirect()->back()->with('error', 'An error occurred while linking the user');
         }
     }
 
     public function storeNewNote(Request $request)
     {
-        Log::info('Request data:', $request->all());
-
         try {
-            // Ensure the user has a promoter
             $promoter = Auth::user()->promoters()->first();
 
             if (!$promoter) {
@@ -150,7 +151,7 @@ class DashboardController extends Controller
                 'name' => 'required|string',
                 'text' => 'required|string',
                 'date' => 'required|date',
-                'isTodo' => 'boolean'
+                'is_todo' => 'boolean'
             ]);
 
             // Create the note
@@ -160,8 +161,12 @@ class DashboardController extends Controller
                 'name' => $validatedData['name'],
                 'text' => $validatedData['text'],
                 'date' => $validatedData['date'],
-                'is_todo' => $validatedData['isTodo'] ?? false,
+                'is_todo' => $validatedData['is_todo'] ?? false,
             ]);
+
+            if ($note->is_todo) {
+                $this->todoService->createTodoFromNote($note);
+            };
 
             // Return success response
             return response()->json([

@@ -93,7 +93,7 @@
           $('#taskInput').val('');
           $('#tasks').empty();
           currentPage = 1;
-          loadTasks(currentPage); // Load tasks for the current page
+          loadTasks(currentPage);
           showSuccessNotification(response.message);
         },
         error: function(xhr) {
@@ -111,18 +111,17 @@
           page: page
         },
         success: function(response) {
-          $('#tasks').append(response.view); // Append new tasks
-          $('#completes-task-btn').show(); // Hide completed button
-          $('#uncomplete-task-btn').hide(); // Show uncompleted button
-          $('#load-more-btn').show(); // Optionally hide Load More button
+          $('#tasks').append(response.view);
+          $('#completed-task-btn').show();
+          $('#uncomplete-task-btn').hide();
+          $('#load-more-btn').show();
 
-          // Handle visibility of Load More button
           if (!response.hasMore) {
-            $('#load-more-btn').hide(); // Hide the button if there are no more tasks
+            $('#load-more-btn').hide();
           }
         },
         error: function(xhr) {
-          console.log('Error: ', xhr.responseText); // Handle error response
+          console.log('Error: ', xhr.responseText);
         }
       });
     }
@@ -212,7 +211,6 @@
           $('#tasks').append(response.view);
           $('#complete-task-btn').hide(); // Hide completed button
           $('#uncomplete-task-btn').show(); // Show uncompleted button
-          attachTaskEventListeners(); // Reattach event listeners for new tasks
         },
         error: function(xhr) {
           console.log('Error: ', xhr.responseText);

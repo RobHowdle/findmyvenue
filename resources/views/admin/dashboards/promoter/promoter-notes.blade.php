@@ -11,15 +11,11 @@
           <form id="newNote" method="POST">
             @csrf
             <div class="border-b border-b-white pb-4">
-              <div class="grid grid-cols-2 gap-12">
+              <div class="grid grid-cols-2 gap-x-12">
                 <div class="col">
                   <div class="group mb-4">
                     <x-input-label-dark>Note Name</x-input-label-dark>
                     <x-text-input id="noteInput" name="note"></x-text-input>
-                  </div>
-                  <div class="group mb-4">
-                    <x-input-label>Text</x-input-label>
-                    <x-textarea-input id="textInput" name="text" class="w-full"></x-textarea-input>
                   </div>
                 </div>
                 <div class="col">
@@ -27,31 +23,39 @@
                     <x-input-label-dark>Date</x-input-label-dark>
                     <x-date-input id="dateInput" name="date"></x-date-input>
                   </div>
+                </div>
 
-                  <div class="group mb-4 flex flex-row-reverse items-end justify-end gap-2">
-                    <x-input-label-dark>Convert to Todo Item</x-input-label-dark>
-                    <x-input-checkbox id="isTodoInput" name="isTodo"></x-input-checkbox>
+                <div class="col-span-2">
+                  <div class="group mb-4">
+                    <x-input-label>Text</x-input-label>
+                    <x-textarea-input id="textInput" name="text" class="w-full"></x-textarea-input>
                   </div>
+                </div>
+
+                <div class="col-span-2 flex flex-row-reverse items-end justify-end gap-2">
+                  <x-input-label>Convert to Todo Item</x-input-label>
+                  <x-input-checkbox id="isTodoInput" name="isTodo"></x-input-checkbox>
                 </div>
               </div>
               <button type="submit" id="newNoteButton"
-                class="h-10 w-40 rounded-lg border border-white bg-white px-4 py-2 font-heading font-bold text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">Add</button>
+                class="mt-4 h-10 w-40 rounded-lg border border-white bg-white px-4 py-2 font-heading font-bold text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">Add</button>
             </div>
           </form>
           <div class="grid grid-cols-3 gap-x-4 gap-y-6 pt-6" id="notes">
-            @include('components.note-items', ['notes' => $notes])
             @if ($notes->isEmpty())
               <p>No notes found.</p>
+            @else
+              @include('components.note-items', ['notes' => $notes])
             @endif
           </div>
           <div class="mt-6 flex flex-row gap-4">
             <button id="load-more-btn"
               class="h-10 w-40 rounded-lg border border-white bg-white px-4 py-2 font-heading font-bold text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">Load
               More</button>
-            <button id="completed-note-btn"
+            <button id="completed-notes-btn"
               class="h-10 w-40 rounded-lg border border-white bg-white px-4 py-2 font-heading font-bold text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">View
               Completed</button>
-            <button id="uncomplete-note-btn" style="display: none;"
+            <button id="uncompleted-notes-btn" style="display: none;"
               class="w-50 h-10 rounded-lg border border-white bg-white px-4 py-2 font-heading font-bold text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">View
               Uncompleted</button>
           </div>
@@ -64,33 +68,46 @@
   $(document).ready(function() {
     let currentPage = 1;
 
-    // Load initial notes
-    loadNotes(currentPage);
-
-    // Delegate click events for dynamically added buttons
-    $(document).on('click', '.complete-note-btn', function() {
-      let noteId = $(this).data('note-id');
-      completeNote(noteId);
-    });
-
-    $(document).on('click', '.delete-note-btn', function() {
-      let noteId = $(this).data('note-id');
-      deleteNote(noteId);
-    });
-
     $('#load-more-btn').on('click', function() {
       currentPage++;
       loadNotes(currentPage);
     });
 
-    $('#complete-note-btn').on('click', function() {
-      currentPage = 1; // Reset to the first page
-      loadCompletedNotes(); // Load completed notes
+    $(document).on('click', '.complete-note-btn', function() {
+      const noteId = $(this).data('note-id');
+      const noteElement = $(this).closest('.note-item')
+      completeNote(noteId);
+
+      $('#notes').empty();
+      currentPage = 1;
     });
 
-    $('#uncomplete-note-btn').on('click', function() {
-      currentPage = 1; // Reset to the first page
-      loadNotes(currentPage); // Load uncompleted notes
+    $(document).on('click', '.uncomplete-note-btn', function() {
+      const noteId = $(this).data('note-id');
+      const noteElement = $(this).closest('.note-item')
+      uncompleteNote(noteId);
+
+      $('#notes').empty();
+      currentPage = 1;
+    });
+
+    $(document).on('click', '.delete-note-btn', function() {
+      const noteId = $(this).data('note-id');
+      const noteElement = $(this).closest('.note-item')
+      deleteNote(noteId);
+
+      $('#notes').empty();
+      currentPage = 1;
+    });
+
+    $('#completed-notes-btn').on('click', function() {
+      currentPage = 1;
+      loadCompletedNotes();
+    });
+
+    $('#uncompleted-notes-btn').on('click', function() {
+      currentPage = 1;
+      loadNotes(currentPage);
     });
 
     // Handle new note submission
@@ -114,12 +131,12 @@
           is_todo: isTodo // Use the correct key name for the backend
         },
         success: function(response) {
-          // Clear input fields
           $('#noteInput').val('');
           $('#textInput').val('');
           $('#dateInput').val('');
           $('#isTodoInput').prop('checked', false);
-          loadNotes(1); // Reload notes from the first page after a new note is added
+          currentPage = 1;
+          loadNotes(currentPage);
           showSuccessNotification(response.message);
         },
         error: function(xhr) {
@@ -137,21 +154,28 @@
           page: page
         },
         success: function(response) {
+          // If it's the first page, clear existing notes
           if (page === 1) {
-            $('#notes').empty(); // Clear existing notes only on the first load
+            $('#notes').empty(); // Clear existing notes
           }
+
           $('#notes').append(response.view); // Append new notes
 
-          // Handle visibility of Load More button
+          // Show or hide the buttons based on response
+          $('#completed-notes-btn').show();
+          $('#uncompleted-notes-btn').hide();
+          $('#load-more-btn').show();
+
           if (!response.hasMore) {
-            $('#load-more-btn').hide(); // Hide the button if there are no more notes
+            $('#load-more-btn').hide();
           }
         },
         error: function(xhr) {
-          console.log('Error: ', xhr.responseText); // Handle error response
+          console.log('Error: ', xhr.responseText);
         }
       });
     }
+
 
     // Function to complete a note
     function completeNote(noteId) {
@@ -162,8 +186,10 @@
           _token: '{{ csrf_token() }}'
         },
         success: function(response) {
-          loadNotes(currentPage); // Reload notes
           showSuccessNotification(response.message);
+          setInterval(() => {
+            loadNotes(currentPage);
+          }, 500);
         },
         error: function(xhr) {
           showFailureNotification(xhr.responseText);
@@ -180,8 +206,10 @@
           _token: '{{ csrf_token() }}'
         },
         success: function(response) {
-          loadNotes(currentPage); // Reload notes
           showSuccessNotification(response.message);
+          setInterval(() => {
+            loadNotes(currentPage);
+          }, 500);
         },
         error: function(xhr) {
           showFailureNotification(xhr.responseText);
@@ -194,10 +222,14 @@
         url: '{{ route('admin.promoter.dashboard.completed-notes') }}',
         type: 'GET',
         success: function(response) {
-          $('#notes').empty(); // Clear existing notes
           $('#notes').append(response.view); // Append new completed notes
-          $('#complete-note-btn').hide(); // Hide completed button
-          $('#uncomplete-note-btn').show(); // Show uncompleted button
+          $('#completed-notes-btn').hide(); // Hide completed button
+          $('#uncompleted-notes-btn').show(); // Show uncompleted button
+          $('#load-more-btn').show();
+
+          if (!response.hasMore) {
+            $('#load-more-btn').hide();
+          }
         },
         error: function(xhr) {
           console.log('Error: ', xhr.responseText);
