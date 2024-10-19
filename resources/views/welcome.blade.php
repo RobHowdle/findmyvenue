@@ -908,7 +908,8 @@
           and add your suggestion to our ideas board.
         </p>
 
-        <a href="#"
+        <a href="https://github.com/RobHowdle/findmyvenue/issues/new?assignees=RobHowdle&labels=Future+Addition%2F+Request&projects=&template=feature-request.md&title=%5BUser+Feature+Request%5D"
+          target="_blank"
           class="mt-2 rounded bg-white p-2 font-sans text-black transition duration-150 ease-in-out hover:bg-gradient-button hover:text-white">Submit
           Idea</a>
       </div>
@@ -924,7 +925,8 @@
           made live sometimes things do slip through the net. If you find a bug or something that doesn’t seem quite
           right - Let us know!
         </p>
-        <a href="#"
+        <a href="https://github.com/RobHowdle/findmyvenue/issues/new?assignees=RobHowdle&labels=bug&projects=&template=bug-report.md&title=%5BUser+Reported+Bug%5D"
+          target="_blank"
           class="rounded bg-white p-2 font-sans text-black transition duration-150 ease-in-out hover:bg-gradient-button hover:text-white">Report
           A
           Bug</a>
