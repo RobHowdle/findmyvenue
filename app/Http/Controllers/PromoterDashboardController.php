@@ -1269,6 +1269,7 @@ class PromoterDashboardController extends Controller
 
         $todoItems = Todo::whereIn('serviceable_id', $serviceableId)
             ->where('completed', false)
+            ->where('completed_at', null)
             ->orderBy('created_at', 'DESC')
             ->paginate(6);
 
@@ -1343,6 +1344,23 @@ class PromoterDashboardController extends Controller
         return response()->json([
             'view' => view('components.todo-items', ['todoItems' => $completedTodos])->render(),
             'hasMore' => $completedTodos->hasMorePages(),
+        ]);
+    }
+
+    public function uncompleteTodoItem($id)
+    {
+        // Find the todo item by ID
+        $todoItem = Todo::findOrFail($id);
+
+        // Mark the item as completed
+        $todoItem->completed = false;
+        $todoItem->completed_at = null;
+        $todoItem->save();
+
+        // Return a success response
+        return response()->json([
+            'message' => 'Todo item marked as uncompleted!',
+            'todoItem' => $todoItem,
         ]);
     }
 

@@ -29,7 +29,7 @@
             <button id="load-more-btn"
               class="h-10 w-40 rounded-lg border border-white bg-white px-4 py-2 font-heading font-bold text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">Load
               More</button>
-            <button id="complete-task-btn"
+            <button id="completed-task-btn"
               class="h-10 w-40 rounded-lg border border-white bg-white px-4 py-2 font-heading font-bold text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">View
               Completed</button>
             <button id="uncomplete-task-btn" style="display: none;"
@@ -50,16 +50,31 @@
       loadTasks(currentPage);
     });
 
-    $('#complete-task-btn').on('click', function() {
-      $('#tasks').empty(); // Clear existing tasks
-      currentPage = 1; // Reset to the first page
-      loadCompletedTasks();
+    $(document).on('click', '.complete-task-btn', function() {
+      const taskId = $(this).data('task-id');
+      const taskElement = $(this).closest('.todo-item');
+      completeTask(taskId);
+
+      $('#tasks').empty();
+      currentPage = 1;
     });
 
-    $('#uncomplete-task-btn').on('click', function() {
-      $('#tasks').empty(); // Clear existing tasks
-      currentPage = 1; // Reset to the first page
-      loadTasks(currentPage); // Load uncompleted tasks
+    $(document).on('click', '.delete-task-btn', function() {
+      const taskId = $(this).data('task-id');
+      const taskElement = $(this).closest('.todo-item');
+      deleteTask(taskId);
+
+      $('#tasks').empty();
+      currentPage = 1;
+    });
+
+    $(document).on('click', '.uncomplete-task-btn', function() {
+      const taskId = $(this).data('task-id');
+      const taskElement = $(this).closest('.todo-item');
+      uncompleteTask(taskId);
+
+      $('#tasks').empty();
+      currentPage = 1;
     });
 
     // Handle new task submission
@@ -97,7 +112,7 @@
         },
         success: function(response) {
           $('#tasks').append(response.view); // Append new tasks
-          $('#complete-task-btn').show(); // Hide completed button
+          $('#completes-task-btn').show(); // Hide completed button
           $('#uncomplete-task-btn').hide(); // Show uncompleted button
           $('#load-more-btn').show(); // Optionally hide Load More button
 
@@ -105,7 +120,6 @@
           if (!response.hasMore) {
             $('#load-more-btn').hide(); // Hide the button if there are no more tasks
           }
-          attachTaskEventListeners(); // Attach listeners for new tasks
         },
         error: function(xhr) {
           console.log('Error: ', xhr.responseText); // Handle error response
@@ -113,34 +127,23 @@
       });
     }
 
-    // Completed tasks button
-    $('#complete-task-btn').on('click', function() {
+    // Show Completed Tasks
+    $('#completed-task-btn').on('click', function() {
       $.ajax({
         url: '{{ route('promoter.dashboard.completed-todo-items') }}', // Adjust route
         type: 'GET',
         success: function(response) {
+          $('#tasks').empty();
           $('#tasks').append(response.view);
           $('#load-more-btn').hide(); // Optionally hide Load More button
-          attachTaskEventListeners(); // Reattach event listeners for new tasks
+          $('#uncomplete-task-btn').show(); // Show uncompleted button
+          $('#completed-task-btn').hide(); // Show uncompleted button
         },
         error: function(xhr) {
           console.log('Error: ', xhr.responseText); // Handle error response
         }
       });
     });
-
-    // Attach click event listeners to delete/complete buttons
-    function attachTaskEventListeners() {
-      $('.delete-task-btn').off('click').on('click', function() {
-        let taskId = $(this).data('task-id');
-        deleteTask(taskId);
-      });
-
-      $('.complete-task-btn').off('click').on('click', function() {
-        let taskId = $(this).data('task-id');
-        completeTask(taskId);
-      });
-    }
 
     // Function to complete a task
     function completeTask(taskId) {
@@ -151,8 +154,10 @@
           _token: '{{ csrf_token() }}'
         },
         success: function(response) {
-          loadTasks(currentPage); // Reload tasks
           showSuccessNotification(response.message);
+          setTimeout(() => {
+            loadTasks(currentPage);
+          }, 500);
         },
         error: function(xhr) {
           showFailureNotification(xhr.responseText);
@@ -169,8 +174,29 @@
           _token: '{{ csrf_token() }}'
         },
         success: function(response) {
-          loadTasks(currentPage); // Reload tasks
           showSuccessNotification(response.message);
+          setTimeout(() => {
+            loadTasks(currentPage);
+          }, 500);
+        },
+        error: function(xhr) {
+          showFailureNotification(xhr.responseText);
+        }
+      });
+    }
+
+    function uncompleteTask(taskId) {
+      $.ajax({
+        url: '{{ route('promoter.dashboard.uncomplete-todo-item', 'TASK_ID') }}'.replace('TASK_ID', taskId),
+        type: 'POST',
+        data: {
+          _token: '{{ csrf_token() }}'
+        },
+        success: function(response) {
+          showSuccessNotification(response.message);
+          setTimeout(() => {
+            loadTasks(currentPage);
+          }, 500);
         },
         error: function(xhr) {
           showFailureNotification(xhr.responseText);
