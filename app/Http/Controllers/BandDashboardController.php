@@ -13,6 +13,7 @@ class BandDashboardController extends Controller
      */
     public function index()
     {
+        $userId = Auth::user()->id;
         // $pendingReviews = PromoterReview::with('promoter')->where('review_approved', '0')->whereNull('deleted_at')->count();
         $band = Auth::user()->load('otherService');
         // $todoItemsCount = $band->promoters()->with(['todos' => function ($query) {
@@ -31,6 +32,7 @@ class BandDashboardController extends Controller
         //     ->count();
 
         return view('admin.dashboards.band-dash', compact([
+            'userId',
             // 'pendingReviews',
             'band',
             // 'todoItemsCount',

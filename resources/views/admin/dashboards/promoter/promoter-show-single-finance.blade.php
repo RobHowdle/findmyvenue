@@ -1,12 +1,12 @@
 <x-app-layout>
   <x-slot name="header">
-    <x-promoter-sub-nav :promoterId="$promoter->id" />
+    <x-sub-nav :promoterId="$promoter->id" />
   </x-slot>
 
   <div class="mx-auto w-full max-w-screen-2xl py-16">
     <div class="relative mb-8 shadow-md sm:rounded-lg">
       <div class="min-w-screen-xl mx-auto max-w-screen-xl rounded-lg bg-yns_dark_gray text-white">
-        <div class="bg-yns_dark_blue rounded-l-lg px-8 py-8">
+        <div class="rounded-l-lg bg-yns_dark_blue px-8 py-8">
           <div class="mb-8 flex flex-col justify-between text-white">
             <div class="mb-8 flex flex-row items-center justify-between">
               <p class="font-heading text-3xl font-bold">Finance Record: #{{ $finance->id }}</p>

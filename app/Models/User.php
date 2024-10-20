@@ -86,10 +86,32 @@ class User extends Authenticatable
         return $this->morphedByMany(Venue::class, 'serviceable', 'service_user', 'user_id', 'serviceable_id')->whereNull('service_user.deleted_at');
     }
 
-    public function otherService(): MorphToMany
+    public function otherService(string $role = null): MorphToMany
     {
-        return $this->morphedByMany(OtherService::class, 'serviceable', 'service_user', 'user_id', 'serviceable_id')->whereNull('service_user.deleted_at');
+        $query = $this->morphedByMany(OtherService::class, 'serviceable', 'service_user', 'user_id', 'serviceable_id')->whereNull('service_user.deleted_at');
+
+        if ($role) {
+            $roleId = $this->getRoleIdByRole($role);
+            if ($roleId) {
+                $query->where('serviceable_id', $roleId);
+            }
+        }
+
+        return $query;
     }
+
+    private function getRoleIdByRole(string $role): ?int
+    {
+        $roleMapping = [
+            'photographer' => 1,
+            'videographer' => 2,
+            'designer' => 3,
+            'band' => 4,
+        ];
+
+        return $roleMapping[$role] ?? null;
+    }
+
 
     public function todos()
     {

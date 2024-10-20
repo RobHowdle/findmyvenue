@@ -1,13 +1,13 @@
 <x-app-layout>
   <x-slot name="header">
-    <x-promoter-sub-nav :promoter="$promoter" :promoterId="$promoter->id" />
+    <x-sub-nav :promoter="$promoter" :promoterId="$promoter->id" />
   </x-slot>
 
   <div class="mx-auto w-full max-w-screen-2xl py-16">
     <div class="relative mb-8 shadow-md sm:rounded-lg">
       <div class="min-w-screen-xl mx-auto max-w-screen-xl rounded-lg bg-yns_dark_gray text-white">
         <div class="grid grid-cols-[1.25fr_1.75fr] rounded-lg border border-white">
-          <div class="bg-yns_dark_blue rounded-l-lg border-r border-r-white px-8 py-8">
+          <div class="rounded-l-lg border-r border-r-white bg-yns_dark_blue px-8 py-8">
             <div class="mb-8 flex flex-row justify-between">
               <a href="{{ route('promoter.dashboard.finances.export') }}" id="exportButton"
                 class="rounded-lg border bg-yns_light_gray px-4 py-2 font-bold text-white transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">Export</a>
