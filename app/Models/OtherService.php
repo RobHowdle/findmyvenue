@@ -21,11 +21,14 @@ class OtherService extends Model
         'longitude',
         'latitude',
         'other_service_id',
+        'description',
         'packages',
         'environment_type',
         'working_times',
-        'band_members',
+        'members',
         'stream_urls',
+        'band_type',
+        'genre',
         'contact_number',
         'contact_email',
         'contact_link',
@@ -69,7 +72,7 @@ class OtherService extends Model
         return $this->belongsToMany(Event::class, 'event_band', 'band_id', 'event_id');
     }
 
-    public function bands()
+    public static function bands()
     {
         return self::where('other_service_id', 4);
     }
