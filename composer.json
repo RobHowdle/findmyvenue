@@ -14,7 +14,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.8",
         "marvinlabs/laravel-discord-logger": "^1.4",
-        "spatie/laravel-permission": "^6.7"
+        "spatie/laravel-permission": "^6.9"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.13",
