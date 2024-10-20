@@ -26,7 +26,7 @@ class TodoTestDataSeeder extends Seeder
 
     private function createTodoItems($faker, $serviceableId, $completedCount)
     {
-        $user = User::where('name', 'Promoter')->firstOrFail();
+        $user = User::where('first_name', 'Promoter')->firstOrFail();
         $userId = $user->id;
         // Create 12 todo items
         for ($i = 0; $i < 12; $i++) {
@@ -47,7 +47,7 @@ class TodoTestDataSeeder extends Seeder
 
     private function createDeletedTodoItem($faker, $serviceableId)
     {
-        $user = User::where('name', 'Promoter')->firstOrFail();
+        $user = User::where('first_name', 'Promoter')->firstOrFail();
         $userId = $user->id;
         // Create 1 deleted todo item
         Todo::create([

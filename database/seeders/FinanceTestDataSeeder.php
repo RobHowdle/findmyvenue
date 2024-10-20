@@ -12,7 +12,7 @@ class FinanceTestDataSeeder extends Seeder
     public function run()
     {
         // User-specific data
-        $user = User::where('name', 'Promoter')->firstOrFail();
+        $user = User::where('first_name', 'Promoter')->firstOrFail();
         $userId = $user->id;
         $serviceableId = 1;
         $serviceableType = 'App\Models\Promoter';

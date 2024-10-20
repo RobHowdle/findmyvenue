@@ -344,6 +344,21 @@ window.showFailureNotification = function (message) {
     });
 };
 
+window.showWarningNotification = function (message) {
+    Swal.fire({
+        showConfirmButton: true,
+        toast: false,
+        customClass: {
+            popup: "bg-yns_dark_gray !important rounded-lg font-heading",
+            title: "text-yns_red",
+            html: "text-white",
+        },
+        icon: "warning",
+        title: "Warning!",
+        text: message,
+    });
+};
+
 window.showConfirmationNotification = function (options) {
     return Swal.fire({
         showConfirmButton: true,

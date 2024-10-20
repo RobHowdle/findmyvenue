@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -15,14 +16,18 @@ class AdminUserSeeder extends Seeder
     public function run(): void
     {
         DB::table('users')->insert([
-            'name' => 'Rob',
+            'first_name' => 'Rob',
+            'last_name' => 'Howdle',
+            'date_of_birth' => Carbon::createFromFormat('d-m-Y', '08-10-1994'),
             'email' => 'robhowdle94@gmail.com',
             'email_verified_at' => now(),
             'password' => Hash::make('yfT11LpReC43(dV(U5'),
         ]);
 
         DB::table('users')->insert([
-            'name' => 'Promoter',
+            'first_name' => 'Promoter',
+            'last_name' => 'Howdle,',
+            'date_of_birth' => Carbon::createFromFormat('d-m-Y', '08-10-1994'),
             'email' => 'robhowdlemusic@gmail.com',
             'email_verified_at' => now(),
             'password' => Hash::make('yfT11LpReC43(dV(U5'),

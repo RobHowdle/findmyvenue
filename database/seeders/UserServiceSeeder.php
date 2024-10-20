@@ -10,7 +10,7 @@ class UserServiceSeeder extends Seeder
 {
     public function run()
     {
-        $user = User::where('name', 'Promoter')->firstOrFail();
+        $user = User::where('first_name', 'Promoter')->firstOrFail();
 
         $serviceUserData = [
             'user_id' => $user->id,

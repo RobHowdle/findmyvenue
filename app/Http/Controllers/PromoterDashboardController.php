@@ -26,6 +26,36 @@ use Illuminate\Validation\ValidationException;
 class PromoterDashboardController extends Controller
 {
     /**
+     * Return the Dashboard
+     */
+    public function index()
+    {
+        $pendingReviews = PromoterReview::with('promoter')->where('review_approved', '0')->whereNull('deleted_at')->count();
+        $promoter = Auth::user()->load('promoters');
+        $todoItemsCount = $promoter->promoters()->with(['todos' => function ($query) {
+            $query->where('completed', 0)->whereNull('deleted_at');
+        }])->get()->pluck('todos')->flatten()->count();
+
+        $startOfWeek = Carbon::now()->startOfWeek();
+        $endOfWeek = Carbon::now()->endOfWeek();
+        $eventsCount = $promoter->promoters()
+            ->with(['events' => function ($query) use ($startOfWeek, $endOfWeek) {
+                $query->whereBetween('event_date', [$startOfWeek, $endOfWeek]);
+            }])
+            ->get()
+            ->pluck('events')
+            ->flatten()
+            ->count();
+
+        return view('admin.dashboards.promoter-dash', compact([
+            'pendingReviews',
+            'promoter',
+            'todoItemsCount',
+            'eventsCount'
+        ]));
+    }
+
+    /**
      * Checking if the user is linked to a promotions record
      */
     public function searchExistingPromoters(Request $request)
@@ -544,33 +574,6 @@ class PromoterDashboardController extends Controller
         return response()->json($venues);
     }
 
-    public function index()
-    {
-        $pendingReviews = PromoterReview::with('promoter')->where('review_approved', '0')->whereNull('deleted_at')->count();
-        $promoter = Auth::user()->load('promoters');
-        $todoItemsCount = $promoter->promoters()->with(['todos' => function ($query) {
-            $query->where('completed', 0)->whereNull('deleted_at');
-        }])->get()->pluck('todos')->flatten()->count();
-
-        $startOfWeek = Carbon::now()->startOfWeek();
-        $endOfWeek = Carbon::now()->endOfWeek();
-        $eventsCount = $promoter->promoters()
-            ->with(['events' => function ($query) use ($startOfWeek, $endOfWeek) {
-                $query->whereBetween('event_date', [$startOfWeek, $endOfWeek]);
-            }])
-            ->get()
-            ->pluck('events')
-            ->flatten()
-            ->count();
-
-        return view('admin.dashboards.promoter-dash', compact([
-            'pendingReviews',
-            'promoter',
-            'todoItemsCount',
-            'eventsCount'
-        ]));
-    }
-
     /**
      * Functions for the Users Module on the Promoter Dashboard
      */
@@ -606,7 +609,7 @@ class PromoterDashboardController extends Controller
         $query = $request->input('query');
 
         // Adjust this query to fit your database schema
-        $users = User::where('name', 'LIKE', "%{$query}%")
+        $users = User::where('first_name', 'LIKE', "%{$query}%")
             // ->orWhere('email', 'LIKE', "%{$query}%")
             ->get();
 

@@ -44,8 +44,8 @@ class DashboardController extends Controller
                     ]));
                 }
                 return redirect()->route('promoter.dashboard');
-            case 'artist':
-                return redirect()->route('artist.dashboard');
+            case 'band':
+                return redirect()->route('band.dashboard');
             case 'venue':
                 return redirect()->route('venue.dashboard');
             case 'administrator':

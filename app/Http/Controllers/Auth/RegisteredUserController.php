@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Auth\Events\Registered;
 use App\Providers\RouteServiceProvider;
+use App\Http\Requests\RegisterUserRequest;
 
 class RegisteredUserController extends Controller
 {
@@ -31,41 +32,78 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request): RedirectResponse
+    public function store(RegisterUserRequest $request): RedirectResponse
     {
-        $admin = Role::where('name', '=', 'administrator')->get();
+        $adminRoleId = Role::where('name', 'administrator')->pluck('id')->first();
 
-        // Check if the request contains a role that is not an administrator
-        if ($request->has('role') && $admin->isNotEmpty()) {
+        // Check if the selected role is not an administrator
+        if ($request->has('role') && $adminRoleId) {
             $selectedRole = $request->input('role');
 
-            // Check if the selected role matches the administrator role by name or id
-            if (!$admin->contains('name', $selectedRole) && !$admin->contains('id', $selectedRole)) {
-                $request->validate([
-                    'name' => ['required', 'string', 'max:255'],
-                    'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
-                    'password' => ['required', 'confirmed', Rules\Password::defaults()],
-                    'role' => ['required', 'exists:App\Models\Role,id'],
-                ]);
+            if ($selectedRole != $adminRoleId) {
+                try {
+                    $user = User::create([
+                        'first_name' => $request->first_name,
+                        'last_name' => $request->last_name,
+                        'date_of_birth' => $request->date_of_birth,
+                        'email' => $request->email,
+                        'password' => Hash::make($request->password),
+                    ]);
 
-                $user = User::create([
-                    'name' => $request->name,
-                    'email' => $request->email,
-                    'password' => Hash::make($request->password),
-                ]);
+                    $requestedRoleId = $request->role;
+                    $role = Role::findOrFail($request->role);
+                    Log::info('Requested Role:', ['role_id' => $requestedRoleId, 'role_name' => $role->name]);
 
-                $role = Role::findOrFail($request->role);
-                $user->assignRole($role->name);
-                event(new Registered($user));
+                    $user->assignRole($role->name);
+                    Log::info('Assigned Role:', ['user_id' => $user->id, 'role_id' => $role->id, 'role_name' => $role->name]);
 
-                Auth::login($user);
+                    event(new Registered($user));
 
-                return redirect(RouteServiceProvider::HOME);
+                    Auth::login($user);
+
+                    // Success response
+                    if ($request->wantsJson()) {
+                        return response()->json(['success' => true, 'message' => 'Registration successful!'], 200);
+                    }
+
+                    session()->flash('success', 'Registration successful!');
+                    return redirect(RouteServiceProvider::HOME);
+                } catch (\Exception $e) {
+                    Log::error('Registration failed:', [
+                        'message' => $e->getMessage(),
+                        'user_data' => [
+                            'first_name' => $request->first_name,
+                            'last_name' => $request->last_name,
+                            'email' => $request->email,
+                        ],
+                        'stack' => $e->getTraceAsString(),
+                    ]);
+
+                    // Error response
+                    if ($request->wantsJson()) {
+                        return response()->json(['success' => false, 'message' => 'Registration failed. Please try again.'], 500);
+                    }
+
+                    return back()->withInput()->withErrors(['general' => 'Registration failed. Please try again.']);
+                }
             } else {
                 $ipAddress = $request->ip();
-                Log::error('A user has attempted to register with a dedicate admin role, please investigate', ['ip_address' => $ipAddress]);
-                return back()->withInput()->withErrors(['role' => 'There has been an error. Please try again later.']);
+                Log::error('User attempted to register with an admin role', ['ip_address' => $ipAddress]);
+
+                // Error response
+                if ($request->wantsJson()) {
+                    return response()->json(['success' => false, 'message' => 'You cannot register as this role.'], 403);
+                }
+
+                return back()->withInput()->withErrors(['role' => 'You cannot register as this role.']);
             }
         }
+
+        // Error response for missing role
+        if ($request->wantsJson()) {
+            return response()->json(['success' => false, 'message' => 'Role selection is required.'], 422);
+        }
+
+        return back()->withInput()->withErrors(['role' => 'Role selection is required.']);
     }
 }

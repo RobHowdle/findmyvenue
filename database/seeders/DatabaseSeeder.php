@@ -34,8 +34,8 @@ class DatabaseSeeder extends Seeder
             VenueExtraInfoSeeder::class, // For Testing Data
             // PromoterTestSeeder::class,
             PromoterSeeder::class,
-            PromoterVenueTestPivotSeeder::class,
-            PromoterReviewTestSeeder::class,
+            // PromoterVenueTestPivotSeeder::class, // For Testing Data
+            // PromoterReviewTestSeeder::class, // For Testing Data
             RoleSeeder::class,
             OtherServicesListSeeder::class,
             OtherServiceSeeder::class,

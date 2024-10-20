@@ -15,6 +15,23 @@
     background-color: theme("colors.yns_cyan");
 }
 
+/* Register Form Password Metere */
+#password-strength-meter {
+    transition: width 0.5s ease; /* Smooth transition */
+}
+
+.weak {
+    background-color: theme("colors.yns_red"); /* Weak */
+}
+
+.medium {
+    background-color: theme("colors.yns_yellow"); /* Medium */
+}
+
+.strong {
+    background-color: green; /* Strong */
+}
+
 /* Preloader */
 @keyframes music-first {
     0% {
