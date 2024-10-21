@@ -5,13 +5,15 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\VenueController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\PromoterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\APIRequestsController;
+use App\Http\Controllers\BandJourneyController;
 use App\Http\Controllers\OtherServiceController;
-use App\Http\Controllers\PromoterDashboardController;
-use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\BandDashboardController;
+use App\Http\Controllers\PromoterDashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -109,6 +111,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/dashboard/promoter/approve-promoter/{reviewId}', [PromoterDashboardController::class, 'approvePromoterReview'])->name('admin.promoter.dashboard.approve-pending-review');
     Route::post('/promoter/dashboard/unapprove-review/{reviewId}', [PromoterDashboardController::class, 'unapprovePromoterReview'])->name('admin.promoter.dashboard.unapprove-review');
     Route::delete('/dashboard/promoter/delete-review/{reviewId}', [PromoterDashboardController::class, 'deletePromoterReview'])->name('admin.promoter.dashboard.delete-review');
+
+    // Documents
+    // Route::get('/dashboard/band/documents', [BandDashboardController::class, 'getBandDocuments'])->name('admin.band.dashboard.get-band-documents');
+    Route::post('/dashboard/document/file-upload', [DocumentController::class, 'fileUpload'])->name('admin.dashboard.document.file.upload');
+    Route::get('/dashboard/band/documents/new', [DashboardController::class, 'newDocument'])->name('admin.dashboard.new-document');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/band-journey', [BandJourneyController::class, 'index'])->name('band.journey');
+    Route::get('/band-search', [BandJourneyController::class, 'search'])->name('band.search');
+    Route::post('/band-journey/join', [BandJourneyController::class, 'joinBand'])->name('band.join');
+    Route::post('/band-journey/create', [BandJourneyController::class, 'createBand'])->name('band.create');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {

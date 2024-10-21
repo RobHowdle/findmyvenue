@@ -30,6 +30,7 @@ class PromoterDashboardController extends Controller
      */
     public function index()
     {
+        $userId = Auth::id();
         $pendingReviews = PromoterReview::with('promoter')->where('review_approved', '0')->whereNull('deleted_at')->count();
         $promoter = Auth::user()->load('promoters');
         $todoItemsCount = $promoter->promoters()->with(['todos' => function ($query) {
@@ -48,6 +49,7 @@ class PromoterDashboardController extends Controller
             ->count();
 
         return view('admin.dashboards.promoter-dash', compact([
+            'userId',
             'pendingReviews',
             'promoter',
             'todoItemsCount',

@@ -36,14 +36,52 @@ class OtherService extends Model
         'services'
     ];
 
+    /**
+     * Polymorphic relation to the users.
+     */
     public function users()
     {
-        return $this->morphToMany(User::class, 'serviceable');
+        return $this->morphToMany(User::class, 'serviceable', 'service_user', 'serviceable_id', 'user_id');
     }
 
+    /**
+     * Retrieve all bands (other services with `other_service_id` as 4).
+     */
+    public static function bands()
+    {
+        return self::where('other_service_id', 4); // Assuming 4 refers to bands in your `other_services` table
+    }
+
+    /**
+     * Belongs to OtherServiceList relation.
+     */
+    public function otherServiceList()
+    {
+        return $this->belongsTo(OtherServiceList::class, 'other_service_id');
+    }
+
+    /**
+     * MorphMany relation to Todo items.
+     */
+    public function todos()
+    {
+        return $this->morphMany(Todo::class, 'serviceable');
+    }
+
+    /**
+     * BelongsToMany relation to Events for band events.
+     */
+    public function events()
+    {
+        return $this->belongsToMany(Event::class, 'event_band', 'band_id', 'event_id');
+    }
+
+    /**
+     * Get the highest rated service of a specific type in a location.
+     */
     public static function getHighestRatedService($serviceType, $location)
     {
-        return self::with('otherServiceList') // Eager load the related model
+        return self::with('otherServiceList') // Eager load related services
             ->whereHas('otherServiceList', function ($query) use ($serviceType) {
                 $query->where('service_name', $serviceType);
             })
@@ -57,28 +95,11 @@ class OtherService extends Model
             ->first();
     }
 
-    public function otherServiceList()
+    /**
+     * Retrieve all bands associated with this service.
+     */
+    public function getAllBands()
     {
-        return $this->belongsTo(OtherServiceList::class, 'other_service_id');
-    }
-
-    public function todos()
-    {
-        return $this->morphMany(Todo::class, 'serviceable');
-    }
-
-    public function events()
-    {
-        return $this->belongsToMany(Event::class, 'event_band', 'band_id', 'event_id');
-    }
-
-    public static function bands()
-    {
-        return self::where('other_service_id', 4);
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
+        return self::bands()->get(); // Get all band services
     }
 }

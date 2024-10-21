@@ -15,6 +15,7 @@ class SubNav extends Component
 {
     // Global
     public $userType;
+    public $role;
     public $promoter;
     public $overallScore;
     public $user;
@@ -93,72 +94,52 @@ class SubNav extends Component
     private function loadUserData(int $userId)
     {
         $user = User::find($userId);
+        if (!$user) {
+            return;
+        }
 
-        if ($user) {
-            $this->role = $user->getRoleNames()->first();
+        $this->role = $user->getRoleNames()->first();
+        $this->userType = $this->role ?? 'guest'; // Set a default user type if none
 
-            switch ($this->role) {
-                case 'promoter':
-                    $promoter = $user->promoters()->first();
-                    if ($promoter) {
-                        $this->loadPromoterData($promoter);
-                    }
-                    break;
+        switch ($this->userType) {
+            case 'promoter':
+                $this->loadPromoterData($user);
+                break;
 
-                case 'band':
-                    $band = $user->otherService('band')->get();
-                    if ($band) {
-                        $this->loadBandData($band);
-                    } else {
-                        \Log::info('error');
-                    }
-                    break;
+            case 'band':
+                $this->loadBandData($user);
+                break;
 
-                case 'designer':
-                    // Load data specific to designer
-                    $this->designerMetric1 = $this->calculateDesignerMetric1($userId);
-                    $this->designerMetric2 = $this->calculateDesignerMetric2($userId);
-                    break;
-
-                case 'venue':
-                    // Load data specific to venue
-                    $this->venueMetric1 = $this->calculateVenueMetric1($userId);
-                    $this->venueMetric2 = $this->calculateVenueMetric2($userId);
-                    break;
-
-                default:
-                    // Handle any unrecognized roles or set defaults
-                    break;
-            }
+                // You can handle designer and venue similarly if needed
+            default:
+                // Handle other types or set defaults
+                break;
         }
     }
 
-    private function loadPromoterData($promoter)
+    private function loadPromoterData($user)
     {
-        $this->promoterId = $promoter->id;
-        $this->eventsCountPromoterYtd = $this->calculateEventsCountPromoterYtd($promoter);
-        $this->totalProfitsPromoterYtd = $this->calculateTotalProfitsPromoterYtd($promoter);
-        $this->overallRatingPromoter = $this->renderRatingIcons($this->promoterId);
-
-        $promoterCompany = $promoter->promoters()->first();
-        if ($promoterCompany) {
-            $this->promoterId = $promoterCompany->id;
-            $this->overallScore = PromoterReview::calculateOverallScore($this->promoterId);
-        } else {
-            $this->promoterId = null;
-            $this->overallScore = 0;
+        $promoter = $user->promoters()->first();
+        if ($promoter) {
+            $this->promoterId = $promoter->id;
+            $this->eventsCountPromoterYtd = $this->calculateEventsCountPromoterYtd($promoter);
+            $this->totalProfitsPromoterYtd = $this->calculateTotalProfitsPromoterYtd($promoter);
+            $this->overallRatingPromoter = $this->renderRatingIcons($this->promoterId);
         }
     }
 
-
-    private function loadBandData($band)
+    private function loadBandData($user)
     {
-        \Log::info($band);
-        $this->bandId = $band->id;
-        $this->gigsCountBandYtd = $this->calculateGigsCountBandYtd($band->id);
-        $this->overallRatingBand = $this->calculateOverallRatingBand($band->id);
-        $this->totalProfitsBandYtd = $this->calculateTotalProfitsBandYtd($band->id);
+        $bands = $user->otherService()->where('other_service_id', 4)->get();
+        if ($bands->isNotEmpty()) {
+            $band = $bands->first();
+            $this->bandId = $band->id;
+            $this->gigsCountBandYtd = $this->calculateGigsCountBandYtd($band->id);
+            $this->overallRatingBand = $this->calculateOverallRatingBand($band->id);
+            $this->totalProfitsBandYtd = $this->calculateTotalProfitsBandYtd($band->id);
+        }
     }
+
     private function loadDesignerData(int $bandId)
     {
         //
@@ -174,8 +155,8 @@ class SubNav extends Component
 
     public function calculateTotalProfitsPromoterYtd($promoter)
     {
-        if ($promoterUser) {
-            $promoterCompany = $promoterUser->promoters()->first();
+        if ($promoter) {
+            $promoterCompany = $promoter->first();
 
             if ($promoterCompany) {
                 $startOfYear = Carbon::now()->startOfYear();
@@ -197,8 +178,8 @@ class SubNav extends Component
 
     public function calculateEventsCountPromoterYtd($promoter)
     {
-        if ($promoterUser) {
-            $promoterCompany = $promoterUser->promoters()->first();
+        if ($promoter) {
+            $promoterCompany = $promoter->first();
 
             if ($promoterCompany) {
                 $startOfYear = Carbon::now()->startOfYear();
@@ -225,9 +206,9 @@ class SubNav extends Component
             $startOfYear = Carbon::now()->startOfYear();
             $endOfYear = Carbon::now()->endOfYear();
 
-            $gigsCountBandYtd = DB::table('event_promoter')
+            $gigsCountBandYtd = DB::table('event_band')
                 ->join('events', 'event_band.event_id', '=', 'events.id')
-                ->where('band_id', $band->id)
+                ->where('event_band.band_id', $band)
                 ->whereBetween('events.event_date', [$startOfYear, $endOfYear])
                 ->count();
 
@@ -252,12 +233,13 @@ class SubNav extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.subnav', [
+        return view('components.sub-nav', [
+            'userType' => $this->userType,
             'overallRatingPromoter' => $this->overallRatingPromoter,
             'overallRatingBand' => $this->overallRatingBand,
             'gigsCountBandYtd' => $this->gigsCountBandYtd,
             'totalProfitsBandYtd' => $this->totalProfitsBandYtd,
-            'eventsCountPromoterYtd' => $this->eventsCountPromoterYtd,
+            'eventsCountPromoterYtd' => $this->userType === 'promoter' ? $this->eventsCountPromoterYtd : null,
             'totalProfitsPromoterYtd' => $this->totalProfitsPromoterYtd,
         ]);
     }

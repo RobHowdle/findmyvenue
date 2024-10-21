@@ -1,6 +1,6 @@
 <x-app-layout>
   <x-slot name="header">
-    <x-sub-nav :promoter="$promoter" :promoterId="$promoter->id" />
+    {{-- <x-sub-nav :promoter="$promoter" :promoterId="$promoter->id" /> --}}
   </x-slot>
 
   <div class="mx-auto w-full max-w-screen-2xl py-16">
