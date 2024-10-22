@@ -623,11 +623,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     document.getElementById("preview-container");
                 previewContainer.innerHTML = ""; // Clear existing preview
 
-                // Add debugging message
-                const debugMessage = document.createElement("div");
-                debugMessage.innerText = "Preview Upload:";
-                previewContainer.appendChild(debugMessage);
-
                 // Create a new preview element
                 const previewElement = document.createElement("div");
                 previewElement.className = "dz-file-preview";
@@ -689,7 +684,14 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             this.on("error", function (file, errorMessage) {
-                console.error("Error uploading file: ", errorMessage);
+                if (file.size > this.options.maxFilesize * 1024 * 1024) {
+                    errorMessage = `File "${file.name}" is too large. Maximum allowed size is ${this.options.maxFilesize}MB.`;
+                } else if (!this.options.acceptedFiles.includes(file.type)) {
+                    errorMessage = `File "${file.name}" not supported.`;
+                }
+
+                showFailureNotification(errorMessage);
+                this.removeFile(file);
             });
             this.on("removedfile", function (file) {
                 console.log("File removed: ", file.name);
