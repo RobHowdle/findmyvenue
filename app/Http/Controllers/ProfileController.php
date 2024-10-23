@@ -29,8 +29,12 @@ class ProfileController extends Controller
         $logo = $promoter ? $promoter->logo_url : 'images/system/yns_logo.png';
         $phone = $promoter ? $promoter->contact_number : '';
         $email = $promoter ? $promoter->contact_email : '';
+        $contactLinks = $promoter ? $promoter->contact_link : [];
 
-        $contactLinks = json_decode($promoter->contact_link, true);
+        if ($contactLinks) {
+            $contactLinks = json_decode($promoter->contact_link, true);
+        }
+
         $platforms = [];
 
         // Define the platforms to check against

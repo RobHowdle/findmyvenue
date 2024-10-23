@@ -174,7 +174,7 @@
                 </button>
               </div>
             </div>
-            <div id="calendar" data-user-id="{{ Auth::user()->id }}"></div>
+            <div id="calendar" data-user-id="{{ Auth::check() ? Auth::user()->id : '' }}"></div>
           </div>
         </div>
       </div>

@@ -10,6 +10,7 @@ class Document extends Model
         'user_id',
         'serviceable_id',
         'serviceable_type',
+        'service',
         'title',
         'file_path',
         'category',

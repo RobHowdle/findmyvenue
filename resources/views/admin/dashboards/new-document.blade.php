@@ -41,3 +41,116 @@
     </div>
   </div>
 </x-app-layout>
+<script>
+  // Dropzone
+  document.addEventListener("DOMContentLoaded", function() {
+    Dropzone.autoDiscover = false;
+
+    if (Dropzone.instances.length) {
+      Dropzone.instances.forEach((dropzone) => dropzone.destroy());
+    }
+
+    const myDropzone = new Dropzone("#my-dropzone", {
+      paramName: "file", // The name that will be used to transfer the file
+      maxFilesize: 2, // MB
+      acceptedFiles: ".pdf,.doc,.docx,.ppt,.pptx,.txt,.png,.jpg,.jpeg", // Add image types for preview
+      headers: {
+        "X-CSRF-TOKEN": document
+          .querySelector('meta[name="csrf-token"]')
+          .getAttribute("content"),
+      },
+      init: function() {
+        this.on("addedfile", function(file) {
+          // Clear any existing previews in the preview container
+          const previewContainer =
+            document.getElementById("preview-container");
+          previewContainer.innerHTML = ""; // Clear existing preview
+
+          // Create a new preview element
+          const previewElement = document.createElement("div");
+          previewElement.className = "dz-file-preview";
+
+          const details = document.createElement("div");
+          details.className = "dz-details";
+
+          const filename = document.createElement("div");
+          filename.className = "dz-filename";
+          filename.innerHTML = `<span data-dz-name>${file.name}</span>`;
+
+          const size = document.createElement("div");
+          size.className = "dz-size";
+          size.innerHTML = `<span data-dz-size>${formatSize(
+                    file.size
+                )}</span>`; // Use the custom formatSize function
+
+          details.appendChild(filename);
+          details.appendChild(size);
+          previewElement.appendChild(details);
+
+          // Preview handling for different file types
+          if (file.type.startsWith("image/")) {
+            const img = document.createElement("img");
+            img.setAttribute("data-dz-thumbnail", "");
+            img.src = URL.createObjectURL(file); // Create a local URL for the image
+            previewElement.appendChild(img);
+          } else if (file.type === "application/pdf") {
+            const viewer = document.createElement("iframe");
+            viewer.src = URL.createObjectURL(file);
+            viewer.width = "100%";
+            viewer.height = "auto"; // Adjust height as needed
+            previewElement.appendChild(viewer);
+          } else if (
+            file.type === "application/msword" ||
+            file.type ===
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          ) {
+            // Handle Word documents
+            const wordMessage = document.createElement("div");
+            wordMessage.innerText =
+              "Preview not available for Word documents.";
+            previewElement.appendChild(wordMessage);
+          } else {
+            // Handle other file types
+            const otherMessage = document.createElement("div");
+            otherMessage.innerText =
+              "Preview not available for this file type.";
+            previewElement.appendChild(otherMessage);
+          }
+
+          // Append the preview element to the preview container
+          previewContainer.appendChild(previewElement);
+        });
+
+        this.on("success", function(file, response) {
+          let filepath = document.getElementById("uploaded_file_path").value =
+            response.path;
+
+          console.log(filepath);
+        });
+
+        this.on("error", function(file, errorMessage) {
+          if (file.size > this.options.maxFilesize * 1024 * 1024) {
+            errorMessage =
+              `File "${file.name}" is too large. Maximum allowed size is ${this.options.maxFilesize}MB.`;
+          } else if (!this.options.acceptedFiles.includes(file.type)) {
+            errorMessage = `File "${file.name}" not supported.`;
+          }
+
+          showFailureNotification(errorMessage);
+          this.removeFile(file);
+        });
+        this.on("removedfile", function(file) {
+          console.log("File removed: ", file.name);
+        });
+      },
+    });
+
+    // Custom function to format file sizes
+    function formatSize(bytes) {
+      const sizes = ["Bytes", "KB", "MB", "GB"];
+      if (bytes === 0) return "0 Byte";
+      const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+      return Math.round(bytes / Math.pow(1024, i), 2) + " " + sizes[i];
+    }
+  });
+</script>

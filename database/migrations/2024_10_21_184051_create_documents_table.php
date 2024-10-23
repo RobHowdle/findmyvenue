@@ -17,7 +17,7 @@ return new class extends Migration
             $table->morphs('serviceable');
             $table->string('title');
             $table->text('description')->nullable();
-            $table->string('category')->nullable();
+            $table->json('category')->nullable();
             $table->string('file_path');
             $table->timestamps();
             $table->softDeletes();

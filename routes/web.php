@@ -116,6 +116,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Route::get('/dashboard/band/documents', [BandDashboardController::class, 'getBandDocuments'])->name('admin.band.dashboard.get-band-documents');
     Route::post('/dashboard/document/file-upload', [DocumentController::class, 'fileUpload'])->name('admin.dashboard.document.file.upload');
     Route::get('/dashboard/band/documents/new', [DashboardController::class, 'newDocument'])->name('admin.dashboard.new-document');
+    Route::post('/dashboard/band/documents/store', [DocumentController::class, 'storeDocument'])->name('admin.dashboard.store-document');
 });
 
 Route::middleware(['auth'])->group(function () {

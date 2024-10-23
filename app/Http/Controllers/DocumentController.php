@@ -9,41 +9,49 @@ use Illuminate\Support\Facades\Session;
 
 class DocumentController extends Controller
 {
-    public function store(Request $request)
+    public function storeDocument(Request $request)
     {
-
-        dd($request->all());
         // Validate the main form data
         $request->validate([
             'title' => 'required|string',
-            'category' => 'nullable|string',
+            'tags' => 'nullable|array',
+            'tags.*' => 'array',
             'description' => 'nullable|string',
-            // Additional validations as needed
         ]);
 
         // Retrieve the uploaded files from session
-        $uploadedFiles = Session::get('uploaded_files', []);
+        $uploadedFiles = Session::get(
+            'uploaded_files',
+            []
+        );
+        $user = auth()->user()->load('roles');
+        $role = $user->roles->first()->name;
+        $service = $user->otherService((ucfirst($role)))->first();
 
-        // Store the main form data, along with the uploaded files
-        // (You may want to create a document model to save this)
-        $document = new Document();
-        $document->title = $request->title;
-        $document->category = $request->category;
-        $document->description = $request->description;
-        $document->serviceable_id = $request->serviceable_id;
-        $document->serviceable_type = $request->serviceable_type;
-        $document->save();
+        if ($service) {
+            $serviceableId = $service->id;
+            $serviceableType = get_class($service);
+            $serviceType = $service->otherServiceList()->first()->service_name;
 
-        // Optionally, you can link the uploaded files to the document
-        foreach ($uploadedFiles as $filePath) {
-            // Logic to save the file path in the database, e.g.:
-            $document->files()->create(['path' => $filePath]);
+            foreach ($uploadedFiles as $filePath) {
+                $document = new Document();
+                $document->user_id = $user->id;
+                $document->serviceable_type = $serviceableType;
+                $document->service = $serviceType;
+                $document->serviceable_id = $serviceableId;
+                $document->title = $request->title;
+                $document->description = $request->description;
+                $document->category = json_encode($request->tags);
+                $document->file_path = $filePath;
+                $document->save();
+            }
+        } else {
+            return response()->json(['sucess' => false, 'message' => 'No service associated with this user'], 400);
         }
 
-        // Clear the uploaded files from the session after storing
         Session::forget('uploaded_files');
 
-        return redirect()->back()->with('success', 'Document uploaded successfully!');
+        return response()->json(['success' => true, 'message' => 'Document uploaded successfully!']);
     }
 
     public function fileUpload(Request $request)
@@ -53,7 +61,12 @@ class DocumentController extends Controller
         ]);
 
         if ($request->file('file')) {
-            $path = $request->file('file')->store('documents');
+            $userId = auth()->id();
+            $user = auth()->user();
+            $userType = strtolower($user->getRoleNames()->first());
+
+            $customPath = "documents/{$userType}/{$userId}";
+            $path = $request->file('file')->store($customPath);
 
             $uploadedFiles = Session::get('uploaded_files', []);
             $uploadedFiles[] = $path;
