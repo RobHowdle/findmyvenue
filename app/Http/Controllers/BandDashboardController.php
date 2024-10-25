@@ -2,21 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\OtherServicesReview;
 use Carbon\Carbon;
+use App\Models\Document;
 use Illuminate\Http\Request;
+use App\Models\OtherServicesReview;
 use Illuminate\Support\Facades\Auth;
 
 class BandDashboardController extends Controller
 {
+    protected function getUserId()
+    {
+        return Auth::id();
+    }
+
     /**
      * Return the Dashboard
      */
     public function index()
     {
-        $userId = Auth::id();
         $pendingReviews = OtherServicesReview::with('otherService')->where('review_approved', '0')->whereNull('deleted_at')->count();
-        $band = Auth::user()->load('otherService');
+        $band = Auth::user()->load(['otherService', 'roles']);
+        $role = $band->roles->first()->name;
         $todoItemsCount = $band->otherService()->with(['todos' => function ($query) {
             $query->where('completed', 0)->whereNull('deleted_at');
         }])->get()->pluck('todos')->flatten()->count();
@@ -32,12 +38,16 @@ class BandDashboardController extends Controller
             ->flatten()
             ->count();
 
-        return view('admin.dashboards.band-dash', compact([
-            'userId',
-            'pendingReviews',
-            'band',
-            'todoItemsCount',
-            'eventsCount'
-        ]));
+        $service = $band->otherService(ucfirst($role))->first();
+        $dashboardType = $service->services;
+
+        return view('admin.dashboards.band-dash', [
+            'userId' => $this->getUserId(),
+            'pendingReviews' => $pendingReviews,
+            'band' => $band,
+            'todoItemsCount' => $todoItemsCount,
+            'eventsCount' => $eventsCount,
+            'dashboardType' => $dashboardType,
+        ]);
     }
 }

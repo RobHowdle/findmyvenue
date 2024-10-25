@@ -12,10 +12,11 @@
               'serviceableId' => $serviceableId,
               'services' => $services,
               'serviceableType' => $serviceableType,
+              'dashboardType' => $dashboardType,
           ])
           <div class="dropzone-container rounded-lg border border-yns_red bg-yns_dark_blue">
-            <form action="{{ route('admin.dashboard.document.file.upload') }}" class="dropzone bg-transparent"
-              id="my-dropzone">
+            <form action="{{ route('admin.dashboard.document.file.upload', ['dashboardType' => $dashboardType]) }}"
+              class="dropzone bg-transparent" id="my-dropzone">
               <div class="dz-message" data-dz-message>
                 <span>Drag and drop files here or click to upload</span>
               </div>
@@ -124,8 +125,6 @@
         this.on("success", function(file, response) {
           let filepath = document.getElementById("uploaded_file_path").value =
             response.path;
-
-          console.log(filepath);
         });
 
         this.on("error", function(file, errorMessage) {

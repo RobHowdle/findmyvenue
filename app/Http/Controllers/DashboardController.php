@@ -181,19 +181,4 @@ class DashboardController extends Controller
             return response()->json(['success' => false, 'message' => 'Error creating note: ' . $e->getMessage()], 400);
         }
     }
-
-    /**
-     * Global Documents Function
-     */
-
-    public function newDocument()
-    {
-        $userId = Auth::id();
-        $user = Auth::user();
-        $serviceable = $user->otherService()->first();
-        $serviceableId = $serviceable->id;
-        $services = $serviceable->services;
-        $serviceableType = 'App\Models\OtherService';
-        return view('admin.dashboards.new-document', compact('userId', 'serviceableId', 'services', 'serviceableType'));
-    }
 }

@@ -1,4 +1,6 @@
-<form id="document-form" method="POST" action={{ route('admin.dashboard.store-document') }} enctype="multipart/form-data">
+<form id="document-form" method="POST"
+  action={{ route('admin.dashboard.store-document', ['dashboardType' => $dashboardType]) }}
+  enctype="multipart/form-data">
   @csrf
   <div class="mb-4 grid grid-cols-1 gap-x-8 gap-y-4">
     <div class="group">
@@ -45,37 +47,38 @@
 <script>
   document.addEventListener("DOMContentLoaded", function() {
     jQuery("#tags").select2({
-      tags: true, // Allow user to type custom tags
+      tags: true,
       tokenSeparators: [","]
     });
+  });
 
-    // Handle form submission
-    jQuery("#document-form").on("submit", function(event) {
-      event.preventDefault(); // Prevent the default form submission
+  // Handle form submission
+  jQuery("#document-form").on("submit", function(event) {
+    event.preventDefault();
 
-      // Serialize form data
-      var formData = new FormData(this);
+    var formData = new FormData(this);
 
-      // Send AJAX request
-      jQuery.ajax({
-        url: jQuery(this).attr('action'), // Form action URL
-        type: 'POST', // HTTP method
-        data: formData, // Form data
-        contentType: false, // Important: Prevent jQuery from setting content type
-        processData: false, // Important: Prevent jQuery from processing the data
-        success: function(response) {
-          // Handle success response
-          showSuccessNotification(response);
+    jQuery.ajax({
+      url: jQuery(this).attr('action'),
+      type: 'POST',
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      },
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: function(response) {
 
-          // Optionally, redirect or clear form fields
-        },
-        error: function(xhr) {
-          // Handle error response
-          var errors = xhr.responseJSON.errors;
-          var errorMessages = Object.values(errors).flat().join("\n");
-          showFailureNotification(error.messages);
-        }
-      });
+        showSuccessNotification(response.message);
+        setTimeout(() => {
+          window.location.href = response.redirect_url;
+        }, 2000);
+      },
+      error: function(xhr) {
+        var errors = xhr.responseJSON.errors;
+        var errorMessages = Object.values(errors).flat().join("\n");
+        showFailureNotification(errorMessages);
+      }
     });
   });
 </script>

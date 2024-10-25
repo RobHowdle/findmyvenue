@@ -39,7 +39,7 @@
         class="min-w-screen-xl mx-auto max-w-screen-xl rounded-lg bg-yns_dark_gray px-16 py-12 text-center text-white">
         <p class="mb-8 font-heading text-xl font-bold">Quick Links</p>
         <div class="grid grid-cols-4 items-center gap-y-12">
-          <a href="{{ route('admin.dashboard.new-document') }}"
+          <a href="{{ route('admin.dashboard.document.create', ['dashboardType' => $dashboardType]) }}"
             class="group flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-yns_yellow">
             <span
               class="fas fa-file-alt mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-yns_yellow"></span>
@@ -64,7 +64,7 @@
             New Todo Item
           </a>
 
-          <a href="#"
+          <a href="{{ route('admin.dashboard.documents.index', ['dashboardType' => $dashboardType]) }}"
             class="group flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-yns_yellow">
             <span
               class="fas fa-file-alt mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-yns_yellow"></span>

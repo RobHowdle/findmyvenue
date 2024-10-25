@@ -35,6 +35,11 @@
               class="{{ request()->is('dashboard/promoter/notes*') ? ' border-b-yns_yellow' : '' }} inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:border-b-yns_yellow hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Notes</a>
           @endcan
 
+          @can('manage_band')
+            <a href="{{ route('admin.dashboard.documents.index', ['dashboardType' => 'band']) }}"
+              class="{{ request()->is('dashboard/band/documents*') ? ' border-b-yns_yellow' : '' }} inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:border-b-yns_yellow hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Documents</a>
+          @endcan
+
           @can(['manage_band', 'manage_photographer', 'manage_designer'])
             <x-nav-link :href="route('admin.createOther')" :active="request()->routeIs('createOther')">
               {{ __('Other') }}

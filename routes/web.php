@@ -113,10 +113,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/dashboard/promoter/delete-review/{reviewId}', [PromoterDashboardController::class, 'deletePromoterReview'])->name('admin.promoter.dashboard.delete-review');
 
     // Documents
-    // Route::get('/dashboard/band/documents', [BandDashboardController::class, 'getBandDocuments'])->name('admin.band.dashboard.get-band-documents');
-    Route::post('/dashboard/document/file-upload', [DocumentController::class, 'fileUpload'])->name('admin.dashboard.document.file.upload');
-    Route::get('/dashboard/band/documents/new', [DashboardController::class, 'newDocument'])->name('admin.dashboard.new-document');
-    Route::post('/dashboard/band/documents/store', [DocumentController::class, 'storeDocument'])->name('admin.dashboard.store-document');
+    Route::prefix('/dashboard/{dashboardType}')->group(function () {
+        Route::get('/documents', [DocumentController::class, 'index'])->name('admin.dashboard.documents.index');
+        Route::get('/documents/new', [DocumentController::class, 'create'])->name('admin.dashboard.document.create');
+        Route::get('/documents/{id}', [DocumentController::class, 'show'])->name('admin.dashboard.document.show');
+        Route::get('/documents/{id}/edit', [DocumentController::class, 'edit'])->name('admin.dashboard.document.edit');
+        Route::post('/document/file-upload', [DocumentController::class, 'fileUpload'])->name('admin.dashboard.document.file.upload');
+        Route::post('/documents/store', [DocumentController::class, 'storeDocument'])->name('admin.dashboard.store-document');
+        Route::put('/documents/{id}', [DocumentController::class, 'update'])->name('admin.dashboard.document.update');
+        Route::delete('/documents/{id}', [DocumentController::class, 'destroy'])->name('admin.dashboard.document.delete');
+        Route::get('/documents/{id}/download', [DocumentController::class, 'download'])->name('admin.dashboard.document.download');
+    });
 });
 
 Route::middleware(['auth'])->group(function () {
