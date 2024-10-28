@@ -1,6 +1,6 @@
 <x-app-layout>
   <x-slot name="header">
-    {{--     {{-- <x-sub-nav :promoter="$promoter" :promoterId="$promoter->id" /> --}} --}}
+    <x-sub-nav :userId="$userId" />
   </x-slot>
 
   <div class="mx-auto w-full max-w-screen-2xl py-16">
@@ -8,8 +8,8 @@
       <div class="min-w-screen-xl mx-auto max-w-screen-xl rounded-lg border border-white bg-yns_dark_gray text-white">
         <div class="header border-b border-b-white px-8 pt-8">
           <div class="flex flex-row justify-between">
-            <h1 class="font-heading text-4xl font-bold">My Events</h1>
-            <a href="{{ route('admin.dashboard.promoter.create-new-event') }}"
+            <h1 class="font-heading text-4xl font-bold">My Events {{ $dashboardType }}</h1>
+            <a href="{{ route('admin.dashboard.create-new-event', ['dashboardType' => $dashboardType]) }}"
               class="rounded-lg bg-white px-4 py-2 text-black transition duration-300 hover:bg-gradient-to-t hover:from-yns_dark_orange hover:to-yns_yellow">New
               Event</a>
           </div>
@@ -31,7 +31,7 @@
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               @if ($initialUpcomingEvents && $initialUpcomingEvents->isNotEmpty())
                 @foreach ($initialUpcomingEvents as $event)
-                  @include('admin.dashboards.promoter.partials.event_card', ['event' => $event])
+                  @include('admin.dashboards.partials.event_card', ['event' => $event])
                 @endforeach
               @else
                 <p>No Upcoming Events Found</p>
@@ -43,7 +43,7 @@
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               @if ($pastEvents && $pastEvents->isNotEmpty())
                 @foreach ($pastEvents as $event)
-                  @include('admin.dashboards.promoter.partials.event_card', ['event' => $event])
+                  @include('admin.dashboards.partials.event_card', ['event' => $event])
                 @endforeach
               @else
                 <p>No Past Events Found</p>
@@ -124,7 +124,7 @@
     });
 
     $.ajax({
-      url: "{{ route('admin.dashboard.promoter.load-more-upcoming-events') }}",
+      url: "{{ route('admin.dashboard.load-more-upcoming-events', ['dashboardType' => $dashboardType]) }}",
       type: "GET",
       data: {
         page: upcomingPage
@@ -153,7 +153,7 @@
     });
 
     $.ajax({
-      url: "{{ route('admin.dashboard.promoter.load-more-past-events') }}",
+      url: "{{ route('admin.dashboard.load-more-past-events', ['dashboardType' => $dashboardType]) }}",
       type: "GET",
       data: {
         page: upcomingPage

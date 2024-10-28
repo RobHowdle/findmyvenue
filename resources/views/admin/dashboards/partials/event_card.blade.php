@@ -6,7 +6,9 @@
     <p class="flex items-center text-sm">
       <span class="fas fa-calendar-alt mr-2"></span>Date: {{ $event->event_date->format('jS F Y') }}
     </p>
-    <h2 class="mt-2 text-xl font-semibold uppercase">{{ $promoter->name }}</h2>
+    @if ($event->promoter)
+      <h2 class="mt-2 text-xl font-semibold uppercase">{{ $promoter->name }}</h2>
+    @endif
     <h2 class="mb-2 text-xl font-semibold uppercase">{{ $event->name }}</h2>
     @if ($event->venues->count() > 0)
       <ul>
@@ -66,7 +68,7 @@
     </div>
 
     <div class="mt-4 flex justify-between">
-      <a href="{{ route('admin.dashboard.promoter.show-single-event', $event->id) }}"
+      <a href="{{ route('admin.dashboard.show-event', ['id' => $event->id, 'dashboardType' => $dashboardType]) }}"
         class="mt-7 rounded-lg border border-white bg-white px-4 py-2 font-heading text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">View
         Details</a>
       <button data-id="{{ $event->id }}"

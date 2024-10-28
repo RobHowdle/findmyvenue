@@ -1,6 +1,6 @@
 <x-app-layout>
   <x-slot name="header">
-    {{-- <x-sub-nav :promoter="$promoter" :promoterId="$promoter->id" /> --}}
+    <x-sub-nav :userId="$userId" />
   </x-slot>
 
   <div class="mx-auto w-full max-w-screen-2xl py-16">
@@ -14,15 +14,17 @@
               <div class="socials"></div>
             </div>
             <div class="group flex gap-x-4">
-              <a href="#" target="_blank"
-                class="mb-4 rounded-lg bg-white px-4 py-2 text-black transition duration-300 hover:bg-gradient-to-t hover:from-yns_dark_orange hover:to-yns_yellow">
-                Tickets <span class="fas fa-ticket-alt ml-1"></span>
-              </a>
-              <a href="#" id="addToCalendarButton"
-                class="mb-4 rounded-lg bg-white px-4 py-2 text-black transition duration-300 hover:bg-gradient-to-t hover:from-yns_dark_orange hover:to-yns_yellow">
-                Add To Calendar <span class="fas fa-calendar-alt ml-1"></span>
-              </a>
-              <a href="{{ route('admin.dashboard.promoter.single-event.edit', $event->id) }}"
+              @if (!$isPastEvent)
+                <a href="{{ $event->ticket_url ? $event->ticket_url : '#' }}" target="_blank"
+                  class="mb-4 rounded-lg bg-white px-4 py-2 text-black transition duration-300 hover:bg-gradient-to-t hover:from-yns_dark_orange hover:to-yns_yellow">
+                  Tickets <span class="fas fa-ticket-alt ml-1"></span>
+                </a>
+                <a href="#" id="addToCalendarButton"
+                  class="mb-4 rounded-lg bg-white px-4 py-2 text-black transition duration-300 hover:bg-gradient-to-t hover:from-yns_dark_orange hover:to-yns_yellow">
+                  Add To Calendar <span class="fas fa-calendar-alt ml-1"></span>
+                </a>
+              @endif
+              <a href="{{ route('admin.dashboard.edit-event', ['id' => $event->id, 'dashboardType' => $dashboardType]) }}"
                 class="mb-4 rounded-lg bg-white px-4 py-2 text-black transition duration-300 hover:bg-gradient-to-t hover:from-yns_dark_orange hover:to-yns_yellow">
                 Edit <span class="fas fa-edit ml-1"></span>
               </a>

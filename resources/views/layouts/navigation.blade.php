@@ -12,8 +12,8 @@
 
         <!-- Navigation Links -->
         <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-          <a href="{{ route('dashboard') }}"
-            class="{{ request()->is('dashboard/promoter') ? ' border-b-yns_yellow' : '' }} inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:border-b-yns_yellow hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Dashboard</a>
+          <a href="{{ route('dashboard.index') }}"
+            class="inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:border-b-yns_yellow hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Dashboard</a>
 
           @can('manage_venue')
             <x-nav-link :href="route('admin.venues')" :active="request()->routeIs('venues')">
@@ -22,22 +22,30 @@
           @endcan
 
           @can('manage_promoter')
-            <a href="{{ route('promoter.dashboard.finances') }}"
+            <a href="{{ route('promoter.dashboard.finances', ['dashboardType' => 'promoter']) }}"
               class="{{ request()->is('dashboard/promoter/finances*') ? ' border-b-yns_yellow' : '' }} inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:border-b-yns_yellow hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Finances</a>
-            <a href="{{ route('admin.dashboard.promoter.show-events') }}"
+
+            <a href="{{ route('admin.dashboard.show-events', ['dashboardType' => 'promoter']) }}"
               class="{{ request()->is('dashboard/promoter/events*') ? ' border-b-yns_yellow' : '' }} inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:border-b-yns_yellow hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Events</a>
-            <a href="{{ route('promoter.dashboard.todo-list') }}"
+
+            <a href="{{ route('promoter.dashboard.todo-list', ['dashboardType' => 'promoter']) }}"
               class="{{ request()->is('dashboard/promoter/todo-list*') ? ' border-b-yns_yellow' : '' }} inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:border-b-yns_yellow hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Todo
               List</a>
-            <a href="{{ route('admin.promoter.dashboard.get-reviews', ['filter' => 'all']) }}" data-filter="all"
+
+            <a href="{{ route('admin.promoter.dashboard.get-reviews', ['filter' => 'all', 'dashboardType' => 'promoter']) }}"
+              data-filter="all"
               class="{{ request()->is('dashboard/promoter/reviews*') ? ' border-b-yns_yellow' : '' }} inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:border-b-yns_yellow hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Reviews</a>
-            <a href="{{ route('admin.dashboard.promoter.show-notes') }}"
+
+            <a href="{{ route('admin.dashboard.promoter.show-notes', ['dashboardType' => 'promoter']) }}"
               class="{{ request()->is('dashboard/promoter/notes*') ? ' border-b-yns_yellow' : '' }} inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:border-b-yns_yellow hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Notes</a>
           @endcan
+
 
           @can('manage_band')
             <a href="{{ route('admin.dashboard.documents.index', ['dashboardType' => 'band']) }}"
               class="{{ request()->is('dashboard/band/documents*') ? ' border-b-yns_yellow' : '' }} inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:border-b-yns_yellow hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Documents</a>
+            <a href="{{ route('admin.dashboard.show-events', ['dashboardType' => 'band']) }}"
+              class="{{ request()->is('dashboard/band/events*') ? ' border-b-yns_yellow' : '' }} inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:border-b-yns_yellow hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Events</a>
           @endcan
 
           @can(['manage_band', 'manage_photographer', 'manage_designer'])
@@ -103,7 +111,7 @@
   <!-- Responsive Navigation Menu -->
   <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden">
     <div class="space-y-1 pb-3 pt-2">
-      <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+      <x-responsive-nav-link :href="route('dashboard.index')" :active="request()->routeIs('dashboard')">
         {{ __('Dashboard') }}
       </x-responsive-nav-link>
     </div>

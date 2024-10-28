@@ -3,6 +3,7 @@
 use App\Models\OtherService;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\VenueController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CalendarController;
@@ -50,19 +51,29 @@ Route::get('/other/filter', [OtherServiceController::class, 'filterCheckboxesSea
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboards
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+
+    // Dashboards
+    Route::prefix('/dashboard')->group(function () {
+        Route::get('/promoter', [PromoterDashboardController::class, 'index'])->name('promoter.dashboard');
+        Route::get('/band', [BandDashboardController::class, 'index'])->name('band.dashboard');
+        // Route::get('/{dashboardType}', [VenueDashboardController::class, 'index'])->name('venue.dashboard');
+    });
+
     Route::post('/dashboard/notes/store-note', [DashboardController::class, 'storeNewNote'])->name('dashboard.store-new-note');
-    Route::get('/dashboard/promoter', [PromoterDashboardController::class, 'index'])->name('promoter.dashboard');
-    Route::get('/dashboard/band', [BandDashboardController::class, 'index'])->name('band.dashboard');
+
     // Finances
-    Route::get('/dashboard/promoter/finances', [PromoterDashboardController::class, 'promoterFinances'])->name('promoter.dashboard.finances');
-    Route::get('/dashboard/promoter/finances/new-budget', [PromoterDashboardController::class, 'createNewPromoterBudget'])->name('promoter.dashboard.finances.new');
-    Route::post('/dashboard/promoter/finances/save-budget', [PromoterDashboardController::class, 'saveNewPromoterBudget'])->name('promoter.dashboard.finances.saveNew');
-    Route::post('/dashboard/promoter/finances/export', [PromoterDashboardController::class, 'exportFinances'])->name('promoter.dashboard.finances.export');
-    Route::get('/dashboard/promoter/finances/{id}', [PromoterDashboardController::class, 'showSingleFinance'])->name('promoter.dashboard.finances.show');
-    Route::get('/dashboard/promoter/finances/{id}/edit', [PromoterDashboardController::class, 'editSingleFinance'])->name('promoter.dashboard.finances.edit');
-    Route::patch('/dashboard/promoter/finances/{finance}', [PromoterDashboardController::class, 'updateSingleFinance'])->name('promoter.dashboard.finances.update');
-    Route::post('/dashboard/promoter/finances/{finance}', [PromoterDashboardController::class, 'exportSingleFinanceRecord'])->name('promoter.dashboard.finances.exportSingleFinanceRecord');
+    Route::prefix('/dashboard/{dashboardType}')->group(function () {
+        Route::get('/finances', [PromoterDashboardController::class, 'promoterFinances'])->name('promoter.dashboard.finances');
+        Route::get('/finances/new-budget', [PromoterDashboardController::class, 'createNewPromoterBudget'])->name('promoter.dashboard.finances.new');
+        Route::post('/finances/save-budget', [PromoterDashboardController::class, 'saveNewPromoterBudget'])->name('promoter.dashboard.finances.saveNew');
+        Route::post('/finances/export', [PromoterDashboardController::class, 'exportFinances'])->name('promoter.dashboard.finances.export');
+        Route::get('/finances/{id}', [PromoterDashboardController::class, 'showSingleFinance'])->name('promoter.dashboard.finances.show');
+        Route::get('/finances/{id}/edit', [PromoterDashboardController::class, 'editSingleFinance'])->name('promoter.dashboard.finances.edit');
+        Route::patch('/finances/{finance}', [PromoterDashboardController::class, 'updateSingleFinance'])->name('promoter.dashboard.finances.update');
+        Route::post('/finances/{finance}', [PromoterDashboardController::class, 'exportSingleFinanceRecord'])->name('promoter.dashboard.finances.exportSingleFinanceRecord');
+    });
+
     // To Do List
     Route::get('/dashboard/promoter/todo-list', [PromoterDashboardController::class, 'showPromoterTodos'])->name('promoter.dashboard.todo-list');
     Route::get('/dashboard/promoter/todo-items', [PromoterDashboardController::class, 'getPromoterTodos'])->name('promoter.dashboard.todo-items');
@@ -83,18 +94,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/dashboard/promoter/users/add-user', [PromoterDashboardController::class, 'addUserToCompany'])->name('admin.dashboard.promoter.add-user-to-company');
     Route::delete('/dashboard/promoter/delete-user', [PromoterDashboardController::class, 'deleteUserFromCompany'])->name('admin.dashboard.promoter.delete-user');
     // Events
-    Route::get('/dashboard/promoter/events', [PromoterDashboardController::class, 'showPromoterEvents'])->name('admin.dashboard.promoter.show-events');
-    Route::get('/dashboard/promoter/events/load-more-upcoming', [PromoterDashboardController::class, 'loadMoreUpcomingEvents'])->name('admin.dashboard.promoter.load-more-upcoming-events');
-    Route::get('/dashboard/promoter/events/load-more-past', [PromoterDashboardController::class, 'loadMorePastEvents'])->name('admin.dashboard.promoter.load-more-past-events');
-    Route::get('/dashboard/promoter/events/create-event', [PromoterDashboardController::class, 'createNewPromoterEvent'])->name('admin.dashboard.promoter.create-new-event');
-    Route::post('/dashboard/promoter/events/add-to-calendar', [CalendarController::class, 'addEventToCalendar'])->name('admin.dashboard.promoter.add-event-to-calendar');
-    Route::get('/dashboard/promoter/events/{user}/check-linked-calendars', [CalendarController::class, 'checkLinkedCalendars']);
-    Route::get('/dashboard/promoter/events/search-venues', [PromoterDashboardController::class, 'eventSelectVenue'])->name('admin.dashboard.promoter.search-venues');
-    Route::post('/dashboard/promoter/events/store-event', [PromoterDashboardController::class, 'storeNewPromoterEvent'])->name('admin.dashboard.promoter.store-new-event');
-    Route::get('/dashboard/promoter/events/{id}', [PromoterDashboardController::class, 'showSinglePromoterEvent'])->name('admin.dashboard.promoter.show-single-event');
-    Route::get('dashboard/promoter/events/{id}/edit', [PromoterDashboardController::class, 'editSinglePromoterEvent'])->name('admin.dashboard.promoter.single-event.edit');
-    Route::put('dashboard/promoter/events/{id}/update', [PromoterDashboardController::class, 'updateSinglePromoterEvent'])->name('admin.dashboard.promoter.single-event.update');
-    Route::delete('/dashboard/promoter/events/{id}', [PromoterDashboardController::class, 'deleteSinglePromoterEvent'])->name('admin.dashboard.promoter.delete-single-event');
+    // Route::post('/dashboard/promoter/events/add-to-calendar', [CalendarController::class, 'addEventToCalendar'])->name('admin.dashboard.promoter.add-event-to-calendar');
+    // Route::get('/dashboard/promoter/events/{user}/check-linked-calendars', [CalendarController::class, 'checkLinkedCalendars']);
+    // Route::get('/dashboard/promoter/events/{id}', [PromoterDashboardController::class, 'showSinglePromoterEvent'])->name('admin.dashboard.promoter.show-single-event');
+    // Route::get('dashboard/promoter/events/{id}/edit', [PromoterDashboardController::class, 'editSinglePromoterEvent'])->name('admin.dashboard.promoter.single-event.edit');
+    // Route::put('dashboard/promoter/events/{id}/update', [PromoterDashboardController::class, 'updateSinglePromoterEvent'])->name('admin.dashboard.promoter.single-event.update');
+    // Route::delete('/dashboard/promoter/events/{id}', [PromoterDashboardController::class, 'deleteSinglePromoterEvent'])->name('admin.dashboard.promoter.delete-single-event');
     //Notes
     Route::get('/dashboard/promoter/notes', [PromoterDashboardController::class, 'showPromoterNotes'])->name('admin.dashboard.promoter.show-notes');
     Route::get('/dashboard/promoter/note-items', [PromoterDashboardController::class, 'getPromoterNotes'])->name('admin.promoter.dashboard.note-items');
@@ -123,6 +128,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/documents/{id}', [DocumentController::class, 'update'])->name('admin.dashboard.document.update');
         Route::delete('/documents/{id}', [DocumentController::class, 'destroy'])->name('admin.dashboard.document.delete');
         Route::get('/documents/{id}/download', [DocumentController::class, 'download'])->name('admin.dashboard.document.download');
+    });
+
+    // Events
+    Route::prefix('/dashboard/{dashboardType}')->group(function () {
+        Route::get('/events', [EventController::class, 'showEvents'])->name('admin.dashboard.show-events');
+        Route::get('/events/load-more-upcoming', [EventController::class, 'loadMoreUpcomingEvents'])->name('admin.dashboard.load-more-upcoming-events');
+        Route::get('/events/load-more-past', [EventController::class, 'loadMorePastEvents'])->name('admin.dashboard.load-more-past-events');
+        Route::get('/events/create-event', [EventController::class, 'createNewEvent'])->name('admin.dashboard.create-new-event');
+        Route::post('/events/store-event', [EventController::class, 'storeNewEvent'])->name('admin.dashboard.store-new-event');
+        Route::get('/events/search-venues', [EventController::class, 'selectVenue'])->name('admin.dashboard.search-venues');
+        Route::get('/events/search-promoters', [EventController::class, 'selectPromoter'])->name('admin.dashboard.search-promoters');
+        Route::get('/events/{id}', [EventController::class, 'showSingleEvent'])->name('admin.dashboard.show-event');
+        Route::get('/events/{id}/edit', [EventController::class, 'editSingleEvent'])->name('admin.dashboard.edit-event');
     });
 });
 

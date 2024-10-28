@@ -14,6 +14,7 @@ class Event extends Model
     protected $table = 'events';
 
     protected $fillable = [
+        'user_id',
         'name',
         'location',
         'event_date',
@@ -52,11 +53,22 @@ class Event extends Model
     public function bands()
     {
         return $this->services()
-            ->where('other_service_id', 4);
+            ->where('other_service_id', 4)
+            ->where('services', 'Band');
     }
 
     public function getBandsAttribute($value)
     {
         return json_decode($value, true);
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function attendees()
+    {
+        return $this->belongsToMany(User::class, 'event_user', 'event_id', 'user_id');
     }
 }

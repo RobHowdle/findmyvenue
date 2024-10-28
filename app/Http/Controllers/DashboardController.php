@@ -17,6 +17,11 @@ class DashboardController extends Controller
 {
     protected $todoService;
 
+    protected function getUserId()
+    {
+        return Auth::id();
+    }
+
     public function __construct(TodoService $todoService)
     {
         $this->todoService = $todoService;
@@ -34,6 +39,7 @@ class DashboardController extends Controller
         $genreList = file_get_contents(public_path('text/genre_list.json'));
         $data = json_decode($genreList, true);
         $genres = $data['genres'];
+        $dashboardType = lcfirst($roleName);
 
         switch ($roleName) {
             case 'promoter':
@@ -43,13 +49,19 @@ class DashboardController extends Controller
                         'genres'
                     ]));
                 }
-                return redirect()->route('promoter.dashboard');
+                return redirect("/dashboard/{$dashboardType}");
             case 'band':
-                return redirect()->route('band.dashboard');
+                return redirect("/dashboard/{$dashboardType}");
             case 'venue':
-                return redirect()->route('venue.dashboard');
+                return redirect("/dashboard/{$dashboardType}");
+            case 'photographer':
+                return redirect("/dashboard/{$dashboardType}");
+            case 'videographer':
+                return redirect("/dashboard/{$dashboardType}");
+            case 'designer':
+                return redirect("/dashboard/{$dashboardType}");
             case 'administrator':
-                return redirect()->route('admin.dashboard');
+                return redirect()->route('admin.dashboard', ['dashboardType' => 'administrator']);
             default:
                 return abort(403); // Forbidden access if role is not recognized
         }

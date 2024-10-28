@@ -1,6 +1,6 @@
 <x-app-layout>
   <x-slot name="header">
-    {{-- <x-sub-nav :promoter="$promoter" :promoterId="$promoter->id" /> --}}
+    <x-sub-nav :userId="$userId" />
   </x-slot>
 
   <div class="mx-auto w-full max-w-screen-2xl py-16">
@@ -9,11 +9,12 @@
         <div class="header px-8 pt-8">
           <h1 class="mb-8 font-heading text-4xl font-bold">New Event</h1>
         </div>
-        <form id="eventForm" action="{{ route('admin.dashboard.promoter.store-new-event') }}" method="POST"
-          enctype="multipart/form-data">
+        <form id="eventForm" action="{{ route('admin.dashboard.store-new-event', ['dashboardType' => $dashboardType]) }}"
+          method="POST" enctype="multipart/form-data">
           @csrf
           <div class="grid grid-cols-3 gap-x-8 px-8 py-8">
             <div class="col">
+              <input type="hidden" id="dashboard_type" value="{{ $dashboardType }}">
               <div class="group mb-4">
                 <x-input-label-dark>Event Name</x-input-label-dark>
                 <x-text-input id="event_name" name="event_name"></x-text-input>
@@ -46,16 +47,30 @@
                   <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                 @enderror
               </div>
-
-              <div class="group mb-4 hidden">
-                <x-input-label-dark>Promoter</x-input-label-dark>
-                <span>This is supposed to be hidden...naughty naughty</span>
-                <x-text-input class="w-auto" id="promoter_id" name="promoter_id"
-                  value="{{ $promoter->id }}"></x-text-input>
-                @error('promoter_id')
-                  <p class="yns_red mt-1 text-sm">{{ $message }}</p>
-                @enderror
-              </div>
+              @if ($dashboardType === 'promoter')
+                <div class="group mb-4">
+                  <x-input-label-dark>Promoter</x-input-label-dark>
+                  <span>This is supposed to be hidden...naughty naughty</span>
+                  <x-text-input class="w-auto" id="promoter_id" name="promoter_id"
+                    value="{{ $role->id }}"></x-text-input>
+                  @error('promoter_id')
+                    <p class="yns_red mt-1 text-sm">{{ $message }}</p>
+                  @enderror
+                </div>
+              @else
+                <div class="group mb-4">
+                  <x-input-label-dark>Promoter</x-input-label-dark>
+                  <x-text-input id="promoter_name" name="promoter_name"
+                    placeholder="Search for a promoter..."></x-text-input>
+                  <input type="hidden" id="promoter_id" name="promoter_id" value="">
+                  <ul id="promoter-suggestions"
+                    class="absolute z-10 mt-1 hidden rounded-md border border-gray-300 bg-white shadow-lg">
+                  </ul>
+                  @error('promoter_id')
+                    <p class="yns_red mt-1 text-sm">{{ $message }}</p>
+                  @enderror
+                </div>
+              @endif
 
               <div class="group mb-4">
                 <x-input-label-dark>End Time</x-input-label-dark>
@@ -260,7 +275,9 @@
       return;
     }
 
-    fetch(`/dashboard/promoter/events/search-venues?query=${encodeURIComponent(query)}`)
+    const dashboardType = document.getElementById('dashboard_type').value;
+
+    fetch(`/dashboard/${dashboardType}/events/search-venues?query=${encodeURIComponent(query)}`)
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -391,7 +408,6 @@
     });
   });
 
-
   // Function to create a new band row
   function createBandRow() {
     bandRowCount++;
@@ -500,7 +516,6 @@
     });
   });
 
-
   // Search for bands and update suggestions
   function searchBand(query, suggestionsId, fieldType, hiddenInputId) {
     fetch(`/api/bands/search?name=${encodeURIComponent(query)}`)
@@ -539,7 +554,6 @@
         console.error('There was a problem with the fetch operation:', error);
       });
   }
-
 
   // Select a band from suggestions
   function selectBand(band, suggestionsId, fieldType, hiddenInputId) {
@@ -581,8 +595,75 @@
     }
   }
 
+  // Promoter Search
+  const promoterInput = document.getElementById('promoter_name');
+  const promoterSuggestionsList = document.getElementById('promoter-suggestions');
+
+  promoterInput.addEventListener('input', function() {
+    const query = this.value;
+
+    if (query.length < 3) {
+      promoterSuggestionsList.innerHTML = '';
+      promoterSuggestionsList.classList.add('hidden');
+      return;
+    }
+
+    const dashboardType = document.getElementById('dashboard_type').value;
+
+    fetch(`/dashboard/${dashboardType}/events/search-promoters?query=${encodeURIComponent(query)}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        promoterSuggestionsList.innerHTML = '';
+        data.forEach(promoter => {
+          const suggestionItem = document.createElement('li');
+          suggestionItem.textContent = promoter.name;
+          suggestionItem.setAttribute('data-id', promoter.id);
+          suggestionItem.classList.add(
+            'cursor-pointer',
+            'hover:text-yns_yellow',
+            'px-4',
+            'py-2',
+            'bg-opac_8_black',
+            'text-white'
+          );
+
+          // Event listener for suggestion item click
+          suggestionItem.addEventListener('click', function() {
+            promoterInput.value = promoter.name; // Set the input value to the selected promoter name
+            document.getElementById('promoter_id').value = promoter
+              .id; // Set the hidden input value to the selected promoter ID
+            promoterSuggestionsList.classList.add('hidden'); // Hide suggestions after selection
+          });
+
+          promoterSuggestionsList.appendChild(suggestionItem);
+        });
+
+        if (data.length) {
+          promoterSuggestionsList.classList.remove('hidden');
+        } else {
+          promoterSuggestionsList.classList.add('hidden');
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching promoter suggestions:', error);
+        promoterSuggestionsList.classList.add('hidden');
+      });
+  });
+
+  // Hide promoter suggestions when clicking outside
+  document.addEventListener('click', function(event) {
+    if (!promoterInput.contains(event.target) && !promoterSuggestionsList.contains(event.target)) {
+      promoterSuggestionsList.classList.add('hidden');
+    }
+  });
+
   // Handle form submission
-  const eventForm = document.getElementById('eventForm'); // Replace with your actual form ID
+  const eventForm = document.getElementById('eventForm');
   eventForm.addEventListener('submit', function(event) {
     event.preventDefault(); // Prevent the default form submission
 
@@ -605,6 +686,9 @@
       .then(data => {
         if (data.success) {
           showSuccessNotification(data.message)
+          setTimeout(() => {
+            window.location.href = data.redirect_url;
+          }, 2000);
         } else {
           Object.keys(data.errors).forEach(key => {
             const error = data.errors[key];

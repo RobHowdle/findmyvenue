@@ -39,7 +39,7 @@ class BandDashboardController extends Controller
             ->count();
 
         $service = $band->otherService(ucfirst($role))->first();
-        $dashboardType = $service->services;
+        $dashboardType = lcfirst($service->services);
 
         return view('admin.dashboards.band-dash', [
             'userId' => $this->getUserId(),

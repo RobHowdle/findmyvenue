@@ -10,6 +10,14 @@ use Illuminate\Support\Facades\Validator;
 
 class PromoterController extends Controller
 {
+    protected $dashboardType;
+
+    public function __construct(Request $request)
+    {
+        $this->dashboardType = $request->dashboardType;
+        view()->share('dashboardType', $this->dashboardType);
+    }
+
     /**
      * Helper function to render rating icons
      */

@@ -11,7 +11,7 @@ class Greeting extends Component
 {
     public $greeting;
     public $userName;
-    public $promoterCompany;
+    public $associatedEntity;
 
     /**
      * Create a new component instance.
@@ -32,13 +32,47 @@ class Greeting extends Component
 
         $this->userName = Auth::check() ? Auth::user()->name : 'User';
 
-        // Retrieve the promoter company name
+        // Retrieve the associated entity based on user role
         if (Auth::check()) {
-            // Get the user's promoter service if it exists
-            $promoter = Auth::user()->services()->where('pivot.serviceable_type', 'App\Models\Promoter')->first();
-            $this->promoterCompany = $promoter ? $promoter->name : null;  // Access the name attribute
+            $user = Auth::user();
+            $role = $user->roles->first()->name;
+            switch ($role) {
+                case 'promoter':
+                    $promoter = $user->promoters()->first();
+                    $this->associatedEntity = $promoter ? $promoter->name : null;
+                    break;
+
+                case 'venue':
+                    $venue = $user->venues()->first();
+                    $this->associatedEntity = $venue ? $venue->name : null;
+                    break;
+
+                case 'band':
+                    $band = $user->otherService()->first();
+                    $this->associatedEntity = $band ? $band->name : null;
+                    break;
+
+                case 'photographer':
+                    $band = $user->otherService()->first();
+                    $this->associatedEntity = $band ? $band->name : null;
+                    break;
+
+                case 'videographer':
+                    $band = $user->otherService()->first();
+                    $this->associatedEntity = $band ? $band->name : null;
+                    break;
+
+                case 'designer':
+                    $band = $user->otherService()->first();
+                    $this->associatedEntity = $band ? $band->name : null;
+                    break;
+
+                default:
+                    $this->associatedEntity = null;
+                    break;
+            }
         } else {
-            $this->promoterCompany = null;  // Default to null if not authenticated
+            $this->associatedEntity = null;
         }
     }
 

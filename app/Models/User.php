@@ -62,23 +62,29 @@ class User extends Authenticatable
 
     public function services()
     {
-        // Get all associated promoters
         $promoters = $this->morphedByMany(Promoter::class, 'serviceable', 'service_user', 'user_id', 'serviceable_id')
             ->select('promoters.*', 'service_user.user_id as pivot_user_id', 'service_user.serviceable_id as pivot_serviceable_id', 'service_user.serviceable_type as pivot_serviceable_type', 'service_user.deleted_at as pivot_deleted_at')
             ->get();
 
-        // Get all associated venues
         $venues = $this->morphedByMany(Venue::class, 'serviceable', 'service_user', 'user_id', 'serviceable_id')
             ->select('venues.*', 'service_user.user_id as pivot_user_id', 'service_user.serviceable_id as pivot_serviceable_id', 'service_user.serviceable_type as pivot_serviceable_type', 'service_user.deleted_at as pivot_deleted_at')
             ->get();
 
-        // Combine both collections
         return $promoters->merge($venues);
     }
 
-    public function promoters(): MorphToMany
+    public function promoters(string $role = null): MorphToMany
     {
-        return $this->morphedByMany(Promoter::class, 'serviceable', 'service_user', 'user_id', 'serviceable_id')->whereNull('service_user.deleted_at');
+        $query = $this->morphedByMany(Promoter::class, 'serviceable', 'service_user', 'user_id', 'serviceable_id')->whereNull('service_user.deleted_at');
+
+        if ($role) {
+            $roleId = $this->role_id;
+            if ($roleId) {
+                $query->where('serviceable_id', $roleId);
+            }
+        }
+
+        return $query;
     }
 
     public function venues(): MorphToMany
