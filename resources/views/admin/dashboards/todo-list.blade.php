@@ -1,6 +1,6 @@
 <x-app-layout>
   <x-slot name="header">
-    {{-- <x-sub-nav :promoter="$promoter" :promoterId="$promoter->id" /> --}}
+    <x-sub-nav :userId="$userId" />
   </x-slot>
 
   <div class="mx-auto w-full max-w-screen-2xl py-16">
@@ -20,9 +20,10 @@
             </div>
           </form>
           <div class="grid grid-cols-3 gap-x-4 gap-y-6 pt-6" id="tasks">
-            @include('components.todo-items', ['todoItems' => $todoItems])
-            @if ($todoItems->isEmpty())
+            @if (!$todoItems)
               <p>No todo items found.</p>
+            @else
+              @include('components.todo-items', ['todoItems' => $todoItems])
             @endif
           </div>
           <div class="mt-6 flex flex-row gap-4">
@@ -44,6 +45,9 @@
 <script>
   $(document).ready(function() {
     let currentPage = 1;
+    let dashboardType = "{{ $dashboardType }}";
+
+    loadTasks(currentPage);
 
     $('#load-more-btn').on('click', function() {
       currentPage++;
@@ -77,35 +81,11 @@
       currentPage = 1;
     });
 
-    // Handle new task submission
-    $('#newTodoItem').on('submit', function(e) {
-      e.preventDefault();
-      let task = $('#taskInput').val();
-
-      $.ajax({
-        url: '{{ route('promoter.dashboard.new-todo-item') }}',
-        type: 'POST',
-        data: {
-          _token: '{{ csrf_token() }}',
-          task: task
-        },
-        success: function(response) {
-          $('#taskInput').val('');
-          $('#tasks').empty();
-          currentPage = 1;
-          loadTasks(currentPage);
-          showSuccessNotification(response.message);
-        },
-        error: function(xhr) {
-          console.log('Error: ', xhr.responseText);
-        }
-      });
-    });
-
     // Function to load tasks dynamically
     function loadTasks(page) {
       $.ajax({
-        url: '{{ route('promoter.dashboard.todo-items') }}',
+        url: '{{ route('admin.dashboard.todo-items', ['dashboardType' => '__dashboardType__']) }}'.replace(
+          '__dashboardType__', dashboardType),
         type: 'GET',
         data: {
           page: page
@@ -126,20 +106,29 @@
       });
     }
 
-    // Show Completed Tasks
-    $('#completed-task-btn').on('click', function() {
+    // Handle new task submission
+    $('#newTodoItem').on('submit', function(e) {
+      e.preventDefault();
+      let task = $('#taskInput').val();
+
       $.ajax({
-        url: '{{ route('promoter.dashboard.completed-todo-items') }}', // Adjust route
-        type: 'GET',
+        url: '{{ route('admin.dashboard.new-todo-item', ['dashboardType' => '__dashboardType__']) }}'
+          .replace(
+            '__dashboardType__', dashboardType),
+        type: 'POST',
+        data: {
+          _token: '{{ csrf_token() }}',
+          task: task
+        },
         success: function(response) {
+          $('#taskInput').val('');
           $('#tasks').empty();
-          $('#tasks').append(response.view);
-          $('#load-more-btn').hide(); // Optionally hide Load More button
-          $('#uncomplete-task-btn').show(); // Show uncompleted button
-          $('#completed-task-btn').hide(); // Show uncompleted button
+          currentPage = 1;
+          loadTasks(currentPage);
+          showSuccessNotification(response.message);
         },
         error: function(xhr) {
-          console.log('Error: ', xhr.responseText); // Handle error response
+          console.log('Error: ', xhr.responseText);
         }
       });
     });
@@ -147,7 +136,9 @@
     // Function to complete a task
     function completeTask(taskId) {
       $.ajax({
-        url: '{{ route('promoter.dashboard.complete-todo-item', 'TASK_ID') }}'.replace('TASK_ID', taskId),
+        url: '{{ route('admin.dashboard.complete-todo-item', ['dashboardType' => '__dashboardType__', 'id' => 'TASK_ID']) }}'
+          .replace('__dashboardType__', dashboardType)
+          .replace('TASK_ID', taskId),
         type: 'POST',
         data: {
           _token: '{{ csrf_token() }}'
@@ -164,10 +155,31 @@
       });
     }
 
+    // Show Completed Tasks
+    $('#completed-task-btn').on('click', function() {
+      $.ajax({
+        url: '{{ route('admin.dashboard.completed-todo-items', ['dashboardType' => '__dashboardType__']) }}'
+          .replace('__dashboardType__', dashboardType),
+        type: 'GET',
+        success: function(response) {
+          $('#tasks').empty();
+          $('#tasks').append(response.view);
+          $('#load-more-btn').hide(); // Optionally hide Load More button
+          $('#uncomplete-task-btn').show(); // Show uncompleted button
+          $('#completed-task-btn').hide(); // Show uncompleted button
+        },
+        error: function(xhr) {
+          console.log('Error: ', xhr.responseText); // Handle error response
+        }
+      });
+    });
+
     // Function to delete a task
     function deleteTask(taskId) {
       $.ajax({
-        url: '{{ route('promoter.dashboard.delete-todo-item', 'TASK_ID') }}'.replace('TASK_ID', taskId),
+        url: '{{ route('admin.dashboard.delete-todo-item', ['dashboardType' => '__dashboardType__', 'id' => 'TASK_ID']) }}'
+          .replace('__dashboardType__', dashboardType)
+          .replace('TASK_ID', taskId),
         type: 'DELETE',
         data: {
           _token: '{{ csrf_token() }}'
@@ -184,9 +196,12 @@
       });
     }
 
+    // Function to uncomplete a task
     function uncompleteTask(taskId) {
       $.ajax({
-        url: '{{ route('promoter.dashboard.uncomplete-todo-item', 'TASK_ID') }}'.replace('TASK_ID', taskId),
+        url: '{{ route('admin.dashboard.uncomplete-todo-item', ['dashboardType' => '__dashboardType__', 'id' => 'TASK_ID']) }}'
+          .replace('__dashboardType__', dashboardType)
+          .replace('TASK_ID', taskId),
         type: 'POST',
         data: {
           _token: '{{ csrf_token() }}'
@@ -203,9 +218,10 @@
       });
     }
 
+    // Function to load completed tasks
     function loadCompletedTasks() {
       $.ajax({
-        url: '{{ route('promoter.dashboard.completed-todo-items') }}',
+        url: '{{ route('admin.dashboard.completed-todo-items', ['dashboardType' => '__dashboardType__']) }}',
         type: 'GET',
         success: function(response) {
           $('#tasks').append(response.view);

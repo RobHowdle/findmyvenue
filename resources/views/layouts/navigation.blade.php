@@ -28,7 +28,7 @@
             <a href="{{ route('admin.dashboard.show-events', ['dashboardType' => 'promoter']) }}"
               class="{{ request()->is('dashboard/promoter/events*') ? ' border-b-yns_yellow' : '' }} inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:border-b-yns_yellow hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Events</a>
 
-            <a href="{{ route('promoter.dashboard.todo-list', ['dashboardType' => 'promoter']) }}"
+            <a href="{{ route('admin.dashboard.todo-list', ['dashboardType' => 'promoter']) }}"
               class="{{ request()->is('dashboard/promoter/todo-list*') ? ' border-b-yns_yellow' : '' }} inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:border-b-yns_yellow hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Todo
               List</a>
 
@@ -46,6 +46,9 @@
               class="{{ request()->is('dashboard/band/documents*') ? ' border-b-yns_yellow' : '' }} inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:border-b-yns_yellow hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Documents</a>
             <a href="{{ route('admin.dashboard.show-events', ['dashboardType' => 'band']) }}"
               class="{{ request()->is('dashboard/band/events*') ? ' border-b-yns_yellow' : '' }} inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:border-b-yns_yellow hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Events</a>
+            <a href="{{ route('admin.dashboard.todo-list', ['dashboardType' => 'band']) }}"
+              class="{{ request()->is('dashboard/band/todo-list*') ? ' border-b-yns_yellow' : '' }} inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:border-b-yns_yellow hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Todo
+              List</a>
           @endcan
 
           @can(['manage_band', 'manage_photographer', 'manage_designer'])
