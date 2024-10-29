@@ -1,6 +1,6 @@
 <x-app-layout>
   <x-slot name="header">
-    {{-- <x-sub-nav :promoter="$promoter" :promoterId="$promoter->id" /> --}}
+    <x-sub-nav :userId="$userId" />
   </x-slot>
 
   <div class="mx-auto w-full max-w-screen-2xl py-16">
@@ -42,7 +42,7 @@
             </div>
           </form>
           <div class="grid grid-cols-3 gap-x-4 gap-y-6 pt-6" id="notes">
-            @if ($notes->isEmpty())
+            @if (!$notes)
               <p>No notes found.</p>
             @else
               @include('components.note-items', ['notes' => $notes])
@@ -67,6 +67,9 @@
 <script>
   $(document).ready(function() {
     let currentPage = 1;
+    let dashboardType = "{{ $dashboardType }}";
+
+    // loadNotes(currentPage);
 
     $('#load-more-btn').on('click', function() {
       currentPage++;
@@ -82,15 +85,6 @@
       currentPage = 1;
     });
 
-    $(document).on('click', '.uncomplete-note-btn', function() {
-      const noteId = $(this).data('note-id');
-      const noteElement = $(this).closest('.note-item')
-      uncompleteNote(noteId);
-
-      $('#notes').empty();
-      currentPage = 1;
-    });
-
     $(document).on('click', '.delete-note-btn', function() {
       const noteId = $(this).data('note-id');
       const noteElement = $(this).closest('.note-item')
@@ -100,15 +94,41 @@
       currentPage = 1;
     });
 
-    $('#completed-notes-btn').on('click', function() {
+    $(document).on('click', '.uncomplete-note-btn', function() {
+      const noteId = $(this).data('note-id');
+      const noteElement = $(this).closest('.note-item')
+      uncompleteNote(noteId);
+
+      $('#notes').empty();
       currentPage = 1;
-      loadCompletedNotes();
     });
 
-    $('#uncompleted-notes-btn').on('click', function() {
-      currentPage = 1;
-      loadNotes(currentPage);
-    });
+    // Function to load notes dynamically
+    function loadNotes(page) {
+      console.log('Loading notes for page:', page);
+      $.ajax({
+        url: '{{ route('admin.dashboard.note-items', ['dashboardType' => '__dashboardType__']) }}'.replace(
+          '__dashboardType__', dashboardType),
+        type: 'GET',
+        data: {
+          page: page
+        },
+        success: function(response) {
+          $('#notes').empty();
+          $('#notes').append(response.view);
+          $('#completed-notes-btn').show();
+          $('#uncompleted-notes-btn').hide();
+          $('#load-more-btn').show();
+
+          if (!response.hasMore) {
+            $('#load-more-btn').hide();
+          }
+        },
+        error: function(xhr) {
+          console.log('Error: ', xhr.responseText);
+        }
+      });
+    }
 
     // Handle new note submission
     $('#newNote').on('submit', function(e) {
@@ -121,14 +141,16 @@
       let isTodo = $('#isTodoInput').is(':checked') ? 1 : 0;
 
       $.ajax({
-        url: `{{ route('dashboard.store-new-note') }}`,
+        url: '{{ route('admin.dashboard.new-note-item', ['dashboardType' => '__dashboardType__']) }}'
+          .replace(
+            '__dashboardType__', dashboardType),
         type: 'POST',
         data: {
           _token: '{{ csrf_token() }}',
           name: noteName,
           text: noteText,
           date: noteDate,
-          is_todo: isTodo // Use the correct key name for the backend
+          is_todo: isTodo
         },
         success: function(response) {
           $('#noteInput').val('');
@@ -145,42 +167,12 @@
       });
     });
 
-    // Function to load notes dynamically
-    function loadNotes(page) {
-      $.ajax({
-        url: '{{ route('admin.promoter.dashboard.note-items') }}',
-        type: 'GET',
-        data: {
-          page: page
-        },
-        success: function(response) {
-          // If it's the first page, clear existing notes
-          if (page === 1) {
-            $('#notes').empty(); // Clear existing notes
-          }
-
-          $('#notes').append(response.view); // Append new notes
-
-          // Show or hide the buttons based on response
-          $('#completed-notes-btn').show();
-          $('#uncompleted-notes-btn').hide();
-          $('#load-more-btn').show();
-
-          if (!response.hasMore) {
-            $('#load-more-btn').hide();
-          }
-        },
-        error: function(xhr) {
-          console.log('Error: ', xhr.responseText);
-        }
-      });
-    }
-
-
     // Function to complete a note
     function completeNote(noteId) {
       $.ajax({
-        url: '{{ route('admin.promoter.dashboard.complete-note', 'NOTE_ID') }}'.replace('NOTE_ID', noteId),
+        url: '{{ route('admin.dashboard.complete-note', ['dashboardType' => '__dashboardType__', 'id' => 'NOTE_ID']) }}'
+          .replace('__dashboardType__', dashboardType)
+          .replace('NOTE_ID', noteId),
         type: 'POST',
         data: {
           _token: '{{ csrf_token() }}'
@@ -197,10 +189,17 @@
       });
     }
 
+    $('#completed-notes-btn').on('click', function() {
+      currentPage = 1;
+      loadCompletedNotes(currentPage);
+    });
+
     // Function to delete a note
     function deleteNote(noteId) {
       $.ajax({
-        url: '{{ route('admin.promoter.dashboard.delete-note', 'NOTE_ID') }}'.replace('NOTE_ID', noteId),
+        url: '{{ route('admin.dashboard.delete-note', ['dashboardType' => '__dashboardType__', 'id' => 'NOTE_ID']) }}'
+          .replace('__dashboardType__', dashboardType)
+          .replace('NOTE_ID', noteId),
         type: 'DELETE',
         data: {
           _token: '{{ csrf_token() }}'
@@ -217,12 +216,41 @@
       });
     }
 
+    // Function to uncomplete a task
+    function uncompleteNote(noteId) {
+      $.ajax({
+        url: '{{ route('admin.dashboard.uncomplete-note-item', ['dashboardType' => '__dashboardType__', 'id' => 'TASK_ID']) }}'
+          .replace('__dashboardType__', dashboardType)
+          .replace('NOTE_ID', noteId),
+        type: 'POST',
+        data: {
+          _token: '{{ csrf_token() }}'
+        },
+        success: function(response) {
+          showSuccessNotification(response.message);
+          setTimeout(() => {
+            loadNotes(currentPage);
+          }, 500);
+        },
+        error: function(xhr) {
+          showFailureNotification(xhr.responseText);
+        }
+      });
+    }
+
+    $('#uncompleted-notes-btn').on('click', function() {
+      currentPage = 1;
+      loadNotes(currentPage);
+    });
+
     function loadCompletedNotes() {
       $.ajax({
-        url: '{{ route('admin.promoter.dashboard.completed-notes') }}',
+        url: '{{ route('admin.dashboard.completed-notes', ['dashboardType' => '__dashboardType__']) }}'
+          .replace('__dashboardType__', dashboardType),
         type: 'GET',
         success: function(response) {
-          $('#notes').append(response.view); // Append new completed notes
+          $('#notes').empty();
+          $('#notes').append(response.view);
           $('#completed-notes-btn').hide(); // Hide completed button
           $('#uncompleted-notes-btn').show(); // Show uncompleted button
           $('#load-more-btn').show();

@@ -221,7 +221,8 @@
     // Function to load completed tasks
     function loadCompletedTasks() {
       $.ajax({
-        url: '{{ route('admin.dashboard.completed-todo-items', ['dashboardType' => '__dashboardType__']) }}',
+        url: '{{ route('admin.dashboard.completed-todo-items', ['dashboardType' => '__dashboardType__']) }}'
+          .replace('__dashboardType__', dashboardType),
         type: 'GET',
         success: function(response) {
           $('#tasks').append(response.view);

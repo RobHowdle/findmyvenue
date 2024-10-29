@@ -2,62 +2,62 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Todo;
+use App\Models\Note;
 use App\Models\Promoter;
 use App\Models\OtherService;
 use Illuminate\Http\Request;
+use App\Services\TodoService;
 use Illuminate\Support\Facades\Auth;
 
-class TodoController extends Controller
+class NoteController extends Controller
 {
+    protected $todoService;
+
     protected function getUserId()
     {
         return Auth::id();
     }
 
-    public function showTodos($dashboardType, Request $request)
+    public function showNotes($dashboardType, Request $request)
     {
-        // Load the authenticated user with their associated promoters and todos
         $user = Auth::user()->load(['promoters', 'todos', 'otherService']);
-
         $perPage = 6;
         $page = $request->input('page', 1);
-
-        $todoItems = collect();
+        $notes = collect();
 
         if ($dashboardType === 'promoter') {
-            $todoItems = Todo::where('serviceable_type', Promoter::class)
+            $notes = Note::where('serviceable_type', Promoter::class)
                 ->whereIn('serviceable_id', $user->promoters->pluck('id'))
                 ->where('completed', false)
                 ->orderBy('created_at', 'DESC')
                 ->paginate($perPage, ['*'], 'page', $page);
         } elseif ($dashboardType === 'band') {
-            $todoItems = Todo::where('serviceable_type', OtherService::class)
+            $notes = Note::where('serviceable_type', OtherService::class)
                 ->whereIn('serviceable_id', $user->otherService("Band")->pluck('other_services.id'))
                 ->where('completed', false)
                 ->orderBy('created_at', 'DESC')
                 ->paginate($perPage, ['*'], 'page', $page);
         } elseif ($dashboardType === 'designer') {
-            $todoItems = Todo::where('serviceable_type', OtherService::class)
+            $notes = Note::where('serviceable_type', OtherService::class)
                 ->whereIn('serviceable_id', $user->otherService("Designer")->pluck('other_services.id'))
                 ->where('completed', false)
                 ->orderBy('created_at', 'DESC')
                 ->paginate($perPage, ['*'], 'page', $page);
         }
 
-        return view('admin.dashboards.todo-list', [
+        return view('admin.dashboards.show-notes', [
             'userId' => $this->getUserId(),
             'dashboardType' => $dashboardType,
-            'todoItems' => $todoItems,
+            'notes' => $notes
         ]);
     }
 
-    public function getTodos($dashboardType, Request $request)
+    public function getNotes($dashboardType, Request $request)
     {
-        $user = Auth::user()->load(['promoters', 'todos', 'otherService']);
+        $user = Auth::user()->load(['promoters', 'notes', 'otherService']);
         $perPage = 6;
         $page = $request->input('page', 1);
-        $todoItems = collect();
+        $notes = collect();
 
         switch ($dashboardType) {
             case 'promoter':
@@ -66,12 +66,12 @@ class TodoController extends Controller
 
                 if ($promoterCompany->isEmpty()) {
                     return response()->json([
-                        'view' => view('components.todo-items', ['todoItems' => collect()])->render(),
+                        'view' => view('components.note-items', ['notes' => collect()])->render(),
                         'hasMore' => false,
                     ]);
                 }
 
-                $todoItems = Todo::where('serviceable_type', Promoter::class)
+                $notes = Note::where('serviceable_type', Promoter::class)
                     ->whereIn('serviceable_id', $serviceableId)
                     ->where('completed', false)
                     ->orderBy('created_at', 'DESC')
@@ -80,17 +80,17 @@ class TodoController extends Controller
                 break;
 
             case 'band':
-                $bandServices = $user->otherService("Band");
+                $bandServices = $user->otherService("Band")->get();
                 $serviceableId = $bandServices->pluck('other_services.id');
 
-                if (!$bandServices) {
+                if ($bandServices->isEmpty()) {
                     return response()->json([
-                        'view' => view('components.todo-items', ['todoItems' => collect()])->render(),
+                        'view' => view('components.note-items', ['notes' => collect()])->render(),
                         'hasMore' => false,
                     ]);
                 }
 
-                $todoItems = Todo::where('serviceable_type', OtherService::class)
+                $notes = Note::where('serviceable_type', OtherService::class)
                     ->whereIn('serviceable_id', $serviceableId)
                     ->where('completed', false)
                     ->orderBy('created_at', 'DESC')
@@ -104,12 +104,12 @@ class TodoController extends Controller
 
                 //     if ($designerCompanies->isEmpty()) {
                 //         return response()->json([
-                //             'view' => view('components.todo-items', ['todoItems' => collect()])->render(),
+                //             'view' => view('components.note-items', ['notes' => collect()])->render(),
                 //             'hasMore' => false,
                 //         ]);
                 //     }
 
-                //     $todoItems = Todo::where('serviceable_type', Designer::class)
+                //     $notes = Note::where('serviceable_type', Designer::class)
                 //         ->whereIn('serviceable_id', $serviceableId)
                 //         ->where('completed', false)
                 //         ->orderBy('created_at', 'DESC')
@@ -119,22 +119,25 @@ class TodoController extends Controller
 
             default:
                 return response()->json([
-                    'view' => view('components.todo-items', ['todoItems' => collect()])->render(),
+                    'view' => view('components.note-items', ['notes' => collect()])->render(),
                     'hasMore' => false,
                 ]);
         }
 
         return response()->json([
-            'view' => view('components.todo-items', compact('todoItems'))->render(),
-            'hasMore' => $todoItems->hasMorePages(),
+            'view' => view('components.note-items', compact('notes'))->render(),
+            'hasMore' => $notes->hasMorePages(),
         ]);
     }
 
-    public function newTodoItem($dashboardType, Request $request)
+    public function newNoteItem($dashboardType, Request $request)
     {
         $user = Auth::user();
         $request->validate([
-            'task' => 'required|string'
+            'name' => 'required|string',
+            'text' => 'required|string',
+            'date' => 'required|date',
+            'is_todo' => 'boolean'
         ]);
 
         $servicealeableType = null;
@@ -163,50 +166,57 @@ class TodoController extends Controller
             $serviceableId = null;
         }
 
-        $todoItem = Todo::create([
-            'user_id' => $user->id,
+        $noteItem = Note::create([
             'serviceable_id' => $serviceableId,
             'serviceable_type' => $servicealeableType,
-            'item' => $request->task,
+            'name' => $request->name,
+            'text' => $request->text,
+            'date' => $request->date,
+            'is_todo' => $request->is_todo ?? false,
         ]);
 
+        if ($noteItem->is_todo) {
+            $this->todoService->createTodoFromNote($noteItem);
+        };
+
         return response()->json([
-            'message' => 'Item Added Successfully',
-            'todoItem' => $todoItem,
+            'message' => 'Note Added Successfully',
+            'noteItem' => $noteItem,
         ]);
     }
 
-    public function completeTodoItem($dashboardType, $id)
+    public function completeNoteItem($dashboardType, $id)
     {
+        $note = Note::findOrFail($id);
 
-        $todoItem = Todo::findOrFail($id);
+        $note->completed = true;
+        $note->completed_at = now();
+        $note->save();
 
-        $todoItem->completed = true;
-        $todoItem->completed_at = now();
-        $todoItem->save();
-
-        // Return a success response
         return response()->json([
-            'message' => 'Todo item marked as completed!',
-            'todoItem' => $todoItem,
+            'message' => 'Note marked as completed!',
+            'note' => $note,
         ]);
     }
 
-    public function deleteTodoItem($dashboardType, $id)
+    public function uncompleteNoteItem($dashboardType, $id)
     {
-        $todoItem = Todo::findOrFail($id);
-        $todoItem->delete();
+        $noteItem = Note::findOrFail($id);
+        $noteItem->completed = false;
+        $noteItem->completed_at = null;
+        $noteItem->save();
 
         return response()->json([
-            'message' => 'Todo item deleted successfully!',
+            'message' => 'Todo item marked as uncompleted!',
+            'noteItem' => $noteItem,
         ]);
     }
 
-    public function showCompletedTodoItems($dashboardType)
+    public function showCompletedNoteItems($dashboardType)
     {
-        $user = Auth::user()->load(['promoters', 'todos', 'otherService']);
+        $user = Auth::user()->load(['promoters', 'notes', 'otherService']);
         $perPage = 6;
-        $todoItems = collect();
+        $notes = collect();
         $serviceableId = collect();
 
         switch ($dashboardType) {
@@ -216,15 +226,15 @@ class TodoController extends Controller
 
                 if ($promoterCompany->isEmpty()) {
                     return response()->json([
-                        'view' => view('components.todo-items', ['todoItems' => collect()])->render(),
+                        'view' => view('components.note-items', ['notes' => collect()])->render(),
                         'hasMore' => false,
                     ]);
                 }
 
                 // Retrieve completed todo items for the promoter
-                $todoItems = Todo::where('serviceable_type', Promoter::class)
+                $notes = Note::where('serviceable_type', Promoter::class)
                     ->whereIn('serviceable_id', $serviceableId)
-                    ->where('completed', true) // Change to true
+                    ->where('completed', true)
                     ->orderBy('created_at', 'DESC')
                     ->paginate($perPage);
                 break;
@@ -235,13 +245,13 @@ class TodoController extends Controller
 
                 if (!$bandServices) {
                     return response()->json([
-                        'view' => view('components.todo-items', ['todoItems' => collect()])->render(),
+                        'view' => view('components.note-items', ['notes' => collect()])->render(),
                         'hasMore' => false,
                     ]);
                 }
 
                 // Retrieve completed todo items for the band
-                $todoItems = Todo::where('serviceable_type', OtherService::class)
+                $notes = Note::where('serviceable_type', OtherService::class)
                     ->whereIn('serviceable_id', $serviceableId)
                     ->where('completed', true)
                     ->orderBy('created_at', 'DESC')
@@ -250,14 +260,14 @@ class TodoController extends Controller
 
             default:
                 return response()->json([
-                    'view' => view('components.todo-items', ['todoItems' => collect()])->render(),
+                    'view' => view('components.note-items', ['notes' => collect()])->render(),
                     'hasMore' => false,
                 ]);
         }
 
         return response()->json([
-            'view' => view('components.todo-items', ['todoItems' => $todoItems])->render(),
-            'hasMore' => $todoItems->hasMorePages(),
+            'view' => view('components.note-items', ['notes' => $notes])->render(),
+            'hasMore' => $notes->hasMorePages(),
         ]);
     }
 
@@ -275,6 +285,16 @@ class TodoController extends Controller
         return response()->json([
             'message' => 'Todo item marked as uncompleted!',
             'todoItem' => $todoItem,
+        ]);
+    }
+
+    public function deleteNoteItem($dashboardType, $id)
+    {
+        $noteItem = Note::findOrFail($id);
+        $noteItem->delete();
+
+        return response()->json([
+            'message' => 'Note deleted successfully!',
         ]);
     }
 }

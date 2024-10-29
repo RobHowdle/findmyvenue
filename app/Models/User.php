@@ -118,10 +118,14 @@ class User extends Authenticatable
         return $roleMapping[$role] ?? null;
     }
 
-
     public function todos()
     {
         return $this->morphMany(Todo::class, 'serviceable');
+    }
+
+    public function notes()
+    {
+        return $this->morphMany(Note::class, 'serviceable');
     }
 
     public function getRoleType()

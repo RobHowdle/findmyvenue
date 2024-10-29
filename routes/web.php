@@ -2,6 +2,7 @@
 
 use App\Models\OtherService;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\NoteController;
 use App\Http\Controllers\TodoController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EventController;
@@ -87,12 +88,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/dashboard/promoter/users/add-user', [PromoterDashboardController::class, 'addUserToCompany'])->name('admin.dashboard.promoter.add-user-to-company');
     Route::delete('/dashboard/promoter/delete-user', [PromoterDashboardController::class, 'deleteUserFromCompany'])->name('admin.dashboard.promoter.delete-user');
 
-    //Notes
-    Route::get('/dashboard/promoter/notes', [PromoterDashboardController::class, 'showPromoterNotes'])->name('admin.dashboard.promoter.show-notes');
-    Route::get('/dashboard/promoter/note-items', [PromoterDashboardController::class, 'getPromoterNotes'])->name('admin.promoter.dashboard.note-items');
-    Route::post('/dashboard/promoter/note-item/{id}/complete', [PromoterDashboardController::class, 'completeNoteItem'])->name('admin.promoter.dashboard.complete-note');
-    Route::delete('/dashboard/promoter/note-item/{id}', [PromoterDashboardController::class, 'deleteNoteItem'])->name('admin.promoter.dashboard.delete-note');
-    Route::get('/dashboard/promoter/note-item/completed-notes', [PromoterDashboardController::class, 'showCompletedNoteItems'])->name('admin.promoter.dashboard.completed-notes');
+    // Notes
+    Route::prefix('/dashboard/{dashboardType}')->group(function () {
+        Route::get('/notes', [NoteController::class, 'showNotes'])->name('admin.dashboard.show-notes');
+        Route::get('/note-items', [NoteController::class, 'getNotes'])->name('admin.dashboard.note-items');
+        Route::post('/notes/new', [NoteController::class, 'newNoteItem'])->name('admin.dashboard.new-note-item');
+        Route::post('/note-item/{id}/complete', [NoteController::class, 'completeNoteItem'])->name('admin.dashboard.complete-note');
+        Route::post('/note-item/{id}/uncomplete', [NoteController::class, 'uncompleteNoteItem'])->name('admin.dashboard.uncomplete-note-item');
+        Route::delete('/note-item/{id}', [NoteController::class, 'deleteNoteItem'])->name('admin.dashboard.delete-note');
+        Route::get('/note-item/completed-notes', [NoteController::class, 'showCompletedNoteItems'])->name('admin.dashboard.completed-notes');
+    });
 
     // Reviews
     Route::get('/dashboard/promoter/reviews/{filter?}', [PromoterDashboardController::class, 'getPromoterReviews'])->name('admin.promoter.dashboard.get-reviews');
@@ -119,6 +124,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // Events
+    // TODO - Finish
     Route::prefix('/dashboard/{dashboardType}')->group(function () {
         Route::get('/events', [EventController::class, 'showEvents'])->name('admin.dashboard.show-events');
         Route::get('/events/load-more-upcoming', [EventController::class, 'loadMoreUpcomingEvents'])->name('admin.dashboard.load-more-upcoming-events');
