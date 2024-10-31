@@ -48,7 +48,7 @@
                 @enderror
               </div>
               @if ($dashboardType === 'promoter')
-                <div class="group mb-4">
+                <div class="group mb-4 hidden">
                   <x-input-label-dark>Promoter</x-input-label-dark>
                   <span>This is supposed to be hidden...naughty naughty</span>
                   <x-text-input class="w-auto" id="promoter_id" name="promoter_id"

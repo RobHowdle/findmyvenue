@@ -51,11 +51,17 @@ class SubNav extends Component
     {
         $output = '';
         $totalIcons = 5;
-        $fullIcons = floor($overallScore);
-        $fraction = $overallScore - $fullIcons;
         $emptyIcon = asset('storage/images/system/ratings/empty.png');
         $fullIcon = asset('storage/images/system/ratings/full.png');
         $hotIcon = asset('storage/images/system/ratings/hot.png');
+
+        // Display 5 empty icons if there is no rating
+        if (is_null($overallScore) || $overallScore == 0) {
+            return str_repeat('<img src="' . $emptyIcon . '" alt="Empty Icon" />', $totalIcons);
+        }
+
+        $fullIcons = floor($overallScore);
+        $fraction = $overallScore - $fullIcons;
 
         if ($overallScore == $totalIcons) {
             // Display 5 hot icons when the score is 5/5
@@ -110,9 +116,22 @@ class SubNav extends Component
                 $this->loadBandData($user);
                 break;
 
-                // You can handle designer and venue similarly if needed
+            case 'venue':
+                $this->loadVenueData($user);
+                break;
+
+            case 'designer':
+                $this->loadDesignerData($user);
+                break;
+
+            case 'photographer':
+                $this->loadPhotographerData($user);
+                break;
+
+            case 'videographer':
+                $this->loadVideographerData($user);
+                break;
             default:
-                // Handle other types or set defaults
                 break;
         }
     }
@@ -130,12 +149,12 @@ class SubNav extends Component
 
     private function loadBandData($user)
     {
-        $bands = $user->otherService()->where('other_service_id', 4)->get();
+        $bands = $user->otherService("Band")->get();
         if ($bands->isNotEmpty()) {
             $band = $bands->first();
             $this->bandId = $band->id;
             $this->gigsCountBandYtd = $this->calculateGigsCountBandYtd($band->id);
-            $this->overallRatingBand = $this->calculateOverallRatingBand($band->id);
+            $this->overallRatingBand = $this->renderRatingIcons($band->overallRating);
             $this->totalProfitsBandYtd = $this->calculateTotalProfitsBandYtd($band->id);
         }
     }
