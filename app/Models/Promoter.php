@@ -43,7 +43,7 @@ class Promoter extends Model
         return $this->hasMany(PromoterReview::class);
     }
 
-    public function users(): MorphToMany
+    public function linkedUsers(): MorphToMany
     {
         return $this->morphToMany(User::class, 'serviceable', 'service_user', 'serviceable_id', 'user_id')
             ->withPivot('created_at', 'updated_at', 'role')

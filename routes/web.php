@@ -7,11 +7,13 @@ use App\Http\Controllers\TodoController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\VenueController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\PromoterController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LinkedUserController;
 use App\Http\Controllers\APIRequestsController;
 use App\Http\Controllers\BandJourneyController;
 use App\Http\Controllers\OtherServiceController;
@@ -77,18 +79,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // Link User To Promoter
-    Route::get('/dashboard/promoter/search', [PromoterDashboardController::class, 'searchExistingPromoters'])->name('admin.dashboard.promoter.search');
-    Route::post('/dashboard/promoter/link', [PromoterDashboardController::class, 'linkToExistingPromoter'])->name('admin.dashboard.promoter.link');
-    Route::post('/dashboard/promoter/store', [PromoterDashboardController::class, 'storeNewPromoter'])->name('admin.dashboard.promoter.store');
+    Route::get('/users/search', [PromoterDashboardController::class, 'searchExistingPromoters'])->name('admin.dashboard.promoter.search');
+    Route::post('/link', [PromoterDashboardController::class, 'linkToExistingPromoter'])->name('admin.dashboard.promoter.link');
+    Route::post('/store', [PromoterDashboardController::class, 'storeNewPromoter'])->name('admin.dashboard.promoter.store');
     // Users
-    Route::get('/dashboard/promoter/users', [PromoterDashboardController::class, 'promoterUsers'])->name('promter.dashboard.users');
-    Route::get('/dashboard/promoter/users/get', [PromoterDashboardController::class, 'getPromoterusers'])->name('admin.promoter.dashboard.get-users');
-    Route::get('/dashboard/promoter/users/new-user', [PromoterDashboardController::class, 'newUser'])->name('promoter.dashboard.users.new');
-    Route::get('/dashboard/promoter/users/search-users', [PromoterDashboardController::class, 'searchUsers'])->name('admin.dashboard.promoter.search-users');
-    Route::post('/dashboard/promoter/users/add-user', [PromoterDashboardController::class, 'addUserToCompany'])->name('admin.dashboard.promoter.add-user-to-company');
-    Route::delete('/dashboard/promoter/delete-user', [PromoterDashboardController::class, 'deleteUserFromCompany'])->name('admin.dashboard.promoter.delete-user');
+    Route::prefix('/dashboard/{dashboardType}')->group(function () {
+        Route::get('/users', [LinkedUserController::class, 'showUsers'])->name('admin.dashboard.users');
+        Route::get('/users/get', [LinkedUserController::class, 'getUsers'])->name('admin.dashboard.get-users');
+        Route::get('/users/new-user', [LinkedUserController::class, 'newUser'])->name('admin.dashboard.new-user');
+        Route::get('/users/search-users', [LinkedUserController::class, 'searchUsers'])->name('admin.dashboard.search-users');
+        Route::post('/users/add-user/{id}', [LinkedUserController::class, 'linkUser'])->name('admin.dashboard.link-user');
+        Route::delete('/users/delete-user/{id}', [LinkedUserController::class, 'deleteUser'])->name('admin.dashboard.delete-user');
+    });
 
     // Notes
+    //TODO - Finish
     Route::prefix('/dashboard/{dashboardType}')->group(function () {
         Route::get('/notes', [NoteController::class, 'showNotes'])->name('admin.dashboard.show-notes');
         Route::get('/note-items', [NoteController::class, 'getNotes'])->name('admin.dashboard.note-items');
@@ -100,15 +105,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // Reviews
-    Route::get('/dashboard/promoter/reviews/{filter?}', [PromoterDashboardController::class, 'getPromoterReviews'])->name('admin.promoter.dashboard.get-reviews');
-    Route::get('/dashboard/promoter/filtered-reviews/{filter?}', [PromoterDashboardController::class, 'fetchReviews'])->name('admin.promoter.dashboard.fetch-reviews');
-    Route::get('/dashboard/promoter/reviews/pending', [PromoterDashboardController::class, 'showPendingPromoterReviews'])->name('admin.promoter.dashboard.show-pending-reviews');
-    Route::get('/dashboard/promoter/reviews/all', [PromoterDashboardController::class, 'showAllPromoterReviews'])->name('admin.promoter.dashboard.show-all-reviews');
-    Route::post('/dashboard/promoter/approve-display-promoter/{reviewId}', [PromoterDashboardController::class, 'approveDisplayPromoterReview'])->name('admin.promoter.dashboard.approve-display-review');
-    Route::post('/promoter/dashboard/hide-display-review/{reviewId}', [PromoterDashboardController::class, 'hidePromoterReview'])->name('admin.promoter.dashboard.hide-display-review');
-    Route::post('/dashboard/promoter/approve-promoter/{reviewId}', [PromoterDashboardController::class, 'approvePromoterReview'])->name('admin.promoter.dashboard.approve-pending-review');
-    Route::post('/promoter/dashboard/unapprove-review/{reviewId}', [PromoterDashboardController::class, 'unapprovePromoterReview'])->name('admin.promoter.dashboard.unapprove-review');
-    Route::delete('/dashboard/promoter/delete-review/{reviewId}', [PromoterDashboardController::class, 'deletePromoterReview'])->name('admin.promoter.dashboard.delete-review');
+    Route::prefix('/dashboard/{dashboardType}')->group(function () {
+        Route::get('/reviews/{filter?}', [ReviewController::class, 'getPromoterReviews'])->name('admin.dashboard.get-reviews');
+        Route::get('/filtered-reviews/{filter?}', [ReviewController::class, 'fetchReviews'])->name('admin.dashboard.fetch-reviews');
+        Route::get('/reviews/pending', [ReviewController::class, 'showPendingReviews'])->name('admin.dashboard.show-pending-reviews');
+        Route::get('/reviews/all', [ReviewController::class, 'showAllReviews'])->name('admin.dashboard.show-all-reviews');
+        Route::post('/approve-display/{reviewId}', [ReviewController::class, 'approveDisplayReview'])->name('admin.dashboard.approve-display-review');
+        Route::post('/hide-display-review/{reviewId}', [ReviewController::class, 'hideReview'])->name('admin.dashboard.hide-display-review');
+        Route::post('/approve/{reviewId}', [ReviewController::class, 'approveReview'])->name('admin.dashboard.approve-pending-review');
+        Route::post('/unapprove-review/{reviewId}', [ReviewController::class, 'unapproveReview'])->name('admin.dashboard.unapprove-review');
+        Route::delete('/delete-review/{reviewId}', [ReviewController::class, 'deleteReview'])->name('admin.dashboard.delete-review');
+    });
 
     // Documents
     Route::prefix('/dashboard/{dashboardType}')->group(function () {

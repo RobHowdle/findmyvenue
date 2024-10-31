@@ -32,7 +32,7 @@
               class="{{ request()->is('dashboard/promoter/todo-list*') ? ' border-b-yns_yellow' : '' }} inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:border-b-yns_yellow hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Todo
               List</a>
 
-            <a href="{{ route('admin.promoter.dashboard.get-reviews', ['filter' => 'all', 'dashboardType' => 'promoter']) }}"
+            <a href="{{ route('admin.dashboard.get-reviews', ['filter' => 'all', 'dashboardType' => 'promoter']) }}"
               data-filter="all"
               class="{{ request()->is('dashboard/promoter/reviews*') ? ' border-b-yns_yellow' : '' }} inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:border-b-yns_yellow hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Reviews</a>
 
@@ -51,6 +51,9 @@
               List</a>
             <a href="{{ route('admin.dashboard.show-notes', ['dashboardType' => 'band']) }}"
               class="{{ request()->is('dashboard/band/notes*') ? ' border-b-yns_yellow' : '' }} inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:border-b-yns_yellow hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Notes</a>
+            <a href="{{ route('admin.dashboard.get-reviews', ['filter' => 'all', 'dashboardType' => 'band']) }}"
+              data-filter="all"
+              class="{{ request()->is('dashboard/band/reviews*') ? ' border-b-yns_yellow' : '' }} inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:border-b-yns_yellow hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow">Reviews</a>
           @endcan
 
           @can(['manage_band', 'manage_photographer', 'manage_designer'])
