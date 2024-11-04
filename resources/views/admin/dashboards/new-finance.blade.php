@@ -1,6 +1,6 @@
-<x-app-layout>
+<x-app-layout :dashboardType="$dashboardType" :modules="$modules">
   <x-slot name="header">
-    {{-- <x-sub-nav :promoterId="$promoter->id" /> --}}
+    <x-sub-nav :userId="$userId" />
   </x-slot>
 
   <div class="mx-auto w-full max-w-screen-2xl py-16">
@@ -115,8 +115,9 @@
               class="mt-8 rounded-lg border border-white bg-white px-4 py-2 font-heading text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">Add
               Row
               <span class="fas fa-plus"></span></button>
-            <button type="submit"
-              class="mt-8 flex w-full justify-center rounded-lg border border-yns_cyan bg-yns_cyan px-4 py-2 font-heading text-xl text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">Save</button>
+            <div class="group mt-4">
+              <x-button type="submit" label="Save"></x-button>
+            </div>
           </form>
         </div>
         <div class="bg-yns_dark_blue px-8 py-8">
@@ -157,6 +158,8 @@
       incomeTotal = 0,
       outgoingTotal = 0,
       profitTotal = 0;
+    const dashboardType = "{{ $dashboardType }}";
+
 
     function calculateTotals() {
       desiredProfit = parseFloat($('#desired_profit').val()) || 0;
@@ -287,7 +290,8 @@
 
       // AJAX request
       $.ajax({
-        url: '{{ route('promoter.dashboard.finances.saveNew') }}',
+        url: "{{ route('admin.dashboard.store-new-finance', ['dashboardType' => ':dashboardType']) }}"
+          .replace(':dashboardType', dashboardType),
         type: 'POST',
         data: formData,
         contentType: false,
@@ -295,6 +299,9 @@
         success: function(response) {
           if (response.success === true) {
             showSuccessNotification(response.message);
+            setTimeout(() => {
+              window.location.href = response.redirect_url;
+            }, 2000);
           } else {
             if (Array.isArray(response.message)) {
               response.message.forEach(function(error) {

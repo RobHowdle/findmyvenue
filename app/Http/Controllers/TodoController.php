@@ -17,7 +17,8 @@ class TodoController extends Controller
 
     public function showTodos($dashboardType, Request $request)
     {
-        // Load the authenticated user with their associated promoters and todos
+        $modules = collect(session('modules', []));
+
         $user = Auth::user()->load(['promoters', 'todos', 'otherService']);
 
         $perPage = 6;
@@ -48,6 +49,7 @@ class TodoController extends Controller
         return view('admin.dashboards.todo-list', [
             'userId' => $this->getUserId(),
             'dashboardType' => $dashboardType,
+            'modules' => $modules,
             'todoItems' => $todoItems,
         ]);
     }

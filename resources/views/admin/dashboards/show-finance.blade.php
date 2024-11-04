@@ -1,6 +1,6 @@
-<x-app-layout>
+<x-app-layout :dashboardType="$dashboardType" :modules="$modules">
   <x-slot name="header">
-    {{-- <x-sub-nav :promoterId="$promoter->id" /> --}}
+    <x-sub-nav :userId="$userId" />
   </x-slot>
 
   <div class="mx-auto w-full max-w-screen-2xl py-16">
@@ -11,10 +11,11 @@
             <div class="mb-8 flex flex-row items-center justify-between">
               <p class="font-heading text-3xl font-bold">Finance Record: #{{ $finance->id }}</p>
               <div class="group flex gap-4">
-                <a href="{{ route('promoter.dashboard.finances.edit', $finance->id) }}"
+                <a href="{{ route('admin.dashboard.edit-finance', ['dashboardType' => $dashboardType, 'id' => $finance->id]) }}"
                   class="rounded-lg border bg-white px-4 py-2 font-bold text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">Edit<span
                     class="fas fa-edit ml-2"></span></a>
-                <form action="{{ route('promoter.dashboard.finances.exportSingleFinanceRecord', $finance->id) }}"
+                <form
+                  action="{{ route('admin.dashboard.export-finance', ['dashboardType' => $dashboardType, 'finance' => $finance->id]) }}"
                   method="POST">
                   @csrf
                   <button type="submit"

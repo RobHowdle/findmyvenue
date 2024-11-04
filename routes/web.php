@@ -8,6 +8,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\VenueController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\DocumentController;
@@ -17,10 +18,10 @@ use App\Http\Controllers\LinkedUserController;
 use App\Http\Controllers\APIRequestsController;
 use App\Http\Controllers\BandJourneyController;
 use App\Http\Controllers\OtherServiceController;
-use App\Http\Controllers\BandDashboardController;
-use App\Http\Controllers\PromoterDashboardController;
-use App\Http\Controllers\VenueDashboardController;
 use App\Http\Controllers\VenueJourneyController;
+use App\Http\Controllers\BandDashboardController;
+use App\Http\Controllers\VenueDashboardController;
+use App\Http\Controllers\PromoterDashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -102,14 +103,14 @@ Route::middleware(['auth', 'web', 'verified'])->group(function () {
 
     // Finances
     Route::prefix('/dashboard/{dashboardType}')->group(function () {
-        Route::get('/finances', [PromoterDashboardController::class, 'promoterFinances'])->name('promoter.dashboard.finances');
-        Route::get('/finances/new-budget', [PromoterDashboardController::class, 'createNewPromoterBudget'])->name('promoter.dashboard.finances.new');
-        Route::post('/finances/save-budget', [PromoterDashboardController::class, 'saveNewPromoterBudget'])->name('promoter.dashboard.finances.saveNew');
-        Route::post('/finances/export', [PromoterDashboardController::class, 'exportFinances'])->name('promoter.dashboard.finances.export');
-        Route::get('/finances/{id}', [PromoterDashboardController::class, 'showSingleFinance'])->name('promoter.dashboard.finances.show');
-        Route::get('/finances/{id}/edit', [PromoterDashboardController::class, 'editSingleFinance'])->name('promoter.dashboard.finances.edit');
-        Route::patch('/finances/{finance}', [PromoterDashboardController::class, 'updateSingleFinance'])->name('promoter.dashboard.finances.update');
-        Route::post('/finances/{finance}', [PromoterDashboardController::class, 'exportSingleFinanceRecord'])->name('promoter.dashboard.finances.exportSingleFinanceRecord');
+        Route::get('/finances', [FinanceController::class, 'showFinances'])->name('admin.dashboard.show-finances');
+        Route::get('/finances/new-budget', [FinanceController::class, 'createFinance'])->name('admin.dashboard.create-new-finance');
+        Route::post('/finances/save-budget', [FinanceController::class, 'storeFinance'])->name('admin.dashboard.store-new-finance');
+        Route::post('/finances/export', [FinanceController::class, 'exportFinances'])->name('admin.dashboard.finances.export');
+        Route::get('/finances/{id}', [FinanceController::class, 'showSingleFinance'])->name('admin.dashboard.show-finance');
+        Route::get('/finances/{id}/edit', [FinanceController::class, 'editFinance'])->name('admin.dashboard.edit-finance');
+        Route::patch('/finances/{finance}', [FinanceController::class, 'updateFinance'])->name('admin.dashboard.update-finances');
+        Route::post('/finances/{finance}', [FinanceController::class, 'exportSingleFinance'])->name('admin.dashboard.export-finance');
     });
 
 

@@ -35,7 +35,7 @@
       </div>
     </div>
 
-    {{-- <div class="relative shadow-md sm:rounded-lg">
+    <div class="relative shadow-md sm:rounded-lg">
       <div
         class="min-w-screen-xl mx-auto max-w-screen-xl rounded-lg bg-yns_dark_gray px-16 py-12 text-center text-white">
         <p class="mb-8 font-heading text-xl font-bold">Quick Links</p>
@@ -52,7 +52,7 @@
               class="fas fa-calendar-alt mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-yns_yellow"></span>
             New Event
           </a>
-          <a href="{{ route('promoter.dashboard.finances.new', ['dashboardType' => $dashboardType]) }}"
+          <a href="{{ route('admin.dashboard.create-new-finance', ['dashboardType' => $dashboardType]) }}"
             class="group flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-yns_yellow">
             <span
               class="fas fa-pound-sign mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-yns_yellow"></span>
@@ -83,7 +83,7 @@
               class="fas fa-calendar-alt mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-yns_yellow"></span>
             Events
           </a>
-          <a href="{{ route('promoter.dashboard.finances', ['dashboardType' => $dashboardType]) }}"
+          <a href="{{ route('admin.dashboard.show-finances', ['dashboardType' => $dashboardType]) }}"
             class="group flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-yns_yellow">
             <span
               class="fas fa-pound-sign mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-yns_yellow"></span>
@@ -103,6 +103,6 @@
           </a>
         </div>
       </div>
-    </div> --}}
+    </div>
   </div>
 </x-app-layout>

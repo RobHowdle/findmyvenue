@@ -15,7 +15,7 @@
           @php
             $links = [
                 'manage_venue' => [
-                    'finances' => route('promoter.dashboard.finances', ['dashboardType' => $dashboardType]),
+                    'finances' => route('admin.dashboard.show-finances', ['dashboardType' => $dashboardType]),
                     'events' => route('admin.dashboard.show-events', ['dashboardType' => $dashboardType]),
                     'todo_list' => route('admin.dashboard.todo-list', ['dashboardType' => $dashboardType]),
                     'reviews' => route('admin.dashboard.get-reviews', [
@@ -25,21 +25,24 @@
                     'notes' => route('admin.dashboard.show-notes', ['dashboardType' => $dashboardType]),
                 ],
                 'manage_promoter' => [
-                    'finances' => route('promoter.dashboard.finances', ['dashboardType' => 'promoter']),
-                    'events' => route('admin.dashboard.show-events', ['dashboardType' => 'promoter']),
-                    'todo_list' => route('admin.dashboard.todo-list', ['dashboardType' => 'promoter']),
+                    'finances' => route('admin.dashboard.show-finances', ['dashboardType' => $dashboardType]),
+                    'events' => route('admin.dashboard.show-events', ['dashboardType' => $dashboardType]),
+                    'todo_list' => route('admin.dashboard.todo-list', ['dashboardType' => $dashboardType]),
                     'reviews' => route('admin.dashboard.get-reviews', [
                         'filter' => 'all',
-                        'dashboardType' => 'promoter',
+                        'dashboardType' => $dashboardType,
                     ]),
-                    'notes' => route('admin.dashboard.show-notes', ['dashboardType' => 'promoter']),
+                    'notes' => route('admin.dashboard.show-notes', ['dashboardType' => $dashboardType]),
                 ],
                 'manage_band' => [
-                    'documents' => route('admin.dashboard.documents.index', ['dashboardType' => 'band']),
-                    'events' => route('admin.dashboard.show-events', ['dashboardType' => 'band']),
-                    'todo_list' => route('admin.dashboard.todo-list', ['dashboardType' => 'band']),
-                    'reviews' => route('admin.dashboard.get-reviews', ['filter' => 'all', 'dashboardType' => 'band']),
-                    'notes' => route('admin.dashboard.show-notes', ['dashboardType' => 'band']),
+                    'documents' => route('admin.dashboard.documents.index', ['dashboardType' => $dashboardType]),
+                    'events' => route('admin.dashboard.show-events', ['dashboardType' => $dashboardType]),
+                    'todo_list' => route('admin.dashboard.todo-list', ['dashboardType' => $dashboardType]),
+                    'reviews' => route('admin.dashboard.get-reviews', [
+                        'filter' => 'all',
+                        'dashboardType' => $dashboardType,
+                    ]),
+                    'notes' => route('admin.dashboard.show-notes', ['dashboardType' => $dashboardType]),
                 ],
             ];
           @endphp

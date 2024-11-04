@@ -17,6 +17,8 @@ class ReviewController extends Controller
 
     public function getPromoterReviews($dashboardType, $filter = 'all')
     {
+        $modules = collect(session('modules', []));
+
         switch ($filter) {
             case 'pending':
                 $filter = 'pending';
@@ -29,6 +31,7 @@ class ReviewController extends Controller
         return view('admin.dashboards.show-reviews', [
             'userId' => $this->getUserId(),
             'dashboardType' => $dashboardType,
+            'modules' => $modules,
             'filter' => $filter,
         ]);
     }

@@ -20,6 +20,7 @@ class NoteController extends Controller
 
     public function showNotes($dashboardType, Request $request)
     {
+        $modules = collect(session('modules', []));
         $user = Auth::user()->load(['promoters', 'todos', 'otherService']);
         $perPage = 6;
         $page = $request->input('page', 1);
@@ -48,6 +49,7 @@ class NoteController extends Controller
         return view('admin.dashboards.show-notes', [
             'userId' => $this->getUserId(),
             'dashboardType' => $dashboardType,
+            'modules' => $modules,
             'notes' => $notes
         ]);
     }

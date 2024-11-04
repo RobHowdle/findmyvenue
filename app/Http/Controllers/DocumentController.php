@@ -16,6 +16,7 @@ class DocumentController extends Controller
 
     public function index($dashboardType)
     {
+        $modules = collect(session('modules', []));
         $user = Auth::user()->load('roles');
         $role = $user->roles->first()->name;
         $service = $user->otherService(ucfirst($role))->first();
@@ -32,6 +33,7 @@ class DocumentController extends Controller
         return view('admin.dashboards.show-documents', [
             'userId' => $this->getUserId(),
             'documents' => $documents,
+            'modules' => $modules,
             'dashboardType' => $dashboardType,
         ]);
     }

@@ -1,6 +1,6 @@
-<x-app-layout>
+<x-app-layout :dashboardType="$dashboardType" :modules="$modules">
   <x-slot name="header">
-    {{-- <x-sub-nav :promoter="$promoter" :promoterId="$promoter->id" /> --}}
+    <x-sub-nav :userId="$userId" />
   </x-slot>
 
   <div class="mx-auto w-full max-w-screen-2xl py-16">
@@ -9,9 +9,10 @@
         <div class="grid grid-cols-[1.25fr_1.75fr] rounded-lg border border-white">
           <div class="rounded-l-lg border-r border-r-white bg-yns_dark_blue px-8 py-8">
             <div class="mb-8 flex flex-row justify-between">
-              <a href="{{ route('promoter.dashboard.finances.export') }}" id="exportButton"
+              <a href="{{ route('admin.dashboard.finances.export', ['dashboardType' => $dashboardType]) }}"
+                id="exportButton"
                 class="rounded-lg border bg-yns_light_gray px-4 py-2 font-bold text-white transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">Export</a>
-              <a href="{{ route('promoter.dashboard.finances.new') }}"
+              <a href="{{ route('admin.dashboard.create-new-finance', ['dashboardType' => $dashboardType]) }}"
                 class="rounded-lg border bg-yns_light_gray px-4 py-2 font-bold text-white transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">New
                 Budget</a>
             </div>
@@ -53,8 +54,11 @@
 
 <script>
   $(document).ready(function() {
-    var serviceableId = '{{ $promoter->promoters()->first()->id }}';
-    var serviceableType = '{{ get_class($promoter->promoters->first()) }}';
+    var serviceableId = "{{ $service->id }}";
+    var serviceableType = "{{ $serviceType }}";
+
+    console.log(serviceableId,
+      serviceableType);
 
     // Initialize the date picker
     flatpickr("#date-picker", {
@@ -320,7 +324,7 @@
 
       // Make the AJAX request to export the data
       $.ajax({
-        url: '/dashboard/promoter/finances/export',
+        url: '/dashboard/{dashboardType}/finances/export',
         method: 'POST',
         data: graphData,
         headers: {
