@@ -6,7 +6,6 @@ use Closure;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Finance;
-use App\Models\PromoterReview;
 use Illuminate\View\Component;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\View\View;
@@ -49,6 +48,7 @@ class SubNav extends Component
      */
     public function renderRatingIcons($overallScore)
     {
+        $overallScore = 0;
         $output = '';
         $totalIcons = 5;
         $emptyIcon = asset('storage/images/system/ratings/empty.png');
@@ -56,7 +56,7 @@ class SubNav extends Component
         $hotIcon = asset('storage/images/system/ratings/hot.png');
 
         // Display 5 empty icons if there is no rating
-        if (is_null($overallScore) || $overallScore == 0) {
+        if (is_null($overallScore) || $overallScore <= 0.1) {
             return str_repeat('<img src="' . $emptyIcon . '" alt="Empty Icon" />', $totalIcons);
         }
 
@@ -85,7 +85,7 @@ class SubNav extends Component
                 $output .= '<img src="' . $emptyIcon . '" alt="Empty Icon" />';
             }
         }
-
+        dd($output);
         return $output;
     }
 
@@ -163,15 +163,26 @@ class SubNav extends Component
     {
         //
     }
-    private function loadVenueData(int $bandId)
+    private function loadVideographerData(int $bandId)
     {
         //
+    }
+    private function loadVenueData($user)
+    {
+        $venue = $user->venues()->first();
+        if ($venue) {
+            $this->venueId = $venue->id;
+            $this->eventsCountVenueYtd = $this->calculateEventsCountPromoterYtd($venue);
+            $this->totalProfitsVenueYtd = $this->calculateTotalProfitsPromoterYtd($venue);
+            $this->overallRatingVenue = $this->renderRatingIcons($this->venueId);
+        }
     }
     private function loadPhotographerData(int $bandId)
     {
         //
     }
 
+    // Promoter Calculations
     public function calculateTotalProfitsPromoterYtd($promoter)
     {
         if ($promoter) {
@@ -219,6 +230,7 @@ class SubNav extends Component
         return 0;
     }
 
+    // Band Calculations
     public function calculateGigsCountBandYtd($band)
     {
         if ($band) {
@@ -247,6 +259,54 @@ class SubNav extends Component
         //
     }
 
+    // Venue Calculations
+    public function calculateTotalProfitsVenueYtd($venue)
+    {
+        if ($venue) {
+            $venueService = $venue->first();
+
+            if ($venueService) {
+                $startOfYear = Carbon::now()->startOfYear();
+                $endOfYear = Carbon::now()->endOfYear();
+
+                // Query the finances table for the current year's profits
+                $totalProfitsYTD = Finance::where('serviceable_id', $venueService->id)
+                    ->where('serviceable_type', 'App\Models\Venue')
+                    ->whereBetween('date_to', [$startOfYear, $endOfYear])
+                    ->sum('total_profit');
+
+                return $totalProfitsYTD;
+            }
+        }
+
+        // Return 0 if no promoter company or no profits found
+        return 0;
+    }
+
+    public function calculateEventsCountVenueYtd($venue)
+    {
+        if ($venue) {
+            $venueService = $venue->first();
+
+            if ($venueService) {
+                $startOfYear = Carbon::now()->startOfYear();
+                $endOfYear = Carbon::now()->endOfYear();
+
+                // Query the finances table for the current year's profits
+                $eventsCountYTD = DB::table('event_venue')
+                    ->join('events', 'event_venue.event_id', '=', 'events.id')
+                    ->where('venue_id', $venueService->id)
+                    ->whereBetween('events.event_date', [$startOfYear, $endOfYear])
+                    ->count();
+
+                return $eventsCountYTD;
+            }
+        }
+
+        // Return 0 if no promoter company or no profits found
+        return 0;
+    }
+
     /**
      * Get the view / contents that represent the component.
      */
@@ -260,6 +320,9 @@ class SubNav extends Component
             'totalProfitsBandYtd' => $this->totalProfitsBandYtd,
             'eventsCountPromoterYtd' => $this->userType === 'promoter' ? $this->eventsCountPromoterYtd : null,
             'totalProfitsPromoterYtd' => $this->totalProfitsPromoterYtd,
+            'totalProfitsVenueYtd' => $this->totalProfitsVenueYtd,
+            'eventsCountVenueYtd' => $this->eventsCountVenueYtd,
+            'overallRatingVenue' => $this->overallRatingVenue,
         ]);
     }
 }

@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout :dashboardType="$dashboardType" :modules="$modules">
   <x-slot name="header">
     <x-sub-nav :userId="$userId" />
   </x-slot>

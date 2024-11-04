@@ -1,3 +1,5 @@
+@props(['dashboardType', 'modules'])
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
@@ -61,7 +63,7 @@
   <div class="absolute inset-0 bg-cover bg-fixed bg-center bg-no-repeat"
     style="background-image: url('{{ asset('storage/images/system/hero-bg.jpg') }}'); z-index: -1;"></div>
   <div class="min-h-screen text-white">
-    @include('layouts.navigation')
+    @include('layouts.navigation', ['dashboardType' => $dashboardType, 'modules' => $modules])
 
     <!-- Page Heading -->
     @if (isset($header))

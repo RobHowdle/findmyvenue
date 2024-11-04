@@ -158,43 +158,111 @@
       event.preventDefault(); // Prevent the default form submission
 
       const formData = $(this).serialize(); // Serialize the form data
-      console.log(formData);
       $.ajax({
         type: 'POST',
         url: $(this).attr('action'), // Use the form's action attribute
         data: formData,
         success: function(response) {
-          showSuccessNotification(response.message); // Show success notification
+          console.log(response); // Log the entire response for debugging
+          if (response.message) {
+            window.showSuccessNotification(response.message); // Ensure message is defined
+          } else {
+            window.showSuccessNotification('Registration successful!'); // Fallback message
+          }
         },
         error: function(xhr) {
           if (xhr.responseJSON && xhr.responseJSON.errors) {
-            const errors = xhr.responseJSON.errors; // Get the errors from the response
-            console.log(xhr);
+            const errors = xhr.responseJSON.errors;
+            console.log(errors); // Log errors for debugging
 
-            // Check for compromised password error
             if (errors.password && errors.password.includes(
                 'This password has been compromised in a data breach. Please choose a different password.'
               )) {
-              showWarningNotification(errors.password[0]); // Show warning notification
+              window.showWarningNotification(errors.password[0]);
             } else if (xhr.status === 422) {
               // Handle validation errors
               for (const error in errors) {
                 if (errors.hasOwnProperty(error)) {
-                  showFailureNotification(errors[error][
-                    0
-                  ]); // Show the first error message for each field
+                  window.showFailureNotification(errors[error][0]); // Show the first error message
                 }
               }
             } else {
-              showFailureNotification('Registration failed. Please try again.'); // Handle other errors
+              window.showFailureNotification('Registration failed. Please try again.');
             }
           } else {
-            showFailureNotification('An unknown error occurred.'); // Fallback for any unknown error
+            window.showFailureNotification('An unknown error occurred.');
           }
         }
       });
     });
 
+    window.showSuccessNotification = function(message) {
+      Swal.fire({
+        showConfirmButton: false,
+        toast: true,
+        position: "top-end",
+        timer: 3000,
+        timerProgressBar: true,
+        customClass: {
+          popup: "bg-yns_dark_gray !important rounded-lg font-heading",
+          title: "text-black",
+          html: "text-black",
+        },
+        icon: "success",
+        title: "Success!",
+        text: message,
+      });
+    };
+
+    window.showFailureNotification = function(message) {
+      Swal.fire({
+        showConfirmButton: false,
+        toast: true,
+        position: "top-end",
+        timer: 3000,
+        timerProgressBar: true,
+        customClass: {
+          popup: "bg-yns_dark_gray !important rounded-lg font-heading",
+          title: "text-black",
+          html: "text-black",
+        },
+        icon: "error",
+        title: "Oops!",
+        text: message,
+      });
+    };
+
+    window.showWarningNotification = function(message) {
+      Swal.fire({
+        showConfirmButton: true,
+        toast: false,
+        customClass: {
+          popup: "bg-yns_dark_gray !important rounded-lg font-heading",
+          title: "text-yns_red",
+          html: "text-white",
+        },
+        icon: "warning",
+        title: "Warning!",
+        text: message,
+      });
+    };
+
+    window.showConfirmationNotification = function(options) {
+      return Swal.fire({
+        showConfirmButton: true,
+        confirmButtonText: "I understand",
+        showCancelButton: true,
+        toast: false,
+        customClass: {
+          popup: "bg-yns_dark_gray !important rounded-lg font-heading",
+          title: "text-white",
+          text: "text-white !important",
+        },
+        icon: "warning",
+        title: "Are you sure?",
+        text: options.text,
+      });
+    };
 
     // Other JavaScript code for password strength and requirements can stay the same
     document.addEventListener('DOMContentLoaded', function() {

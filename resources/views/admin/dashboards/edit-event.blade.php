@@ -1,6 +1,6 @@
-<x-app-layout>
+<x-app-layout :dashboardType="$dashboardType" :modules="$modules">
   <x-slot name="header">
-    {{-- <x-sub-nav :promoter="$promoter" :promoterId="$promoter->id" /> --}}
+    <x-sub-nav :userId="$userId" />
   </x-slot>
 
   <div class="mx-auto w-full max-w-screen-2xl py-16">
@@ -9,8 +9,7 @@
         <div class="header px-8 pt-8">
           <h1 class="mb-8 font-heading text-4xl font-bold">Edit Event</h1>
         </div>
-        <form id="eventForm" action="{{ route('admin.dashboard.promoter.single-event.update', $event->id) }}"
-          method="POST" enctype="multipart/form-data">
+        <form id="eventForm" method="POST" enctype="multipart/form-data" data-dashboard-type="{{ $dashboardType }}">
           @csrf
           @method('PUT')
           <div class="grid grid-cols-3 gap-x-8 px-8 py-8">
@@ -31,8 +30,7 @@
                   <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                 @enderror
               </div>
-
-              <div class="group mb-4">
+              <div class="group mb-4 hidden">
                 <x-input-label-dark>Date of Event</x-input-label-dark>
                 <span>This is supposed to be hidden...naughty naughty</span>
                 <x-date-input id="formattedEventDate" name="formattedEventDate"
@@ -41,7 +39,6 @@
                   <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                 @enderror
               </div>
-
               <div class="group mb-4">
                 <x-input-label-dark>Start Time</x-input-label-dark>
                 <span>This is supposed to be hidden...naughty naughty</span>
@@ -51,8 +48,7 @@
                   <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                 @enderror
               </div>
-
-              <div class="group mb-4">
+              <div class="group mb-4 hidden">
                 <x-input-label-dark>Promoter</x-input-label-dark>
                 <span>This is supposed to be hidden...naughty naughty</span>
                 <x-text-input class="w-auto" id="promoter_id" name="promoter_id" value="{{ $promoter->id }}"
@@ -61,7 +57,6 @@
                   <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                 @enderror
               </div>
-
               <div class="group mb-4">
                 <x-input-label-dark>End Time</x-input-label-dark>
                 <x-text-input class="w-auto" id="event_end_time" name="event_end_time"
@@ -70,7 +65,6 @@
                   <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                 @enderror
               </div>
-
               <div class="group mb-4">
                 <x-input-label-dark>Description</x-input-label-dark>
                 <x-textarea-input id="event_description" name="event_description"
@@ -79,7 +73,6 @@
                   <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                 @enderror
               </div>
-
               <div class="group mb-4">
                 <x-input-label-dark>Facebook Event Link</x-input-label-dark>
                 <x-text-input id="facebook_event_url" name="facebook_event_url"
@@ -98,6 +91,7 @@
               </div>
               <div class="group mb-4">
                 <x-input-label-dark>Door Ticket Price</x-input-label-dark>
+                <input type="hidden" name="existing_poster_url" value="{{ $event->poster_url }}">
                 <x-number-input-pound id="on_the_door_ticket_price" name="on_the_door_ticket_price"
                   value="{{ old('on_the_door_ticket_price', $event->on_the_door_ticket_price) }}"></x-number-input-pound>
                 @error('on_the_door_ticket_price')
@@ -209,16 +203,13 @@
                 </div>
               </div>
             </div>
-          </div>
-          <div class="flex justify-end px-8 py-4">
-            <x-primary-button class="rounded-full">Update Event</x-primary-button>
+            <x-button type="submit" class="text-center" label="Save" />
           </div>
         </form>
       </div>
     </div>
   </div>
 </x-app-layout>
-
 
 <script>
   flatpickr('#event_end_time', {
@@ -233,7 +224,7 @@
     dateFormat: "H:i",
     time_24hr: true,
   });
-  flatpickr('#merged_date_time', {
+  flatpickr('#combinedDateTime', {
     enableTime: true,
     dateFormat: "d-m-Y H:i",
     time_24hr: true,
@@ -423,7 +414,6 @@
     });
   });
 
-
   // Function to create a new band row
   function createBandRow() {
     bandRowCount++;
@@ -532,7 +522,6 @@
     });
   });
 
-
   // Search for bands and update suggestions
   function searchBand(query, suggestionsId, fieldType, hiddenInputId) {
     fetch(`/api/bands/search?name=${encodeURIComponent(query)}`)
@@ -571,7 +560,6 @@
         console.error('There was a problem with the fetch operation:', error);
       });
   }
-
 
   // Select a band from suggestions
   function selectBand(band, suggestionsId, fieldType, hiddenInputId) {
@@ -614,38 +602,79 @@
   }
 
   // Handle form submission
-  const eventForm = document.getElementById('eventForm'); // Replace with your actual form ID
-  eventForm.addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent the default form submission
+  document.getElementById('eventForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    console.log(document.getElementById('poster_url'));
+
+    const dashboardType = "{{ $dashboardType }}";
+    const otd_ticket_price = document.getElementById('on_the_door_ticket_price').value;
+    const event_date = document.getElementById('combinedDateTime').value;
+    const formattedDate = event_date.split(' ')[0];
+    const eventId = "{{ $event->id }}";
 
     const formData = new FormData(this); // Get form data
+    formData.delete('on_the_door_ticket_price');
+    formData.append('otd_ticket_price', otd_ticket_price);
+    formData.append('event_date', formattedDate);
+    const fileInput = document.getElementById('poster_url');
+    const file = fileInput.files[0]; // Get the uploaded file if one exists
 
-    // Send the AJAX request
-    fetch(eventForm.action, { // Use the action URL of the form
-        method: 'POST',
-        body: formData,
-        headers: {
-          'X-CSRF-TOKEN': '{{ csrf_token() }}' // Include the CSRF token
-        },
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
+    // Only append if there is a new file uploaded
+    if (file) {
+      console.log('Selected file name:', file.name);
+      console.log('Selected file type:', file.type);
+      // No need to manually append poster_url, as it's already in formData
+    } else {
+      // If no new file, the existing URL will be sent automatically if the field is empty
+      console.log('No new file uploaded, sending existing URL if present.');
+    }
+
+    if (fileInput.files.length === 0) {
+      formData.delete('poster_url');
+
+      const existingPosterUrl = document.querySelector('input[name="existing_poster_url"]').value;
+      formData.append('poster_url', existingPosterUrl); // Include existing poster URL
+    }
+
+    console.log('Form Data:', [...formData]);
+
+    $.ajax({
+      url: "{{ route('admin.dashboard.update-event', ['dashboardType' => ':dashboardType', 'id' => ':id']) }}"
+        .replace(':dashboardType', dashboardType)
+        .replace(':id', eventId),
+      method: 'POST',
+      data: formData,
+      contentType: false,
+      processData: false,
+      headers: {
+        'X-CSRF-TOKEN': '{{ csrf_token() }}' // Include the CSRF token
+      },
+      success: function(data) {
+        console.log('Data processed:', data); // Log the data
         if (data.success) {
-          showSuccessNotification(data.message)
+          showSuccessNotification(data.message); // Show success notification
+          setTimeout(() => {
+            console.log('Redirecting to:', data.redirect_url); // Log redirect URL
+            window.location.href = data.redirect_url; // Redirect after 2 seconds
+          }, 2000);
         } else {
-          Object.keys(data.errors).forEach(key => {
-            const error = data.errors[key];
-            showFailureNotification(error);
-          });
+          console.log('Errors:', data.errors); // Log any errors
+          if (data.errors) {
+            Object.keys(data.errors).forEach(key => {
+              const error = data.errors[key];
+              showFailureNotification(error); // Show error notification
+            });
+          } else {
+            showFailureNotification(
+              'An unexpected error occurred. Please try again.'); // General error message
+          }
         }
-      })
-      .catch(error => {
-        showFailureNotification(error);
-      });
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.error('AJAX error:', textStatus, errorThrown); // Log any AJAX errors
+        showFailureNotification('An error occurred: ' + errorThrown); // Show error notification
+      }
+    });
   });
 </script>

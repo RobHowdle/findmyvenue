@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout :dashboardType="$dashboardType" :modules="$modules">
   <div class="mx-auto w-full max-w-screen-2xl py-16">
     <div class="relative mb-8 shadow-md sm:rounded-lg">
       <div class="min-w-screen-xl mx-auto max-w-screen-xl rounded-lg bg-yns_dark_gray px-16 py-12 text-white">
@@ -346,8 +346,9 @@
               $('#promoter-results').append(
                 '<li class="flex px-2 flex-row items-center justify-between"><p>' +
                 promoter.name +
-                '</p><button class="bg-white text-black rounded-lg px-4 py-2 font-heading transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow" onclick="linkUserToPromoter(' +
-                promoter.id + ')">Link</button></li>');
+                '</p><button class="bg-white text-black rounded-lg px-4 py-2 font-heading transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow" data-id="' +
+                promoter.id +
+                '">Link</button></li>');
             });
             $('#create-promoter-form').fadeOut(500);
             $('#result-count').text(data.count + ' results found');
@@ -360,9 +361,15 @@
       });
     });
 
+    // Event delegation for dynamically created buttons
+    $('#promoter-results').on('click', 'button', function() {
+      const promoterId = $(this).data('id'); // Retrieve the id from data-id attribute
+      linkUserToPromoter(promoterId); // Call your function
+    });
+
     function linkUserToPromoter(promoterId) {
       $.ajax({
-        url: '{{ route('admin.dashboard.promoter.link') }}', // Add this route
+        url: '{{ route('admin.dashboard.promoter.link') }}',
         type: 'POST',
         data: {
           _token: '{{ csrf_token() }}',
@@ -372,12 +379,12 @@
           showSuccessNotification(response.message);
           setTimeout(function() {
             window.location.href = response.redirect_url;
-          }, 3000)
+          }, 3000);
         }
       });
     }
 
-    // Call this function after populating genres
-    populateGenres(genres); // Populate genres dynamically
+
+    populateGenres(genres);
   });
 </script>

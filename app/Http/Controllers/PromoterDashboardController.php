@@ -33,11 +33,12 @@ class PromoterDashboardController extends Controller
     /**
      * Return the Dashboard
      */
-    public function index()
+    public function index($dashboardType)
     {
+        $modules = collect(session('modules', []));
+
         $user = Auth::user()->load(['roles', 'promoters']);
         $service = 'Promoter';
-        $dashboardType = lcfirst($service);
         $pendingReviews = PromoterReview::with('promoter')->where('review_approved', '0')->whereNull('deleted_at')->count();
         $promoter = Auth::user()->load('promoters');
         $todoItemsCount = $promoter->promoters()->with(['todos' => function ($query) {
@@ -58,6 +59,7 @@ class PromoterDashboardController extends Controller
         return view('admin.dashboards.promoter-dash', [
             'userId' => $this->getUserId(),
             'dashboardType' => $dashboardType,
+            'modules' => $modules,
             'pendingReviews' => $pendingReviews,
             'todoItemsCount' => $todoItemsCount,
             'eventsCount' => $eventsCount,
@@ -65,7 +67,7 @@ class PromoterDashboardController extends Controller
     }
 
     /**
-     * Checking if the user is linked to a promotions record
+     * New Promoter - Linking to existing company/ create new one
      */
     public function searchExistingPromoters(Request $request)
     {
@@ -113,85 +115,11 @@ class PromoterDashboardController extends Controller
         }
 
 
-        return response()->json(['redirect_url' => route($userRole->name . '.dashboard'), 'message' => 'Successfully linked! Hold tight whilst we redirect you']);
+        return response()->json([
+            'redirect_url' => route('dashboard', ['dashboardType' => $userRole->name]),
+            'message' => 'Successfully linked! Hold tight whilst we redirect you'
+        ]);
     }
-
-    /**
-     * Events
-     */
-    // public function showPromoterEvents()
-    // {
-    //     $promoter = Auth::user()->promoters()->first();
-
-    //     // Fetch all upcoming events
-    //     $upcomingEvents = Event::where('event_date', '>', now())
-    //         ->orderBy('event_date', 'asc')
-    //         ->get(); // Get all upcoming events without pagination
-
-    //     // Set the initial count and check how many events there are
-    //     $totalUpcomingCount = $upcomingEvents->count();
-    //     $initialUpcomingEvents = $upcomingEvents->take(3); // Only take the first 3 for display
-
-    //     // Count past events
-    //     $totalPastCount = Event::where('event_date', '<=', now())->count();
-
-    //     // Fetch past events with pagination
-    //     $pastEvents = Event::where('event_date', '<=', now())
-    //         ->orderBy('event_date', 'desc')
-    //         ->paginate(3);
-
-    //     // Show the "Load More" button if there are more than 3 upcoming events
-    //     $showLoadMoreUpcoming = $totalUpcomingCount > 3;
-    //     $hasMorePast = $totalPastCount > 3; // You can also check if there are more than 3 past events
-
-    //     return view('admin.dashboards.promoter.promoter-events', compact('promoter', 'initialUpcomingEvents', 'pastEvents', 'showLoadMoreUpcoming', 'hasMorePast', 'totalUpcomingCount'));
-    // }
-
-    // public function loadMoreUpcomingEvents(Request $request)
-    // {
-    //     $promoter = Auth::user()->promoters()->first();
-
-    //     $currentPage = $request->input('page', 1);
-
-    //     $upcomingEvents = Event::where('event_date', '>', now())
-    //         ->orderBy('event_date')
-    //         ->paginate(3, ['*'], 'page', $currentPage);
-
-    //     $hasMorePages = $upcomingEvents->hasMorePages();
-
-    //     $html = '';
-    //     foreach ($upcomingEvents as $event) {
-    //         $html .= view('admin.dashboards.promoter.partials.event_card', ['promoter' => $promoter, 'event' => $event])->render();
-    //     }
-
-    //     return response()->json([
-    //         'html' => $html,
-    //         'hasMorePages' => $hasMorePages
-    //     ]);
-    // }
-
-    // public function loadMorePastEvents(Request $request)
-    // {
-    //     $promoter = Auth::user()->promoters()->first();
-
-    //     $currentPage = $request->input('page', 1);
-
-    //     $pastEvents = Event::where('event_date', '<', now())
-    //         ->orderBy('event_date')
-    //         ->paginate(3, ['*'], 'page', $currentPage);
-
-    //     $hasMorePages = $pastEvents->hasMorePages();
-
-    //     $html = '';
-    //     foreach ($pastEvents as $event) {
-    //         $html .= view('admin.dashboards.promoter.partials.event_card', ['promoter' => $promoter, 'event' => $event])->render();
-    //     }
-
-    //     return response()->json([
-    //         'html' => $html,
-    //         'hasMorePages' => $hasMorePages
-    //     ]);
-    // }
 
     public function showSinglePromoterEvent($id)
     {
@@ -405,7 +333,6 @@ class PromoterDashboardController extends Controller
             ->with('success', 'Event updated successfully!');
     }
 
-
     public function deleteSinglePromoterEvent($id)
     {
         $promoter = Auth::user()->promoters()->first();
@@ -425,149 +352,6 @@ class PromoterDashboardController extends Controller
             'message' => 'Event not found.'
         ], 404);
     }
-
-    // public function createNewPromoterEvent()
-    // {
-    //     $promoter = Auth::user()->promoters()->first();
-
-    //     return view('admin.dashboards.promoter.promoter-new-event', compact('promoter'));
-    // }
-
-    // public function storeNewPromoterEvent(Request $request)
-    // {
-    //     $promoter = Auth::user()->promoters()->first();
-    //     \Log::info($request->all());
-
-    //     try {
-    //         $validatedData = $request->validate([
-    //             'event_name' => 'required|string',
-    //             'event_date' => 'required|date_format:d-m-Y',
-    //             'event_start_time' => 'required|date_format:H:i',
-    //             'event_end_time' => 'nullable|date_format:H:i',
-    //             'event_description' => 'nullable',
-    //             'facebook_event_url' => 'nullable|url',
-    //             'ticket_url' => 'nullable|url',
-    //             'otd_ticket_price' => 'required|numeric',
-    //             'venue_id' => 'required|integer|exists:venues,id',
-    //             'headliner' => 'required|string',
-    //             'headliner_id' => 'required|integer',
-    //             'mainSupport' => 'required|string',
-    //             'main_support_id' => 'required|integer',
-    //             'band' => 'nullable|array',
-    //             'band.*' => 'nullable|string',
-    //             'band_id' => 'required|array',
-    //             'band_id.*' => 'required|integer',
-    //             'opener' => 'nullable|string',
-    //             'opener_id' => 'required|integer',
-    //             'poster_url' => 'required|image|mimes:jpeg,jpg,png,webp,svg|max:5120'
-    //         ]);
-
-    //         $bandsArray = [];
-
-    //         if (!empty($request->headliner)) {
-    //             $bandsArray[] = ['role' => 'Headliner', 'band_id' => $request->headliner_id];
-    //         }
-
-    //         if (!empty($request->mainSupport)) {
-    //             $bandsArray[] = ['role' => 'Main Support', 'band_id' => $request->main_support_id];
-    //         }
-
-    //         if (!empty($request->band_id)) {
-    //             foreach ($request->band_id as $bandId) {
-    //                 if (!empty($bandId)) {
-    //                     $bandsArray[] = ['role' => 'Band', 'band_id' => $bandId];
-    //                 }
-    //             }
-    //         }
-
-    //         if (!empty($request->opener)) {
-    //             $bandsArray[] = ['role' => 'Opener', 'band_id' => $request->opener_id];
-    //         }
-
-    //         // Correct Event Start Date/Time
-    //         $event_date = Carbon::createFromFormat('d-m-Y H:i:s', $validatedData['event_date'] . ' 00:00:00')->format('Y-m-d H:i:s');
-
-    //         // Poster Upload
-    //         $posterUrl = null;
-
-    //         if ($request->hasFile('poster_url')) {
-    //             // Get the uploaded image file
-    //             $eventPosterFile = $request->file('poster_url');
-
-    //             // Generate a unique filename based on the event name and extension
-    //             $eventName = $request->input('event_name');
-    //             $posterExtension = $eventPosterFile->getClientOriginalExtension() ?: $eventPosterFile->guessExtension();
-    //             $posterFilename = Str::slug($eventName) . '_poster.' . $posterExtension; // Adding '_poster' to the filename
-
-    //             // Specify the destination directory, ensure the correct folder structure
-    //             $destinationPath = public_path('images/event_posters/' . $promoter->id); // Create a folder for the promoter
-
-    //             // Check if the directory exists; if not, create it
-    //             if (!File::exists($destinationPath)) {
-    //                 File::makeDirectory($destinationPath, 0755, true); // Create directory with permissions
-    //             }
-
-    //             // Move the uploaded image to the specified directory
-    //             $eventPosterFile->move($destinationPath, $posterFilename);
-
-    //             // Construct the URL to the stored image
-    //             $posterUrl = 'images/event_posters/' . $promoter->id . '/' . $posterFilename;
-    //         }
-
-    //         // Main Event Creation
-    //         $event = Event::create([
-    //             'name' => $validatedData['event_name'],
-    //             'event_date' => $event_date,
-    //             'event_start_time' => $validatedData['event_start_time'],
-    //             'event_end_time' => $validatedData['event_end_time'],
-    //             'event_description' => $validatedData['event_description'],
-    //             'facebook_event_url' => $validatedData['facebook_event_url'],
-    //             'poster_url' => $posterUrl,
-    //             'band_ids' => json_encode($bandsArray),
-    //             'ticket_url' => $validatedData['ticket_url'],
-    //             'on_the_door_ticket_price' => $validatedData['otd_ticket_price'],
-    //         ]);
-
-    //         // Event Band Creation
-    //         if (!empty($bandsArray)) {
-    //             foreach ($bandsArray as $band) {
-    //                 $event->services()->attach($band['band_id'], ['event_id' => $event->id]);
-    //             }
-    //         }
-
-    //         // Event Venue Creation
-    //         if (isset($validatedData['venue_id'])) {
-    //             $event->venues()->attach($validatedData['venue_id'], ['event_id' => $event->id]);
-    //         }
-
-    //         // Event Promoter Creation
-    //         if (isset($promoter)) {
-    //             $event->promoters()->attach($promoter->id, ['event_id' => $event->id]);
-    //         }
-
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => 'Event created successfully',
-    //             'id' => $event->id,
-    //             'promoter' => $promoter->id
-    //         ], 201);
-    //     } catch (\Exception $e) {
-    //         Log::error('Error creating event: ' . $e->getMessage(), [
-    //             'success' => false,
-    //             'message' => 'Error creating event. Please try again.',
-    //             'request' => $request->all(),
-    //             'exception' => $e,
-    //         ]);
-
-    //         // Redirect back with an error message (optional)
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'There was an error creating the event. Please try again.',
-    //             'request' => $request->all(),
-    //             'exception' => $e->getMessage(),
-    //         ], 500);
-    //     }
-    // }
 
     public function eventSelectVenue(Request $request)
     {

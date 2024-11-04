@@ -20,14 +20,18 @@ class LinkedUserController extends Controller
 
     public function showUsers($dashboardType)
     {
+        $modules = collect(session('modules', []));
+
         return view('admin.dashboards.show-users', [
             'userId' => $this->getUserId(),
-            'dashboardType' => $dashboardType
+            'dashboardType' => $dashboardType,
+            'modules' => $modules
         ]);
     }
 
     public function getUsers($dashboardType)
     {
+        $modules = collect(session('modules', []));
         $user = Auth::user()->load(['promoters', 'otherService']);
 
         $relatedUsers = null;
@@ -42,11 +46,13 @@ class LinkedUserController extends Controller
             'userId' => $this->getUserId(),
             'dashboardType' => $dashboardType,
             'relatedUsers' => $relatedUsers,
+            'modules' => $modules,
         ]);
     }
 
     public function newUser($dashboardType)
     {
+        $modules = collect(session('modules', []));
         $user = Auth::user();
         $role = $user->roles->first()->name;
         $service = null;
@@ -92,11 +98,13 @@ class LinkedUserController extends Controller
             'dashboardType' => $dashboardType,
             'service' => $service,
             'currentServiceId' => $currentServiceId,
+            'modules' => $modules,
         ]);
     }
 
     public function searchUsers($dashboardType, Request $request)
     {
+        $modules = collect(session('modules', []));
         $user = Auth::user();
         $query = $request->input('query');
 
@@ -151,11 +159,13 @@ class LinkedUserController extends Controller
             'userId' => $this->getUserId(),
             'dashboardType' => $dashboardType,
             'result' => $result,
+            'modules' => $modules,
         ]);
     }
 
     public function linkUser($dashboardType, $id, Request $request)
     {
+        $modules = collect(session('modules', []));
         try {
             $userId = User::where('id', $id)->value('id');
             if (!$userId) {
@@ -196,6 +206,7 @@ class LinkedUserController extends Controller
 
     public function deleteUser(Request $request)
     {
+        $modules = collect(session('modules', []));
         $relatedUser = DB::table('service_user')
             ->where('user_id', $request->user_id)
             ->where('serviceable_id', $request->service_id)

@@ -19,6 +19,8 @@ use App\Http\Controllers\BandJourneyController;
 use App\Http\Controllers\OtherServiceController;
 use App\Http\Controllers\BandDashboardController;
 use App\Http\Controllers\PromoterDashboardController;
+use App\Http\Controllers\VenueDashboardController;
+use App\Http\Controllers\VenueJourneyController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,18 +55,50 @@ Route::get('/other/{serviceName}', [OtherServiceController::class, 'showGroup'])
 Route::get('/other/{serviceName}/{serviceId}', [OtherServiceController::class, 'show'])->name('singleService');
 Route::get('/other/filter', [OtherServiceController::class, 'filterCheckboxesSearch'])->name('other.filterCheckboxesSearch');
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    // Dashboards
+Route::middleware(['auth', 'web', 'verified'])->group(function () {
+    // Dashboards - Main Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
-    // Dashboards
+    // Dashboards - Role Based Dashboards
     Route::prefix('/dashboard')->group(function () {
-        Route::get('/promoter', [PromoterDashboardController::class, 'index'])->name('promoter.dashboard');
-        Route::get('/band', [BandDashboardController::class, 'index'])->name('band.dashboard');
-        // Route::get('/{dashboardType}', [VenueDashboardController::class, 'index'])->name('venue.dashboard');
+        Route::get('/{dashboardType}', function ($dashboardType) {
+            // Determine the appropriate controller based on the dashboard type
+            $controllerName = ucfirst($dashboardType) . 'DashboardController';
+
+            // Check if the controller class exists
+            if (class_exists("App\\Http\\Controllers\\$controllerName")) {
+                // Create an instance of the controller and call the index method
+                return app("App\\Http\\Controllers\\$controllerName")->index($dashboardType);
+            }
+
+            // Handle the case where the controller does not exist
+            abort(404);
+        })->name('dashboard');
     });
 
     Route::post('/dashboard/notes/store-note', [DashboardController::class, 'storeNewNote'])->name('dashboard.store-new-note');
+
+    // First Time User Routes
+    Route::prefix('/{dashboardType}')->middleware(['auth'])->group(function () {
+        Route::get('/band-journey', [BandJourneyController::class, 'index'])->name('band.journey');
+        Route::get('/band-search', [BandJourneyController::class, 'search'])->name('band.search');
+        Route::post('/band-journey/join/{id}', [BandJourneyController::class, 'joinBand'])->name('band.join');
+        Route::post('/band-journey/create', [BandJourneyController::class, 'createBand'])->name('band.create');
+    });
+
+    Route::prefix('/{dashboardType}')->middleware(['auth'])->group(function () {
+        Route::get('/users/search', [PromoterDashboardController::class, 'searchExistingPromoters'])->name('admin.dashboard.promoter.search');
+        Route::post('/link', [PromoterDashboardController::class, 'linkToExistingPromoter'])->name('admin.dashboard.promoter.link');
+        Route::post('/store', [PromoterDashboardController::class, 'storeNewPromoter'])->name('admin.dashboard.promoter.store');
+    });
+
+    Route::prefix('/{dashboardType}')->middleware(['auth'])->group(function () {
+        Route::get('/venue-journey', [VenueJourneyController::class, 'index'])->name('venue.journey');
+        Route::get('/venue-search', [VenueJourneyController::class, 'searchVenue'])->name('venue.search');
+        Route::get('/venue-select', [VenueJourneyController::class, 'selectVenue'])->name('venue.select');
+        Route::post('/venue-journey/link/{id}', [VenueJourneyController::class, 'linkVenue'])->name('venue.link');
+        Route::post('/venue/create', [VenueJourneyController::class, 'createVenue'])->name('venue.store');
+    });
 
     // Finances
     Route::prefix('/dashboard/{dashboardType}')->group(function () {
@@ -78,10 +112,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/finances/{finance}', [PromoterDashboardController::class, 'exportSingleFinanceRecord'])->name('promoter.dashboard.finances.exportSingleFinanceRecord');
     });
 
-    // Link User To Promoter
-    Route::get('/users/search', [PromoterDashboardController::class, 'searchExistingPromoters'])->name('admin.dashboard.promoter.search');
-    Route::post('/link', [PromoterDashboardController::class, 'linkToExistingPromoter'])->name('admin.dashboard.promoter.link');
-    Route::post('/store', [PromoterDashboardController::class, 'storeNewPromoter'])->name('admin.dashboard.promoter.store');
+
     // Users
     Route::prefix('/dashboard/{dashboardType}')->group(function () {
         Route::get('/users', [LinkedUserController::class, 'showUsers'])->name('admin.dashboard.users');
@@ -140,14 +171,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/events/store-event', [EventController::class, 'storeNewEvent'])->name('admin.dashboard.store-new-event');
         Route::get('/events/search-venues', [EventController::class, 'selectVenue'])->name('admin.dashboard.search-venues');
         Route::get('/events/search-promoters', [EventController::class, 'selectPromoter'])->name('admin.dashboard.search-promoters');
-        Route::get('/events/{id}', [EventController::class, 'showSingleEvent'])->name('admin.dashboard.show-event');
-        Route::get('/events/{id}/edit', [EventController::class, 'editSingleEvent'])->name('admin.dashboard.edit-event');
-
-        // Route::post('/dashboard/promoter/events/add-to-calendar', [CalendarController::class, 'addEventToCalendar'])->name('admin.dashboard.promoter.add-event-to-calendar');
-        // Route::get('/dashboard/promoter/events/{user}/check-linked-calendars', [CalendarController::class, 'checkLinkedCalendars']);
-        // Route::get('dashboard/promoter/events/{id}/edit', [PromoterDashboardController::class, 'editSinglePromoterEvent'])->name('admin.dashboard.promoter.single-event.edit');
-        // Route::put('dashboard/promoter/events/{id}/update', [PromoterDashboardController::class, 'updateSinglePromoterEvent'])->name('admin.dashboard.promoter.single-event.update');
-        // Route::delete('/dashboard/promoter/events/{id}', [PromoterDashboardController::class, 'deleteSinglePromoterEvent'])->name('admin.dashboard.promoter.delete-single-event');
+        Route::get('/events/{id}', [EventController::class, 'showEvent'])->name('admin.dashboard.show-event');
+        Route::get('/events/{id}/edit', [EventController::class, 'editEvent'])->name('admin.dashboard.edit-event');
+        Route::put('/events/{id}/update', [EventController::class, 'updateEvent'])->name('admin.dashboard.update-event');
+        Route::post('/events/{id}/add-to-calendar', [CalendarController::class, 'addEventToCalendar'])->name('admin.dashboard.add-event-to-calendar');
+        Route::get('/events/{user}/check-linked-calendars', [CalendarController::class, 'checkLinkedCalendars']);
+        Route::delete('/events/{id}/delete', [EventController::class, 'deleteEvent'])->name('admin.dashboard.delete-event');
     });
 
     // To-Do List
@@ -162,19 +191,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/band-journey', [BandJourneyController::class, 'index'])->name('band.journey');
-    Route::get('/band-search', [BandJourneyController::class, 'search'])->name('band.search');
-    Route::post('/band-journey/join', [BandJourneyController::class, 'joinBand'])->name('band.join');
-    Route::post('/band-journey/create', [BandJourneyController::class, 'createBand'])->name('band.create');
-});
+Route::middleware(['auth'])->group(function () {});
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile/events/{user}', [APIRequestsController::class, 'getUserCalendarEvents']);
     Route::get('profile/events/{user}/apple/sync', [CalendarController::class, 'syncAllEventsToAppleCalendar'])->name('apple.sync');
-    Route::get('/profile/{user}', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::put('/profile/{user}', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/profile/{dashboardType}/{id}', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile/{dashboardType}/{user}', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/profile/{dashboardType}/settings/', [ProfileController::class, 'settings'])->name('settings.index');
+    Route::post('/profile/{dashboardType}/settings/update', [ProfileController::class, 'updateModule'])->name('settings.updateModule');
+
 
     Route::get('auth/google', [CalendarController::class, 'redirectToGoogle'])->name('google.redirect');
     Route::get('auth/google/callback', [CalendarController::class, 'handleGoogleCallback']);

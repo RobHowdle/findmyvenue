@@ -47,7 +47,7 @@ class Event extends Model
 
     public function promoters()
     {
-        return $this->belongsToMany(Promoter::class, 'event_promoter');
+        return $this->belongsToMany(Promoter::class);
     }
 
     public function bands()
@@ -70,5 +70,20 @@ class Event extends Model
     public function attendees()
     {
         return $this->belongsToMany(User::class, 'event_user', 'event_id', 'user_id');
+    }
+
+    public function eventPromoters()
+    {
+        return $this->hasMany(EventPromoter::class);
+    }
+
+    public function eventVenues()
+    {
+        return $this->hasMany(EventVenue::class);
+    }
+
+    public function eventBands()
+    {
+        return $this->hasMany(EventBand::class);
     }
 }

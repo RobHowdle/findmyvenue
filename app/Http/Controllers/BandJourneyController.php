@@ -9,11 +9,22 @@ use App\Http\Requests\JoinBandRequest;
 
 class BandJourneyController extends Controller
 {
-    public function index()
+    protected function getUserId()
     {
+        return Auth::id();
+    }
+
+    public function index($dashboardType)
+    {
+        $modules = collect(session('modules', []));
         $bands = OtherService::bands()->get();
 
-        return view('admin.dashboards.band.band-journey', compact('bands'));
+        return view('admin.dashboards.band.band-journey', [
+            'userId' => $this->getUserId(),
+            'dashboardType' => $dashboardType,
+            'modules' => $modules,
+            'bands' => $bands,
+        ]);
     }
 
     public function search(Request $request)
@@ -31,22 +42,15 @@ class BandJourneyController extends Controller
         }
 
         $html = '';
-
         foreach ($bands as $band) {
-            $html .= '<tr>
-                <td class="border-b px-4 py-2">' . $band->name . '</td>
-                <td class="border-b px-4 py-2">
-                  <button class="join-band-btn rounded-md text-sm text-gray-600 underline hover:text-gray-900" 
-                          data-band-id="' . $band->id . '">Join</button>
-                </td>
-              </tr>';
+            $html .= view('admin.dashboards.partials.band-row', compact('band'))->render();
         }
 
         return response()->json(['html' => $html]);
     }
 
 
-    public function joinBand(Request $request)
+    public function joinBand($dashboardType, Request $request)
     {
         $bandId = $request->input('band_id');
         $user = Auth::user();
@@ -75,7 +79,7 @@ class BandJourneyController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Successfully joined the band!',
-            'redirect' => route('dashboard')
+            'redirect' => route('dashboard', ['dashboardType' => $dashboardType])
         ], 200);
     }
 

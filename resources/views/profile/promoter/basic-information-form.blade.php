@@ -3,7 +3,7 @@
     {{ __('Promoter Details') }}
   </h2>
 </header>
-<form method="POST" action="{{ route('profile.update', ['user' => $user->id]) }}"
+<form method="POST" action="{{ route('profile.update', ['dashboardType' => $dashboardType, 'user' => $user->id]) }}"
   class="grid grid-cols-3 gap-x-8 gap-y-8">
   @csrf
   @method('PUT')
@@ -18,7 +18,7 @@
 
     <div class="group mb-6">
       <x-input-label-dark>Where are you based?</x-input-label-dark>
-      <x-text-input id="address-input" name="address-input" value="{{ old('location', $location) }}"
+      <x-text-input id="address-input" name="address-input" value="{{ old('location', $promoterData['location']) }}"
         class="map-input"></x-text-input>
       @error('address-input')
         <p class="yns_red mt-1 text-sm">{{ $message }}</p>
@@ -53,7 +53,7 @@
 
     <div class="group mb-6">
       <x-input-label-dark for="phone">Phone</x-input-label-dark>
-      <x-text-input id="phone" name="phone" value="{{ old('phone', $phone) }}"></x-text-input>
+      <x-text-input id="phone" name="phone" value="{{ old('phone', $promoterData['phone']) }}"></x-text-input>
       @error('phone')
         <p class="yns_red mt-1 text-sm">{{ $message }}</p>
       @enderror
@@ -61,7 +61,7 @@
 
     <div class="group mb-6">
       <x-input-label-dark for="email">Email</x-input-label-dark>
-      <x-text-input id="email" name="email" value="{{ old('email', $email) }}"></x-text-input>
+      <x-text-input id="email" name="email" value="{{ old('email', $promoterData['email']) }}"></x-text-input>
       @error('email')
         <p class="yns_red mt-1 text-sm">{{ $message }}</p>
       @enderror
@@ -69,7 +69,7 @@
   </div>
 
   <div class="col-start-2 col-end-3">
-    @foreach ($platforms as $platform => $links)
+    @foreach ($promoterData['platforms'] as $platform => $links)
       <div class="group mb-6">
         <x-input-label-dark for="{{ $platform }}">{{ ucfirst($platform) }}:</x-input-label-dark>
 
@@ -88,7 +88,6 @@
           </x-text-input>
         @endif
 
-        {{-- Optional: Display an error message for each platform --}}
         @error('contact_links.' . $platform . '.*')
           <p class="yns_red mt-1 text-sm">{{ $message }}</p>
         @enderror
@@ -100,7 +99,6 @@
   <div class="col-start-3 col-end-4">
     <div class="group mb-6">
       <x-input-label-dark for="logo">Logo</x-input-label-dark>
-      <img src="{{ asset($logo) }}" alt="{{ $promoterName }} Logo" class="_250img rounded-lg border border-white">
       <x-input-file id="logo" name="logo" class="mt-4"></x-input-file>
       @error('promoterName')
         <p class="yns_red mt-1 text-sm">{{ $message }}</p>

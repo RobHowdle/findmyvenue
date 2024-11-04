@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
+use App\Models\UserModuleSetting;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
@@ -13,71 +14,74 @@ use App\Http\Requests\ProfileUpdateRequest;
 
 class ProfileController extends Controller
 {
+    protected function getUserId()
+    {
+        return Auth::id();
+    }
+
     /**
      * Display the user's profile form.
      */
-    public function edit(User $user): View
+    public function edit($dashboardType, $user): View
     {
+        $modules = collect(session('modules', []));
+        $user = User::where('id', $user)->first();
         $roles = Role::where('name', '!=', 'administrator')->get();
         $userRole = $user->roles;
         $name = $user->name;
         $email = $user->email;
-        $promoter = $user->promoters()->first();
 
-        $promoterName = $promoter ? $promoter->name : '';
-        $location = $promoter ? $promoter->location : '';
-        $logo = $promoter ? $promoter->logo_url : 'images/system/yns_logo.png';
-        $phone = $promoter ? $promoter->contact_number : '';
-        $email = $promoter ? $promoter->contact_email : '';
-        $contactLinks = $promoter ? $promoter->contact_link : [];
+        // Initialize promoter variables
+        $promoterData = [];
+        $bandData = [];
 
-        if ($contactLinks) {
-            $contactLinks = json_decode($promoter->contact_link, true);
+        // Check if the dashboardType is 'promoter' and get promoter data
+        if ($dashboardType === 'promoter') {
+            $promoterData = $this->getPromoterData($user);
+        } elseif ($dashboardType === 'band') {
+            $bandData = $this->getBandData($user);
         }
 
-        $platforms = [];
+        // Load the modules configuration
+        $modules = collect(config('modules.modules'))->map(function ($module) {
+            $module['is_enabled'] = $module['enabled'] ?? false; // Map 'enabled' to 'is_enabled'
+            return $module;
+        })->toArray();
 
-        // Define the platforms to check against
-        $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+        // Prepare an array to store the modules with their settings
+        $modulesWithSettings = [];
 
-        // Initialize platform array
-        foreach ($platformsToCheck as $platform) {
-            $platforms[$platform] = [];
+        foreach ($modules as $key => $module) {
+            // Include only the enabled modules
+            $modulesWithSettings[$key] = [
+                'name' => $module['name'],
+                'description' => $module['description'],
+                'is_enabled' => $module['is_enabled'],
+            ];
         }
 
-        // Process contact links
-        if (is_array($contactLinks)) {
-            foreach ($contactLinks as $platform => $links) {
-                if (array_key_exists($platform, $platforms)) {
-                    $platforms[$platform] = array_merge($platforms[$platform], $links);
-                }
-            }
-        }
+        $modulesWithSettings = $this->getModulesWithSettings($user, $dashboardType);
 
-        $about = $promoter ? $promoter->description : '';
-        $myVenues = $promoter ? $promoter->my_venues : '';
 
-        return view('profile.edit', compact([
-            'user',
-            'roles',
-            'userRole',
-            'name',
-            'email',
-            'promoter',
-            'promoterName',
-            'location',
-            'logo',
-            'phone',
-            'platforms',
-            'about',
-            'myVenues',
-        ]));
+        return view('profile.edit', [
+            'userId' => $this->getUserId(),
+            'dashboardType' => $dashboardType,
+            'modules' => $modules,
+            'promoterData' => $promoterData,
+            'bandData' => $bandData,
+            'user' => $user,
+            'roles' => $roles,
+            'userRole' => $userRole,
+            'name' => $name,
+            'email' => $email,
+            'modules' => $modulesWithSettings,
+        ]);
     }
 
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request, $userId): RedirectResponse
+    public function update($dashboardType, ProfileUpdateRequest $request, $userId): RedirectResponse
     {
         $user = User::findOrFail($userId);
         $userData = $request->validated();
@@ -116,5 +120,143 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    protected function getModulesWithSettings($user, $dashboardType)
+    {
+        // Load all modules from config
+        $modules = config('modules.modules');
+
+        // Get user-specific enabled modules from the session
+        $userModules = collect(session('modules', [])); // This should contain user's active modules
+        $modulesWithSettings = [];
+
+        foreach ($modules as $moduleKey => $module) {
+            // Check if the user has this module enabled
+            $isEnabled = $userModules->has($moduleKey) && $userModules->get($moduleKey)['is_enabled'] ?? false;
+
+            // Add the module to the settings array
+            $modulesWithSettings[$module['name']] = [
+                'description' => $module['description'], // Include the description
+                'is_enabled' => $isEnabled, // Directly set the enabled status
+            ];
+        }
+
+        return $modulesWithSettings;
+    }
+
+
+    public function updateModule(Request $request)
+    {
+        // Validate the incoming request
+        $request->validate([
+            'module' => 'required|string',
+            'is_enabled' => 'required|boolean',
+        ]);
+
+        // Update the module settings in the database
+        $module = UserModuleSetting::where('module_name', $request->module)->first();
+
+        if ($module) {
+            $module->is_enabled = $request->is_enabled;
+            $module->save();
+
+            return response()->json(['success' => true, 'message' => 'Module updated successfully.']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Module not found.'], 404);
+    }
+
+
+    private function getPromoterData(User $user)
+    {
+        $promoter = $user->promoters()->first();
+
+        $promoterName = $promoter ? $promoter->name : '';
+        $location = $promoter ? $promoter->location : '';
+        $logo = $promoter ? $promoter->logo_url : 'images/system/yns_logo.png';
+        $phone = $promoter ? $promoter->contact_number : '';
+        $email = $promoter ? $promoter->contact_email : '';
+        $contactLinks = $promoter ? $promoter->contact_link : [];
+
+        if ($contactLinks) {
+            $contactLinks = json_decode($promoter->contact_link, true);
+        }
+
+        $platforms = [];
+        $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+
+        foreach ($platformsToCheck as $platform) {
+            $platforms[$platform] = [];
+        }
+
+        if (is_array($contactLinks)) {
+            foreach ($contactLinks as $platform => $links) {
+                if (array_key_exists($platform, $platforms)) {
+                    $platforms[$platform] = array_merge($platforms[$platform], $links);
+                }
+            }
+        }
+
+        $about = $promoter ? $promoter->description : '';
+        $myVenues = $promoter ? $promoter->my_venues : '';
+
+        return [
+            'promoter' => $promoter,
+            'promoterName' => $promoterName,
+            'location' => $location,
+            'logo' => $logo,
+            'phone' => $phone,
+            'platforms' => $platforms,
+            'about' => $about,
+            'myVenues' => $myVenues,
+            'email' => $email
+        ];
+    }
+
+    private function getBandData(User $user)
+    {
+        $band = $user->otherService("Band")->first();
+
+        $bandName = $band ? $band->name : '';
+        $location = $band ? $band->location : '';
+        $logo = $band ? $band->logo_url : 'images/system/yns_logo.png';
+        $phone = $band ? $band->contact_number : '';
+        $email = $band ? $band->contact_email : '';
+        $contactLinks = $band ? $band->contact_link : [];
+
+        if ($contactLinks) {
+            $contactLinks = json_decode($band->contact_link, true);
+        }
+
+        $platforms = [];
+        $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+
+        foreach ($platformsToCheck as $platform) {
+            $platforms[$platform] = [];
+        }
+
+        if (is_array($contactLinks)) {
+            foreach ($contactLinks as $platform => $links) {
+                if (array_key_exists($platform, $platforms)) {
+                    $platforms[$platform] = array_merge($platforms[$platform], $links);
+                }
+            }
+        }
+
+        $about = $band ? $band->description : '';
+        $myVenues = $band ? $band->my_venues : '';
+
+        return [
+            'band' => $band,
+            'bandName' => $bandName,
+            'location' => $location,
+            'logo' => $logo,
+            'phone' => $phone,
+            'platforms' => $platforms,
+            'about' => $about,
+            'myVenues' => $myVenues,
+            'email' => $email
+        ];
     }
 }

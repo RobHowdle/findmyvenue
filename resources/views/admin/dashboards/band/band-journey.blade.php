@@ -1,6 +1,6 @@
-<x-app-layout>
+<x-app-layout :dashboardType="$dashboardType" :modules="$modules">
   <x-slot name="header">
-    {{-- <x-sub-nav :promoterId="$promoter->id" /> --}}
+    <x-sub-nav :userId="$userId" />
   </x-slot>
 
   <div class="mx-auto w-full max-w-screen-2xl py-16">
@@ -23,10 +23,12 @@
         <div class="group mb-4">
           <h2 class="mb-4 text-xl font-semibold">Available Bands</h2>
           <table class="w-full border border-white text-left font-sans rtl:text-right" id="bandsTable">
-            <thead>
+            <thead class="underline">
               <tr>
-                <th class="border-b px-4 py-2">Band Name</th>
-                <th class="border-b px-4 py-2">Action</th>
+                <th scope="col" class="md-text-2xl sm:px-2 sm:py-2 sm:text-xl md:px-6 md:py-3 lg:px-8 lg:py-4">
+                  Band Name</th>
+                <th scope="col" class="md-text-2xl sm:px-2 sm:py-2 sm:text-xl md:px-6 md:py-3 lg:px-8 lg:py-4">
+                  Action</th>
               </tr>
             </thead>
             <tbody>
@@ -36,7 +38,7 @@
         </div>
 
         <h2 class="mb-4 text-xl font-semibold">Not seeing your band? Create a New Band!</h2>
-        <form action="{{ route('band.create') }}" method="POST" class="mb-4">
+        <form action="{{ route('band.create', ['dashboardType' => $dashboardType]) }}" method="POST" class="mb-4">
           @csrf
           <div class="mb-4">
             <label for="band_name" class="mb-1 block text-left text-sm font-medium">Band Name:</label>
@@ -51,10 +53,12 @@
 </x-app-layout>
 
 <script>
+  const dashboardType = "{{ $dashboardType }}";
+
   $(document).ready(function() {
     function fetchBands(query = '') {
       $.ajax({
-        url: '{{ route('band.search') }}',
+        url: `/${dashboardType}/band-search`,
         method: 'GET',
         data: {
           query: query
@@ -79,29 +83,31 @@
       let query = $(this).val();
       fetchBands(query);
     });
-  });
 
-  $(document).on('click', '.join-band-btn', function(e) {
-    e.preventDefault();
-    let bandId = $(this).data('band-id');
+    // Join band functionality
+    $(document).on('click', '.join-band-btn', function(e) {
+      e.preventDefault();
+      let bandId = $(this).data('band-id');
+      console.log(bandId);
 
-    $.ajax({
-      url: '{{ route('band.join') }}',
-      method: 'POST',
-      data: {
-        band_id: bandId,
-        _token: '{{ csrf_token() }}'
-      },
-      success: function(response) {
-        if (response.success) {
-          showSuccessNotification(response.message);
-          window.location.href = response.redirect;
+      $.ajax({
+        url: `/${dashboardType}/band-journey/join/${bandId}`,
+        method: 'POST',
+        data: {
+          band_id: bandId,
+          _token: '{{ csrf_token() }}'
+        },
+        success: function(response) {
+          if (response.success) {
+            showSuccessNotification(response.message);
+            window.location.href = response.redirect;
+          }
+        },
+        error: function(xhr) {
+          let errorMessage = xhr.responseJSON.message || 'Something went wrong!';
+          showFailureNotification(errorMessage);
         }
-      },
-      error: function(xhr) {
-        let errorMessage = xhr.responseJSON.message || 'Something went wrong!';
-        showFailureNotification(errorMessage);
-      }
+      });
     });
   });
 </script>

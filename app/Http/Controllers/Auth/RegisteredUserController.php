@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules;
+use App\Models\UserModuleSetting;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
@@ -57,6 +58,9 @@ class RegisteredUserController extends Controller
                     $user->assignRole($role->name);
                     Log::info('Assigned Role:', ['user_id' => $user->id, 'role_id' => $role->id, 'role_name' => $role->name]);
 
+                    // Set Default Modules based on Role
+                    $this->setDefaultModules($user, $role->name);
+
                     event(new Registered($user));
 
                     Auth::login($user);
@@ -105,5 +109,71 @@ class RegisteredUserController extends Controller
         }
 
         return back()->withInput()->withErrors(['role' => 'Role selection is required.']);
+    }
+
+    protected function setDefaultModules($user, $roleName)
+    {
+        Log::info('Setting default modules for user', ['user_id' => $user->id, 'role' => $roleName]);
+
+        // Define all available modules
+        $allModules = ['events', 'todo_list', 'notes', 'finances', 'documents', 'users', 'reviews'];
+
+        // Define default modules based on the user role
+        $defaultModules = [];
+        $serviceableType = '';
+        $role = Role::where('name', $roleName)->first();
+
+        switch ($role->name) {
+            case "standard": // Standard User
+                $defaultModules = []; // No default modules
+                break;
+
+            case "venue":
+            case "promoter":
+            case "band":
+                $defaultModules = $allModules; // All modules for these roles
+                $serviceableType = 'App\Models\\' . ucfirst($role->name);
+                break;
+
+            case "photographer":
+            case "designer":
+            case "videographer":
+                $defaultModules = ['todo_list', 'notes', 'finances', 'documents', 'reviews'];
+                $serviceableType = 'App\Models\OtherService';
+                break;
+
+            case "administrator":
+                $defaultModules = $allModules; // All modules for administrators
+                break;
+        }
+
+        // Create module settings for all modules, enabling only default ones
+        foreach ($allModules as $module) {
+            try {
+                $defaultSettings = UserModuleSetting::updateOrCreate(
+                    [
+                        'user_id' => $user->id,
+                        'serviceable_id' => $role ? $role->id : null,
+                        'serviceable_type' => $serviceableType,
+                        'module_name' => $module,
+                    ],
+                    [
+                        'is_enabled' => in_array($module, $defaultModules), // Enable if in default modules
+                    ]
+                );
+
+                Log::info('UserModuleSetting processed', [
+                    'user_id' => $user->id,
+                    'module_name' => $module,
+                    'is_enabled' => $defaultSettings->is_enabled,
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Failed to create UserModuleSetting', [
+                    'user_id' => $user->id,
+                    'module_name' => $module,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
     }
 }

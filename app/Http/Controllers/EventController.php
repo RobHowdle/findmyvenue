@@ -7,10 +7,12 @@ use App\Models\Event;
 use App\Models\Venue;
 use App\Models\Promoter;
 use Illuminate\Support\Str;
+use App\Models\OtherService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use App\Http\Requests\StoreUpdateEventRequest;
 
 class EventController extends Controller
 {
@@ -21,6 +23,7 @@ class EventController extends Controller
 
     public function showEvents($dashboardType)
     {
+        $modules = collect(session('modules', []));
         $user = Auth::user()->load(['roles', 'otherService']);
         $role = $user->roles->first()->name;
 
@@ -32,6 +35,7 @@ class EventController extends Controller
                     'user' => $user,
                     'userId' => $this->getUserId(),
                     'dashboardType' => $dashboardType,
+                    'modules' => $modules,
                     'initialUpcomingEvents' => collect(),
                     'pastEvents' => collect(),
                     'showLoadMoreUpcoming' => false,
@@ -53,6 +57,7 @@ class EventController extends Controller
                 'user' => $user,
                 'userId' => $this->getUserId(),
                 'dashboardType' => $dashboardType,
+                'modules' => $modules,
                 'initialUpcomingEvents' => collect(),
                 'pastEvents' => collect(),
                 'showLoadMoreUpcoming' => false,
@@ -109,6 +114,7 @@ class EventController extends Controller
             'user' => $user,
             'userId' => $this->getUserId(),
             'dashboardType' => $dashboardType,
+            'modules' => $modules,
             'initialUpcomingEvents' => $initialUpcomingEvents,
             'pastEvents' => $pastEvents,
             'showLoadMoreUpcoming' => $showLoadMoreUpcoming,
@@ -119,6 +125,8 @@ class EventController extends Controller
 
     public function loadMoreUpcomingEvents($dashboardType, Request $request)
     {
+        $modules = collect(session('modules', []));
+
         $user = Auth::user()->load('roles');
         $role = $user->getRoleNames()->first();
 
@@ -156,6 +164,8 @@ class EventController extends Controller
 
     public function loadMorePastEvents(Request $request)
     {
+        $modules = collect(session('modules', []));
+
         $promoter = Auth::user()->promoters()->first();
 
         $currentPage = $request->input('page', 1);
@@ -179,6 +189,8 @@ class EventController extends Controller
 
     public function createNewEvent($dashboardType)
     {
+        $modules = collect(session('modules', []));
+
         $user = Auth::user()->load(['roles', 'promoters', 'venues', 'otherService']);
         switch ($dashboardType) {
             case 'promoter':
@@ -208,11 +220,14 @@ class EventController extends Controller
             'role' => $role,
             'userId' => $this->getUserId(),
             'dashboardType' => $dashboardType,
+            'modules' => $modules,
         ]);
     }
 
     public function selectVenue($dashboardType, Request $request)
     {
+        $modules = collect(session('modules', []));
+
         $query = $request->input('query');
 
         if (!is_string($query) || strlen($query) < 3) {
@@ -237,6 +252,8 @@ class EventController extends Controller
 
     public function selectPromoter($dashboardType, Request $request)
     {
+        $modules = collect(session('modules', []));
+
         $query = $request->input('query');
 
         if (!is_string($query) || strlen($query) < 3) {
@@ -250,6 +267,8 @@ class EventController extends Controller
 
     public function storeNewEvent($dashboardType, Request $request)
     {
+        $modules = collect(session('modules', []));
+
         try {
             $validatedData = $request->validate([
                 'event_name' => 'required|string',
@@ -349,18 +368,36 @@ class EventController extends Controller
             // Event Band Creation
             if (!empty($bandsArray)) {
                 foreach ($bandsArray as $band) {
-                    $event->services()->attach($band['band_id'], ['event_id' => $event->id]);
+                    $event->services()->attach($band['band_id'], [
+                        'event_id' => $event->id,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ]);
                 }
             }
 
             // Event Venue Creation
             if (isset($validatedData['venue_id'])) {
-                $event->venues()->attach($validatedData['venue_id'], ['event_id' => $event->id]);
+                $event->venues()->attach(
+                    $validatedData['venue_id'],
+                    [
+                        'event_id' => $event->id,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ]
+                );
             }
 
             // Event Promoter Creation
             if (isset($promoter)) {
-                $event->promoters()->attach($promoter->id, ['event_id' => $event->id]);
+                $event->promoters()->attach(
+                    $promoter->id,
+                    [
+                        'event_id' => $event->id,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ]
+                );
             }
 
             return response()->json([
@@ -385,8 +422,10 @@ class EventController extends Controller
         }
     }
 
-    public function showSingleEvent($dashboardType, $id)
+    public function showEvent($dashboardType, $id)
     {
+        $modules = collect(session('modules', []));
+
         $user = Auth::user()->load(['roles', 'otherService']);
         $role = $user->roles->first()->name;
         $event = Event::with(['bands', 'promoters', 'venues', 'services'])->findOrFail($id);
@@ -428,6 +467,7 @@ class EventController extends Controller
         return view('admin.dashboards.show-event', [
             'userId' => $this->getUserId(),
             'dashboardType' => $dashboardType,
+            'modules' => $modules,
             'event' => $event,
             'isPastEvent' => $isPastEvent,
             'headliner' => $headliner,
@@ -439,8 +479,10 @@ class EventController extends Controller
         ]);
     }
 
-    public function editSingleEvent($id)
+    public function editEvent($dashboardType, $id)
     {
+        $modules = collect(session('modules', []));
+
         $promoter = Auth::user()->promoters()->first();
 
         $event = Event::with(['promoters', 'venues', 'services'])->findOrFail($id);
@@ -487,7 +529,10 @@ class EventController extends Controller
             }
         }
 
-        return view('admin.dashboards.promoter.promoter-edit-event', [
+        return view('admin.dashboards.edit-event', [
+            'userId' => $this->getUserId(),
+            'dashboardType' => $dashboardType,
+            'modules' => $modules,
             'event' => $event,
             'combinedDateTime' => $combinedDateTime,
             'promoter' => $promoter,
@@ -496,7 +541,166 @@ class EventController extends Controller
             'headliner' => $headliner,
             'mainSupport' => $mainSupport,
             'bandObjects' => $bandObjects,
-            'opener' => $opener
+            'opener' => $opener,
         ]);
+    }
+
+    public function updateEvent($dashboardType, StoreUpdateEventRequest $request, $eventId)
+    {
+        $modules = collect(session('modules', []));
+
+        try {
+            $user = Auth::user()->load('roles');
+            $role = $user->getRoleNames()->first();
+
+            // Find the existing event
+            $event = Event::findOrFail($eventId);
+
+            $bandsArray = [];
+
+            if ($request->has('promoter_id')) {
+                $promoter = Promoter::find($request->promoter_id);
+            }
+
+            if (!empty($request->headliner)) {
+                $bandsArray[] = ['role' => 'Headliner', 'band_id' => $request->headliner_id];
+            }
+
+            if (!empty($request->mainSupport)) {
+                $bandsArray[] = ['role' => 'Main Support', 'band_id' => $request->main_support_id];
+            }
+
+            if (!empty($request->band_id)) {
+                foreach ($request->band_id as $bandId) {
+                    if (!empty($bandId)) {
+                        $bandsArray[] = ['role' => 'Band', 'band_id' => $bandId];
+                    }
+                }
+            }
+
+            if (!empty($request->opener)) {
+                $bandsArray[] = ['role' => 'Opener', 'band_id' => $request->opener_id];
+            }
+
+            // Correct Event Start Date/Time
+            $event_date = Carbon::createFromFormat('d-m-Y H:i:s', $request->event_date . ' 00:00:00')->format('Y-m-d H:i:s');
+
+            // Poster Upload
+            $posterUrl = $event->poster_url;
+
+            if ($request->hasFile('poster_url')) {
+                $eventPosterFile = $request->file('poster_url');
+
+                $eventName = $request->input('event_name');
+                $posterExtension = $eventPosterFile->getClientOriginalExtension() ?: $eventPosterFile->guessExtension();
+                $posterFilename = Str::slug($eventName) . '_poster.' . $posterExtension; // Adding '_poster' to the filename
+
+                // Specify the destination directory
+                $destinationPath = public_path('images/event_posters/' . strtolower($role) . '/' . $user->id);
+
+                // Check if the directory exists; if not, create it
+                if (!File::exists($destinationPath)) {
+                    File::makeDirectory($destinationPath, 0755, true); // Create directory with permissions
+                }
+
+                // Move the uploaded image to the specified directory
+                $eventPosterFile->move($destinationPath, $posterFilename);
+
+                // Construct the URL to the stored image
+                $posterUrl = 'images/event_posters/' . strtolower($role) . '/' . $user->id . '/' . $posterFilename;
+            }
+
+            // Update the event
+            $event->update([
+                'user_id' => $user->id,
+                'name' => $request->event_name,
+                'event_date' => $event_date,
+                'event_start_time' => $request->event_start_time,
+                'event_end_time' => $request->event_end_time,
+                'event_description' => $request->event_description,
+                'facebook_event_url' => $request->facebook_event_url,
+                'poster_url' => $posterUrl,
+                'band_ids' => json_encode($bandsArray),
+                'ticket_url' => $request->ticket_url,
+                'on_the_door_ticket_price' => $request->otd_ticket_price,
+            ]);
+
+            // Sync Event Bands (attach or detach based on changes)
+            if (!empty($bandsArray)) {
+                $existingBandIds = $event->services()->pluck('band_id')->toArray();
+                $newBandIds = array_column($bandsArray, 'band_id');
+
+                // Attach new bands
+                foreach (array_diff($newBandIds, $existingBandIds) as $bandId) {
+                    $event->services()->attach($bandId, [
+                        'event_id' => $event->id,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ]);
+                }
+
+                // Detach removed bands
+                foreach (array_diff($existingBandIds, $newBandIds) as $bandId) {
+                    $event->services()->detach($bandId);
+                }
+            }
+
+            // Update Event Venue
+            if (isset($validatedData['venue_id'])) {
+                // If the venue has changed, detach the old one and attach the new one
+                if ($event->venues()->pluck('event_venue.id')->first() !== $validatedData['venue_id']) {
+                    $event->venues()->sync([$validatedData['venue_id'] => ['event_id' => $event->id]]);
+                }
+            }
+
+            // Update Event Promoter
+            if (isset($promoter)) {
+                // If the promoter has changed, detach the old one and attach the new one
+                if (!$event->promoters()->where('event_promoter.id', $promoter->id)->exists()) {
+                    $event->promoters()->sync([$promoter->id => ['event_id' => $event->id]]);
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Event updated successfully',
+                'redirect_url' => route('admin.dashboard.show-event', ['dashboardType' => $dashboardType, 'id' => $event->id])
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Error updating event: ' . $e->getMessage(), [
+                'success' => false,
+                'message' => 'Error updating event. Please try again.',
+                'request' => $request->all(),
+                'exception' => $e,
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'There was an error updating the event. Please try again.',
+                'request' => $request->all(),
+                'exception' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function deleteEvent($dashboardType, $eventId)
+    {
+        $modules = collect(session('modules', []));
+        $event = Event::findOrFail($eventId);
+
+        if ($event) {
+            $event->eventPromoters()->delete();
+            $event->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Event deleted successfully'
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Event not found.'
+        ], 404);
     }
 }

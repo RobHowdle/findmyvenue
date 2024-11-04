@@ -3,19 +3,16 @@
     {{ __('Promoter Details') }}
   </h2>
 </header>
-<form method="POST" action="{{ route('profile.update', ['user' => $user->id]) }}">
+<form method="POST" action="{{ route('profile.update', ['dashboardType' => $dashboardType, 'user' => $user->id]) }}">
   @csrf
   @method('PUT')
   <div class="group mb-6">
-    <x-input-label-dark for="myVenues">Tell us about the venues you've worked with</x-input-label-dark>
-    <x-textarea-input class="summernote" id="myVenues" name="myVenues"></x-textarea-input>
-    @error('myVenues')
+    <x-input-label-dark for="about">A bit about you...</x-input-label-dark>
+    <x-textarea-input class="summernote" id="about" name="about"></x-textarea-input>
+    @error('about')
       <p class="yns_red mt-1 text-sm">{{ $message }}</p>
     @enderror
   </div>
-  <div id="suggestions"
-    style="display:none; position: absolute; background: white; border: 1px solid #ccc; z-index: 1000;"></div>
-
 
   <div class="flex items-center gap-4">
     <button type="submit"
@@ -26,13 +23,6 @@
     @endif
   </div>
 </form>
-@push('scripts')
-  <script>
-    // var existingContent = @json(old('myVenues', $myVenues));
-    $(document).ready(function() {
-      console.log("Ready to initialize summernote...");
-
-      initialiseSummernote(".summernote", existingContent);
-    });
-  </script>
-@endpush
+<script>
+  var existingContent = @json(old('about', $about));
+</script>

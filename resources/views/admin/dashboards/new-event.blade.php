@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout :dashboardType="$dashboardType" :modules="$modules">
   <x-slot name="header">
     <x-sub-nav :userId="$userId" />
   </x-slot>
@@ -9,8 +9,7 @@
         <div class="header px-8 pt-8">
           <h1 class="mb-8 font-heading text-4xl font-bold">New Event</h1>
         </div>
-        <form id="eventForm" action="{{ route('admin.dashboard.store-new-event', ['dashboardType' => $dashboardType]) }}"
-          method="POST" enctype="multipart/form-data">
+        <form id="eventForm" method="POST" enctype="multipart/form-data" data-dashboard-type="{{ $dashboardType }}">
           @csrf
           <div class="grid grid-cols-3 gap-x-8 px-8 py-8">
             <div class="col">
@@ -596,64 +595,72 @@
   }
 
   // Promoter Search
-  const promoterInput = document.getElementById('promoter_name');
-  const promoterSuggestionsList = document.getElementById('promoter-suggestions');
+  document.addEventListener('DOMContentLoaded', function() {
+    const promoterInput = document.getElementById('promoter_name');
+    const promoterSuggestionsList = document.getElementById('promoter-suggestions');
+    const dashboardTypeElement = document.getElementById('dashboard_type');
 
-  promoterInput.addEventListener('input', function() {
-    const query = this.value;
+    // Check if the dashboardType element and promoterInput are available
+    if (dashboardTypeElement && promoterInput) {
+      const dashboardType = dashboardTypeElement.value;
 
-    if (query.length < 3) {
-      promoterSuggestionsList.innerHTML = '';
-      promoterSuggestionsList.classList.add('hidden');
-      return;
-    }
+      if (dashboardType === 'promoter') {
+        promoterInput.addEventListener('input', function() {
+          const query = this.value;
 
-    const dashboardType = document.getElementById('dashboard_type').value;
+          if (query.length < 3) {
+            promoterSuggestionsList.innerHTML = '';
+            promoterSuggestionsList.classList.add('hidden');
+            return;
+          }
 
-    fetch(`/dashboard/${dashboardType}/events/search-promoters?query=${encodeURIComponent(query)}`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        promoterSuggestionsList.innerHTML = '';
-        data.forEach(promoter => {
-          const suggestionItem = document.createElement('li');
-          suggestionItem.textContent = promoter.name;
-          suggestionItem.setAttribute('data-id', promoter.id);
-          suggestionItem.classList.add(
-            'cursor-pointer',
-            'hover:text-yns_yellow',
-            'px-4',
-            'py-2',
-            'bg-opac_8_black',
-            'text-white'
-          );
+          fetch(`/dashboard/${dashboardType}/events/search-promoters?query=${encodeURIComponent(query)}`)
+            .then(response => {
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              return response.json();
+            })
+            .then(data => {
+              promoterSuggestionsList.innerHTML = '';
+              data.forEach(promoter => {
+                const suggestionItem = document.createElement('li');
+                suggestionItem.textContent = promoter.name;
+                suggestionItem.setAttribute('data-id', promoter.id);
+                suggestionItem.classList.add(
+                  'cursor-pointer',
+                  'hover:text-yns_yellow',
+                  'px-4',
+                  'py-2',
+                  'bg-opac_8_black',
+                  'text-white'
+                );
 
-          // Event listener for suggestion item click
-          suggestionItem.addEventListener('click', function() {
-            promoterInput.value = promoter.name; // Set the input value to the selected promoter name
-            document.getElementById('promoter_id').value = promoter
-              .id; // Set the hidden input value to the selected promoter ID
-            promoterSuggestionsList.classList.add('hidden'); // Hide suggestions after selection
-          });
+                // Add click event listener to each suggestion item
+                suggestionItem.addEventListener('click', function() {
+                  promoterInput.value = promoter.name;
+                  document.getElementById('promoter_id').value = promoter.id;
+                  promoterSuggestionsList.classList.add('hidden');
+                });
 
-          promoterSuggestionsList.appendChild(suggestionItem);
+                promoterSuggestionsList.appendChild(suggestionItem);
+              });
+
+              if (data.length) {
+                promoterSuggestionsList.classList.remove('hidden');
+              } else {
+                promoterSuggestionsList.classList.add('hidden');
+              }
+            })
+            .catch(error => {
+              console.error('Error fetching promoter suggestions:', error);
+              promoterSuggestionsList.classList.add('hidden');
+            });
         });
-
-        if (data.length) {
-          promoterSuggestionsList.classList.remove('hidden');
-        } else {
-          promoterSuggestionsList.classList.add('hidden');
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching promoter suggestions:', error);
-        promoterSuggestionsList.classList.add('hidden');
-      });
+      }
+    }
   });
+
 
   // Hide promoter suggestions when clicking outside
   document.addEventListener('click', function(event) {
@@ -663,41 +670,49 @@
   });
 
   // Handle form submission
-  const eventForm = document.getElementById('eventForm');
-  eventForm.addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent the default form submission
+  document.getElementById('eventForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent default form submission
+    console.log('Form submitted'); // Log form submission
+
+    const dashboardType = "{{ $dashboardType }}"; // Capture the dashboard type from the template
 
     const formData = new FormData(this); // Get form data
 
-    // Send the AJAX request
-    fetch(eventForm.action, { // Use the action URL of the form
-        method: 'POST',
-        body: formData,
-        headers: {
-          'X-CSRF-TOKEN': '{{ csrf_token() }}' // Include the CSRF token
-        },
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
+    $.ajax({
+      url: "{{ route('admin.dashboard.store-new-event', ['dashboardType' => ':dashboardType']) }}"
+        .replace(':dashboardType', dashboardType),
+      method: 'POST',
+      data: formData,
+      contentType: false,
+      processData: false,
+      headers: {
+        'X-CSRF-TOKEN': '{{ csrf_token() }}' // Include the CSRF token
+      },
+      success: function(data) {
+        console.log('Data processed:', data); // Log the data
         if (data.success) {
-          showSuccessNotification(data.message)
+          showSuccessNotification(data.message); // Show success notification
           setTimeout(() => {
-            window.location.href = data.redirect_url;
+            console.log('Redirecting to:', data.redirect_url); // Log redirect URL
+            window.location.href = data.redirect_url; // Redirect after 2 seconds
           }, 2000);
         } else {
-          Object.keys(data.errors).forEach(key => {
-            const error = data.errors[key];
-            showFailureNotification(error);
-          });
+          console.log('Errors:', data.errors); // Log any errors
+          if (data.errors) {
+            Object.keys(data.errors).forEach(key => {
+              const error = data.errors[key];
+              showFailureNotification(error); // Show error notification
+            });
+          } else {
+            showFailureNotification(
+              'An unexpected error occurred. Please try again.'); // General error message
+          }
         }
-      })
-      .catch(error => {
-        showFailureNotification(error);
-      });
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.error('AJAX error:', textStatus, errorThrown); // Log any AJAX errors
+        showFailureNotification('An error occurred: ' + errorThrown); // Show error notification
+      }
+    });
   });
 </script>

@@ -23,14 +23,5 @@ class AdminUserSeeder extends Seeder
             'email_verified_at' => now(),
             'password' => Hash::make('yfT11LpReC43(dV(U5'),
         ]);
-
-        DB::table('users')->insert([
-            'first_name' => 'Promoter',
-            'last_name' => 'Howdle,',
-            'date_of_birth' => Carbon::createFromFormat('d-m-Y', '08-10-1994'),
-            'email' => 'robhowdlemusic@gmail.com',
-            'email_verified_at' => now(),
-            'password' => Hash::make('yfT11LpReC43(dV(U5'),
-        ]);
     }
 }

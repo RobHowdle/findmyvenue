@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout :dashboardType="$dashboardType" :modules="$modules">
   <x-slot name="header">
     <x-sub-nav :userId="$userId" />
   </x-slot>
@@ -145,15 +145,19 @@
   $(document).ready(function() {
     $('#delete-event-btn').click(function(e) {
       e.preventDefault();
-      let eventId = $(this).data('id');
+      const dashboardType = "{{ $dashboardType }}";
+      const eventId = "{{ $event->id }}";
+
       showConfirmationNotification({
         text: 'Are you sure you want to delete this event?'
       }).then((result) => {
         $.ajax({
-          url: `/dashboard/promoter/events/${eventId}`,
+          url: "{{ route('admin.dashboard.delete-event', ['dashboardType' => ':dashboardType', 'id' => ':id']) }}"
+            .replace(':dashboardType', dashboardType)
+            .replace(':id', eventId),
           type: 'DELETE',
           data: {
-            _token: '{{ csrf_token() }}', // Include CSRF token for Laravel
+            _token: '{{ csrf_token() }}',
           },
           success: function(response) {
             if (response.success) {

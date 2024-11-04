@@ -149,4 +149,9 @@ class User extends Authenticatable
 
         return null;
     }
+
+    public function moduleSettings()
+    {
+        return $this->hasMany(UserModuleSetting::class);
+    }
 }

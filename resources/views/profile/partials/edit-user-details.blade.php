@@ -4,7 +4,8 @@
       {{ __('Change your user details') }}
     </h2>
   </header>
-  <form method="POST" action="{{ route('profile.update', ['user' => $user->id]) }}" class="mt-6 space-y-6">
+  <form method="POST" action="{{ route('profile.update', ['dashboardType' => $dashboardType, 'user' => $user->id]) }}"
+    class="mt-6 space-y-6">
     @csrf
     @method('PUT')
     <div>
@@ -53,7 +54,7 @@
 
     <div class="flex items-center gap-4">
       <button type="submit"
-        class="hover:border-yns_yellow hover:text-yns_yellow mt-8 rounded-lg border border-white bg-white px-4 py-2 font-heading font-bold text-black transition duration-150 ease-in-out">Save</button>
+        class="mt-8 rounded-lg border border-white bg-white px-4 py-2 font-heading font-bold text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">Save</button>
       @if (session('status') === 'profile-updated')
         <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
           class="text-sm text-gray-600 dark:text-gray-400">{{ __('Saved.') }}</p>

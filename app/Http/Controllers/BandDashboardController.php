@@ -18,8 +18,10 @@ class BandDashboardController extends Controller
     /**
      * Return the Dashboard
      */
-    public function index()
+    public function index($dashboardType)
     {
+        $modules = collect(session('modules', []));
+
         $pendingReviews = OtherServicesReview::with('otherService')->where('review_approved', '0')->whereNull('deleted_at')->count();
         $band = Auth::user()->load(['otherService', 'roles']);
         $role = $band->roles->first()->name;
@@ -39,15 +41,16 @@ class BandDashboardController extends Controller
             ->count();
 
         $service = $band->otherService(ucfirst($role))->first();
-        $dashboardType = lcfirst($service->services);
+        // $dashboardType = lcfirst($service->services);
 
         return view('admin.dashboards.band-dash', [
             'userId' => $this->getUserId(),
+            'dashboardType' => $dashboardType,
+            'modules' => $modules,
             'pendingReviews' => $pendingReviews,
             'band' => $band,
             'todoItemsCount' => $todoItemsCount,
             'eventsCount' => $eventsCount,
-            'dashboardType' => $dashboardType,
         ]);
     }
 }
