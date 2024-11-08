@@ -53,7 +53,10 @@
             <p class="text-xl font-bold">User Settings</p>
             @include('profile.partials.edit-user-details', [
                 'userRole' => $userRole,
-                'name' => $name,
+                'firstName' => $firstName,
+                'lastName' => $lastName,
+                'email' => $email,
+                'location' => $location,
             ])
           </div>
         </div>

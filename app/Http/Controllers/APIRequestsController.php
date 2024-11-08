@@ -57,7 +57,7 @@ class APIRequestsController extends Controller
                 $eventDate = Carbon::parse($event->event_date)->format('Y-m-d');
 
                 return [
-                    'title' => $event->name,
+                    'title' => $event->event_name,
                     'start' => $eventDate . 'T' . $event->event_start_time,
                     'end' => $eventDate . 'T' . $event->event_end_time,
                     'description' => $event->event_description,

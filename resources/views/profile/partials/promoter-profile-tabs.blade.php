@@ -1,7 +1,10 @@
 <div x-show="selectedTab === 2" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
   <div class="w-full">
     @include('profile.promoter.basic-information-form', [
-        'name' => $name,
+        'firstName' => $firstName,
+        'lastName' => $lastName,
+        'email' => $email,
+        'location' => $location,
         'promoterName' => $promoterData['promoterName'],
     ]) </div>
 </div>
@@ -22,7 +25,10 @@
     5
     @include('profile.promoter.my-events', [
         'userRole' => $userRole,
-        'name' => $name,
+        'firstName' => $firstName,
+        'lastName' => $lastName,
+        'email' => $email,
+        'location' => $location,
     ]) </div>
 </div>
 <div x-show="selectedTab === 6" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
@@ -30,7 +36,10 @@
     6
     @include('profile.promoter.my-bands', [
         'userRole' => $userRole,
-        'name' => $name,
+        'firstName' => $firstName,
+        'lastName' => $lastName,
+        'email' => $email,
+        'location' => $location,
     ]) </div>
 </div>
 <div x-show="selectedTab === 7" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
@@ -39,6 +48,9 @@
     @include('profile.promoter.my-genres', [
         'dashboardType' => $dashboardType,
         'userRole' => $userRole,
-        'name' => $name,
+        'firstName' => $firstName,
+        'lastName' => $lastName,
+        'email' => $email,
+        'location' => $location,
     ]) </div>
 </div>

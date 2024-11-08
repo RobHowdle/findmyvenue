@@ -28,8 +28,10 @@ class ProfileController extends Controller
         $user = User::where('id', $user)->first();
         $roles = Role::where('name', '!=', 'administrator')->get();
         $userRole = $user->roles;
-        $name = $user->name;
+        $firstName = $user->first_name;
+        $lastName = $user->last_name;
         $email = $user->email;
+        $location = $user->location;
 
         // Initialize promoter variables
         $promoterData = [];
@@ -62,7 +64,6 @@ class ProfileController extends Controller
 
         $modulesWithSettings = $this->getModulesWithSettings($user, $dashboardType);
 
-
         return view('profile.edit', [
             'userId' => $this->getUserId(),
             'dashboardType' => $dashboardType,
@@ -72,8 +73,10 @@ class ProfileController extends Controller
             'user' => $user,
             'roles' => $roles,
             'userRole' => $userRole,
-            'name' => $name,
+            'firstName' => $firstName,
+            'lastName' => $lastName,
             'email' => $email,
+            'location' => $location,
             'modules' => $modulesWithSettings,
         ]);
     }
@@ -83,8 +86,20 @@ class ProfileController extends Controller
      */
     public function update($dashboardType, ProfileUpdateRequest $request, $userId): RedirectResponse
     {
+        \Log::info("Request's latitude: {$request->latitude}, Request's longitude: {$request->longitude}");
+
         $user = User::findOrFail($userId);
         $userData = $request->validated();
+
+        if (isset($userData['latitude']) && isset($userData['longitude'])) {
+            // Assign correct latitude and longitude fields
+            $user->latitude = $userData['latitude'];
+            $user->longitude = $userData['longitude'];
+        }
+
+        if (isset($userData['location'])) {
+            $user->location = $userData['location'];
+        }
 
         $user->fill($userData);
 
@@ -98,7 +113,7 @@ class ProfileController extends Controller
 
         $user->save();
 
-        return redirect()->route('profile.edit', $user->id)->with('status', 'profile-updated');
+        return redirect()->route('profile.edit', ['dashboardType' => $dashboardType, 'id' => $user->id])->with('status', 'profile-updated');
     }
 
     /**

@@ -17,7 +17,7 @@
               <div class="group mb-4">
                 <x-input-label-dark>Event Name</x-input-label-dark>
                 <x-text-input id="event_name" name="event_name"
-                  value="{{ old('event_name', $event->name) }}"></x-text-input>
+                  value="{{ old('event_name', $event->event_name) }}"></x-text-input>
                 @error('event_name')
                   <p class="yns_red mt-1 text-sm">{{ $message }}</p>
                 @enderror

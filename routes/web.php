@@ -12,6 +12,7 @@ use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\GigGuideController;
 use App\Http\Controllers\PromoterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LinkedUserController;
@@ -55,6 +56,9 @@ Route::get('/other', [OtherServiceController::class, 'index'])->name('other');
 Route::get('/other/{serviceName}', [OtherServiceController::class, 'showGroup'])->name('singleServiceGroup');
 Route::get('/other/{serviceName}/{serviceId}', [OtherServiceController::class, 'show'])->name('singleService');
 Route::get('/other/filter', [OtherServiceController::class, 'filterCheckboxesSearch'])->name('other.filterCheckboxesSearch');
+
+Route::get('/gig-guide', [GigGuideController::class, 'showGigGuide'])->name('gig-guide');
+Route::get('/gigs/filter', [GigGuideController::class, 'filterGigs'])->name('gigs.filter');
 
 Route::middleware(['auth', 'web', 'verified'])->group(function () {
     // Dashboards - Main Dashboard

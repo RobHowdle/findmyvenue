@@ -73,14 +73,12 @@
       <div class="group mb-6">
         <x-input-label-dark for="{{ $platform }}">{{ ucfirst($platform) }}:</x-input-label-dark>
 
-        {{-- Display all stored links --}}
         @foreach ($links as $index => $link)
           <x-text-input id="{{ $platform }}-{{ $index }}" name="contact_links[{{ $platform }}][]"
             value="{{ old('contact_links.' . $platform . '.' . $index, $link) }}">
           </x-text-input>
         @endforeach
 
-        {{-- Always provide at least one empty field if there are no links --}}
         @if (empty($links))
           <x-text-input id="{{ $platform }}-new" name="contact_links[{{ $platform }}][]"
             value="{{ old('contact_links.' . $platform . '.new', '') }}"

@@ -1,7 +1,7 @@
 <div class="event-card bg-yns_light_gray1 font-sans text-black shadow-md" data-id={{ $event->id }}>
   <img class="h-52 w-full object-cover"
     src="{{ asset($event->poster_url) ? asset($event->poster_url) : asset('images/system/yns_logo.png') }}"
-    alt="{{ $event->name }}">
+    alt="{{ $event->event_name }}">
   <div class="body p-4">
     <p class="flex items-center text-sm">
       <span class="fas fa-calendar-alt mr-2"></span>Date: {{ $event->event_date->format('jS F Y') }}
@@ -9,7 +9,7 @@
     @if ($event->promoter)
       <h2 class="mt-2 text-xl font-semibold uppercase">{{ $promoter->name }}</h2>
     @endif
-    <h2 class="mb-2 text-xl font-semibold uppercase">{{ $event->name }}</h2>
+    <h2 class="mb-2 text-xl font-semibold uppercase">{{ $event->event_name }}</h2>
     @if ($event->venues->count() > 0)
       <ul>
         @foreach ($event->venues as $venue)

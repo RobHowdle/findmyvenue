@@ -9,7 +9,7 @@
         <div class="header border-b border-b-white px-8 py-8">
           <div class="flex flex-row items-center justify-between">
             <div class="group">
-              <h1 class="font-heading text-4xl font-bold">{{ $event->name }}</h1>
+              <h1 class="font-heading text-4xl font-bold">{{ $event->event_name }}</h1>
               <p class="text-xl">Date: {{ $event->event_date->format('jS F Y') }}</p>
               <div class="socials"></div>
             </div>
@@ -102,7 +102,7 @@
               class="absolute right-2 top-12 flex h-12 w-12 place-items-center justify-center rounded-50 bg-opac_8_black p-2 transition duration-150 ease-in-out hover:bg-opac_5_black">
               <span class="fas fa-search-plus"></span>
             </div>
-            <img src="{{ asset($event->poster_url) }}" alt="{{ $event->name }} Poster"
+            <img src="{{ asset($event->poster_url) }}" alt="{{ $event->event_name }} Poster"
               class="cursor-pointer object-cover transition duration-150 ease-in-out hover:opacity-75" id="eventPoster"
               onclick="openModal()">
             <div id="modal"
@@ -209,7 +209,7 @@
 
   function addEventToGoogleCalendar(calendarService) {
     const eventId = {{ $event->id }};
-    const eventName = @json($event->name);
+    const eventName = @json($event->event_name);
     const eventDate = '{{ $event->event_date }}';
     const eventStartTime = '{{ $event->event_start_time }}';
     const eventEndTime = '{{ $event->event_end_time }}';

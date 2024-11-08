@@ -282,7 +282,7 @@ class CalendarController extends Controller
         DTSTAMP:" . now()->format('Ymd\THis') . "
         DTSTART:{$startTime}
         DTEND:{$endTime}
-        SUMMARY:{$event->name}
+        SUMMARY:{$event->event_name}
         DESCRIPTION:{$event->description}
         LOCATION:{$event->location}
         END:VEVENT
