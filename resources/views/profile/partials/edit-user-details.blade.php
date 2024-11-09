@@ -49,38 +49,45 @@
       <x-input-error :messages="$errors->get('location')" class="mt-2" />
     </div>
 
-    <!-- Hidden fields to store the coordinates -->
-    <label>Lat</label>
-    <input type="text" id="address-latitude" name="latitude" class="text-black"
-      value="{{ old('latitude', $user->latitude ?? '') }}">
+    <div class="group hidden">
+      <label>Lat</label>
+      <input type="text" id="address-latitude" name="latitude" class="hidden text-black"
+        value="{{ old('latitude', $user->latitude ?? '') }}">
+    </div>
 
-    <label>Lon</label>
-    <input type="text" id="address-longitude" name="longitude" class="text-black"
-      value="{{ old('longitude', $user->longitude ?? '') }}">
+    <div class="group hidden">
+      <label>Lon</label>
+      <input type="text" id="address-longitude" name="longitude" class="hidden text-black"
+        value="{{ old('longitude', $user->longitude ?? '') }}">
+    </div>
 
 
-
-    <div class="mt-4 grid grid-cols-2 items-center gap-4">
-      <!-- Left Column: Current Roles -->
-      <div>
-        <x-input-label-dark>Current Role(s):</x-input-label-dark>
-        @foreach ($userRole as $role)
-          <p class="capitalize">{{ $role->name }}</p>
-        @endforeach
-      </div>
-
-      <!-- Right Column: Edit and Add Buttons -->
-      <div class="flex flex-col justify-start space-y-2">
-        <x-input-label-dark>Actions</x-input-label-dark>
-        <div class="role-buttons-container">
+    <div class="mt-4">
+      <!-- Table to Display Current Roles -->
+      <table id="role-table" class="min-w-full table-auto border-collapse">
+        <thead>
+          <tr>
+            <th class="px-4 py-2 text-left">Current Role(s)</th>
+            <th class="px-4 py-2 text-left">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
           @foreach ($userRole as $role)
-            <div class="flex space-x-2">
-              <x-button type="button" id="edit-role" data-role-id="{{ $role->id }}"
-                data-role-name="{{ $role->name }}" label="Edit"></x-button>
-              <x-button type="button" id="add-role" label="Add Role"></x-button>
-            </div>
+            <tr class="border-b">
+              <td class="px-4 py-2 capitalize">{{ $role->name }}</td>
+              <td class="px-4 py-2">
+                <x-button type="button" id="edit-role" data-role-id="{{ $role->id }}"
+                  data-role-name="{{ $role->name }}" label="Edit"></x-button>
+                <x-button type="button" id="delete-role" data-role-id="{{ $role->id }}"
+                  data-role-name="{{ $role->name }}" label="Delete"></x-button>
+              </td>
+            </tr>
           @endforeach
-        </div>
+        </tbody>
+      </table>
+
+      <div class="mt-4">
+        <x-button type="button" id="add-role" label="Add Role"></x-button>
       </div>
     </div>
 
@@ -102,23 +109,35 @@
         </div>
         <div class="mt-4">
           <button id="save-edit-role-btn" class="rounded bg-blue-500 px-4 py-2 text-white">Save Changes</button>
-          <button onclick="closeModal('editRoleModal')" class="rounded bg-gray-300 px-4 py-2 text-black">Cancel</button>
+          <button onclick="closeModal('editRoleModal')"
+            class="rounded bg-gray-300 px-4 py-2 text-black">Cancel</button>
         </div>
       </div>
     </div>
 
+    @php
+      $userRoleIds = $userRole->pluck('id')->toArray();
+    @endphp
+
     <div id="addRoleModal" class="fixed inset-0 flex hidden items-center justify-center bg-gray-500 bg-opacity-75">
-      <div class="rounded bg-white p-4 shadow-md">
+      <div class="w-96 rounded bg-black p-8 text-white shadow-md">
         <h2 id="addModalTitle" class="text-lg font-semibold">Add Role</h2>
         <input type="hidden" id="add-role-id" />
         <div class="mt-2">
-          <label for="role-name">Role Name:</label>
-          <input type="text" id="role-name" class="mt-1 block w-full rounded border p-2" />
+          <label for="role-name">Select Role</label>
+          <select id="new-role" name="role"
+            class="mt-1 block w-full rounded-md border-yns_red shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-indigo-600 dark:focus:ring-indigo-600"
+            required autofocus autocomplete="role">
+            @foreach ($roles as $role)
+              <option value="{{ $role->id }}" @if (in_array($role->id, $userRoleIds)) disabled @endif>
+                {{ ucfirst($role->name) }}</option>
+            @endforeach
+          </select>
+          <x-input-error :messages="$errors->get('role')" class="mt-2" />
         </div>
-        <div class="mt-4">
-          <button id="save-add-role-btn" class="rounded bg-blue-500 px-4 py-2 text-white">Add Role</button>
-          <button onclick="closeModal('addRoleModal')"
-            class="rounded bg-gray-300 px-4 py-2 text-black">Cancel</button>
+        <div class="mt-4 flex flex-row gap-6">
+          <x-button id="save-add-role-btn" label="Add Role"></x-button>
+          <x-button onclick="closeModal('addRoleModal')" label="Cancel"></x-button>
         </div>
       </div>
     </div>
@@ -135,63 +154,167 @@
 </section>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    const roleContainer = document.querySelector('.role-buttons-container');
-
-    roleContainer.addEventListener('click', function(event) {
-      const target = event.target.closest('button'); // Get the closest button element
-
-      if (target) {
-        console.log("Button clicked:", target.id); // Log the clicked button ID
-        const roleId = target.dataset.roleId || ''; // Get the role ID if it exists
-        const roleName = target.dataset.roleName || ''; // Get the role name if it exists
-
-        if (target.id === 'edit-role') {
-          console.log("Editing role:", roleName); // Log role being edited
-          showEditRoleModal(roleId, roleName);
-        } else if (target.id === 'add-role') {
-          console.log("Adding role"); // Log add role action
-          showAddRoleModal();
-        }
-      }
-    });
-
-    function showEditRoleModal(roleId, roleName) {
-      const editModalTitle = document.getElementById('editModalTitle');
-      const editRoleInput = document.getElementById('edit-role-name');
-      const saveEditButton = document.getElementById('save-edit-role-btn');
-
-      editModalTitle.textContent = 'Edit Role';
-      editRoleInput.value = roleName; // Set the existing role name
-      document.getElementById('edit-role-id').value = roleId; // Store the role ID
-
-      saveEditButton.onclick = function() {
-        saveEditRole(roleId); // Define this function to handle saving the edited role
-      };
-
-      // Remove the hidden class to show the edit modal
-      document.getElementById('editRoleModal').classList.remove('hidden');
-    }
-
-    function showAddRoleModal() {
-      const addModalTitle = document.getElementById('addModalTitle');
-      const roleInput = document.getElementById('role ');
-      const saveAddButton = document.getElementById('save-add-role-btn');
-
-      addModalTitle.textContent = 'Add Role';
-      roleInput.value = ''; // Clear the input for new role
-      document.getElementById('add-role-id').value = ''; // Clear the role ID
-
-      saveAddButton.onclick = saveAddRole; // Set to add role function
-
-      // Remove the hidden class to show the add modal
-      document.getElementById('addRoleModal').classList.remove('hidden');
-    }
-
-    // Close modal function
-    window.closeModal = function(modalId) {
-      document.getElementById(modalId).classList.add('hidden');
+    const addRoleBtn = document.getElementById('add-role');
+    if (addRoleBtn) {
+      addRoleBtn.addEventListener('click', showAddRoleModal);
     }
   });
+
+  function showEditRoleModal(roleId, roleName) {
+    const editModalTitle = document.getElementById('editModalTitle');
+    const editRoleInput = document.getElementById('edit-role-name');
+    const saveEditButton = document.getElementById('save-edit-role-btn');
+
+    editModalTitle.textContent = 'Edit Role';
+    editRoleInput.value = roleName; // Set the existing role name
+    document.getElementById('edit-role-id').value = roleId; // Store the role ID
+
+    saveEditButton.onclick = function() {
+      saveEditRole(roleId); // Define this function to handle saving the edited role
+    };
+
+    // Remove the hidden class to show the edit modal
+    document.getElementById('editRoleModal').classList.remove('hidden');
+  }
+
+  function showAddRoleModal() {
+    const addModalTitle = document.getElementById('addModalTitle');
+    const saveAddButton = document.getElementById('save-add-role-btn');
+    const dashboardType = "{{ $dashboardType }}";
+    const userId = "{{ $user->id }}";
+
+    addModalTitle.textContent = 'Add Role';
+
+    saveAddButton.onclick = function() {
+      const roleSelect = document.getElementById('new-role'); // Get the role select element
+      saveAddRole(roleSelect.value);
+    };
+
+    // Remove the hidden class to show the add modal
+    document.getElementById('addRoleModal').classList.remove('hidden');
+  }
+
+  // Close modal function
+  window.closeModal = function(modalId) {
+    document.getElementById(modalId).classList.add('hidden');
+  }
+
+  function saveAddRole(roleSelect) {
+    const dashboardType = "{{ $dashboardType }}";
+    const userId = "{{ $user->id }}";
+
+    if (!roleSelect) {
+      showFailureNotification('Please select a role');
+      return;
+    }
+
+    fetch(`/profile/${dashboardType}/${userId}/add-role`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+        },
+        body: JSON.stringify({
+          id: userId,
+          roleId: roleSelect,
+          dashboardType: dashboardType,
+        }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Close the modal
+          closeModal('addRoleModal');
+          showSuccessNotification(data.message);
+
+          // Update the roles table dynamically
+          const roleTableBody = document.querySelector('#role-table tbody');
+
+          // Create a new row for the added role
+          const newRow = document.createElement('tr');
+          newRow.classList.add('border-b');
+          newRow.innerHTML = `
+                <td class="px-4 py-2 capitalize">${data.newRoleName}</td>
+                <td class="px-4 py-2">
+                    <x-button type="button" id="edit-role" data-role-id="${data.newRoleId}" data-role-name="${data.newRoleName}" label="Edit"></x-button>
+                </td>
+            `;
+
+          // Append the new row to the table
+          roleTableBody.appendChild(newRow);
+        } else {
+          showFailureNotification(data.message || 'Failed to add role');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showFailureNotification('An error occurred while adding the role');
+      });
+  }
+
+  // Example removeRole function (if you want to remove the role later)
+  function removeRole(userId, roleId) {
+    // Logic for removing the role, which can involve another AJAX call to the backend
+    console.log(`Removing role ${roleId} for user ${userId}`);
+  }
+
+
+  function saveEditRole(roleId) {
+    const newRole = document.getElementById('role').value;
+    const dashboardType = "{{ $dashboardType }}";
+    const userId = "{{ $user->id }}";
+
+    fetch(`/profile/${dashboardType}/${userId}/edit-role`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+        },
+        body: JSON.stringify({
+          roleId: roleId,
+          newRole: newRole,
+        }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Close the modal
+          closeModal('editRoleModal');
+          showSuccessNotification(data.message);
+
+          // Add new row to the table
+          const table = document.getElementById('role-table'); // Assuming your table has this ID
+          const newRow = table.insertRow(); // Insert a new row
+
+          // Insert cells into the row and populate with the new role data
+          const roleCell = newRow.insertCell(0);
+          const actionCell = newRow.insertCell(1);
+
+          roleCell.textContent = newRole; // Populate with the new role name
+
+          // You can also add an action button (e.g., delete/edit) to this row
+          const editButton = document.createElement('button');
+          editButton.textContent = 'Edit';
+          editButton.className = 'btn btn-warning'; // Add your button classes here
+          editButton.onclick = () => {
+            // Trigger the edit role modal, passing the current role data
+            openEditRoleModal(roleId, newRole);
+          };
+
+          actionCell.appendChild(editButton);
+
+          // Optional: You may also want to clear the form or reset the inputs
+          document.getElementById('role').value = ''; // Reset the role input field
+        } else {
+          showFailureNotification(data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showFailureNotification('An unexpected error occurred: ' + error.message);
+      });
+  }
+
 
   document.addEventListener("DOMContentLoaded", function() {
     const locationInput = document.getElementById("location"); // The location text input

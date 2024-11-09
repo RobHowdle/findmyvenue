@@ -15,6 +15,7 @@ class GigGuideController extends Controller
         $genreList = file_get_contents(public_path('text/genre_list.json'));
         $data = json_decode($genreList, true);
         $genres = $data['genres'];
+        $user = auth()->user();
 
         $gigsCloseToMe = [];
         $gigs5Miles = [];
@@ -24,8 +25,6 @@ class GigGuideController extends Controller
 
 
         if (auth()->check()) {
-            $user = auth()->user();
-
             // Attempt to get coordinates from user's location dynamically
             if ($user->location) {
                 $gigsCloseToMe = Event::with('venues')
@@ -114,7 +113,6 @@ class GigGuideController extends Controller
 
     public function filterGigs(Request $request)
     {
-        \Log::info($request->all());
         $distance = $request->get('distance');
         $latitude = $request->get('latitude');
         $longitude = $request->get('longitude');

@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
 use App\Models\UserModuleSetting;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
@@ -273,5 +274,49 @@ class ProfileController extends Controller
             'myVenues' => $myVenues,
             'email' => $email
         ];
+    }
+
+    public function addRole(Request $request)
+    {
+        try {
+            // Retrieve the user
+            $user = User::findOrFail($request->id);
+            \Log::info('User found: ', [$user]);
+
+            // Validate the incoming request
+            $request->validate([
+                'roleId' => 'required|exists:roles,id', // Ensure roleId is valid
+            ]);
+
+            // Retrieve the role
+            $role = Role::find($request->roleId);
+            \Log::info('Role found: ', [$role]);
+
+            if (!$role) {
+                return response()->json(['success' => false, 'message' => 'Role not found.'], 404);
+            }
+
+            // Check if the user already has the role
+            if ($user->hasRole($role->name)) {
+                return response()->json(['success' => false, 'message' => 'User already has this role.'], 400);
+            }
+
+            // Add the new role to the user
+            $user->assignRole($role->name);  // This adds the role, doesn't replace existing roles
+
+            // Return the response with success message and role name
+            return response()->json([
+                'success' => true,
+                'message' => 'Role added successfully.',
+                'newRoleName' => $role->name
+            ]);
+        } catch (\Exception $e) {
+            // Log the error and return a response
+            \Log::error('Error adding role: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while adding the role.'
+            ], 500);
+        }
     }
 }

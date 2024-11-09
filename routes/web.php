@@ -199,8 +199,10 @@ Route::middleware(['auth', 'web', 'verified'])->group(function () {
 Route::middleware(['auth'])->group(function () {});
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::post('/profile/{dashboardType}/{user}/add-role', [ProfileController::class, 'addRole'])->name('profile.add-role');
+    Route::post('/profile/{dashboardType}/{user}/edit-role', [ProfileController::class, 'editRole'])->name('profile.add-role');
+    Route::get('/profile/events/{user}/apple/sync', [CalendarController::class, 'syncAllEventsToAppleCalendar'])->name('apple.sync');
     Route::get('/profile/events/{user}', [APIRequestsController::class, 'getUserCalendarEvents']);
-    Route::get('profile/events/{user}/apple/sync', [CalendarController::class, 'syncAllEventsToAppleCalendar'])->name('apple.sync');
     Route::get('/profile/{dashboardType}/{id}', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile/{dashboardType}/{user}', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

@@ -71,143 +71,67 @@
   </div>
 </x-guest-layout>
 <script>
-  // Define userLatitude and userLongitude globally
   let userLatitude = {{ $user->latitude ?? 'null' }};
   let userLongitude = {{ $user->longitude ?? 'null' }};
-  let distance = document.getElementById('distance').value; // Default value for distance filter
+  let distance = document.getElementById('distance').value;
 
-  // Function to format the event date and time
-  function formatDateTime(eventDate, eventStartTime) {
-    // Ensure both eventDate and eventStartTime are provided
-    if (!eventDate || !eventStartTime) {
-      return 'Invalid Date/Time';
-    }
-
-    // Convert eventDate to a Date object
-    const datePart = new Date(eventDate);
-
-    // Check if datePart is valid
-    if (isNaN(datePart)) {
-      return 'Invalid Date';
-    }
-
-    // Format the date as DD-MM-YYYY
-    const formattedDate = datePart.toLocaleDateString('en-GB', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-
-    const timePart = eventStartTime.split(':').slice(0, 2).join(':');
-
-    // Combine formatted date with event start time
-    const formattedDateTime = `${formattedDate} @ ${timePart}`;
-
-    return formattedDateTime;
-  }
-
-  // Function to generate row HTML for the gigs table
-  function createRow(event, distanceLabel) {
-    const eventDate = event.event_date || 'No Date';
-    const eventTime = event.event_start_time || '00:00'; // Default time if not provided
-
-    // Format the date and time
-    const formattedDateTime = formatDateTime(eventDate, eventTime);
-
-    return `
-      <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
-        <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">${event.event_name || 'No name'}</td>
-        <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">${event.location || 'No Location'}</td>
-        <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">${event.distance ? event.distance.toFixed(2) : 'No Distance'} miles</td>
-        <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">${formattedDateTime || 'No Date/Time'}</td>
-      </tr>
-    `;
-  }
-
-  document.getElementById('distance').addEventListener('change', function() {
-    distance = this.value; // Update distance whenever the selection changes
-    console.log("Selected Distance:", distance);
-
-    // If latitude and longitude are not available from the user profile, use geolocation
-    if (!userLatitude || !userLongitude) {
-      console.log("Latitude and Longitude are not stored in the user profile. Attempting to get geolocation...");
+  function getUserLocation(callback) {
+    if (userLatitude && userLongitude) {
+      console.log("Using stored location: Lat " + userLatitude + ", Long " + userLongitude);
+      callback(userLatitude, userLongitude);
+    } else {
+      console.log("No stored location. Attempting to get geolocation from the browser...");
       if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-          userLatitude = position.coords.latitude;
-          userLongitude = position.coords.longitude;
-          console.log("Geolocation obtained: Lat " + userLatitude + ", Long " + userLongitude);
-          fetchGigs(distance, userLatitude, userLongitude);
-        }, function() {
-          alert("Unable to retrieve your location.");
-        });
+        console.log('hit');
+        navigator.geolocation.getCurrentPosition(
+          function(position) {
+            console.log('hit2');
+            userLatitude = position.coords.latitude;
+            userLongitude = position.coords.longitude;
+            console.log("Geolocation obtained: Lat " + userLatitude + ", Long " + userLongitude);
+            callback(userLatitude, userLongitude);
+          },
+          function(error) {
+            console.log('Error handler hit');
+            switch (error.code) {
+              case error.PERMISSION_DENIED:
+                alert("User denied the request for Geolocation.");
+                break;
+              case error.POSITION_UNAVAILABLE:
+                alert("Location information is unavailable.");
+                break;
+              case error.TIMEOUT:
+                alert("The request to get user location timed out.");
+                break;
+              case error.UNKNOWN_ERROR:
+                alert("An unknown error occurred.");
+                break;
+            }
+          }
+        );
       } else {
         alert("Geolocation is not supported by this browser.");
       }
-    } else {
-      console.log("Using stored location: Lat " + userLatitude + ", Long " + userLongitude);
-      fetchGigs(distance, userLatitude, userLongitude);
     }
-  });
+  }
 
-  document.getElementById('show-other-gigs').addEventListener('change', function() {
-    const showOtherGigs = this.checked; // Whether the checkbox is checked
-    console.log('Show other gigs:', showOtherGigs);
 
-    // Capture the necessary parameters for the request
-    fetch(
-        `/gigs/filter?distance=${distance}&latitude=${userLatitude}&longitude=${userLongitude}&showOtherGigs=${showOtherGigs}`
-      )
+  function fetchGigs(distance, latitude, longitude) {
+    fetch(`/gigs/filter?distance=${distance}&latitude=${latitude}&longitude=${longitude}`)
       .then(response => response.json())
       .then(data => {
-        console.log('Fetched data:', data); // Debugging output to check response
-
-        // Clear existing rows before populating new data
-        const tableBody = document.getElementById('gigsTableBody');
-        tableBody.innerHTML = '';
-
-        // Add gigs within the selected distance
-        data.gigsCloseToMe.forEach(event => {
-          tableBody.innerHTML += createRow(event, `${event.distance} miles`);
-        });
-
-        // Only add "other gigs" if the checkbox is checked
-        if (showOtherGigs) {
-          console.log('Adding other gigs...');
-          data.otherGigs.forEach(event => {
-            tableBody.innerHTML += createRow(event, 'All');
-          });
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching gigs:', error);
-        alert('There was an error fetching the gigs. Please try again.');
-      });
-  });
-
-  // Initialize the page with the default gigs
-  fetchGigs(distance, userLatitude, userLongitude);
-
-  function fetchGigs(distance, userLatitude, userLongitude) {
-    // Make the AJAX request to the filterGigs route
-    fetch(`/gigs/filter?distance=${distance}&latitude=${userLatitude}&longitude=${userLongitude}`)
-      .then(response => response.json()) // Parse JSON from the response
-      .then(data => {
-        console.log(data);
-        // Check for errors in the response
         if (data.error) {
           console.error(data.error);
           return;
         }
 
         const tableBody = document.getElementById('gigsTableBody');
-        tableBody.innerHTML = ''; // Clear existing rows
+        tableBody.innerHTML = '';
 
-        // Populate table with gigs within the selected distance
         data.gigsCloseToMe.forEach(event => {
           tableBody.innerHTML += createRow(event, `${event.distance} miles`);
         });
 
-        // Populate table with other gigs
         if (data.otherGigs) {
           data.otherGigs.forEach(event => {
             tableBody.innerHTML += createRow(event, 'All');
@@ -216,4 +140,6 @@
       })
       .catch(error => console.error('Error fetching gigs:', error));
   }
+
+  getUserLocation((lat, lon) => fetchGigs(distance, lat, lon));
 </script>
