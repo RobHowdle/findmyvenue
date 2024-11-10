@@ -64,7 +64,7 @@
                   <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">${user.first_name} ${user.last_name}</td>
                   <td class="whitespace-nowrap font-sans text-white sm:py-3 sm:text-base md:py-2 lg:py-4">${user.email}</td>
                   <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">${user.pivot ? user.pivot.role : 'N/A'}</td>
-                  <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">${user.pivot ? formatDateToDMY(user.pivot.created_at) : 'N/A'}</td>
+                  <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">${user.pivot ? user.pivot.created_at : 'N/A'}</td>
                   <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
                       <button class="remove-user-btn w-full rounded-lg bg-white px-4 py-2 font-heading text-black transition duration-150 ease-in-out hover:text-yns_yellow" data-user-id="${user.id}" data-service-id="${service.id}">Remove</button>
                   </td>

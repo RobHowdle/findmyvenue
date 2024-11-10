@@ -37,7 +37,8 @@ class User extends Authenticatable
         'apple_calendar_synced',
         'google_access_token',
         'google_refresh_token',
-        'token_expires_at'
+        'token_expires_at',
+        'mailing_preferences',
     ];
 
     /**
@@ -58,12 +59,31 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
-        'last_logged_in' => 'datetime'
+        'last_logged_in' => 'datetime',
+        'mailing_preferences' => 'array',
     ];
 
     protected $dates = [
         'last_logged_in',
     ];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($user) {
+            if (is_null($user->mailing_preferences)) {
+                $user->mailing_preferences = [
+                    'system_announcements' => true,
+                    'legal_or_policy_updates' => true,
+                    'account_notifications' => true,
+                    'event_invitations' => true,
+                    'surveys_and_feedback' => true,
+                    'birthday_anniversary_holiday' => true,
+                ];
+            }
+        });
+    }
 
 
     public function services()

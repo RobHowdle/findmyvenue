@@ -43,6 +43,14 @@
               :class="{ 'opacity-100': selected === 9, 'opacity-0': selected !== 9 }"></span>
             <span class="relative z-10">Settings</span>
           </button>
+
+          <button @click="selected = 10; selectedTab =10"
+            :class="{ 'bg-gradient-button': selected === 10, 'bg-yns_dark_gray': selected !== 10 }"
+            class="group relative w-full px-8 py-2 text-left text-white transition duration-150 ease-in-out">
+            <span class="absolute inset-0 transition-opacity duration-300 ease-in-out"
+              :class="{ 'opacity-100': selected === 10, 'opacity-0': selected !== 10 }"></span>
+            <span class="relative z-10">Communication</span>
+          </button>
         </div>
       </div>
     </div>
@@ -110,7 +118,15 @@
             </div>
           </div>
         </div>
-
+        <div x-show="selectedTab === 10" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
+          <div class="w-full">
+            <div class="group">
+              @include('profile.partials.communication-settings', [
+                  'communications' => $communications,
+              ])
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 </x-app-layout>

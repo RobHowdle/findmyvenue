@@ -10,12 +10,12 @@ window.jQuery = $;
 window.Alpine = Alpine;
 Alpine.start();
 
-window.initialize = initialize;
+// window.initialize = initialize;
 
-// Initialize Google Maps after the page is loaded
-document.addEventListener("DOMContentLoaded", function () {
-    initialize(); // Call here if needed
-});
+// // Initialize Google Maps after the page is loaded
+// document.addEventListener("DOMContentLoaded", function () {
+//     initialize(); // Call here if needed
+// });
 
 // Format currency helper
 window.formatCurrency = function (value) {
@@ -35,94 +35,101 @@ window.formatDateToDMY = function (dateString) {
     return `${day}-${month}-${year}`; // Return in DMY format
 };
 
-$(document).ready(function () {
+jQuery(document).ready(function () {
     // Accordion functionality
-    $("[data-accordion-target]").click(function () {
-        const isExpanded = $(this).attr("aria-expanded") === "true";
-        const accordionBody = $(this).attr("data-accordion-target");
+    jQuery("[data-accordion-target]").click(function () {
+        const isExpanded = jQuery(this).attr("aria-expanded") === "true";
+        const accordionBody = jQuery(this).attr("data-accordion-target");
 
-        $(this).find("svg.icon").toggleClass("rotate-180");
+        jQuery(this).find("svg.icon").toggleClass("rotate-180");
 
         if (isExpanded) {
-            $(this).attr("aria-expanded", "false");
-            $(accordionBody).slideUp().addClass("hidden");
+            jQuery(this).attr("aria-expanded", "false");
+            jQuery(accordionBody).slideUp().addClass("hidden");
         } else {
-            $(accordionBody).slideDown().removeClass("hidden");
-            $(this).attr("aria-expanded", "true");
+            jQuery(accordionBody).slideDown().removeClass("hidden");
+            jQuery(this).attr("aria-expanded", "true");
         }
     });
 
     // Hide accordion content by default
-    $(".accordion-content").hide();
+    jQuery(".accordion-content").hide();
 
-    $(".accordion-item .accordion-title").click(function () {
+    jQuery(".accordion-item .accordion-title").click(function () {
         // Toggle active class to show/hide accordion content
-        $(this).parent().toggleClass("active");
-        $(this).parent().find(".accordion-content").slideToggle();
-        $(".accordion-item")
-            .not($(this).parent())
+        jQuery(this).parent().toggleClass("active");
+        jQuery(this).parent().find(".accordion-content").slideToggle();
+        jQuery(".accordion-item")
+            .not(jQuery(this).parent())
             .removeClass("active")
             .find(".accordion-content")
             .slideUp();
 
         // Prevent checkbox from being checked/unchecked when clicking on label
-        var checkbox = $(this).siblings('input[type="checkbox"]');
+        var checkbox = jQuery(this).siblings('input[type="checkbox"]');
         checkbox.prop("checked", !checkbox.prop("checked"));
     });
 
     // Function to close all accordion items
     function closeAllAccordions() {
-        $(".accordion-item").removeClass("active");
-        $(".accordion-content").slideUp().addClass("hidden");
+        jQuery(".accordion-item").removeClass("active");
+        jQuery(".accordion-content").slideUp().addClass("hidden");
     }
 
-    // Click outside to close the accordion`
-    $(document).click(function (event) {
+    // Click outside to close the accordion
+    jQuery(document).click(function (event) {
         // Check if the click is outside the accordion
         if (
-            !$(event.target).closest(".accordion-item, [data-accordion-target]")
-                .length
+            !jQuery(event.target).closest(
+                ".accordion-item, [data-accordion-target]"
+            ).length
         ) {
             closeAllAccordions();
         }
     });
 
     // Prevent clicks inside the accordion from closing it
-    $(".accordion-item").click(function (event) {
+    jQuery(".accordion-item").click(function (event) {
         event.stopPropagation();
     });
 
-    // Hide all tab contents except the first one
-    $(".venue-tab-content > div:not(:first)").hide();
+    // Ensure jQuery is loaded properly
+    jQuery(document).ready(function () {
+        // Cache selectors for performance
+        var $tabs = jQuery(".tabLinks");
+        var $tabContents = jQuery(".venue-tab-content > div");
 
-    // Add active class to the default tab link
-    $(".tabLinks:first").addClass(
-        "active text-yns_yellow border-b-2 border-yns_yellow rounded-t-lg group"
-    );
+        // Hide all tab contents except the first one
+        $tabContents.not(":first").hide();
 
-    // Add click event to tab links
-    $(".tabLinks").click(function () {
-        // Get the tab ID from the data attribute
-        var tabId = $(this).data("tab");
+        // Add active class to the default tab link
+        $tabs
+            .first()
+            .addClass(
+                "active text-yns_yellow border-b-2 border-yns_yellow rounded-t-lg group"
+            );
 
-        // Hide all tab contents
-        $(".venue-tab-content > div").hide();
+        // Add click event to tab links
+        $tabs.click(function (e) {
+            e.preventDefault(); // Prevent the default anchor click behavior
 
-        // Show the selected tab content
-        $("#" + tabId).fadeIn();
+            // Get the tab ID from the data attribute
+            var tabId = jQuery(this).data("tab");
 
-        // Remove "active" class from all tab links
-        $(".tabLinks").removeClass(
-            "active text-yns_yellow border-b-2 border-yns_yellow rounded-t-lg group"
-        );
+            // Hide all tab contents and show the selected one
+            $tabContents.hide();
+            jQuery("#" + tabId).fadeIn();
 
-        // Add "active" class to the clicked tab link
-        $(this).addClass(
-            "active text-yns_yellow border-b-2 border-yns_yellow rounded-t-lg group"
-        );
+            // Remove "active" class from all tab links
+            $tabs.removeClass(
+                "active text-yns_yellow border-b-2 border-yns_yellow rounded-t-lg group"
+            );
 
-        // Prevent default link behavior
-        return false;
+            // Add "active" class to the clicked tab link
+            jQuery(this).addClass(
+                "active text-yns_yellow border-b-2 border-yns_yellow rounded-t-lg group"
+            );
+        });
     });
 });
 
@@ -173,6 +180,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+// Ratings
 document.addEventListener("DOMContentLoaded", function () {
     const emptyIcon = "{{ asset('storage/images/system/ratings/empty.png') }}";
     const fullIcon = "{{ asset('storage/images/system/ratings/full.png') }}";
@@ -232,7 +240,6 @@ $(document).ready(function () {
 
 // Function to initialize Summernote
 window.initialiseSummernote = function (selector, initialContent) {
-    console.log("Initializing summernote..."); // Debug line
     $(selector).summernote({
         height: 300,
         toolbar: [

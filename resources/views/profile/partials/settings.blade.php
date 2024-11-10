@@ -3,7 +3,8 @@
     <h2 class="font-heading text-xl font-medium text-white">
       {{ __('Settings') }}
     </h2>
-    <p class="text-md mt-2 text-yns_light_gray"></p>
+    <p class="text-md mt-2 text-yns_light_gray">Turn on/off the modules you want or don't want to use. This will hide the
+      modules from your navigation and dashboard.</p>
   </header>
   <div class="grid grid-cols-3 gap-4">
     @foreach ($modules as $moduleName => $moduleSettings)

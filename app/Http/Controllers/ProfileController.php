@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Promoter;
 use Illuminate\View\View;
+use App\Models\OtherService;
 use Illuminate\Http\Request;
 use App\Models\UserModuleSetting;
 use Illuminate\Support\Facades\DB;
@@ -12,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Requests\PromoterProfileUpdateRequest;
 
 class ProfileController extends Controller
 {
@@ -64,6 +67,7 @@ class ProfileController extends Controller
         }
 
         $modulesWithSettings = $this->getModulesWithSettings($user, $dashboardType);
+        $communicationSettings = $this->getCommunicationSettings($user, $dashboardType);
 
         return view('profile.edit', [
             'userId' => $this->getUserId(),
@@ -79,6 +83,7 @@ class ProfileController extends Controller
             'email' => $email,
             'location' => $location,
             'modules' => $modulesWithSettings,
+            'communications' => $communicationSettings,
         ]);
     }
 
@@ -87,8 +92,6 @@ class ProfileController extends Controller
      */
     public function update($dashboardType, ProfileUpdateRequest $request, $userId): RedirectResponse
     {
-        \Log::info("Request's latitude: {$request->latitude}, Request's longitude: {$request->longitude}");
-
         $user = User::findOrFail($userId);
         $userData = $request->validated();
 
@@ -102,19 +105,82 @@ class ProfileController extends Controller
             $user->location = $userData['location'];
         }
 
-        $user->fill($userData);
 
         if ($request->has('role') && $user->hasRole($request->role)) {
             $user->syncRoles([$request->role]);
         }
 
-        if ($user->isDirty('email')) {
-            $user->email_verified_at = null;
-        }
+        $user->fill($userData);
 
         $user->save();
 
         return redirect()->route('profile.edit', ['dashboardType' => $dashboardType, 'id' => $user->id])->with('status', 'profile-updated');
+    }
+
+    public function updatePromoter($dashboardType, PromoterProfileUpdateRequest $request, $userId)
+    {
+        \Log::info('User reached updatePromoter', ['user' => auth()->user()]);
+        // Fetch the user
+        $user = User::findOrFail($userId);
+        $userData = $request->validated();
+
+        if ($dashboardType == 'promoter') {
+            // Fetch the promoter associated with the user via the service_user pivot table
+            $promoter = Promoter::whereHas('linkedUsers', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })->first();
+
+            // If the promoter exists, update the fields
+            if ($promoter) {
+                // Update various fields for the promoter
+                if (isset($userData['email']) && $promoter->contact_email !== $userData['email']) {
+                    $promoter->update(['contact_email' => $userData['email']]);
+                }
+
+                // Update description, venues, genres
+                if (isset($userData['about']) && $promoter->description !== $userData['about']) {
+                    $promoter->update(['description' => $userData['about']]);
+                }
+
+                if (isset($userData['myVenues']) && $promoter->my_venues !== $userData['myVenues']) {
+                    $promoter->update(['my_venues' => $userData['myVenues']]);
+                }
+
+                if (isset($userData['genres']) && $promoter->genre !== json_encode($userData['genres'])) {
+                    $promoter->update(['genre' => json_encode($userData['genres'])]);
+                }
+
+                // Handle contact links
+                \Log::info($userData['contact_links']);
+
+                if (isset($userData['contact_links']) && is_array($userData['contact_links'])) {
+                    // Initialize the contact_links array if it's empty or doesn't exist
+                    if (!isset($user->contact_links)) {
+                        $user->contact_links = [];
+                    }
+
+                    // Update the user's contact_links array for each platform with the new link
+                    foreach ($userData['contact_links'] as $platform => $links) {
+                        // Ensure we are working with an array of links (in case there are multiple links for each platform)
+                        if (is_array($links)) {
+                            foreach ($links as $index => $link) {
+                                $user->contact_links[$platform][$index] = $link;  // Update multiple links for the same platform
+                            }
+                        } else {
+                            // If there's just a single link, ensure it gets stored as an array
+                            $user->contact_links[$platform] = [$links];
+                        }
+                    }
+
+                    // Save the updated contact links directly to the user model as an associative array
+                    $user->update(['contact_links' => $user->contact_links]);
+                    return redirect()->route('profile.edit', ['dashboardType' => $dashboardType, 'id' => $user->id])->with('status', 'profile-updated');
+                }
+            } else {
+                // Handle case where no promoter is linked to the user
+                return response()->json(['error' => 'Promoter not found'], 404);
+            }
+        }
     }
 
     /**
@@ -161,7 +227,6 @@ class ProfileController extends Controller
         return $modulesWithSettings;
     }
 
-
     public function updateModule(Request $request)
     {
         // Validate the incoming request
@@ -183,39 +248,48 @@ class ProfileController extends Controller
         return response()->json(['success' => false, 'message' => 'Module not found.'], 404);
     }
 
-
     private function getPromoterData(User $user)
     {
         $promoter = $user->promoters()->first();
 
         $promoterName = $promoter ? $promoter->name : '';
         $location = $promoter ? $promoter->location : '';
-        $logo = $promoter ? $promoter->logo_url : 'images/system/yns_logo.png';
+        $logo = $promoter && $promoter->logo_url ? asset('storage/' . $promoter->logo_url) : asset('images/system/yns_no_image_found.png');
         $phone = $promoter ? $promoter->contact_number : '';
-        $email = $promoter ? $promoter->contact_email : '';
+        $contact_email = $promoter ? $promoter->contact_email : '';
         $contactLinks = $promoter ? $promoter->contact_link : [];
+
+        $contactName = $promoter ? $promoter->contact_name : '';
 
         if ($contactLinks) {
             $contactLinks = json_decode($promoter->contact_link, true);
         }
-
         $platforms = [];
         $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
 
+        // Initialize the platforms array with empty strings for each platform
         foreach ($platformsToCheck as $platform) {
             $platforms[$platform] = [];
         }
 
-        if (is_array($contactLinks)) {
-            foreach ($contactLinks as $platform => $links) {
+        // Check if the contactLinks array exists and contains social links
+        if (isset($contactLinks['social_links']) && is_array($contactLinks['social_links'])) {
+            foreach ($contactLinks['social_links'] as $platform => $link) {
+                // Only add the link if the platform is one we want to check
                 if (array_key_exists($platform, $platforms)) {
-                    $platforms[$platform] = array_merge($platforms[$platform], $links);
+                    $platforms[$platform] = $link;  // Store the link in an array for each platform
                 }
             }
         }
 
         $about = $promoter ? $promoter->description : '';
         $myVenues = $promoter ? $promoter->my_venues : '';
+        $myEvents = $promoter ? $promoter->events()->with('venues')->get() : collect();
+        $uniqueBands = $this->getUniqueBandsForPromoterEvents($promoter->id);
+        $genreList = file_get_contents(public_path('text/genre_list.json'));
+        $data = json_decode($genreList, true);
+        $genres = $data['genres'];
+        $promoterGenres = is_array($promoter->genre) ? $promoter->genre : explode(',', $promoter->genre);
 
         return [
             'promoter' => $promoter,
@@ -224,9 +298,15 @@ class ProfileController extends Controller
             'logo' => $logo,
             'phone' => $phone,
             'platforms' => $platforms,
+            'platformsToCheck' => $platformsToCheck,
             'about' => $about,
             'myVenues' => $myVenues,
-            'email' => $email
+            'myEvents' => $myEvents,
+            'contact_email' => $contact_email,
+            'contactName' => $contactName,
+            'uniqueBands' => $uniqueBands,
+            'genres' => $genres,
+            'promoterGenres' => $promoterGenres,
         ];
     }
 
@@ -318,5 +398,71 @@ class ProfileController extends Controller
                 'message' => 'An error occurred while adding the role.'
             ], 500);
         }
+    }
+
+    // Communication Prefs
+    protected function getCommunicationSettings($user, $dashboardType)
+    {
+        // Retrieve the user's mailing preferences (already decoded as array due to 'casts')
+        $mailingPreferences = $user->mailing_preferences;
+
+        // Define default preferences from config file
+        $defaultPreferences = config('mailing_preferences.communication_preferences');
+
+        // Merge the default preferences with the user's preferences (user preferences will override defaults)
+        return array_merge($defaultPreferences, $mailingPreferences);
+    }
+
+    public function updatePreferences(Request $request)
+    {
+        $user = auth()->user();
+
+        // Get the current mailing preferences, or set them to default if null
+        $preferences = $user->mailing_preferences ?? [
+            'system_announcements' => true,
+            'legal_or_policy_updates' => true,
+            'account_notifications' => true,
+            'event_invitations' => true,
+            'surveys_and_feedback' => true,
+            'birthday_anniversary_holiday' => true,
+        ];
+
+        // Ensure the preferences are an array, even if the stored value is a string
+        if (!is_array($preferences)) {
+            $preferences = json_decode($preferences, true) ?? [];
+        }
+
+        // Update the specific preference sent in the request
+        foreach ($request->all() as $key => $value) {
+            if (array_key_exists($key, $preferences)) {
+                $preferences[$key] = $value; // Update the preference with the new value (true or false)
+            }
+        }
+
+        // Save the updated preferences (this will store the array as JSON due to the model's cast)
+        $user->mailing_preferences = $preferences;
+        $user->save();
+
+        // Return a success message
+        return response()->json(['message' => 'Preferences updated successfully.']);
+    }
+
+    /**
+     * Get a unique list of bands linked to events associated with the given promoter.
+     *
+     * @param  int  $promoterId
+     * @return \Illuminate\Support\Collection
+     */
+    private function getUniqueBandsForPromoterEvents($promoterId)
+    {
+        // Fetch unique bands linked to events that the promoter is associated with
+        return OtherService::where('other_service_id', 4)
+            ->whereHas('events', function ($query) use ($promoterId) {
+                $query->whereHas('promoters', function ($q) use ($promoterId) {
+                    $q->where('promoter_id', $promoterId);
+                });
+            })
+            ->distinct()
+            ->get();
     }
 }

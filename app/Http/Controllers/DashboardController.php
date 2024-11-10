@@ -82,6 +82,9 @@ class DashboardController extends Controller
             case 'designer':
                 return redirect("/dashboard/{$dashboardType}")->with(['dashboardType', $dashboardType, 'modules', $modules]);
                 break;
+            case 'standard':
+                return redirect("/dashboard/{$dashboardType}")->with(['dashboardType', $dashboardType, 'modules', $modules]);
+                break;
             case 'administrator':
                 return redirect()->route('admin.dashboard', ['dashboardType' => 'administrator']);
             default:

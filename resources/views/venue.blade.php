@@ -11,6 +11,8 @@
         <div class="header flex gap-4">
           @if ($venue->logo_url)
             <img src="{{ asset($venue->logo_url) }}" alt="{{ $venue->name }} Logo" class="_250img">
+          @else
+            <img src="{{ asset('images/system/yns_no_image_found.png') }}" alt="No Image" class="_250img">
           @endif
           <div class="header-text flex flex-col justify-center gap-2">
             <h1 class="text-sans text-4xl">{{ $venue->name }}</h1>
@@ -76,7 +78,7 @@
 
           <div class="venue-tab-content mt-4 overflow-auto font-sans text-lg text-white">
             <div id="about">
-              @if (!$venue->description)
+              @if (empty($venue->description))
                 <p>We're still working on this! Come back later to read about us!</p>
               @else
                 <p>{{ $venue->description }}</p>
@@ -104,11 +106,12 @@
 
             <div id="band-types-genres">
               @php
-                $bandTypes = json_decode($venue->band_type);
+                $bandTypes = json_decode($venue->band_type ?? '[]');
               @endphp
               @if (!$bandTypes)
                 <p>We don't have any specific band types listed, please <a class="underline hover:text-yns_yellow"
-                    href="mailto:{{ $venue->contact_email }}">contact us.</a> if you would like to enquire about booking
+                    href="mailto:{{ $venue->contact_email }}">contact us.</a> if you would like to enquire about
+                  booking
                   your band.</p>
               @else
                 <p class="mb-2">The band types that we usually have at <span
@@ -141,23 +144,28 @@
                     class="underline hover:text-yns_yellow" href="mailto:{{ $venue->email }}">contact us.</a></p>
               @endif
 
-              <p class="mt-4">The genres that we usually have at {{ $venue->name }} are:</p>
+              @if ($venue->genre)
+                <p class="mt-4">The genres that we usually have at {{ $venue->name }} are:</p>
 
-              @php
-                $genres = json_decode($venue->genre);
-              @endphp
+                @php
+                  $genres = json_decode($venue->genre ?? '[]');
+                @endphp
 
-              <!-- Split into 3 columns using Tailwind -->
-              <ul class="genre-list columns-3 gap-4">
-                @foreach ($genres as $genre)
-                  <li class="ml-6">{{ $genre }}</li>
-                @endforeach
-              </ul>
+                <ul class="genre-list columns-3 gap-4">
+                  @foreach ($genres as $genre)
+                    <li class="ml-6">{{ $genre }}</li>
+                  @endforeach
+                </ul>
 
-              <p class="mt-4">If you would like to enquire about a show, please <a
-                  class="underline hover:text-yns_yellow" href="mailto:{{ $venue->contact_email }}">contact us.</a></p>
+                <p class="mt-4">If you would like to enquire about a show, please <a
+                    class="underline hover:text-yns_yellow" href="mailto:{{ $venue->contact_email }}">contact us.</a>
+                </p>
+              @else
+                <p>We don't have a preference on genres of music at {{ $venue->name }}. If you would like to enquire
+                  about a show, please <a class="underline hover:text-yns_yellow"
+                    href="mailto:{{ $venue->contact_email }}">contact us.</a></p>
+              @endif
             </div>
-
 
             <div id="reviews">
               <p class="text-center">Want to know what we're like? Check out our reviews!</p>
@@ -206,10 +214,10 @@
                 @endif
                 <p class="bold pb-2 pt-2 text-2xl">More Info:</p>
                 <p class="pb-2">{!! nl2br(e($venue->additional_info)) !!}</p>
+              @else
+                <p>No Further Information Avaliable</p>
+              @endif
             </div>
-          @else
-            <p>No Further Information Avaliable</p>
-            @endif
           </div>
         </div>
         <x-suggestion-block :existingPromoters="$existingPromoters" :promoterWithHighestRating="$promoterWithHighestRating" :photographerWithHighestRating="$photographerWithHighestRating" :videographerWithHighestRating="$videographerWithHighestRating" :bandWithHighestRating="$bandWithHighestRating"

@@ -11,6 +11,8 @@
         <div class="header flex gap-4">
           @if ($promoter->logo_url)
             <img src="{{ asset($promoter->logo_url) }}" alt="{{ $promoter->name }} Logo" class="_250img">
+          @else
+            <img src="{{ asset('images/system/yns_no_image_found.png') }}" alt="No Image" class="_250img">
           @endif
           <div class="header-text flex flex-col justify-center gap-2">
             <h1 class="text-sans text-4xl">{{ $promoter->name }}</h1>
@@ -72,7 +74,7 @@
               @if (!$promoter->description)
                 <p>We're still working on this! Come back later to read about us!</p>
               @else
-                <p>{{ $promoter->description }}</p>
+                <p>{!! $promoter->description !!}</p>
               @endif
             </div>
 

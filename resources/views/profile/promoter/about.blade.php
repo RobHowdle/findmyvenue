@@ -1,13 +1,14 @@
 <header>
   <h2 class="text-md font-heading font-medium text-white">
-    {{ __('Promoter Details') }}
+    {{ __('About You') }}
   </h2>
 </header>
 <form method="POST" action="{{ route('profile.update', ['dashboardType' => $dashboardType, 'user' => $user->id]) }}">
   @csrf
   @method('PUT')
   <div class="group mb-6">
-    <x-input-label-dark for="about">A bit about you...</x-input-label-dark>
+    <x-input-label-dark for="about">Tell us about you... Where you started, why you started, what you do
+      etc</x-input-label-dark>
     <x-textarea-input class="summernote" id="about" name="about"></x-textarea-input>
     @error('about')
       <p class="yns_red mt-1 text-sm">{{ $message }}</p>
@@ -24,5 +25,8 @@
   </div>
 </form>
 <script>
-  var existingContent = @json(old('about', $about));
+  var aboutContent = @json(old('about', $about));
+  $(document).ready(function() {
+    initialiseSummernote("#about", aboutContent);
+  });
 </script>

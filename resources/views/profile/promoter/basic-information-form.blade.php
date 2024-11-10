@@ -3,7 +3,7 @@
     {{ __('Promoter Details') }}
   </h2>
 </header>
-<form method="POST" action="{{ route('profile.update', ['dashboardType' => $dashboardType, 'user' => $user->id]) }}"
+<form method="POST" action="{{ route('promoter.update', ['dashboardType' => $dashboardType, 'userId' => $user->id]) }}"
   class="grid grid-cols-3 gap-x-8 gap-y-8">
   @csrf
   @method('PUT')
@@ -12,6 +12,15 @@
       <x-input-label-dark for="promoterName">Promotions Company Name</x-input-label-dark>
       <x-text-input id="promoterName" name="promoterName" value="{{ old('promoterName', $promoterName) }}"></x-text-input>
       @error('promoterName')
+        <p class="yns_red mt-1 text-sm">{{ $message }}</p>
+      @enderror
+    </div>
+
+    <div class="group mb-6">
+      <x-input-label-dark for="promoterName">Contact Name</x-input-label-dark>
+      <x-text-input id="contact_name" name="contact_name"
+        value="{{ old('contact_name', $contactName) }}"></x-text-input>
+      @error('contact_name')
         <p class="yns_red mt-1 text-sm">{{ $message }}</p>
       @enderror
     </div>
@@ -52,53 +61,74 @@
     </div>
 
     <div class="group mb-6">
-      <x-input-label-dark for="phone">Phone</x-input-label-dark>
+      <x-input-label-dark for="email">Email</x-input-label-dark>
+      <x-text-input id="contact_email" name="contact_email"
+        value="{{ old('contact_email', $promoterData['contact_email']) }}"></x-text-input>
+      @error('contact_email')
+        <p class="yns_red mt-1 text-sm">{{ $message }}</p>
+      @enderror
+    </div>
+
+    <div class="group mb-6">
+      <x-input-label-dark for="phone">Contact Phone</x-input-label-dark>
       <x-text-input id="phone" name="phone" value="{{ old('phone', $promoterData['phone']) }}"></x-text-input>
       @error('phone')
         <p class="yns_red mt-1 text-sm">{{ $message }}</p>
       @enderror
     </div>
+  </div>
 
-    <div class="group mb-6">
-      <x-input-label-dark for="email">Email</x-input-label-dark>
-      <x-text-input id="email" name="email" value="{{ old('email', $promoterData['email']) }}"></x-text-input>
-      @error('email')
-        <p class="yns_red mt-1 text-sm">{{ $message }}</p>
-      @enderror
+  @if (is_array($platformsToCheck))
+    <div class="col-start-2 col-end-3">
+      @foreach ($platformsToCheck as $platform)
+        <div class="group mb-6">
+          <x-input-label-dark for="{{ $platform }}">{{ ucfirst($platform) }}:</x-input-label-dark>
+
+          @php
+            // Initialize the platform as an empty array if it doesn't exist
+            $links =
+                isset($platforms[$platform]) && is_array($platforms[$platform])
+                    ? $platforms[$platform]
+                    : ($platforms[$platform]
+                        ? [$platforms[$platform]]
+                        : []);
+          @endphp
+
+          @foreach ($links as $index => $link)
+            <x-text-input id="{{ $platform }}-{{ $index }}" name="contact_links[{{ $platform }}][]"
+              value="{{ old('contact_links.' . $platform . '.' . $index, $link) }}">
+            </x-text-input>
+          @endforeach
+
+          <!-- Add a new input field if no links exist for the platform -->
+          @if (empty($links))
+            <x-text-input id="{{ $platform }}-new" name="contact_links[{{ $platform }}][]"
+              value="{{ old('contact_links.' . $platform . '.new', '') }}"
+              placeholder="Add a {{ ucfirst($platform) }} link">
+            </x-text-input>
+          @endif
+
+          <!-- Display any validation errors for each platform's links -->
+          @error('contact_links.' . $platform . '.*')
+            <p class="yns_red mt-1 text-sm">{{ $message }}</p>
+          @enderror
+        </div>
+      @endforeach
     </div>
-  </div>
+  @endif
 
-  <div class="col-start-2 col-end-3">
-    @foreach ($promoterData['platforms'] as $platform => $links)
-      <div class="group mb-6">
-        <x-input-label-dark for="{{ $platform }}">{{ ucfirst($platform) }}:</x-input-label-dark>
-
-        @foreach ($links as $index => $link)
-          <x-text-input id="{{ $platform }}-{{ $index }}" name="contact_links[{{ $platform }}][]"
-            value="{{ old('contact_links.' . $platform . '.' . $index, $link) }}">
-          </x-text-input>
-        @endforeach
-
-        @if (empty($links))
-          <x-text-input id="{{ $platform }}-new" name="contact_links[{{ $platform }}][]"
-            value="{{ old('contact_links.' . $platform . '.new', '') }}"
-            placeholder="Add a {{ ucfirst($platform) }} link">
-          </x-text-input>
-        @endif
-
-        @error('contact_links.' . $platform . '.*')
-          <p class="yns_red mt-1 text-sm">{{ $message }}</p>
-        @enderror
-      </div>
-    @endforeach
-  </div>
 
 
   <div class="col-start-3 col-end-4">
-    <div class="group mb-6">
-      <x-input-label-dark for="logo">Logo</x-input-label-dark>
-      <x-input-file id="logo" name="logo" class="mt-4"></x-input-file>
-      @error('promoterName')
+    <div class="group mb-6 flex flex-col items-center">
+      <x-input-label-dark for="logo" class="text-left">Logo</x-input-label-dark>
+      <x-input-file id="logo" name="logo" onchange="previewLogo(event)"></x-input-file>
+
+      <!-- Preview Image -->
+      <img id="logo-preview" src="{{ $logo }}" alt="Logo Preview" class="mt-4 h-80 w-80 object-cover"
+        style="display: {{ $logo ? 'block' : 'none' }};">
+
+      @error('logo')
         <p class="yns_red mt-1 text-sm">{{ $message }}</p>
       @enderror
     </div>
@@ -113,3 +143,20 @@
     @endif
   </div>
 </form>
+<script>
+  function previewLogo(event) {
+    const file = event.target.files[0];
+    const preview = document.getElementById('logo-preview');
+
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        preview.src = e.target.result; // Set the preview to the file data
+        preview.style.display = 'block'; // Show the preview image
+      };
+
+      reader.readAsDataURL(file); // Read the file as a data URL
+    }
+  }
+</script>

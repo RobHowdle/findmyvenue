@@ -1,6 +1,6 @@
 <header>
   <h2 class="text-md font-heading font-medium text-white">
-    {{ __('Promoter Details') }}
+    {{ __('Your Venues') }}
   </h2>
 </header>
 <form method="POST" action="{{ route('profile.update', ['dashboardType' => $dashboardType, 'user' => $user->id]) }}">
@@ -28,11 +28,9 @@
 </form>
 @push('scripts')
   <script>
-    // var existingContent = @json(old('myVenues', $myVenues));
+    var myVenuesContent = @json(old('myVenues', $myVenues));
     $(document).ready(function() {
-      console.log("Ready to initialize summernote...");
-
-      initialiseSummernote(".summernote", existingContent);
+      initialiseSummernote("#myVenues", myVenuesContent);
     });
   </script>
 @endpush

@@ -59,6 +59,8 @@ Route::get('/other/filter', [OtherServiceController::class, 'filterCheckboxesSea
 
 Route::get('/gig-guide', [GigGuideController::class, 'showGigGuide'])->name('gig-guide');
 Route::get('/gigs/filter', [GigGuideController::class, 'filterGigs'])->name('gigs.filter');
+Route::view('/privacy-policy', 'privacy-policy');
+
 
 Route::middleware(['auth', 'web', 'verified'])->group(function () {
     // Dashboards - Main Dashboard
@@ -116,7 +118,6 @@ Route::middleware(['auth', 'web', 'verified'])->group(function () {
         Route::patch('/finances/{finance}', [FinanceController::class, 'updateFinance'])->name('admin.dashboard.update-finances');
         Route::post('/finances/{finance}', [FinanceController::class, 'exportSingleFinance'])->name('admin.dashboard.export-finance');
     });
-
 
     // Users
     Route::prefix('/dashboard/{dashboardType}')->group(function () {
@@ -196,43 +197,33 @@ Route::middleware(['auth', 'web', 'verified'])->group(function () {
     });
 });
 
-Route::middleware(['auth'])->group(function () {});
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::post('/profile/{dashboardType}/{user}/add-role', [ProfileController::class, 'addRole'])->name('profile.add-role');
-    Route::post('/profile/{dashboardType}/{user}/edit-role', [ProfileController::class, 'editRole'])->name('profile.add-role');
-    Route::get('/profile/events/{user}/apple/sync', [CalendarController::class, 'syncAllEventsToAppleCalendar'])->name('apple.sync');
-    Route::get('/profile/events/{user}', [APIRequestsController::class, 'getUserCalendarEvents']);
-    Route::get('/profile/{dashboardType}/{id}', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::put('/profile/{dashboardType}/{user}', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    Route::get('/profile/{dashboardType}/settings/', [ProfileController::class, 'settings'])->name('settings.index');
-    Route::post('/profile/{dashboardType}/settings/update', [ProfileController::class, 'updateModule'])->name('settings.updateModule');
+// Route::middleware(['auth', 'verified'])->group(function () {
+// More specific routes
+Route::put('/profile/{dashboardType}/public-profile-update/{userId}', [ProfileController::class, 'updatePromoter'])->name('promoter.update');
+Route::get('/profile/{dashboardType}/settings', [ProfileController::class, 'settings'])->name('settings.index');
+Route::post('/profile/{dashboardType}/settings/update', [ProfileController::class, 'updateModule'])->name('settings.updateModule');
+Route::get('/profile/{dashboardType}/communications', [ProfileController::class, 'communications'])->name('communications.index');
+Route::post('/profile/{dashboardType}/communications/update', [ProfileController::class, 'updatePreferences'])->name('communications.updatePreferences');
 
 
-    Route::get('auth/google', [CalendarController::class, 'redirectToGoogle'])->name('google.redirect');
-    Route::get('auth/google/callback', [CalendarController::class, 'handleGoogleCallback']);
-    Route::post('google/sync', [CalendarController::class, 'syncGoogleCalendar'])->name('google.sync');
-    Route::post('google/unlink', [CalendarController::class, 'unlinkGoogle'])->name('google.unlink');
+Route::post('/profile/{dashboardType}/{user}/add-role', [ProfileController::class, 'addRole'])->name('profile.add-role');
+Route::post('/profile/{dashboardType}/{user}/edit-role', [ProfileController::class, 'editRole'])->name('profile.edit-role');
 
-    Route::get('/admin/venues', [AdminController::class, 'getVenues'])->name('admin.venues');
-    Route::post('/admin/venues', [AdminController::class, 'saveNewVenue'])->name('admin.new-venue');
-    Route::get('/admin/venues/list', [AdminController::class, 'viewVenueList'])->name('admin.venue-list');
-    Route::get('/admin/venues/{venueId}/edit', [AdminController::class, 'editVenue'])->name('admin.edit-venues');
-    Route::post('/admin/venues/{venueId}', [AdminController::class, 'updateVenue'])->name('admin.update-venue');
-    Route::delete('/admin/venues/{venueId}', [AdminController::class, 'deleteVenue'])->name('admin.delete-venue');
+// Calendar-specific routes
+Route::get('/profile/events/{user}/apple/sync', [CalendarController::class, 'syncAllEventsToAppleCalendar'])->name('apple.sync');
+Route::get('/profile/events/{user}', [APIRequestsController::class, 'getUserCalendarEvents']);
 
-    Route::get('/admin/promoters', [AdminController::class, 'getPromoters'])->name('admin.promoters');
-    Route::post('/admin/promoters', [AdminController::class, 'saveNewPromoter'])->name('admin.new-promoter');
-    Route::get('/admin/promoters/list', [AdminController::class, 'viewPromoterList'])->name('admin.promoter-list');
-    Route::get('/admin/promoters/{promoterId}/edit', [AdminController::class, 'editPromoter'])->name('admin.edit-promoter');
-    Route::post('/admin/promoters/{promoterId}', [AdminController::class, 'updatePromoter'])->name('admin.update-promoter');
-    Route::delete('/admin/promoters/{promoterId}', [AdminController::class, 'deletePromoter'])->name('admin.delete-promoter');
-    Route::get('/admin/promoters/get-location-venues', [AdminController::class, 'getVenuesBySelectedLocation']);
+// General profile routes
+Route::get('/profile/{dashboardType}/{id}', [ProfileController::class, 'edit'])->name('profile.edit');
+Route::put('/profile/{dashboardType}/{user}', [ProfileController::class, 'update'])->name('profile.update');
+Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/admin/create-other', [AdminController::class, 'createOtherService'])->name('admin.createOther');
-    Route::post('/admin/save-other', [AdminController::class, 'saveNewOtherService'])->name('admin.save-other');
-});
+// Google calendar routes
+Route::get('auth/google', [CalendarController::class, 'redirectToGoogle'])->name('google.redirect');
+Route::get('auth/google/callback', [CalendarController::class, 'handleGoogleCallback']);
+Route::post('google/sync', [CalendarController::class, 'syncGoogleCalendar'])->name('google.sync');
+Route::post('google/unlink', [CalendarController::class, 'unlinkGoogle'])->name('google.unlink');
+// });
+
 
 require __DIR__ . '/auth.php';

@@ -144,13 +144,32 @@
           </li>
           <li>
             <a href="#"
-              class="text-white transition duration-150 ease-in-out hover:text-yns_yellow hover:underline">Support</a>
+              class="text-white transition duration-150 ease-in-out hover:text-yns_yellow hover:underline">Credits</a>
           </li>
           <li>
             <a href="#"
               class="text-white transition duration-150 ease-in-out hover:text-yns_yellow hover:underline">Contact</a>
           </li>
         </ul>
+        <ul class="flex w-60 flex-col gap-2 text-right font-heading">
+          <li>
+            <a href="https://www.youtube.com/watch?v=Rs2z7OA3XKI" target="_blank"
+              class="text-white transition duration-150 ease-in-out hover:text-yns_yellow">We didn't know
+              what to put
+              here so here is a funny video</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="w-full bg-black px-2 py-2">
+      <div class="mx-auto flex max-w-screen-2xl flex-wrap items-center justify-between">
+        <a href="/privacy-policy"
+          class="text-white transition duration-150 ease-in-out hover:text-yns_yellow hover:underline">Privacy
+          Policy</a>
+        <p class="text-yns_med_gray">&copy; {{ env('APP_NAME') }} All Rights Reserved {{ date('Y') }}</p>
+        <a href="#"
+          class="text-white transition duration-150 ease-in-out hover:text-yns_yellow hover:underline">Terms &
+          Conditions</a>
       </div>
     </div>
   </footer>

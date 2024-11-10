@@ -33,6 +33,10 @@ class Promoter extends Model
         'contact_link',
     ];
 
+    protected $casts = [
+        'contact_links' => 'array',
+    ];
+
     public function venues()
     {
         return $this->belongsToMany(Venue::class, 'promoter_venue_pivot', 'promoters_id', 'venues_id');

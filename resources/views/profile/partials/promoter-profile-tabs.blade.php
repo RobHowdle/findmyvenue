@@ -3,9 +3,14 @@
     @include('profile.promoter.basic-information-form', [
         'firstName' => $firstName,
         'lastName' => $lastName,
-        'email' => $email,
         'location' => $location,
         'promoterName' => $promoterData['promoterName'],
+        'contactName' => $promoterData['contactName'],
+        'email' => $promoterData['contact_email'],
+        'phone' => $promoterData['phone'],
+        'platformsToCheck' => $promoterData['platformsToCheck'],
+        'platforms' => $promoterData['platforms'],
+        'logo' => $promoterData['logo'],
     ]) </div>
 </div>
 <div x-show="selectedTab === 3" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
@@ -22,29 +27,29 @@
 </div>
 <div x-show="selectedTab === 5" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
   <div class="w-full">
-    5
     @include('profile.promoter.my-events', [
         'userRole' => $userRole,
         'firstName' => $firstName,
         'lastName' => $lastName,
         'email' => $email,
         'location' => $location,
+        'myEvents' => $promoterData['myEvents'],
+        'dashboardType' => $dashboardType,
     ]) </div>
 </div>
 <div x-show="selectedTab === 6" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
   <div class="w-full">
-    6
     @include('profile.promoter.my-bands', [
         'userRole' => $userRole,
         'firstName' => $firstName,
         'lastName' => $lastName,
         'email' => $email,
         'location' => $location,
+        'uniqueBands' => $promoterData['uniqueBands'],
     ]) </div>
 </div>
 <div x-show="selectedTab === 7" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
   <div class="w-full">
-    7
     @include('profile.promoter.my-genres', [
         'dashboardType' => $dashboardType,
         'userRole' => $userRole,
@@ -52,5 +57,7 @@
         'lastName' => $lastName,
         'email' => $email,
         'location' => $location,
+        'genres' => $promoterData['genres'],
+        'promoterGenres' => $promoterData['promoterGenres'],
     ]) </div>
 </div>

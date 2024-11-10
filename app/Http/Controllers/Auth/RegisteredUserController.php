@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Config;
 use App\Providers\RouteServiceProvider;
 use App\Http\Requests\RegisterUserRequest;
 
@@ -60,6 +61,8 @@ class RegisteredUserController extends Controller
 
                     // Set Default Modules based on Role
                     $this->setDefaultModules($user, $role->name);
+                    // Set default mailing preferences
+                    $this->setDefaultMailingPreferences($user);
 
                     event(new Registered($user));
 
@@ -175,5 +178,26 @@ class RegisteredUserController extends Controller
                 ]);
             }
         }
+    }
+
+    protected function setDefaultMailingPreferences($user)
+    {
+        // Retrieve the default communication preferences from the config file
+        $defaultPreferences = Config::get('mailing_preferences.communication_preferences');
+
+        // Set all preferences to true (enabled)
+        $preferences = [];
+        foreach ($defaultPreferences as $preferenceKey => $preference) {
+            $preferences[$preferenceKey] = true; // Default all preferences to true
+        }
+
+        // Store the preferences as an array (Laravel will handle the JSON encoding automatically)
+        $user->mailing_preferences = $preferences;
+        $user->save();
+
+        // Optionally, you can return a success response
+        return response()->json([
+            'message' => 'Default mailing preferences set successfully.'
+        ]);
     }
 }
