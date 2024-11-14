@@ -197,33 +197,33 @@ Route::middleware(['auth', 'web', 'verified'])->group(function () {
     });
 });
 
-// Route::middleware(['auth', 'verified'])->group(function () {
-// More specific routes
-Route::put('/profile/{dashboardType}/public-profile-update/{userId}', [ProfileController::class, 'updatePromoter'])->name('promoter.update');
-Route::get('/profile/{dashboardType}/settings', [ProfileController::class, 'settings'])->name('settings.index');
-Route::post('/profile/{dashboardType}/settings/update', [ProfileController::class, 'updateModule'])->name('settings.updateModule');
-Route::get('/profile/{dashboardType}/communications', [ProfileController::class, 'communications'])->name('communications.index');
-Route::post('/profile/{dashboardType}/communications/update', [ProfileController::class, 'updatePreferences'])->name('communications.updatePreferences');
+Route::middleware(['auth', 'verified'])->group(function () {
+    // More specific routes
+    Route::put('/profile/{dashboardType}/public-profile-update/{user}', [ProfileController::class, 'updatePromoter'])->name('promoter.update');
+    Route::get('/profile/{dashboardType}/settings', [ProfileController::class, 'settings'])->name('settings.index');
+    Route::post('/profile/{dashboardType}/settings/update', [ProfileController::class, 'updateModule'])->name('settings.updateModule');
+    Route::get('/profile/{dashboardType}/communications', [ProfileController::class, 'communications'])->name('communications.index');
+    Route::post('/profile/{dashboardType}/communications/update', [ProfileController::class, 'updatePreferences'])->name('communications.updatePreferences');
 
+    Route::post('/profile/{dashboardType}/{user}/add-role', [ProfileController::class, 'addRole'])->name('profile.add-role');
+    Route::post('/profile/{dashboardType}/{user}/edit-role', [ProfileController::class, 'editRole'])->name('profile.edit-role');
+    Route::delete('/profile/{dashboardType}/{user}/delete-role', [ProfileController::class, 'deleteRole'])->name('profile.delete-role');
 
-Route::post('/profile/{dashboardType}/{user}/add-role', [ProfileController::class, 'addRole'])->name('profile.add-role');
-Route::post('/profile/{dashboardType}/{user}/edit-role', [ProfileController::class, 'editRole'])->name('profile.edit-role');
+    // Calendar-specific routes
+    Route::get('/profile/events/{user}/apple/sync', [CalendarController::class, 'syncAllEventsToAppleCalendar'])->name('apple.sync');
+    Route::get('/profile/events/{user}', [APIRequestsController::class, 'getUserCalendarEvents']);
 
-// Calendar-specific routes
-Route::get('/profile/events/{user}/apple/sync', [CalendarController::class, 'syncAllEventsToAppleCalendar'])->name('apple.sync');
-Route::get('/profile/events/{user}', [APIRequestsController::class, 'getUserCalendarEvents']);
+    // General profile routes
+    Route::get('/profile/{dashboardType}/{id}', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile/{dashboardType}/{user}', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-// General profile routes
-Route::get('/profile/{dashboardType}/{id}', [ProfileController::class, 'edit'])->name('profile.edit');
-Route::put('/profile/{dashboardType}/{user}', [ProfileController::class, 'update'])->name('profile.update');
-Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-// Google calendar routes
-Route::get('auth/google', [CalendarController::class, 'redirectToGoogle'])->name('google.redirect');
-Route::get('auth/google/callback', [CalendarController::class, 'handleGoogleCallback']);
-Route::post('google/sync', [CalendarController::class, 'syncGoogleCalendar'])->name('google.sync');
-Route::post('google/unlink', [CalendarController::class, 'unlinkGoogle'])->name('google.unlink');
-// });
+    // Google calendar routes
+    Route::get('auth/google', [CalendarController::class, 'redirectToGoogle'])->name('google.redirect');
+    Route::get('auth/google/callback', [CalendarController::class, 'handleGoogleCallback']);
+    Route::post('google/sync', [CalendarController::class, 'syncGoogleCalendar'])->name('google.sync');
+    Route::post('google/unlink', [CalendarController::class, 'unlinkGoogle'])->name('google.unlink');
+});
 
 
 require __DIR__ . '/auth.php';

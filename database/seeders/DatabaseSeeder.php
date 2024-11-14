@@ -29,14 +29,14 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AdminUserSeeder::class,
             PermissionsSeeder::class,
+            RoleSeeder::class,
             // VenueTestSeeder::class, // For Testing Data
-            VenuesSeeder::class,
-            VenueExtraInfoSeeder::class, // For Testing Data
+            // VenuesSeeder::class,
+            // VenueExtraInfoSeeder::class, // For Testing Data
             // PromoterTestSeeder::class,
-            PromoterSeeder::class,
+            // PromoterSeeder::class,
             // PromoterVenueTestPivotSeeder::class, // For Testing Data
             // PromoterReviewTestSeeder::class, // For Testing Data
-            RoleSeeder::class,
             // OtherServicesListSeeder::class,
             // OtherServiceSeeder::class,
             // FinanceTestDataSeeder::class,

@@ -3,7 +3,7 @@
     {{ __('Promoter Details') }}
   </h2>
 </header>
-<form method="POST" action="{{ route('promoter.update', ['dashboardType' => $dashboardType, 'userId' => $user->id]) }}"
+<form method="POST" action="{{ route('promoter.update', ['dashboardType' => $dashboardType, 'user' => $user]) }}"
   class="grid grid-cols-3 gap-x-8 gap-y-8">
   @csrf
   @method('PUT')
@@ -85,7 +85,7 @@
           <x-input-label-dark for="{{ $platform }}">{{ ucfirst($platform) }}:</x-input-label-dark>
 
           @php
-            // Initialize the platform as an empty array if it doesn't exist
+            // Ensure the links for the platform are correctly handled as an array
             $links =
                 isset($platforms[$platform]) && is_array($platforms[$platform])
                     ? $platforms[$platform]
@@ -100,7 +100,7 @@
             </x-text-input>
           @endforeach
 
-          <!-- Add a new input field if no links exist for the platform -->
+          <!-- If no links exist, provide a way to add one -->
           @if (empty($links))
             <x-text-input id="{{ $platform }}-new" name="contact_links[{{ $platform }}][]"
               value="{{ old('contact_links.' . $platform . '.new', '') }}"
@@ -108,16 +108,14 @@
             </x-text-input>
           @endif
 
-          <!-- Display any validation errors for each platform's links -->
           @error('contact_links.' . $platform . '.*')
             <p class="yns_red mt-1 text-sm">{{ $message }}</p>
           @enderror
         </div>
       @endforeach
+
     </div>
   @endif
-
-
 
   <div class="col-start-3 col-end-4">
     <div class="group mb-6 flex flex-col items-center">

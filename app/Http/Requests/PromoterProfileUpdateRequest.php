@@ -11,7 +11,7 @@ class PromoterProfileUpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,19 +22,20 @@ class PromoterProfileUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'sometimes|string|max:255',
-            'location' => 'sometimes|string',
-            'postal_town' => 'sometimes|string',
-            'latitude' => 'sometimes|numeric',
-            'longitude' => 'sometimes|numeric',
-            'logo' => 'sometimes|image|mimes:jpeg,jpg,png,webp,svg|max:5120',
-            'about' => 'sometimes|string',
-            'myVenues' => 'sometimes|string',
-            'genres' => 'sometimes|array',
-            'band_types' => 'sometimes|array',
-            'contact_name' => 'sometimes|string',
-            'contact_email' => 'sometimes|email',
-            'contact_links.*.*' => 'nullable|url'
+            'name' => 'nullable|string|max:255',
+            'location' => 'nullable|string',
+            'postal_town' => 'nullable|string',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+            'logo' => 'nullable|image|mimes:jpeg,jpg,png,webp,svg|max:5120',
+            'about' => 'nullable|string',
+            'myVenues' => 'nullable|string',
+            'genres' => 'nullable|array',
+            'band_types' => 'nullable|array',
+            'contact_name' => 'nullable|string',
+            'contact_email' => 'nullable|email',
+            'contact_links.*.*' => 'nullable|url',
+            'genres' => 'nullable|array',
         ];
     }
 }

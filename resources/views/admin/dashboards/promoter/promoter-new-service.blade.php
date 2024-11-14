@@ -17,8 +17,9 @@
           <div class="col-span-2" id="create-promoter-form" style="display: none;">
             <p class="col-span-2 mb-3 font-bold">It looks like you're not already in the system - Let's get you added!
             </p>
-            <form action="{{ route('admin.dashboard.promoter.store') }}" class="grid grid-cols-2 gap-x-8 gap-y-4"
-              id="promoter-create-form" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('admin.dashboard.promoter.store', ['dashboardType' => $dashboardType]) }}"
+              class="grid grid-cols-2 gap-x-8 gap-y-4" id="promoter-create-form" method="POST"
+              enctype="multipart/form-data">
               @csrf
               <div class="group">
                 <x-input-label-dark>Where are you based?</x-input-label-dark>
@@ -330,9 +331,12 @@
     // Promoter search functionality
     $('#promoter-search').on('keyup', function() {
       let query = $(this).val();
+      const dashboardType = "{{ $dashboardType }}";
+
 
       $.ajax({
-        url: '{{ route('admin.dashboard.promoter.search') }}',
+        url: '{{ route('admin.dashboard.promoter.search', ['dashboardType' => ':dashboardType']) }}'
+          .replace(':dashboardType', dashboardType),
         type: 'GET',
         data: {
           query: query
@@ -368,8 +372,10 @@
     });
 
     function linkUserToPromoter(promoterId) {
+      const dashboardType = "{{ $dashboardType }}";
       $.ajax({
-        url: '{{ route('admin.dashboard.promoter.link') }}',
+        url: '{{ route('admin.dashboard.promoter.link', ['dashboardType' => ':dashboardType']) }}'
+          .replace(':dashboardType', dashboardType),
         type: 'POST',
         data: {
           _token: '{{ csrf_token() }}',

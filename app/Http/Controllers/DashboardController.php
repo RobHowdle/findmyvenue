@@ -48,6 +48,7 @@ class DashboardController extends Controller
         $modules = $this->getUserModules($user);
         session(['modules' => $modules]);
 
+
         // Determine dashboard type
         $dashboardType = lcfirst($roleName);
 

@@ -95,8 +95,16 @@ class ProfileController extends Controller
         $user = User::findOrFail($userId);
         $userData = $request->validated();
 
+        if (isset($userData['firstName']) || isset($userData['lastName'])) {
+            $user->first_name = $userData['firstName'];
+            $user->last_name = $userData['lastName'];
+        }
+
+        if (isset($userData['email'])) {
+            $user->email = $userData['email'];
+        }
+
         if (isset($userData['latitude']) && isset($userData['longitude'])) {
-            // Assign correct latitude and longitude fields
             $user->latitude = $userData['latitude'];
             $user->longitude = $userData['longitude'];
         }
@@ -104,7 +112,6 @@ class ProfileController extends Controller
         if (isset($userData['location'])) {
             $user->location = $userData['location'];
         }
-
 
         if ($request->has('role') && $user->hasRole($request->role)) {
             $user->syncRoles([$request->role]);
@@ -117,11 +124,11 @@ class ProfileController extends Controller
         return redirect()->route('profile.edit', ['dashboardType' => $dashboardType, 'id' => $user->id])->with('status', 'profile-updated');
     }
 
-    public function updatePromoter($dashboardType, PromoterProfileUpdateRequest $request, $userId)
+    public function updatePromoter($dashboardType, PromoterProfileUpdateRequest $request, $user)
     {
-        \Log::info('User reached updatePromoter', ['user' => auth()->user()]);
         // Fetch the user
-        $user = User::findOrFail($userId);
+        $user = User::findOrFail($user);
+        $userId = $user->id;
         $userData = $request->validated();
 
         if ($dashboardType == 'promoter') {
@@ -130,14 +137,13 @@ class ProfileController extends Controller
                 $query->where('user_id', $userId);
             })->first();
 
-            // If the promoter exists, update the fields
+            // Check if the promoter exists
             if ($promoter) {
                 // Update various fields for the promoter
-                if (isset($userData['email']) && $promoter->contact_email !== $userData['email']) {
-                    $promoter->update(['contact_email' => $userData['email']]);
+                if (isset($userData['contact_email']) && $promoter->contact_email !== $userData['contact_email']) {
+                    $promoter->update(['contact_email' => $userData['contact_email']]);
                 }
 
-                // Update description, venues, genres
                 if (isset($userData['about']) && $promoter->description !== $userData['about']) {
                     $promoter->update(['description' => $userData['about']]);
                 }
@@ -146,36 +152,32 @@ class ProfileController extends Controller
                     $promoter->update(['my_venues' => $userData['myVenues']]);
                 }
 
-                if (isset($userData['genres']) && $promoter->genre !== json_encode($userData['genres'])) {
-                    $promoter->update(['genre' => json_encode($userData['genres'])]);
+                if (isset($userData['genres'])) {
+                    $storedGenres = json_decode($promoter->genre, true);
+                    if ($storedGenres !== $userData['genres']) {
+                        $promoter->update(['genre' => json_encode($userData['genres'])]);
+                    }
                 }
-
-                // Handle contact links
-                \Log::info($userData['contact_links']);
 
                 if (isset($userData['contact_links']) && is_array($userData['contact_links'])) {
-                    // Initialize the contact_links array if it's empty or doesn't exist
-                    if (!isset($user->contact_links)) {
-                        $user->contact_links = [];
-                    }
+                    // Start with the existing `contact_links` array or an empty array if it doesn't exist
+                    $updatedLinks = !empty($promoter->contact_link) ? json_decode($promoter->contact_link, true) : [];
 
-                    // Update the user's contact_links array for each platform with the new link
+                    // Iterate through the `contact_link` array from the request data
                     foreach ($userData['contact_links'] as $platform => $links) {
-                        // Ensure we are working with an array of links (in case there are multiple links for each platform)
-                        if (is_array($links)) {
-                            foreach ($links as $index => $link) {
-                                $user->contact_links[$platform][$index] = $link;  // Update multiple links for the same platform
-                            }
-                        } else {
-                            // If there's just a single link, ensure it gets stored as an array
-                            $user->contact_links[$platform] = [$links];
-                        }
+                        // Ensure we're setting only non-empty values
+                        $updatedLinks[$platform] = !empty($links[0]) ? $links[0] : null;
                     }
 
-                    // Save the updated contact links directly to the user model as an associative array
-                    $user->update(['contact_links' => $user->contact_links]);
-                    return redirect()->route('profile.edit', ['dashboardType' => $dashboardType, 'id' => $user->id])->with('status', 'profile-updated');
+                    // Filter out null values to remove platforms with no links
+                    $updatedLinks = array_filter($updatedLinks);
+
+                    // Encode the array back to JSON for storage and update the promoter record
+                    $promoter->update(['contact_link' => json_encode($updatedLinks)]);
                 }
+
+                // Return success message with redirect
+                return redirect()->route('profile.edit', ['dashboardType' => $dashboardType, 'id' => $user->id])->with('status', 'profile-updated');
             } else {
                 // Handle case where no promoter is linked to the user
                 return response()->json(['error' => 'Promoter not found'], 404);
@@ -257,27 +259,23 @@ class ProfileController extends Controller
         $logo = $promoter && $promoter->logo_url ? asset('storage/' . $promoter->logo_url) : asset('images/system/yns_no_image_found.png');
         $phone = $promoter ? $promoter->contact_number : '';
         $contact_email = $promoter ? $promoter->contact_email : '';
-        $contactLinks = $promoter ? $promoter->contact_link : [];
-
+        $contactLinks = $promoter ? json_decode($promoter->contact_link, true) : [];
         $contactName = $promoter ? $promoter->contact_name : '';
 
-        if ($contactLinks) {
-            $contactLinks = json_decode($promoter->contact_link, true);
-        }
         $platforms = [];
         $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
 
         // Initialize the platforms array with empty strings for each platform
         foreach ($platformsToCheck as $platform) {
-            $platforms[$platform] = [];
+            $platforms[$platform] = '';  // Set default to empty string
         }
 
         // Check if the contactLinks array exists and contains social links
-        if (isset($contactLinks['social_links']) && is_array($contactLinks['social_links'])) {
-            foreach ($contactLinks['social_links'] as $platform => $link) {
-                // Only add the link if the platform is one we want to check
-                if (array_key_exists($platform, $platforms)) {
-                    $platforms[$platform] = $link;  // Store the link in an array for each platform
+        if ($contactLinks) {
+            foreach ($platformsToCheck as $platform) {
+                // Only add the link if the platform exists in the $contactLinks array
+                if (isset($contactLinks[$platform])) {
+                    $platforms[$platform] = $contactLinks[$platform];  // Store the link for the platform
                 }
             }
         }
@@ -289,7 +287,7 @@ class ProfileController extends Controller
         $genreList = file_get_contents(public_path('text/genre_list.json'));
         $data = json_decode($genreList, true);
         $genres = $data['genres'];
-        $promoterGenres = is_array($promoter->genre) ? $promoter->genre : explode(',', $promoter->genre);
+        $promoterGenres = is_array($promoter->genre) ? $promoter->genre : json_decode($promoter->genre, true);
 
         return [
             'promoter' => $promoter,
@@ -396,6 +394,50 @@ class ProfileController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'An error occurred while adding the role.'
+            ], 500);
+        }
+    }
+
+    public function deleteRole(Request $request)
+    {
+        try {
+            // Retrieve the user
+            $user = User::findOrFail($request->id);
+            \Log::info('User found: ', [$user]);
+
+            // Validate the incoming request
+            $request->validate([
+                'roleId' => 'required|exists:roles,id', // Ensure roleId is valid
+            ]);
+
+            // Retrieve the role
+            $role = Role::find($request->roleId);
+            \Log::info('Role found: ', [$role]);
+
+            if (!$role) {
+                return response()->json(['success' => false, 'message' => 'Role not found.'], 404);
+            }
+
+            // Check if the user has the role
+            if (!$user->hasRole($role->name)) {
+                return response()->json(['success' => false, 'message' => 'User does not have this role.'], 400);
+            }
+
+            // Remove the role from the user
+            $user->removeRole($role->name);  // This removes the role from the user
+
+            // Return the response with success message and role name
+            return response()->json([
+                'success' => true,
+                'message' => 'Role removed successfully.',
+                'removedRoleName' => $role->name
+            ]);
+        } catch (\Exception $e) {
+            // Log the error and return a response
+            \Log::error('Error removing role: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while removing the role.'
             ], 500);
         }
     }

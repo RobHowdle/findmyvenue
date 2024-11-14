@@ -142,6 +142,20 @@
       </div>
     </div>
 
+    <div id="deleteRoleModal" class="fixed inset-0 flex hidden items-center justify-center bg-gray-500 bg-opacity-75">
+      <div class="w-96 rounded bg-black p-8 text-white shadow-md">
+        <h2 id="deleteModalTitle" class="text-lg font-semibold">Delete Role</h2>
+        <input type="hidden" id="add-role-id" />
+        <div class="mt-2">
+          <p>Are you sure you want to delete this role? You will loose all access to this dashboard.</p>
+        </div>
+        <div class="mt-4 flex flex-row gap-6">
+          <x-button id="save-delete-role-btn" label="Delete Role"></x-button>
+          <x-button onclick="closeModal('deleteRoleModal')" label="Cancel"></x-button>
+        </div>
+      </div>
+    </div>
+
     <div class="flex items-center gap-4">
       <button type="submit"
         class="mt-8 rounded-lg border border-white bg-white px-4 py-2 font-heading font-bold text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">Save</button>
@@ -155,10 +169,20 @@
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const addRoleBtn = document.getElementById('add-role');
+    const deleteRoleBtns = document.querySelectorAll('#delete-role');
+
     if (addRoleBtn) {
       addRoleBtn.addEventListener('click', showAddRoleModal);
     }
-  });
+
+    deleteRoleBtns.forEach(button => {
+      button.addEventListener('click', function(event) {
+        const roleId = event.target.getAttribute('data-role-id');
+        const roleName = event.target.getAttribute('data-role-name');
+        showDeleteRoleModal(roleId, roleName);
+      });
+    });
+  })
 
   function showEditRoleModal(roleId, roleName) {
     const editModalTitle = document.getElementById('editModalTitle');
@@ -192,6 +216,26 @@
 
     // Remove the hidden class to show the add modal
     document.getElementById('addRoleModal').classList.remove('hidden');
+  }
+
+  function showDeleteRoleModal(roleId, roleName) {
+    const deleteModalTitle = document.getElementById('deleteModalTitle');
+    const saveDeleteButton = document.getElementById('save-delete-role-btn');
+
+    deleteModalTitle.textContent = 'Delete Role';
+
+    // Store role information on the button
+    saveDeleteButton.setAttribute('data-role-id', roleId);
+    saveDeleteButton.setAttribute('data-role-name', roleName);
+
+    // Update the button's onclick to handle deletion
+    saveDeleteButton.onclick = function() {
+      const roleId = saveDeleteButton.getAttribute('data-role-id');
+      saveDeleteRole(roleId); // Implement role deletion logic here
+    };
+
+    // Show the modal
+    document.getElementById('deleteRoleModal').classList.remove('hidden');
   }
 
   // Close modal function
@@ -314,6 +358,40 @@
         showFailureNotification('An unexpected error occurred: ' + error.message);
       });
   }
+
+  function saveDeleteRole(roleId) {
+    const dashboardType = "{{ $dashboardType }}";
+    const userId = "{{ $user->id }}";
+
+    fetch(`/profile/${dashboardType}/${userId}/delete-role`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
+        body: JSON.stringify({
+          id: userId,
+          roleId: roleId,
+          dashboardType: dashboardType
+        }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showSuccessNotification('Role deleted successfully');
+          closeModal('deleteRoleModal');
+          location.reload(); // Optionally reload the page to reflect the changes
+        } else {
+          showFailureNotification('Failed to delete role');
+        }
+      })
+      .catch(error => {
+        console.error('Error deleting role:', error);
+        showFailureNotification('Error occurred while deleting role');
+      });
+  }
+
+
 
 
   document.addEventListener("DOMContentLoaded", function() {

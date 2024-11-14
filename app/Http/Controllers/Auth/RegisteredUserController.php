@@ -54,10 +54,8 @@ class RegisteredUserController extends Controller
 
                     $requestedRoleId = $request->role;
                     $role = Role::findOrFail($request->role);
-                    Log::info('Requested Role:', ['role_id' => $requestedRoleId, 'role_name' => $role->name]);
 
                     $user->assignRole($role->name);
-                    Log::info('Assigned Role:', ['user_id' => $user->id, 'role_id' => $role->id, 'role_name' => $role->name]);
 
                     // Set Default Modules based on Role
                     $this->setDefaultModules($user, $role->name);
@@ -116,8 +114,6 @@ class RegisteredUserController extends Controller
 
     protected function setDefaultModules($user, $roleName)
     {
-        Log::info('Setting default modules for user', ['user_id' => $user->id, 'role' => $roleName]);
-
         // Define all available modules
         $allModules = ['events', 'todo_list', 'notes', 'finances', 'documents', 'users', 'reviews'];
 
@@ -164,12 +160,6 @@ class RegisteredUserController extends Controller
                         'is_enabled' => in_array($module, $defaultModules), // Enable if in default modules
                     ]
                 );
-
-                Log::info('UserModuleSetting processed', [
-                    'user_id' => $user->id,
-                    'module_name' => $module,
-                    'is_enabled' => $defaultSettings->is_enabled,
-                ]);
             } catch (\Exception $e) {
                 Log::error('Failed to create UserModuleSetting', [
                     'user_id' => $user->id,

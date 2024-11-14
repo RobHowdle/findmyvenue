@@ -4,19 +4,20 @@
   </h2>
 </header>
 
-<form action="{{ route('profile.update', ['dashboardType' => $dashboardType, 'user' => $user->id]) }}" method="POST">
+<form action="{{ route('promoter.update', ['dashboardType' => $dashboardType, 'user' => $user->id]) }}" method="POST"
+  class="mt-4">
   @csrf
   @method('PUT')
   <div class="mt-4 grid sm:grid-cols-2 sm:gap-3 lg:grid-cols-3 lg:gap-4">
     @php
-      $promoterGenres = is_array($promoterGenres) ? $promoterGenres : explode(',', $promoterGenres);
+      $promoterGenres = is_string($promoter->genre) ? explode(',', $promoter->genre) : $promoter->genre;
     @endphp
 
     <!-- "All Genres" checkbox -->
     <div class="flex items-center">
       <input id="all-genres" name="all-genres" type="checkbox" value=""
         class="genre-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
-        onchange="toggleAllGenres(this)" {{ in_array('All', $promoterGenres) ? 'checked' : '' }}>
+        {{ in_array('All', $promoterGenres) ? 'checked' : '' }}>
       <label for="all-genres" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">All Genres</label>
     </div>
 
@@ -34,18 +35,13 @@
               All {{ $genre['name'] }}
             </label>
 
-            @error('genres[]')
-              <span class="text-red-500">{{ $message }}</span>
-            @enderror
-
             <div class="accordion-content mt-2 pl-4">
               @foreach ($genre['subgenres'] as $subIndex => $subgenre)
                 <div class="checkbox-wrapper mb-2 flex items-center">
                   <input type="checkbox"
                     class="subgenre-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
                     id="genre-{{ $index }}-subgenre-{{ $subIndex }}" name="genres[]"
-                    value="{{ $subgenre }}" {{ in_array($subgenre, $promoterGenres) ? 'checked' : '' }}
-                    data-parent-genre="{{ $genre['name'] }}">
+                    value="{{ $subgenre }}" {{ in_array($subgenre, $promoterGenres) ? 'checked' : '' }}>
                   <label class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100"
                     for="subgenre-{{ $index }}-{{ $subIndex }}">{{ $subgenre }}</label>
                 </div>
@@ -55,78 +51,87 @@
         </div>
       </div>
     @endforeach
+  </div>
 
-    <div class="mt-4">
-      <x-button type="submit" label="Save"></x-button>
-    </div>
+  <div class="mt-4">
+    <button type="submit" class="rounded bg-blue-500 px-4 py-2 text-white">Update Genres</button>
   </div>
 </form>
 
 <script>
-  // Event handler for "All Genres" checkbox
-  function toggleAllGenres(checkbox) {
-    var isChecked = checkbox.checked;
-    $(".genre-checkbox").prop("checked", isChecked);
+  const dashboardType = "{{ $dashboardType }}";
+  const userId = "{{ $user->id }}";
 
-    // If "All Genres" is checked, select all subgenres of each genre
-    if (isChecked) {
-      $(".accordion-item .subgenre-checkbox").prop("checked", true); // Check subgenres
-    } else {
-      $(".accordion-item .subgenre-checkbox").prop("checked", false); // Uncheck subgenres
-    }
+  let selectedGenres = "{{ json_encode($promoterGenres) }}";
 
-    updateAllGenresCheckbox();
-    applyFilters();
-  }
-
-  // Event handler for individual genre checkboxes
-  $('.genre-checkbox').change(function() {
-    var isChecked = $(this).prop('checked');
-    var genreId = $(this).attr('id');
-
-    var genreIdParts = genreId.split('-');
-    var genreIndex = genreIdParts[2];
-
-    var subgenreCheckboxes = $('input[type="checkbox"][id*="genre-' + genreIndex + '-subgenre"]');
-    subgenreCheckboxes.prop('checked', isChecked);
-
-    updateAllGenresCheckbox();
-    applyFilters();
+  $('.genre-checkbox, .subgenre-checkbox').each(function() {
+    $(this).prop('checked', selectedGenres.includes($(this).val()));
   });
 
-  // Event handler for subgenre checkboxes
-  $('.subgenre-checkbox').change(function() {
-    // If a subgenre checkbox is selected, deselect the "All Genres" checkbox
-    $('#all-genres').prop('checked', false);
-    updateAllGenresCheckbox();
-    applyFilters();
-  });
+  // Initialize variables
+  let debounceTimer;
+  let activeCheckbox = false; // Flag to check if user is actively selecting checkboxes
 
-  function updateAllGenresCheckbox() {
-    var allGenresChecked = true;
-    $(".genre-checkbox").each(function() {
-      if (!$(this).prop('checked')) {
-        allGenresChecked = false;
-      }
-    });
-    $('#all-genres').prop('checked', allGenresChecked);
-  }
+  // Collect selected genres and subgenres after a pause in user activity
+  function collectAndSendData() {
+    if (activeCheckbox) return; // Skip if user is still clicking checkboxes
 
-  function applyFilters() {
-    // Get selected genre and subgenre values
-    var selectedGenres = [];
+    let selectedGenres = [];
+    let selectedSubgenres = [];
+
+    // Gather selected genres
     $('.genre-checkbox:checked').each(function() {
       selectedGenres.push($(this).val());
     });
 
-    var selectedSubgenres = [];
+    // Gather selected subgenres
     $('.subgenre-checkbox:checked').each(function() {
       selectedSubgenres.push($(this).val());
     });
 
-    var mergedGenres = selectedGenres.concat(selectedSubgenres);
+    let mergedGenres = selectedGenres.concat(selectedSubgenres);
 
-    // Example of how you can use the merged genres for filtering
-    console.log("Selected Genres and Subgenres:", mergedGenres);
+    console.log(mergedGenres);
+  }
+
+  // Debounce function
+  function debouncedSave() {
+    clearTimeout(debounceTimer);
+
+    // Set a slight delay to ensure no more selections are made
+    debounceTimer = setTimeout(() => {
+      activeCheckbox = false; // Reset active flag after user stops interacting
+      collectAndSendData();
+    }, 500); // Adjust debounce time as needed
+  }
+
+  // Handle All Genres checkbox
+  $('#all-genres').change(function() {
+    activeCheckbox = true; // User is actively selecting
+    var isChecked = $(this).prop('checked');
+    $(".genre-checkbox, .subgenre-checkbox").prop("checked", isChecked);
+  });
+
+  // Handle individual genre checkboxes
+  $('.genre-checkbox').change(function() {
+    activeCheckbox = true; // User is actively selecting
+    var isChecked = $(this).prop('checked');
+    var genreIndex = $(this).attr('id').split('-')[2];
+
+    $('input[type="checkbox"][id*="genre-' + genreIndex + '-subgenre"]').prop('checked', isChecked);
+    updateAllGenresCheckbox();
+  });
+
+  // Handle individual subgenre checkboxes
+  $('.subgenre-checkbox').change(function() {
+    activeCheckbox = true; // User is actively selecting
+    $('#all-genres').prop('checked', false); // Uncheck "All Genres"
+    updateAllGenresCheckbox();
+  });
+
+  // Update "All Genres" checkbox based on other selections
+  function updateAllGenresCheckbox() {
+    const allGenresChecked = $(".genre-checkbox").length === $(".genre-checkbox:checked").length;
+    $('#all-genres').prop('checked', allGenresChecked);
   }
 </script>

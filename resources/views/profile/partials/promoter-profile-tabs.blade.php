@@ -59,5 +59,7 @@
         'location' => $location,
         'genres' => $promoterData['genres'],
         'promoterGenres' => $promoterData['promoterGenres'],
+        'userId' => $userId,
+        'promoter' => $promoterData['promoter'],
     ]) </div>
 </div>

@@ -25,9 +25,9 @@ class Kernel extends ConsoleKernel
         $this->load(__DIR__ . '/Commands');
 
         // Ensure you register the custom command here
-        $this->commands([
-            SetDefaultMailingPreferences::class,
-        ]);
+        // $this->commands([
+        //     SetDefaultMailingPreferences::class,
+        // ]);
 
         // Optionally, you can keep this if you have other commands to load from routes/console.php
         require base_path('routes/console.php');

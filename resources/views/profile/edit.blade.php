@@ -83,10 +83,9 @@
             <div class="flex items-center justify-center">
               <div class="group">
                 @if (Auth::user()->google_access_token)
-                  <p>Your Google Calendar is linked!</p>
                   <form action="{{ route('google.unlink') }}" method="POST">
                     @csrf
-                    <button type="submit" class="btn-danger btn">Unlink Google Calendar</button>
+                    <x-button type="submit" label="Unlink Google Calendar"></x-button>
                   </form>
                 @else
                   <a href="{{ route('google.redirect') }}" class="btn btn-primary">Link Google Calendar</a>
@@ -98,13 +97,13 @@
                   <button type="submit" class="btn btn-success">Manual Google Sync</button>
                 </form>
               </div>
-              <div class="group">
+              {{-- <div class="group">
                 <button id="sync-all-events-apple"
                   class="rounded bg-green-500 px-4 py-2 font-semibold text-white hover:bg-green-600"
                   title="Sync All Events to Apple Calendar">
                   Sync All Events to Apple Calendar
                 </button>
-              </div>
+              </div> --}}
             </div>
             <div id="calendar" data-user-id="{{ Auth::check() ? Auth::user()->id : '' }}"></div>
           </div>
