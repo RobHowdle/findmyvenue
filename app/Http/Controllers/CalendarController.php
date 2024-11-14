@@ -51,8 +51,6 @@ class CalendarController extends Controller
                     'google_refresh_token' => $token['refresh_token'],
                 ]);
 
-                dd(Auth::user()->id);
-
                 return redirect()->route('profile.edit', Auth::user()->id)->with('success', 'Google Calendar linked successfully!');
             } else {
                 return redirect('/')->with('error', 'Failed to link Google Calendar: invalid token.');

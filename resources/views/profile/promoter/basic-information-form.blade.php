@@ -4,14 +4,14 @@
   </h2>
 </header>
 <form method="POST" action="{{ route('promoter.update', ['dashboardType' => $dashboardType, 'user' => $user]) }}"
-  class="grid grid-cols-3 gap-x-8 gap-y-8">
+  class="grid grid-cols-3 gap-x-8 gap-y-8" enctype="multipart/form-data">
   @csrf
   @method('PUT')
   <div class="col-start-1 col-end-2">
     <div class="group mb-6">
-      <x-input-label-dark for="promoterName">Promotions Company Name</x-input-label-dark>
-      <x-text-input id="promoterName" name="promoterName" value="{{ old('promoterName', $promoterName) }}"></x-text-input>
-      @error('promoterName')
+      <x-input-label-dark for="name">Promotions Company Name</x-input-label-dark>
+      <x-text-input id="name" name="name" value="{{ old('name', $name) }}"></x-text-input>
+      @error('name')
         <p class="yns_red mt-1 text-sm">{{ $message }}</p>
       @enderror
     </div>
@@ -19,7 +19,7 @@
     <div class="group mb-6">
       <x-input-label-dark for="promoterName">Contact Name</x-input-label-dark>
       <x-text-input id="contact_name" name="contact_name"
-        value="{{ old('contact_name', $contactName) }}"></x-text-input>
+        value="{{ old('contact_name', $contact_name) }}"></x-text-input>
       @error('contact_name')
         <p class="yns_red mt-1 text-sm">{{ $message }}</p>
       @enderror
@@ -71,8 +71,9 @@
 
     <div class="group mb-6">
       <x-input-label-dark for="phone">Contact Phone</x-input-label-dark>
-      <x-text-input id="phone" name="phone" value="{{ old('phone', $promoterData['phone']) }}"></x-text-input>
-      @error('phone')
+      <x-text-input id="contact_number" name="contact_number"
+        value="{{ old('contact_number', $promoterData['contact_number']) }}"></x-text-input>
+      @error('contact_number')
         <p class="yns_red mt-1 text-sm">{{ $message }}</p>
       @enderror
     </div>
@@ -126,6 +127,8 @@
       <img id="logo-preview" src="{{ $logo }}" alt="Logo Preview" class="mt-4 h-80 w-80 object-cover"
         style="display: {{ $logo ? 'block' : 'none' }};">
 
+
+
       @error('logo')
         <p class="yns_red mt-1 text-sm">{{ $message }}</p>
       @enderror
@@ -152,6 +155,7 @@
       reader.onload = function(e) {
         preview.src = e.target.result; // Set the preview to the file data
         preview.style.display = 'block'; // Show the preview image
+        console.log('Preview URL:', e.target.result); // Log the preview URL
       };
 
       reader.readAsDataURL(file); // Read the file as a data URL

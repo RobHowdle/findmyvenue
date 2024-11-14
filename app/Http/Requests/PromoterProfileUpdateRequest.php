@@ -33,6 +33,7 @@ class PromoterProfileUpdateRequest extends FormRequest
             'genres' => 'nullable|array',
             'band_types' => 'nullable|array',
             'contact_name' => 'nullable|string',
+            'contact_number' => ['nullable', 'regex:/^(?:0|\+44)(?:\d\s?){9,10}$/'],
             'contact_email' => 'nullable|email',
             'contact_links.*.*' => 'nullable|url',
             'genres' => 'nullable|array',

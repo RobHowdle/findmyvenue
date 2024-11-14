@@ -3,7 +3,7 @@
     {{ __('About You') }}
   </h2>
 </header>
-<form method="POST" action="{{ route('profile.update', ['dashboardType' => $dashboardType, 'user' => $user->id]) }}">
+<form method="POST" action="{{ route('promoter.update', ['dashboardType' => $dashboardType, 'user' => $user->id]) }}">
   @csrf
   @method('PUT')
   <div class="group mb-6">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Promoter;
 use Illuminate\View\View;
+use Illuminate\Support\Str;
 use App\Models\OtherService;
 use Illuminate\Http\Request;
 use App\Models\UserModuleSetting;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Redirect;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Http\Requests\PromoterProfileUpdateRequest;
@@ -139,26 +141,28 @@ class ProfileController extends Controller
 
             // Check if the promoter exists
             if ($promoter) {
-                // Update various fields for the promoter
+                // Promoter Name
+                if (isset($userData['name']) && $promoter->name !== $userData['name']) {
+                    $promoter->update(['name' => $userData['name']]);
+                }
+                // Contact Name
+                if (isset($userData['contact_name']) && $promoter->contact_name !== $userData['contact_name']) {
+                    $promoter->update(['contact_name' => $userData['contact_name']]);
+                }
+                // Location
+
+
+                // Contact Email
                 if (isset($userData['contact_email']) && $promoter->contact_email !== $userData['contact_email']) {
                     $promoter->update(['contact_email' => $userData['contact_email']]);
                 }
 
-                if (isset($userData['about']) && $promoter->description !== $userData['about']) {
-                    $promoter->update(['description' => $userData['about']]);
+                // Contact Number 
+                if (isset($userData['contact_number']) && $promoter->contact_number !== $userData['contact_number']) {
+                    $promoter->update(['contact_number' => $userData['contact_number']]);
                 }
 
-                if (isset($userData['myVenues']) && $promoter->my_venues !== $userData['myVenues']) {
-                    $promoter->update(['my_venues' => $userData['myVenues']]);
-                }
-
-                if (isset($userData['genres'])) {
-                    $storedGenres = json_decode($promoter->genre, true);
-                    if ($storedGenres !== $userData['genres']) {
-                        $promoter->update(['genre' => json_encode($userData['genres'])]);
-                    }
-                }
-
+                // Contact Links
                 if (isset($userData['contact_links']) && is_array($userData['contact_links'])) {
                     // Start with the existing `contact_links` array or an empty array if it doesn't exist
                     $updatedLinks = !empty($promoter->contact_link) ? json_decode($promoter->contact_link, true) : [];
@@ -175,6 +179,48 @@ class ProfileController extends Controller
                     // Encode the array back to JSON for storage and update the promoter record
                     $promoter->update(['contact_link' => json_encode($updatedLinks)]);
                 }
+
+                // About
+                if (isset($userData['about']) && $promoter->description !== $userData['about']) {
+                    $promoter->update(['description' => $userData['about']]);
+                }
+
+                // My Venues
+                if (isset($userData['myVenues']) && $promoter->my_venues !== $userData['myVenues']) {
+                    $promoter->update(['my_venues' => $userData['myVenues']]);
+                }
+
+                // Genres
+                if (isset($userData['genres'])) {
+                    $storedGenres = json_decode($promoter->genre, true);
+                    if ($storedGenres !== $userData['genres']) {
+                        $promoter->update(['genre' => json_encode($userData['genres'])]);
+                    }
+                }
+
+                // Logo
+                if (isset($userData['logo'])) {
+                    $promoterLogoFile = $userData['logo'];
+
+                    // Generate the file name
+                    $promoterName = $request->input('name');
+                    $promoterLogoExtension = $promoterLogoFile->getClientOriginalExtension() ?: $promoterLogoFile->guessExtension();
+                    $promoterLogoFilename = Str::slug($promoterName) . '.' . $promoterLogoExtension;
+
+                    // Store the file
+                    // $promoterLogoFile->storeAs('public/images/promoters_logos', $promoterLogoFilename);
+                    $promoterLogoFile->move(storage_path('app/public/images/promoters_logos'), $promoterLogoFilename);
+
+
+                    // Log file path
+
+                    // Get the URL to the file
+                    $logoUrl = Storage::url('images/promoters_logos/' . $promoterLogoFilename);
+
+                    // Update database
+                    $promoter->update(['logo_url' => $logoUrl]);
+                }
+
 
                 // Return success message with redirect
                 return redirect()->route('profile.edit', ['dashboardType' => $dashboardType, 'id' => $user->id])->with('status', 'profile-updated');
@@ -254,13 +300,17 @@ class ProfileController extends Controller
     {
         $promoter = $user->promoters()->first();
 
-        $promoterName = $promoter ? $promoter->name : '';
+        $name = $promoter ? $promoter->name : '';
         $location = $promoter ? $promoter->location : '';
-        $logo = $promoter && $promoter->logo_url ? asset('storage/' . $promoter->logo_url) : asset('images/system/yns_no_image_found.png');
-        $phone = $promoter ? $promoter->contact_number : '';
+        $logo = $promoter && $promoter->logo_url
+            ? (filter_var($promoter->logo_url, FILTER_VALIDATE_URL) ? $promoter->logo_url : Storage::url($promoter->logo_url))
+            : asset('images/system/yns_no_image_found.png');
+
+
+        $contact_number = $promoter ? $promoter->contact_number : '';
         $contact_email = $promoter ? $promoter->contact_email : '';
         $contactLinks = $promoter ? json_decode($promoter->contact_link, true) : [];
-        $contactName = $promoter ? $promoter->contact_name : '';
+        $contact_name = $promoter ? $promoter->contact_name : '';
 
         $platforms = [];
         $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
@@ -291,17 +341,17 @@ class ProfileController extends Controller
 
         return [
             'promoter' => $promoter,
-            'promoterName' => $promoterName,
+            'name' => $name,
             'location' => $location,
             'logo' => $logo,
-            'phone' => $phone,
+            'contact_number' => $contact_number,
             'platforms' => $platforms,
             'platformsToCheck' => $platformsToCheck,
             'about' => $about,
             'myVenues' => $myVenues,
             'myEvents' => $myEvents,
             'contact_email' => $contact_email,
-            'contactName' => $contactName,
+            'contact_name' => $contact_name,
             'uniqueBands' => $uniqueBands,
             'genres' => $genres,
             'promoterGenres' => $promoterGenres,
