@@ -396,8 +396,8 @@
               </div>
             </div>
           @endif
-          <x-suggestion-block :promoterWithHighestRating="$promoterWithHighestRating" :photographerWithHighestRating="$photographerWithHighestRating" :videographerWithHighestRating="$videographerWithHighestRating" :bandWithHighestRating="$bandWithHighestRating"
-            :designerWithHighestRating="$designerWithHighestRating" />
+          {{-- <x-suggestion-block :promoterWithHighestRating="$promoterWithHighestRating" :photographerWithHighestRating="$photographerWithHighestRating" :videographerWithHighestRating="$videographerWithHighestRating" :bandWithHighestRating="$bandWithHighestRating"
+            :designerWithHighestRating="$designerWithHighestRating" /> --}}
           <x-review-modal title="{{ $singleService->name }}" route="submit-venue-review"
             profileId="{{ $singleService->id }}" />
         </div>

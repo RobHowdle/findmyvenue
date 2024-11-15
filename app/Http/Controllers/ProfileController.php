@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Venue;
 use App\Models\Promoter;
 use Illuminate\View\View;
 use Illuminate\Support\Str;
@@ -16,6 +17,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Redirect;
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Requests\VenueProfileUpdateRequest;
 use App\Http\Requests\PromoterProfileUpdateRequest;
 
 class ProfileController extends Controller
@@ -42,12 +44,15 @@ class ProfileController extends Controller
         // Initialize promoter variables
         $promoterData = [];
         $bandData = [];
+        $venueData = [];
 
         // Check if the dashboardType is 'promoter' and get promoter data
         if ($dashboardType === 'promoter') {
             $promoterData = $this->getPromoterData($user);
         } elseif ($dashboardType === 'band') {
             $bandData = $this->getBandData($user);
+        } elseif ($dashboardType === 'venue') {
+            $venueData = $this->getVenueData($user);
         }
 
         // Load the modules configuration
@@ -77,6 +82,7 @@ class ProfileController extends Controller
             'modules' => $modules,
             'promoterData' => $promoterData,
             'bandData' => $bandData,
+            'venueData' => $venueData,
             'user' => $user,
             'roles' => $roles,
             'userRole' => $userRole,
@@ -231,6 +237,117 @@ class ProfileController extends Controller
         }
     }
 
+    public function updateVenue($dashboardType, VenueProfileUpdateRequest $request, $user)
+    {
+        // Fetch the user
+        $user = User::findOrFail($user);
+        $userId = $user->id;
+        $userData = $request->validated();
+
+        if ($dashboardType == 'venue') {
+            // Fetch the promoter associated with the user via the service_user pivot table
+            $venue = Venue::whereHas('linkedUsers', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })->first();
+
+            // Check if the promoter exists
+            if ($venue) {
+                // Promoter Name
+                if (isset($userData['name']) && $venue->name !== $userData['name']) {
+                    $venue->update(['name' => $userData['name']]);
+                }
+                // Contact Name
+                if (isset($userData['contact_name']) && $venue->contact_name !== $userData['contact_name']) {
+                    $venue->update(['contact_name' => $userData['contact_name']]);
+                }
+                // Location
+
+
+                // Contact Email
+                if (isset($userData['contact_email']) && $venue->contact_email !== $userData['contact_email']) {
+                    $venue->update(['contact_email' => $userData['contact_email']]);
+                }
+
+                // Contact Number 
+                if (isset($userData['contact_number']) && $venue->contact_number !== $userData['contact_number']) {
+                    $venue->update(['contact_number' => $userData['contact_number']]);
+                }
+
+                // Contact Links
+                if (isset($userData['contact_links']) && is_array($userData['contact_links'])) {
+                    // Start with the existing `contact_links` array or an empty array if it doesn't exist
+                    $updatedLinks = !empty($venue->contact_link) ? json_decode($venue->contact_link, true) : [];
+
+                    // Iterate through the `contact_link` array from the request data
+                    foreach ($userData['contact_links'] as $platform => $links) {
+                        // Ensure we're setting only non-empty values
+                        $updatedLinks[$platform] = !empty($links[0]) ? $links[0] : null;
+                    }
+
+                    // Filter out null values to remove platforms with no links
+                    $updatedLinks = array_filter($updatedLinks);
+
+                    // Encode the array back to JSON for storage and update the promoter record
+                    $venue->update(['contact_link' => json_encode($updatedLinks)]);
+                }
+
+                // About
+                if (isset($userData['about']) && $venue->description !== $userData['about']) {
+                    $venue->update(['description' => $userData['about']]);
+                }
+
+                // My Venues
+                if (isset($userData['myVenues']) && $venue->my_venues !== $userData['myVenues']) {
+                    $venue->update(['my_venues' => $userData['myVenues']]);
+                }
+
+                // In House Gear
+                if (isset($userData['inHouseGear']) && $venue->in_house_gear !== $userData['inHouseGear']) {
+                    $venue->update(['in_house_gear' => $userData['inHouseGear']]);
+                }
+
+                // Genres
+                if (isset($userData['genres'])) {
+                    $storedGenres = json_decode($venue->genre, true);
+                    if ($storedGenres !== $userData['genres']) {
+                        $venue->update(['genre' => json_encode($userData['genres'])]);
+                    }
+                }
+
+                // Logo
+                if (isset($userData['logo'])) {
+                    $venueLogoFile = $userData['logo'];
+
+                    // Generate the file name
+                    $venueName = $request->input('name');
+                    $venueLogoExtension = $venueLogoFile->getClientOriginalExtension() ?: $venueLogoFile->guessExtension();
+                    $venueLogoFilename = Str::slug($venueName) . '.' . $venueLogoExtension;
+
+                    // Store the file
+                    $venueLogoFile->move(storage_path('app/public/images/venue_logos'), $venueLogoFilename);
+
+                    // Get the URL to the file
+                    $logoUrl = Storage::url('images/venue_logos/' . $venueLogoFilename);
+
+                    // Update database
+                    $venue->update(['logo_url' => $logoUrl]);
+                }
+
+                // Capacity
+                if (isset($userData['capacity'])) {
+                    $venue->update(['capacity' => $userData['capacity']]);
+                }
+
+
+                // Return success message with redirect
+                return redirect()->route('profile.edit', ['dashboardType' => $dashboardType, 'id' => $user->id])->with('status', 'profile-updated');
+            } else {
+                // Handle case where no promoter is linked to the user
+                return response()->json(['error' => 'Venue not found'], 404);
+            }
+        }
+    }
+
     /**
      * Delete the user's account.
      */
@@ -357,6 +474,70 @@ class ProfileController extends Controller
             'promoterGenres' => $promoterGenres,
         ];
     }
+    private function getVenueData(User $user)
+    {
+        $venue = $user->venues()->first();
+
+        $name = $venue ? $venue->name : '';
+        $location = $venue ? $venue->location : '';
+        $logo = $venue && $venue->logo_url
+            ? (filter_var($venue->logo_url, FILTER_VALIDATE_URL) ? $venue->logo_url : Storage::url($venue->logo_url))
+            : asset('images/system/yns_no_image_found.png');
+
+        $capacity = $venue ? $venue->capacity : '';
+        $contact_number = $venue ? $venue->contact_number : '';
+        $contact_email = $venue ? $venue->contact_email : '';
+        $contactLinks = $venue ? json_decode($venue->contact_link, true) : [];
+        $contact_name = $venue ? $venue->contact_name : '';
+
+        $platforms = [];
+        $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+
+        // Initialize the platforms array with empty strings for each platform
+        foreach ($platformsToCheck as $platform) {
+            $platforms[$platform] = '';  // Set default to empty string
+        }
+
+        // Check if the contactLinks array exists and contains social links
+        if ($contactLinks) {
+            foreach ($platformsToCheck as $platform) {
+                // Only add the link if the platform exists in the $contactLinks array
+                if (isset($contactLinks[$platform])) {
+                    $platforms[$platform] = $contactLinks[$platform];  // Store the link for the platform
+                }
+            }
+        }
+
+        $about = $venue ? $venue->description : '';
+        $inHouseGear = $venue ? $venue->in_house_gear : '';
+        $myEvents = $venue ? $venue->events()->with('venues')->get() : collect();
+        $uniqueBands = $this->getUniqueBandsForPromoterEvents($venue->id);
+        $genreList = file_get_contents(public_path('text/genre_list.json'));
+        $data = json_decode($genreList, true);
+        $genres = $data['genres'];
+        $venueGenres = is_array($venue->genre) ? $venue->genre : json_decode($venue->genre, true);
+        $additionalInfo = $venue ? $venue->additional_info : '';
+
+        return [
+            'venue' => $venue,
+            'name' => $name,
+            'location' => $location,
+            'logo' => $logo,
+            'contact_number' => $contact_number,
+            'platforms' => $platforms,
+            'platformsToCheck' => $platformsToCheck,
+            'about' => $about,
+            'inHouseGear' => $inHouseGear,
+            'myEvents' => $myEvents,
+            'contact_email' => $contact_email,
+            'contact_name' => $contact_name,
+            'uniqueBands' => $uniqueBands,
+            'genres' => $genres,
+            'venueGenres' => $venueGenres,
+            'capacity' => $capacity,
+            'additionalInfo' => $additionalInfo,
+        ];
+    }
 
     private function getBandData(User $user)
     {
@@ -409,7 +590,7 @@ class ProfileController extends Controller
         try {
             // Retrieve the user
             $user = User::findOrFail($request->id);
-            \Log::info('User found: ', [$user]);
+            // \Log::info('User found: ', [$user]);
 
             // Validate the incoming request
             $request->validate([
@@ -418,7 +599,7 @@ class ProfileController extends Controller
 
             // Retrieve the role
             $role = Role::find($request->roleId);
-            \Log::info('Role found: ', [$role]);
+            // \Log::info('Role found: ', [$role]);
 
             if (!$role) {
                 return response()->json(['success' => false, 'message' => 'Role not found.'], 404);
@@ -440,7 +621,7 @@ class ProfileController extends Controller
             ]);
         } catch (\Exception $e) {
             // Log the error and return a response
-            \Log::error('Error adding role: ' . $e->getMessage());
+            // \Log::error('Error adding role: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'An error occurred while adding the role.'
@@ -453,7 +634,7 @@ class ProfileController extends Controller
         try {
             // Retrieve the user
             $user = User::findOrFail($request->id);
-            \Log::info('User found: ', [$user]);
+            // \Log::info('User found: ', [$user]);
 
             // Validate the incoming request
             $request->validate([
@@ -462,7 +643,7 @@ class ProfileController extends Controller
 
             // Retrieve the role
             $role = Role::find($request->roleId);
-            \Log::info('Role found: ', [$role]);
+            // \Log::info('Role found: ', [$role]);
 
             if (!$role) {
                 return response()->json(['success' => false, 'message' => 'Role not found.'], 404);
@@ -484,7 +665,7 @@ class ProfileController extends Controller
             ]);
         } catch (\Exception $e) {
             // Log the error and return a response
-            \Log::error('Error removing role: ' . $e->getMessage());
+            // \Log::error('Error removing role: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'An error occurred while removing the role.'

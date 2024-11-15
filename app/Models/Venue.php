@@ -19,7 +19,6 @@ class Venue extends Model
 
     protected $fillable = [
         'name',
-        'logo_url',
         'location',
         'postal_town',
         'longitude',
@@ -33,7 +32,8 @@ class Venue extends Model
         'contact_email',
         'contact_link',
         'description',
-        'additional_info'
+        'additional_info',
+        'logo_url',
     ];
 
     public function users(): MorphToMany
@@ -69,5 +69,12 @@ class Venue extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function linkedUsers(): MorphToMany
+    {
+        return $this->morphToMany(User::class, 'serviceable', 'service_user', 'serviceable_id', 'user_id')
+            ->withPivot('created_at', 'updated_at', 'role')
+            ->whereNull('service_user.deleted_at');
     }
 }

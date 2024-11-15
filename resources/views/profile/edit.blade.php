@@ -26,29 +26,33 @@
             @include('profile.partials.band-profile', [
                 'bandData' => $bandData,
             ])
+          @elseif($dashboardType == 'venue')
+            @include('profile.partials.venue-profile', [
+                'venueData' => $venueData,
+            ])
           @endif
 
-          <button @click="selected = 8; selectedTab = 8" data-tab="calendar"
-            :class="{ 'bg-gradient-button': selected === 8, 'bg-yns_dark_gray': selected !== 8 }"
-            class="group relative w-full px-8 py-2 text-left text-white transition duration-150 ease-in-out">
-            <span class="absolute inset-0 transition-opacity duration-300 ease-in-out"
-              :class="{ 'opacity-100': selected === 8, 'opacity-0': selected !== 8 }"></span>
-            <span class="relative z-10">Calendar</span>
-          </button>
-
-          <button @click="selected = 9; selectedTab =9"
-            :class="{ 'bg-gradient-button': selected === 9, 'bg-yns_dark_gray': selected !== 9 }"
-            class="group relative w-full px-8 py-2 text-left text-white transition duration-150 ease-in-out">
-            <span class="absolute inset-0 transition-opacity duration-300 ease-in-out"
-              :class="{ 'opacity-100': selected === 9, 'opacity-0': selected !== 9 }"></span>
-            <span class="relative z-10">Settings</span>
-          </button>
-
-          <button @click="selected = 10; selectedTab =10"
+          <button @click="selected = 10; selectedTab = 10" data-tab="calendar"
             :class="{ 'bg-gradient-button': selected === 10, 'bg-yns_dark_gray': selected !== 10 }"
             class="group relative w-full px-8 py-2 text-left text-white transition duration-150 ease-in-out">
             <span class="absolute inset-0 transition-opacity duration-300 ease-in-out"
               :class="{ 'opacity-100': selected === 10, 'opacity-0': selected !== 10 }"></span>
+            <span class="relative z-10">Calendar</span>
+          </button>
+
+          <button @click="selected = 11; selectedTab =11"
+            :class="{ 'bg-gradient-button': selected === 11, 'bg-yns_dark_gray': selected !== 11 }"
+            class="group relative w-full px-8 py-2 text-left text-white transition duration-150 ease-in-out">
+            <span class="absolute inset-0 transition-opacity duration-300 ease-in-out"
+              :class="{ 'opacity-100': selected === 11, 'opacity-0': selected !== 11 }"></span>
+            <span class="relative z-10">Settings</span>
+          </button>
+
+          <button @click="selected = 12; selectedTab =12"
+            :class="{ 'bg-gradient-button': selected === 12, 'bg-yns_dark_gray': selected !== 12 }"
+            class="group relative w-full px-8 py-2 text-left text-white transition duration-150 ease-in-out">
+            <span class="absolute inset-0 transition-opacity duration-300 ease-in-out"
+              :class="{ 'opacity-100': selected === 12, 'opacity-0': selected !== 12 }"></span>
             <span class="relative z-10">Communication</span>
           </button>
         </div>
@@ -76,9 +80,13 @@
           @include('profile.partials.band-profile-tabs', [
               'bandData' => $bandData,
           ])
+        @elseif($dashboardType == 'venue')
+          @include('profile.partials.venue-profile-tabs', [
+              'venueData' => $venueData,
+          ])
         @endif
 
-        <div x-show="selectedTab === 8" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
+        <div x-show="selectedTab === 10" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
           <div class="w-full">
             <div class="flex items-center justify-center">
               <div class="group">
@@ -108,7 +116,7 @@
             <div id="calendar" data-user-id="{{ Auth::check() ? Auth::user()->id : '' }}"></div>
           </div>
         </div>
-        <div x-show="selectedTab === 9" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
+        <div x-show="selectedTab === 11" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
           <div class="w-full">
             <div class="group">
               @include('profile.partials.settings', [
@@ -117,7 +125,7 @@
             </div>
           </div>
         </div>
-        <div x-show="selectedTab === 10" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
+        <div x-show="selectedTab === 12" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
           <div class="w-full">
             <div class="group">
               @include('profile.partials.communication-settings', [

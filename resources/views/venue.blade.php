@@ -220,8 +220,8 @@
             </div>
           </div>
         </div>
-        <x-suggestion-block :existingPromoters="$existingPromoters" :promoterWithHighestRating="$promoterWithHighestRating" :photographerWithHighestRating="$photographerWithHighestRating" :videographerWithHighestRating="$videographerWithHighestRating" :bandWithHighestRating="$bandWithHighestRating"
-          :designerWithHighestRating="$designerWithHighestRating" />
+        {{-- <x-suggestion-block :existingPromoters="$existingPromoters" :promoterWithHighestRating="$promoterWithHighestRating" :photographerWithHighestRating="$photographerWithHighestRating" :videographerWithHighestRating="$videographerWithHighestRating" :bandWithHighestRating="$bandWithHighestRating"
+          :designerWithHighestRating="$designerWithHighestRating" /> --}}
         <x-review-modal title="{{ $venue->name }}" route="submit-venue-review" profileId="{{ $venue->id }}" />
       </div>
     </div>

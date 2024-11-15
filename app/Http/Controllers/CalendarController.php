@@ -260,7 +260,6 @@ class CalendarController extends Controller
     {
         $userId = $request->user()->id;
         $user = User::find($userId);
-        \Log::info("Syncing events for user ID: $user");
 
         $event = Event::findOrFail($eventId);
         $startTime = \Carbon\Carbon::parse($event->start_time)->format('Ymd\THis');

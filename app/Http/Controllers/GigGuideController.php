@@ -124,11 +124,9 @@ class GigGuideController extends Controller
             return response()->json(['error' => 'Location data is missing.'], 400);
         }
 
-        \Log::info("User's latitude: {$latitude}, User's longitude: {$longitude}");
         $userLatRad = deg2rad($latitude);
         $userLongRad = deg2rad($longitude);
 
-        \Log::info("User's Latitude in radians: {$userLatRad}, Longitude in radians: {$userLongRad}");
 
 
         $startOfWeek = now()->startOfWeek()->format('Y-m-d');
@@ -189,16 +187,14 @@ class GigGuideController extends Controller
         }
 
 
-        // Debugging: log the calculated distances and coordinates for each gig
-        \Log::info('Gigs Close to Me:');
-        foreach ($gigsCloseToMe as $gig) {
-            \Log::info("Gig: {$gig->name}, Venue Coordinates: lat={$gig->latitude}, long={$gig->longitude}, Calculated Distance: {$gig->distance} miles");
-        }
+        // // Debugging: log the calculated distances and coordinates for each gig
+        // foreach ($gigsCloseToMe as $gig) {
+        //     \Log::info("Gig: {$gig->name}, Venue Coordinates: lat={$gig->latitude}, long={$gig->longitude}, Calculated Distance: {$gig->distance} miles");
+        // }
 
-        \Log::info('Other Gigs:');
-        foreach ($otherGigs as $gig) {
-            \Log::info("Gig: {$gig->name}, Venue Coordinates: lat={$gig->latitude}, long={$gig->longitude}, Calculated Distance: {$gig->distance} miles");
-        }
+        // foreach ($otherGigs as $gig) {
+        //     \Log::info("Gig: {$gig->name}, Venue Coordinates: lat={$gig->latitude}, long={$gig->longitude}, Calculated Distance: {$gig->distance} miles");
+        // }
 
         return response()->json([
             'gigsCloseToMe' => $gigsCloseToMe,
