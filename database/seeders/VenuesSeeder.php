@@ -14,6 +14,11 @@ class VenuesSeeder extends Seeder
     public function run(): void
     {
         $csvFile = fopen(base_path("database/data/venues.csv"), "r");
+
+        if ($csvFile === false) {
+            throw new \Exception("Could not open the CSV file.");
+        }
+
         $firstLine = true;
         while (($data = fgetcsv($csvFile, 2000, ",")) !== FALSE) {
             if (!$firstLine) {

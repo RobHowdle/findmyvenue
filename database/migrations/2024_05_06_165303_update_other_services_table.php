@@ -17,9 +17,9 @@ return new class extends Migration
             $table->string('longitude')->after('postal_town');
             $table->string('latitude')->after('longitude');
             $table->unsignedBigInteger('other_service_id')->after('latitude');
-            $table->longText('packages')->after('other_service_id');
-            $table->longText('environment_type')->after('packages');
-            $table->longText('working_times')->after('environment_type');
+            $table->json('packages')->after('other_service_id');
+            $table->json('environment_type')->after('packages');
+            $table->json('working_times')->after('environment_type');
         });
     }
 

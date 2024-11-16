@@ -17,6 +17,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Redirect;
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Requests\BandProfileUpdateRequest;
 use App\Http\Requests\VenueProfileUpdateRequest;
 use App\Http\Requests\PromoterProfileUpdateRequest;
 
@@ -348,6 +349,127 @@ class ProfileController extends Controller
         }
     }
 
+    public function updateBand($dashboardType, BandProfileUpdateRequest $request, $user)
+    {
+        // Fetch the user
+        $user = User::findOrFail($user);
+        $userId = $user->id;
+        $userData = $request->validated();
+
+        if ($dashboardType == 'band') {
+            // Fetch the promoter associated with the user via the service_user pivot table
+            $band = OtherService::where('other_service_id', 4)->whereHas('linkedUsers', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })->first();
+
+            // Check if the promoter exists
+            if ($band) {
+                // Promoter Name
+                if (isset($userData['name']) && $band->name !== $userData['name']) {
+                    $band->update(['name' => $userData['name']]);
+                }
+                // Contact Name
+                if (isset($userData['contact_name']) && $band->contact_name !== $userData['contact_name']) {
+                    $band->update(['contact_name' => $userData['contact_name']]);
+                }
+                // Location
+
+
+                // Contact Email
+                if (isset($userData['contact_email']) && $band->contact_email !== $userData['contact_email']) {
+                    $band->update(['contact_email' => $userData['contact_email']]);
+                }
+
+                // Contact Number 
+                if (isset($userData['contact_number']) && $band->contact_number !== $userData['contact_number']) {
+                    $band->update(['contact_number' => $userData['contact_number']]);
+                }
+
+                // Contact Links
+                if (isset($userData['contact_links']) && is_array($userData['contact_links'])) {
+                    // Start with the existing `contact_links` array or an empty array if it doesn't exist
+                    $updatedLinks = !empty($band->contact_link) ? json_decode($band->contact_link, true) : [];
+
+                    // Iterate through the `contact_link` array from the request data
+                    foreach ($userData['contact_links'] as $platform => $links) {
+                        // Ensure we're setting only non-empty values
+                        $updatedLinks[$platform] = !empty($links[0]) ? $links[0] : null;
+                    }
+
+                    // Filter out null values to remove platforms with no links
+                    $updatedLinks = array_filter($updatedLinks);
+
+                    // Encode the array back to JSON for storage and update the promoter record
+                    $band->update(['contact_link' => json_encode($updatedLinks)]);
+                }
+
+                // Stream Links
+                if (isset($userData['stream_links'])) {
+                    $storedStreamLinks = json_decode($band->stream_urls, true);
+                    if ($storedStreamLinks !== $userData['stream_links']) {
+                        $band->update(['stream_urls' => json_encode($userData['stream_links'])]);
+                    }
+                }
+
+                // About
+                if (isset($userData['about']) && $band->description !== $userData['about']) {
+                    $band->update(['description' => $userData['about']]);
+                }
+
+                // Members
+                if (isset($userData['members'])) {
+                    $storedMembers = json_decode($band->members, true);
+                    if ($storedMembers !== $userData['members']) {
+                        $band->update(['members' => json_encode($userData['members'])]);
+                    }
+                }
+
+                // Genres
+                if (isset($userData['genres'])) {
+                    $storedGenres = json_decode($band->genre, true);
+                    if ($storedGenres !== $userData['genres']) {
+                        $band->update(['genre' => json_encode($userData['genres'])]);
+                    }
+                }
+
+                // Logo
+                if (isset($userData['logo_url'])) {
+                    $bandLogoFile = $userData['logo_url'];
+
+                    // Generate the file name
+                    $bandName = $request->input('name');
+                    $bandLogoExtension = $bandLogoFile->getClientOriginalExtension() ?: $bandLogoFile->guessExtension();
+                    $bandLogoFilename = Str::slug($bandName) . '.' . $bandLogoExtension;
+
+                    // Store the file
+                    $bandLogoFile->move(storage_path('app/public/images/band_logos'), $bandLogoFilename);
+
+                    // Get the URL to the file
+                    $logoUrl = Storage::url('images/band_logos/' . $bandLogoFilename);
+
+                    // Update database
+                    $band->update(['logo_url' => $logoUrl]);
+                }
+
+                // Portfolio Link
+                if (isset($userData['portfolio_link'])) {
+                    $band->update(['portfolio_link' => $userData['portfolio_link']]);
+                }
+
+                // Services
+                if (isset($userData['services'])) {
+                    $band->update(['services' => $userData['services']]);
+                }
+
+                // Return success message with redirect
+                return redirect()->route('profile.edit', ['dashboardType' => $dashboardType, 'id' => $user->id])->with('status', 'profile-updated');
+            } else {
+                // Handle case where no promoter is linked to the user
+                return response()->json(['error' => 'Venue not found'], 404);
+            }
+        }
+    }
+
     /**
      * Delete the user's account.
      */
@@ -474,6 +596,7 @@ class ProfileController extends Controller
             'promoterGenres' => $promoterGenres,
         ];
     }
+
     private function getVenueData(User $user)
     {
         $venue = $user->venues()->first();
@@ -543,45 +666,76 @@ class ProfileController extends Controller
     {
         $band = $user->otherService("Band")->first();
 
-        $bandName = $band ? $band->name : '';
+        $name = $band ? $band->name : '';
         $location = $band ? $band->location : '';
         $logo = $band ? $band->logo_url : 'images/system/yns_logo.png';
         $phone = $band ? $band->contact_number : '';
-        $email = $band ? $band->contact_email : '';
-        $contactLinks = $band ? $band->contact_link : [];
-
-        if ($contactLinks) {
-            $contactLinks = json_decode($band->contact_link, true);
-        }
+        $contact_name = $band ? $band->contact_name : '';
+        $contact_email = $band ? $band->contact_email : '';
+        $contact_number = $band ? $band->contact_number : '';
+        $contactLinks = $band ? json_decode($band->contact_link, true) : [];
 
         $platforms = [];
-        $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+        $platformsToCheck = ['website', 'facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
 
+        // Initialize the platforms array with empty strings for each platform
         foreach ($platformsToCheck as $platform) {
-            $platforms[$platform] = [];
+            $platforms[$platform] = '';  // Set default to empty string
         }
 
-        if (is_array($contactLinks)) {
-            foreach ($contactLinks as $platform => $links) {
-                if (array_key_exists($platform, $platforms)) {
-                    $platforms[$platform] = array_merge($platforms[$platform], $links);
+        // Check if the contactLinks array exists and contains social links
+        if ($contactLinks) {
+            foreach ($platformsToCheck as $platform) {
+                // Only add the link if the platform exists in the $contactLinks array
+                if (isset($contactLinks[$platform])) {
+                    $platforms[$platform] = $contactLinks[$platform];  // Store the link for the platform
                 }
             }
         }
 
         $about = $band ? $band->description : '';
-        $myVenues = $band ? $band->my_venues : '';
+        $myEvents = $band ? $band->events()->with('venues')->get() : collect();
+        $genreList = file_get_contents(public_path('text/genre_list.json'));
+        $data = json_decode($genreList, true);
+        $genres = $data['genres'];
+        $bandGenres = is_array($band->genre) ? $band->genre : json_decode($band->genre, true);
+        $streamLinks = is_array($band->genre) ? $band->stream_urls : json_decode($band->stream_urls, true);
+
+        $streamPlatforms = [];
+        $streamPlatformsToCheck = ['spotify', 'apple-music', 'youtube-music', 'amazon-music', 'bandcamp', 'soundcloud'];
+
+        foreach ($streamPlatformsToCheck as $streamPlatform) {
+            $streamPlatforms[$streamPlatform] = '';
+        }
+
+        if ($streamLinks) {
+            foreach ($streamPlatformsToCheck as $streamPlatform) {
+                if (isset($streamLinks[$streamPlatform])) {
+                    $streamPlatforms[$streamPlatform] = $streamLinks[$streamPlatform];
+                };
+            };
+        }
+
+        $members = is_array($band->members) ? $band->members : json_decode($band->members, true);
 
         return [
             'band' => $band,
-            'bandName' => $bandName,
+            'name' => $name,
             'location' => $location,
             'logo' => $logo,
             'phone' => $phone,
-            'platforms' => $platforms,
             'about' => $about,
-            'myVenues' => $myVenues,
-            'email' => $email
+            'myEvents' => $myEvents,
+            'contact_name' => $contact_name,
+            'contact_email' => $contact_email,
+            'contact_number' => $contact_number,
+            'platforms' => $platforms,
+            'platformsToCheck' => $platformsToCheck,
+            'genres' => $genres,
+            'bandGenres' => $bandGenres,
+            'streamLinks' => $streamLinks,
+            'streamPlatformsToCheck' => $streamPlatformsToCheck,
+            'members' => $members
         ];
     }
 

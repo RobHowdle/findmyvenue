@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class OtherService extends Model
 {
@@ -29,6 +30,7 @@ class OtherService extends Model
         'stream_urls',
         'band_type',
         'genre',
+        'contact_name',
         'contact_number',
         'contact_email',
         'contact_link',
@@ -101,5 +103,12 @@ class OtherService extends Model
     public function getAllBands()
     {
         return self::bands()->get(); // Get all band services
+    }
+
+    public function linkedUsers(): MorphToMany
+    {
+        return $this->morphToMany(User::class, 'serviceable', 'service_user', 'serviceable_id', 'user_id')
+            ->withPivot('created_at', 'updated_at', 'role')
+            ->whereNull('service_user.deleted_at');
     }
 }
