@@ -52,6 +52,8 @@ class DashboardController extends Controller
         // Determine dashboard type
         $dashboardType = lcfirst($roleName);
 
+        \Log::info($promoter);
+
         // Role-based redirection
         switch ($roleName) {
             case 'promoter':

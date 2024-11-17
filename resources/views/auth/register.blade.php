@@ -3,7 +3,8 @@
     <p class="px-8 py-8 text-center font-heading text-4xl font-bold text-white">Register</p>
     <div class="rounded bg-black p-8 font-sans">
       <p class="mb-2 text-white">
-        We take security <span class="font-bold">very</span> seriously and are committed to protecting you. Please ensure
+        We take security <span class="font-bold">very</span> seriously and are committed to protecting you and your data.
+        Please ensure
         that all of your information is accurate and secure.
       </p>
 
@@ -159,15 +160,25 @@
 
       const formData = $(this).serialize(); // Serialize the form data
       $.ajax({
-        type: 'POST',
         url: $(this).attr('action'), // Use the form's action attribute
+        type: 'POST',
+        dataType: 'json', // Ensure that the response is expected as JSON
+        headers: {
+          'Accept': 'application/json', // Tell the server to send a JSON response
+        },
         data: formData,
         success: function(response) {
           console.log(response); // Log the entire response for debugging
-          if (response.message) {
+          if (response.success) {
             window.showSuccessNotification(response.message); // Ensure message is defined
+            setTimeout(() => {
+              window.location.href = response.redirect;
+            }, 3000);
           } else {
             window.showSuccessNotification('Registration successful!'); // Fallback message
+            setTimeout(() => {
+              window.location.href = response.redirect;
+            }, 3000);
           }
         },
         error: function(xhr) {

@@ -12,11 +12,14 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Config;
 use App\Providers\RouteServiceProvider;
 use App\Http\Requests\RegisterUserRequest;
+use Illuminate\Http\Response;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+
 
 class RegisteredUserController extends Controller
 {
@@ -34,7 +37,8 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(RegisterUserRequest $request): RedirectResponse
+
+    public function store(RegisterUserRequest $request): JsonResponse
     {
         $adminRoleId = Role::where('name', 'administrator')->pluck('id')->first();
 
@@ -44,6 +48,7 @@ class RegisteredUserController extends Controller
 
             if ($selectedRole != $adminRoleId) {
                 try {
+                    // Create the user
                     $user = User::create([
                         'first_name' => $request->first_name,
                         'last_name' => $request->last_name,
@@ -52,27 +57,28 @@ class RegisteredUserController extends Controller
                         'password' => Hash::make($request->password),
                     ]);
 
-                    $requestedRoleId = $request->role;
+                    // Assign the requested role
                     $role = Role::findOrFail($request->role);
-
                     $user->assignRole($role->name);
 
-                    // Set Default Modules based on Role
+                    // Set default modules and mailing preferences
                     $this->setDefaultModules($user, $role->name);
-                    // Set default mailing preferences
                     $this->setDefaultMailingPreferences($user);
 
+                    // Fire the Registered event
                     event(new Registered($user));
 
+                    // Log the user in
                     Auth::login($user);
 
-                    // Success response
-                    if ($request->wantsJson()) {
-                        return response()->json(['success' => true, 'message' => 'Registration successful!'], 200);
-                    }
+                    $dashboardType = lcfirst($role->name);
 
-                    session()->flash('success', 'Registration successful!');
-                    return redirect(RouteServiceProvider::HOME);
+                    // Success JSON response
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Registration successful! Hang tight, we\'re making your dashboard!',
+                        'redirect' => route('dashboard.index')  // Use the correct named route
+                    ], 200);
                 } catch (\Exception $e) {
                     Log::error('Registration failed:', [
                         'message' => $e->getMessage(),
@@ -84,33 +90,32 @@ class RegisteredUserController extends Controller
                         'stack' => $e->getTraceAsString(),
                     ]);
 
-                    // Error response
-                    if ($request->wantsJson()) {
-                        return response()->json(['success' => false, 'message' => 'Registration failed. Please try again.'], 500);
-                    }
-
-                    return back()->withInput()->withErrors(['general' => 'Registration failed. Please try again.']);
+                    // Error response for JSON requests
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Registration failed. Please try again.'
+                    ], 500);
                 }
             } else {
+                // Log and return error for users attempting to register as an admin
                 $ipAddress = $request->ip();
                 Log::error('User attempted to register with an admin role', ['ip_address' => $ipAddress]);
 
-                // Error response
-                if ($request->wantsJson()) {
-                    return response()->json(['success' => false, 'message' => 'You cannot register as this role.'], 403);
-                }
-
-                return back()->withInput()->withErrors(['role' => 'You cannot register as this role.']);
+                // Error response for JSON requests
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You cannot register as this role.'
+                ], 403);
             }
         }
 
-        // Error response for missing role
-        if ($request->wantsJson()) {
-            return response()->json(['success' => false, 'message' => 'Role selection is required.'], 422);
-        }
-
-        return back()->withInput()->withErrors(['role' => 'Role selection is required.']);
+        // Error response for missing role in request
+        return response()->json([
+            'success' => false,
+            'message' => 'Role selection is required.'
+        ], 422);
     }
+
 
     protected function setDefaultModules($user, $roleName)
     {
