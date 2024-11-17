@@ -185,13 +185,22 @@ class OtherServiceController extends Controller
             $designerWithHighestRating = $suggestions['designer'];
         }
 
-        // Split the field containing multiple URLs into an array
+        // If contact_link is a JSON string, decode it into an array.
         if ($singleService->contact_link) {
-            $urls = explode(',', $singleService->contact_link);
-            $platforms = [];
+            // Decode the JSON if it's in JSON format, otherwise use it as a plain string
+            $urls = is_array($singleService->contact_link)
+                ? $singleService->contact_link
+                : json_decode($singleService->contact_link, true);
+
+            // If the JSON decoding results in null (i.e., invalid JSON), use explode as a fallback.
+            if ($urls === null) {
+                $urls = explode(',', $singleService->contact_link);
+            }
+
+            $platforms = []; // Initialize the array to store platforms
         }
 
-        // // Check each URL against the platforms
+        // Now process each URL to associate with its platform
         foreach ($urls as $url) {
             // Initialize the platform as unknown
             $matchedPlatform = 'Unknown';
@@ -212,7 +221,10 @@ class OtherServiceController extends Controller
             ];
         }
 
+        // Store the platform information as an array (no need for json_decode anymore)
         $singleService->platforms = $platforms;
+
+
         $recentReviews = OtherServicesReview::getRecentReviewsForOtherService($serviceId);
         $singleService->recentReviews = $recentReviews->isNotEmpty() ? $recentReviews : null;
 
@@ -254,6 +266,8 @@ class OtherServiceController extends Controller
         $bandType = json_decode($singleService->band_type);
         $genre = json_decode($singleService->genre);
 
+
+
         return view('single-service', compact(
             'singleService',
             'singleServiceTitle',
@@ -269,7 +283,7 @@ class OtherServiceController extends Controller
             'members',
             'streamUrls',
             'bandType',
-            'genre',
+            'genres',
             'bandAverageCommunicationRating',
             'bandAverageMusicRating',
             'bandAveragePromotionRating',
