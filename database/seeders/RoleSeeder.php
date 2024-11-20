@@ -20,6 +20,7 @@ class RoleSeeder extends Seeder
         Role::create(['name' => 'promoter']);
         Role::create(['name' => 'band']);
         Role::create(['name' => 'photographer']);
+        Role::create(['name' => 'videographer']);
         Role::create(['name' => 'designer']);
         Role::create(['name' => 'administrator']);
 
@@ -28,6 +29,7 @@ class RoleSeeder extends Seeder
         $managePromotionPermission = Permission::where('name', 'manage_promoter')->first();
         $manageBandPermission = Permission::where('name', 'manage_band')->first();
         $managePhotographerPermission = Permission::where('name', 'manage_photographer')->first();
+        $manageVideographerPermission = Permission::where('name', 'manage_videographer')->first();
         $manageDesignerPermission = Permission::where('name', 'manage_designer')->first();
 
         // Assign permissions to roles if they exist
@@ -43,14 +45,14 @@ class RoleSeeder extends Seeder
         if ($managePhotographerPermission) {
             Role::where('name', 'photographer')->first()->syncPermissions([$managePhotographerPermission]);
         }
+        if ($manageVideographerPermission) {
+            Role::where('name', 'videographer')->first()->syncPermissions([$manageVideographerPermission]);
+        }
         if ($manageDesignerPermission) {
             Role::where('name', 'designer')->first()->syncPermissions([$manageDesignerPermission]);
         }
 
         $user = User::find(1);
         $user->assignRole('administrator');
-
-        $user = User::find(2);
-        $user->assignRole('promoter');
     }
 }

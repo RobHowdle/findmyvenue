@@ -5,12 +5,14 @@
     </h1>
   </x-slot>
 
-  <div class="mx-auto w-full max-w-screen-2xl py-16">
+  <div class="mx-auto my-6 w-full max-w-screen-2xl pt-32">
     <div class="relative shadow-md sm:rounded-lg">
-      <div class="min-w-screen-xl mx-auto max-w-screen-xl bg-opac8Black px-16 py-12 text-white">
+      <div class="min-w-screen-xl mx-auto max-w-screen-xl bg-opac_8_black px-16 py-12 text-white">
         <div class="header flex gap-4">
           @if ($promoter->logo_url)
             <img src="{{ asset($promoter->logo_url) }}" alt="{{ $promoter->name }} Logo" class="_250img">
+          @else
+            <img src="{{ asset('images/system/yns_no_image_found.png') }}" alt="No Image" class="_250img">
           @endif
           <div class="header-text flex flex-col justify-center gap-2">
             <h1 class="text-sans text-4xl">{{ $promoter->name }}</h1>
@@ -19,14 +21,14 @@
               <x-contact-and-social-links :item="$promoter" />
             </div>
             <div class="rating-wrapper flex flex-row items-center gap-2">
-              <p>Overall Rating ({{ $reviewCount }}): </p>
+              <p class="h-full place-content-end font-sans">Overall Rating ({{ $reviewCount }}): </p>
               <div class="ratings flex">
                 {!! $overallReviews[$promoter->id] !!}
               </div>
             </div>
             <div class="leave-review">
               <button
-                class="rounded bg-gradient-to-t from-ynsDarkOrange to-ynsYellow px-6 py-2 text-sm text-black hover:bg-ynsYellow"
+                class="rounded bg-gradient-to-t from-yns_dark_orange to-yns_yellow px-6 py-2 text-sm text-black hover:bg-yns_yellow"
                 data-modal-toggle="review-modal" type="button">Leave a review</button>
             </div>
           </div>
@@ -38,19 +40,19 @@
               class="flex flex-wrap justify-between border-b border-gray-200 text-center text-sm font-medium text-gray-500 dark:border-gray-700 dark:text-gray-400">
               <li class="tab me-2 pl-0">
                 <a href="#" data-tab="about"
-                  class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
+                  class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
                   <span class="fas fa-info-circle mr-2"></span>About
                 </a>
               </li>
               <li class="tab me-2">
                 <a href="#" data-tab="my-venues"
-                  class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
+                  class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
                   <span class="fas fa-cogs mr-2"></span>My Venues
                 </a>
               </li>
               <li class="tab me-2">
                 <a href="#" data-tab="bands-and-genres"
-                  class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
+                  class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
                   <svg class="me-2 h-4 w-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
                     viewBox="0 0 20 20">
                     <path
@@ -60,7 +62,7 @@
               </li>
               <li class="tab me-2">
                 <a href="#" data-tab="reviews"
-                  class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
+                  class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
                   <span class="fas fa-star mr-2"></span> Reviews
                 </a>
               </li>
@@ -72,7 +74,7 @@
               @if (!$promoter->description)
                 <p>We're still working on this! Come back later to read about us!</p>
               @else
-                <p>{{ $promoter->description }}</p>
+                <p>{!! $promoter->description !!}</p>
               @endif
             </div>
 
@@ -90,7 +92,7 @@
               @endphp
               @if (!$bandTypes)
                 <p class="mb-2">We don't have any specific band types that we prefer to work with, please <a
-                    class="underline hover:text-ynsYellow" href="mailto:{{ $promoter->contact_email }}">contact us.</a>
+                    class="underline hover:text-yns_yellow" href="mailto:{{ $promoter->contact_email }}">contact us.</a>
                   if you would like to enquire about promoting your band.</p>
               @else
                 <p class="mb-2"><span class="bold">{{ $promoter->name }}</span> specifically promotes
@@ -121,13 +123,17 @@
                 $genres = json_decode($promoter->genre);
               @endphp
               <p class="mb-2">
-                We like to work mostly with artists in the
-                @foreach ($genres as $index => $genre)
-                  {{ $genre }}@if ($index < count($genres) - 1)
-                    ,
-                  @endif
-                @endforeach
-                genres.
+                @if ($genres)
+                  We like to work mostly with artists in the
+                  @foreach ($genres as $index => $genre)
+                    {{ $genre }}@if ($index < count($genres) - 1)
+                      ,
+                    @endif
+                  @endforeach
+                  genres.
+                @else
+                  We haven't got round to adding our genres yet, we're on it!
+                @endif
               </p>
             </div>
 
@@ -168,8 +174,8 @@
             </div>
           </div>
         </div>
-        <x-suggestion-block :existingVenues="$existingVenues" :venueWithHighestRating="$venueWithHighestRating" :photographerWithHighestRating="$photographerWithHighestRating" :videographerWithHighestRating="$videographerWithHighestRating" :bandWithHighestRating="$bandWithHighestRating"
-          :designerWithHighestRating="$designerWithHighestRating" />
+        {{-- <x-suggestion-block :existingVenues="$existingVenues" :venueWithHighestRating="$venueWithHighestRating" :photographerWithHighestRating="$photographerWithHighestRating" :videographerWithHighestRating="$videographerWithHighestRating" :bandWithHighestRating="$bandWithHighestRating"
+          :designerWithHighestRating="$designerWithHighestRating" /> --}}
 
         <x-review-modal title="{{ $promoter->name }}" route="submit-venue-review" profileId="{{ $promoter->id }}" />
       </div>

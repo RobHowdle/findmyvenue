@@ -12,8 +12,89 @@
 }
 
 [type="checkbox"]:checked {
-    background-color: theme("colors.ynsCyan");
+    background-color: theme("colors.yns_cyan");
 }
+
+.group:hover .group-hover\:block {
+    display: block;
+}
+
+/* Register Form Password Metere */
+#password-strength-meter {
+    transition: width 0.5s ease; /* Smooth transition */
+}
+
+.weak {
+    background-color: theme("colors.yns_red"); /* Weak */
+}
+
+.medium {
+    background-color: theme("colors.yns_yellow"); /* Medium */
+}
+
+.strong {
+    background-color: green; /* Strong */
+}
+
+.select2-container--default .select2-selection--multiple {
+    background-color: theme("colors.yns_dark_blue");
+    border: 1px solid theme("colors.yns_red");
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    border: 1px solid theme("colors.yns_red");
+    background-color: white;
+    color: black;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+        border: 1px solid theme("colors.yns_red");
+}
+.select2-container--default .select2-results__option--selected {
+    background-color: theme("colors.yns_med_gray");
+    color: black;
+}
+
+.select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
+    background-color: theme("colors.yns_cyan");
+}
+
+.select2-container {
+  width: 100%;
+  color: #d1d5db; /* Tailwind color: dark:text-gray-300 */
+  border-radius: 0.375rem; /* Rounded-md */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Shadow-sm */
+}
+
+.select2-selection {
+  display: flex;
+  align-items: center; /* Center items vertically */
+}
+
+.select2-selection__rendered {
+  color: #d1d5db; /* Tailwind color for selected items */
+}
+
+.select2-selection__placeholder {
+  color: #6b7280; /* Tailwind color: text-gray-500 */
+}
+
+.select2-search__field {
+  background-color: #1f2937; /* Tailwind color: dark:bg-gray-900 */
+  color: #d1d5db; /* Tailwind color: dark:text-gray-300 */
+  border: 1px solid #374151; /* Tailwind color: border-gray-700 */
+  border-radius: 0.375rem; /* Rounded-md */
+  padding: 0.5rem; /* Padding for the input */
+}
+
+/* Adjust dropdown styling */
+.select2-results {
+  background-color: theme("colors.yns_dark_gray"); /* Tailwind color: bg-gray-800 */
+  color: #d1d5db; /* Tailwind color: dark:text-gray-300 */
+border: 1px solid theme("colors.yns_red");
+}
+
+
 
 /* Preloader */
 @keyframes music-first {
@@ -47,6 +128,63 @@
     100% {
         opacity: 0;
     }
+}
+
+/* Profile */
+#calendar {
+    width: 100%;
+    min-height: 500px;
+    height: auto;
+}
+
+/* Notes */
+  @keyframes slideIn {
+    0% {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideOut {
+    0% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    100% {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+  }
+
+  #notes-popout {
+    animation-duration: 0.3s;
+    animation-fill-mode: forwards;
+  }
+
+  .slide-in {
+    animation-name: slideIn;
+  }
+
+  .slide-out {
+    animation-name: slideOut;
+  }
+
+  .scale-0 {
+  transform: scale(0);
+}
+
+.scale-100 {
+  transform: scale(1);
+}
+
+.transition-transform {
+  transition: transform 0.3s ease-in-out;
 }
 
 .pre-overlay {
@@ -165,8 +303,8 @@
 }
 
 .active {
-    color: theme("colors.ynsYellow");
-    border-bottom-color: theme("colors.ynsYellow");
+    color: theme("colors.yns_yellow");
+    border-bottom-color: theme("colors.yns_yellow");
     border-bottom-width: 2px;
 }
 
@@ -177,16 +315,28 @@
 }
 
 .note-editor.note-frame {
-    padding-top: 3rem;
     color: var(--color-white);
 }
 
-body {
-    background-image: url("/public/images/hero-bg.jpg");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: cover;
-    background-attachment: fixed;
+.note-editing-area {
+    border-color: theme("colors.yns_red");
+}
+
+.note-toolbar {
+    border-left-color: theme("colors.yns_red") !important;
+    border-left-width: 1px;
+    border-left-style: solid;
+    border-top-color: theme("colors.yns_red") !important;
+    border-top-width: 1px;
+    border-top-style: solid;
+    border-right-color: theme("colors.yns_red") !important;
+    border-right-width: 1px;
+    border-right-style: solid;
+}
+
+.highlight {
+    background-color: theme("colors.yns_yellow");
+    /* padding: 0.5rem; */
 }
 
 .search {

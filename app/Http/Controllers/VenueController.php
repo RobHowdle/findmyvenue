@@ -290,10 +290,18 @@ class VenueController extends Controller
         $data = json_decode($genreList, true);
         $genres = $data['genres'];
 
+        $overallReviews = []; // Array to store overall reviews for each venue
+
+        foreach ($paginatedResults as $venue) {
+            $overallScore = VenueReview::calculateOverallScore($venue->id);
+            $overallReviews[$venue->id] = $this->renderRatingIcons($overallScore);
+        }
+
         return view('venues', [
             'venues' => $paginatedResults,
             'genres' => $genres,
-            'searchQuery' => $searchQuery
+            'searchQuery' => $searchQuery,
+            'overallReviews' => $overallReviews
         ]);
     }
 

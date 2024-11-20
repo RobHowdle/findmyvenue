@@ -8,7 +8,7 @@
       <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
         <th scope="row"
           class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
-          <a href="{{ route('venue', $venue->id) }}" class="venue-link hover:text-ynsYellow">{{ $venue->name }}</a>
+          <a href="{{ route('venue', $venue->id) }}" class="venue-link hover:text-yns_yellow">{{ $venue->name }}</a>
         </th>
         <td class="rating-wrapper flex whitespace-nowrap sm:py-3 sm:text-base md:py-2 lg:py-4">{!! $overallReviews[$venue->id] !!}
         </td>
@@ -23,7 +23,7 @@
           class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
           @if ($venue->promoters)
             @foreach ($venue->promoters as $promoter)
-              <a class="hover:text-ynsYellow" href="{{ url('promoters', $promoter->id) }}">{{ $promoter['name'] }}</a>
+              <a class="hover:text-yns_yellow" href="{{ url('promoters', $promoter->id) }}">{{ $promoter['name'] }}</a>
             @endforeach
           @endif
         </td>
@@ -256,7 +256,7 @@
       return `
             <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
                 <th scope="row" class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
-                    <a href="${venueRoute.replace(':venueId', venue.id)}" class="venue-link hover:text-ynsYellow">${venue.name}</a>
+                    <a href="${venueRoute.replace(':venueId', venue.id)}" class="venue-link hover:text-yns_yellow">${venue.name}</a>
                 </th>
                 <td class="rating-wrapper flex whitespace-nowrap sm:py-3 sm:text-base md:py-2 lg:py-4">
                     ${ratingHtml}
@@ -265,22 +265,22 @@
                     ${venue.postal_town}
                 </td>
                 <td class="flex gap-4 whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
-                    ${venue.contact_number ? '<a href="tel:' + venue.contact_number + '" class="hover:text-ynsYellow"><span class="fas fa-phone"></span></a>' : ''}
-                    ${venue.contact_email ? '<a href="mailto:' + venue.contact_email + '" class="hover:text-ynsYellow"><span class="fas fa-envelope"></span></a>' : ''}
+                    ${venue.contact_number ? '<a href="tel:' + venue.contact_number + '" class="hover:text-yns_yellow"><span class="fas fa-phone"></span></a>' : ''}
+                    ${venue.contact_email ? '<a href="mailto:' + venue.contact_email + '" class="hover:text-yns_yellow"><span class="fas fa-envelope"></span></a>' : ''}
                     ${venue.platforms ? venue.platforms.map(function(platform) {
                         switch (platform.platform) {
                             case 'facebook':
-                                return '<a class="hover:text-ynsYellow" href="' + platform.url + '" target=_blank><span class="fab fa-facebook"></span></a>';
+                                return '<a class="hover:text-yns_yellow" href="' + platform.url + '" target=_blank><span class="fab fa-facebook"></span></a>';
                             case 'twitter':
-                                return '<a class="hover:text-ynsYellow" href="' + platform.url + '" target=_blank><span class="fab fa-twitter"></span></a>';
+                                return '<a class="hover:text-yns_yellow" href="' + platform.url + '" target=_blank><span class="fab fa-twitter"></span></a>';
                             case 'instagram':
-                                return '<a class="hover:text-ynsYellow" href="' + platform.url + '" target=_blank><span class="fab fa-instagram"></span></a>';
+                                return '<a class="hover:text-yns_yellow" href="' + platform.url + '" target=_blank><span class="fab fa-instagram"></span></a>';
                             case 'snapchat':
-                                return '<a class="hover:text-ynsYellow" href="' + platform.url + '" target=_blank><span class="fab fa-snapchat-ghost"></span></a>';
+                                return '<a class="hover:text-yns_yellow" href="' + platform.url + '" target=_blank><span class="fab fa-snapchat-ghost"></span></a>';
                             case 'tiktok':
-                                return '<a class="hover:text-ynsYellow" href="' + platform.url + '" target=_blank><span class="fab fa-tiktok"></span></a>';
+                                return '<a class="hover:text-yns_yellow" href="' + platform.url + '" target=_blank><span class="fab fa-tiktok"></span></a>';
                             case 'youtube':
-                                return '<a class="hover:text-ynsYellow" href="' + platform.url + '" target=_blank><span class="fab fa-youtube"></span></a>';
+                                return '<a class="hover:text-yns_yellow" href="' + platform.url + '" target=_blank><span class="fab fa-youtube"></span></a>';
                             default:
                                 return '';
                         }

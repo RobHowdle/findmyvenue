@@ -15,6 +15,7 @@ class Todo extends Model
         'serviceable_id',
         'serviceable_type',
         'item',
+        'due_date',
         'completed',
         'completed_at'
     ];
@@ -27,5 +28,10 @@ class Todo extends Model
     public function serviceable()
     {
         return $this->morphTo();
+    }
+
+    public function promoters()
+    {
+        return $this->morphMany(Todo::class, 'serviceable');
     }
 }

@@ -4,12 +4,17 @@
       {{ __('Other') }}
     </h1>
   </x-slot>
-  <div class="mx-auto w-full max-w-screen-2xl py-16">
+  <div class="mx-auto my-6 w-full max-w-screen-2xl pt-32">
     <div class="relative shadow-md sm:rounded-lg">
-      <div class="min-w-screen-xl mx-auto max-w-screen-xl bg-opac8Black px-16 py-12 text-white">
+      <div class="min-w-screen-xl mx-auto max-w-screen-xl bg-opac_8_black px-16 py-12 text-white">
         <div class="header flex gap-4">
-          @if ($singleService->logo_url)
+          @php
+            $imagePath = public_path($singleService->logo_url);
+          @endphp
+          @if ($singleService->logo_url && file_exists($imagePath))
             <img src="{{ asset($singleService->logo_url) }}" alt="{{ $singleService->name }} Logo" class="_250img">
+          @else
+            <img src="{{ asset('images/system/yns_no_image_found.png') }}" alt="No Image" class="_250img">
           @endif
           <div class="header-text flex flex-col justify-center gap-2">
             <h1 class="text-sans text-4xl">{{ $singleService->name }}</h1>
@@ -18,12 +23,10 @@
               <x-contact-and-social-links :item="$singleService" />
             </div>
             <div class="rating-wrapper flex flex-row items-center gap-2">
-              <p>Overall Rating (
-                @if ($singleService->services == 'Band')
-                  {{ $bandReviewCount }}
-                  )
-                  @else{{ $reviewCount }}
-                @endif:
+              <p class="h-full place-content-end font-sans">Overall Rating
+                (@if ($singleService->services == 'Band')
+                  {{ $bandReviewCount }}@else{{ $reviewCount }}
+                @endif):
               </p>
               <div class="ratings flex">
                 {!! $overallReviews[$singleService->id] !!}
@@ -31,7 +34,7 @@
             </div>
             <div class="leave-review">
               <button
-                class="rounded bg-gradient-to-t from-ynsDarkOrange to-ynsYellow px-6 py-2 text-sm text-black hover:bg-ynsYellow"
+                class="rounded-lg bg-gradient-to-t from-yns_dark_orange to-yns_yellow px-6 py-2 text-sm text-black hover:bg-yns_yellow"
                 data-modal-toggle="review-modal" type="button">Leave a review</button>
             </div>
 
@@ -45,32 +48,32 @@
                 class="flex flex-wrap justify-between border-b border-gray-200 text-center text-sm font-medium text-gray-500 dark:border-gray-700 dark:text-gray-400">
                 <li class="tab me-2 pl-0">
                   <a href="#" data-tab="about"
-                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
+                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
                     <span class="fas fa-info-circle mr-2"></span>About
                   </a>
                 </li>
                 <li class="tab me-2">
                   <a href="#" data-tab="members"
-                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
-                    <span class="fas fa-cog mr-2"></span>Members
+                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
+                    <span class="fas fa-users mr-2"></span>Members
                   </a>
                 </li>
                 <li class="tab me-2">
                   <a href="#" data-tab="music"
-                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
-                    <span class="fas fa-cog mr-2"></span>Music
+                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
+                    <span class="fas fa-music mr-2"></span>Music
                   </a>
                 </li>
                 <li class="tab me-2">
                   <a href="#" data-tab="reviews"
-                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
-                    <span class="fas fa-star mr-2"></span> Reviews
+                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
+                    <span class="fas fa-star mr-2"></span>Reviews
                   </a>
                 </li>
                 <li class="tab me-2">
                   <a href="#" data-tab="socials"
-                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
-                    <span class="fas fa-plus mr-2"></span> Socials
+                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
+                    <span class="fas fa-icons mr-2"></span>Socials
                   </a>
                 </li>
               </ul>
@@ -84,25 +87,25 @@
                 class="flex flex-wrap justify-between border-b border-gray-200 text-center text-sm font-medium text-gray-500 dark:border-gray-700 dark:text-gray-400">
                 <li class="tab me-2 pl-0">
                   <a href="#" data-tab="overview"
-                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
+                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
                     <span class="fas fa-info-circle mr-2"></span>Overview
                   </a>
                 </li>
                 <li class="tab me-2">
                   <a href="#" data-tab="services"
-                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
+                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
                     <span class="fas fa-cog mr-2"></span>Services
                   </a>
                 </li>
                 <li class="tab me-2">
                   <a href="#" data-tab="reviews"
-                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
+                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
                     <span class="fas fa-star mr-2"></span> Reviews
                   </a>
                 </li>
                 <li class="tab me-2">
                   <a href="#" data-tab="socials"
-                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
+                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
                     <span class="fas fa-plus mr-2"></span> Socials
                   </a>
                 </li>
@@ -120,9 +123,9 @@
                   <p class="mb-4">{{ $singleService->description }}</p>
 
                   <p class="underline"> Genre & Type</p>
-                  <p>We are {{ a0rAn($genre->genres[0]) }}
-                    @if (is_array($genre->genres))
-                      @foreach ($genre->genres as $index => $type)
+                  <p>We are {{ a0rAn($genres[0]) }}
+                    @if (is_array($genres))
+                      @foreach ($genres as $index => $type)
                         {{ $type }}@if (!$loop->last)
                           ,
                         @endif
@@ -131,8 +134,8 @@
                       Unknown type
                     @endif
                     that play
-                    @if (is_array($bandType->band_type))
-                      @foreach ($bandType->band_type as $index => $type)
+                    @if (is_array($bandType))
+                      @foreach ($bandType as $index => $type)
                         {{ $type }}@if (!$loop->last)
                           ,
                         @endif
@@ -142,18 +145,13 @@
                     @endif
                     music.
                   </p>
-
                 @endif
               </div>
 
               <div id="members" class="flex flex-wrap gap-4 overflow-auto">
                 @if ($members)
                   <div class="service min-w-[calc(50%-1rem)] flex-1">
-                    <ul class="list-inside list-none">
-                      @foreach ($members as $member)
-                        <li>{{ $member->name }} - {{ $member->role }}</li>
-                      @endforeach
-                    </ul>
+                    <p>{!! $members !!}</p>
                   </div>
                 @else
                   <p>We haven't got our services set up yet! Come back soon!</p>
@@ -162,43 +160,52 @@
 
               <div id="music">
                 <p class="mb-4 text-center text-2xl font-bold">Listen To Us</p>
-                <p class="mb-4 text-center">Our music is avaliable on the following platforms. Feel free to give us a
-                  follow
-                  to stay updated with our releases!</p>
+                <p class="mb-4 text-center">Our music is available on the following platforms. Feel free to give us a
+                  follow to stay updated with our releases!</p>
+
                 @php
-                  $streamUrls = $streamUrls ?? [];
-                  $spotifyUrl = '';
+                  // Assuming $streamUrls is an object (stdClass) and not an array
+                  $streamUrls = $streamUrls ?? new stdClass();
+
+                  // Initialize URLs for platforms
+                  $spotifyUrl = isset($streamUrls->spotify[0])
+                      ? $streamUrls->spotify[0]
+                      : 'https://open.spotify.com/track/4PTG3Z6ehGkBFwjybzWkR8?si=23c6845e25df4307';
                   $otherLinks = [];
 
-                  foreach ($streamUrls as $link) {
-                      if (stripos($link->host, 'Spotify') !== false) {
-                          $spotifyUrl = $link->url;
-                      } else {
-                          $otherLinks[] = $link;
+                  // Collect other platforms (non-Spotify)
+                  foreach ($streamUrls as $platform => $links) {
+                      if ($platform !== 'spotify' && isset($links[0]) && $links[0] !== null) {
+                          $otherLinks[] = ['platform' => $platform, 'url' => $links[0]];
                       }
                   }
-
-                  if ($spotifyUrl == null) {
-                      $spotifyUrl = 'https://open.spotify.com/track/4PTG3Z6ehGkBFwjybzWkR8?si=23c6845e25df4307';
-                  }
-
                 @endphp
+
                 @if ($spotifyUrl)
-                  <div id="embed-iframe" loading="lazy" allowfullscreen="" frameBorder="0"
-                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></div>
+                  <p class="my-4 text-center">Listen on Spotify:</p>
+                  <div id="embed-iframe" class="mb-4 text-center">
+                    <!-- Instead of embedding Spotify directly, use a clickable link or embed player -->
+                    <a href="{{ $spotifyUrl }}" target="_blank" class="text-blue-600 underline"
+                      rel="noopener noreferrer">
+                      Open in Spotify
+                    </a>
+                  </div>
                 @endif
 
                 <p class="my-4 text-center text-2xl font-bold">Also Catch Us On</p>
+
                 @php
                   $linkCount = count($otherLinks);
                 @endphp
+
                 <div
                   class="streaming-platforms grid-cols-{{ $linkCount }} grid place-items-center items-center gap-4">
                   @foreach ($otherLinks as $link)
-                    <a href="{{ $link->url }}" target="_blank"
-                      class="streaming-platforms transition hover:bg-ynsYellow" rel="noopener noreferrer">
-                      <img src="{{ asset('storage/images/system/streaming/' . strtolower($link->host) . '.png') }}"
-                        alt="{{ $link->host }} Streaming Link" class="streaming-platform-logo">
+                    <a href="{{ $link['url'] }}" target="_blank" class="streaming-platforms"
+                      rel="noopener noreferrer">
+                      <img
+                        src="{{ asset('storage/images/system/streaming/' . strtolower($link['platform']) . '.png') }}"
+                        alt="{{ ucfirst($link['platform']) }} Streaming Link" class="streaming-platform-logo">
                     </a>
                   @endforeach
                 </div>
@@ -244,34 +251,34 @@
                 @if ($singleService->platforms)
                   @foreach ($singleService->platforms as $platform)
                     @if ($platform['platform'] == 'facebook')
-                      <a class="mb-4 mr-2 flex items-center hover:text-ynsYellow" href="{{ $platform['url'] }}"
+                      <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
-                        <span class="fab fa-facebook mr-4 h-10"></span> {{ $platform['url'] }}
+                        <span class="fab fa-facebook mr-4 h-10"></span> {{ ucfirst($platform['platform']) }}
                       </a>
                     @elseif($platform['platform'] == 'twitter')
-                      <a class="mb-4 mr-2 flex items-center hover:text-ynsYellow" href="{{ $platform['url'] }}"
+                      <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
-                        <span class="fab fa-twitter mr-4 h-10"></span> {{ $platform['url'] }}
+                        <span class="fab fa-twitter mr-4 h-10"></span> {{ ucfirst($platform['platform']) }}
                       </a>
                     @elseif($platform['platform'] == 'instagram')
-                      <a class="mb-4 mr-2 flex items-center hover:text-ynsYellow" href="{{ $platform['url'] }}"
+                      <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
-                        <span class="fab fa-instagram mr-4 h-10"></span> {{ $platform['url'] }}
+                        <span class="fab fa-instagram mr-4 h-10"></span> {{ ucfirst($platform['platform']) }}
                       </a>
                     @elseif($platform['platform'] == 'snapchat')
-                      <a class="mb-4 mr-2 flex items-center hover:text-ynsYellow" href="{{ $platform['url'] }}"
+                      <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
-                        <span class="fab fa-snapchat-ghost mr-4 h-10"></span> {{ $platform['url'] }}
+                        <span class="fab fa-snapchat-ghost mr-4 h-10"></span> {{ ucfirst($platform['platform']) }}
                       </a>
                     @elseif($platform['platform'] == 'tiktok')
-                      <a class="mb-4 mr-2 flex items-center hover:text-ynsYellow" href="{{ $platform['url'] }}"
+                      <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
-                        <span class="fab fa-tiktok mr-4 h-10"></span> {{ $platform['url'] }}
+                        <span class="fab fa-tiktok mr-4 h-10"></span> {{ ucfirst($platform['platform']) }}
                       </a>
                     @elseif($platform['platform'] == 'youtube')
-                      <a class="mb-4 mr-2 flex items-center hover:text-ynsYellow" href="{{ $platform['url'] }}"
+                      <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
-                        <span class="fab fa-youtube mr-4 h-10"></span> {{ $platform['url'] }}
+                        <span class="fab fa-youtube mr-4 h-10"></span> {{ ucfirst($platform['platform']) }}
                       </a>
                     @endif
                   @endforeach
@@ -308,12 +315,12 @@
                     </div>
                   @endforeach
                   <p class="mt-4">All services are subject to location and travel costs. Please <a
-                      class="underline hover:text-ynsYellow"
+                      class="underline hover:text-yns_yellow"
                       href="mailto:{{ $singleService->contact_email }}">contact
                       us</a> with any
                     queries.</p>
                   @if ($singleService->portfolio_link)
-                    <p class="mt-2">You can view our portfolio by <a class="underline hover:text-ynsYellow"
+                    <p class="mt-2">You can view our portfolio by <a class="underline hover:text-yns_yellow"
                         href="{{ $singleService->portfolio_link }}" target="_blank">clicking here.</a></p>
                   @endif
                 @else
@@ -361,32 +368,32 @@
                 @if ($singleService->platforms)
                   @foreach ($singleService->platforms as $platform)
                     @if ($platform['platform'] == 'facebook')
-                      <a class="mb-4 mr-2 flex items-center hover:text-ynsYellow" href="{{ $platform['url'] }}"
+                      <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
                         <span class="fab fa-facebook mr-4 h-10"></span> {{ $platform['url'] }}
                       </a>
                     @elseif($platform['platform'] == 'twitter')
-                      <a class="mb-4 mr-2 flex items-center hover:text-ynsYellow" href="{{ $platform['url'] }}"
+                      <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
                         <span class="fab fa-twitter mr-4 h-10"></span> {{ $platform['url'] }}
                       </a>
                     @elseif($platform['platform'] == 'instagram')
-                      <a class="mb-4 mr-2 flex items-center hover:text-ynsYellow" href="{{ $platform['url'] }}"
+                      <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
                         <span class="fab fa-instagram mr-4 h-10"></span> {{ $platform['url'] }}
                       </a>
                     @elseif($platform['platform'] == 'snapchat')
-                      <a class="mb-4 mr-2 flex items-center hover:text-ynsYellow" href="{{ $platform['url'] }}"
+                      <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
                         <span class="fab fa-snapchat-ghost mr-4 h-10"></span> {{ $platform['url'] }}
                       </a>
                     @elseif($platform['platform'] == 'tiktok')
-                      <a class="mb-4 mr-2 flex items-center hover:text-ynsYellow" href="{{ $platform['url'] }}"
+                      <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
                         <span class="fab fa-tiktok mr-4 h-10"></span> {{ $platform['url'] }}
                       </a>
                     @elseif($platform['platform'] == 'youtube')
-                      <a class="mb-4 mr-2 flex items-center hover:text-ynsYellow" href="{{ $platform['url'] }}"
+                      <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
                         <span class="fab fa-youtube mr-4 h-10"></span> {{ $platform['url'] }}
                       </a>
@@ -398,8 +405,8 @@
               </div>
             </div>
           @endif
-          <x-suggestion-block :promoterWithHighestRating="$promoterWithHighestRating" :photographerWithHighestRating="$photographerWithHighestRating" :videographerWithHighestRating="$videographerWithHighestRating" :bandWithHighestRating="$bandWithHighestRating"
-            :designerWithHighestRating="$designerWithHighestRating" />
+          {{-- <x-suggestion-block :promoterWithHighestRating="$promoterWithHighestRating" :photographerWithHighestRating="$photographerWithHighestRating" :videographerWithHighestRating="$videographerWithHighestRating" :bandWithHighestRating="$bandWithHighestRating"
+            :designerWithHighestRating="$designerWithHighestRating" /> --}}
           <x-review-modal title="{{ $singleService->name }}" route="submit-venue-review"
             profileId="{{ $singleService->id }}" />
         </div>
@@ -408,7 +415,6 @@
 </x-guest-layout>
 <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
 <script>
-  console.log('running');
   window.onSpotifyIframeApiReady = (IFrameAPI) => {
     const element = document.getElementById('embed-iframe');
     const options = {

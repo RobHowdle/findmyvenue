@@ -15,7 +15,7 @@
     @if (isset($existingPromoters) && $existingPromoters->isNotEmpty())
       @foreach ($existingPromoters as $promoter)
         <a href="{{ route('promoter', $promoter->id) }}"
-          class="flex flex-col items-center justify-center p-4 text-center transition-colors duration-100 ease-in-out hover:bg-ynsYellow">
+          class="hover:bg-yns_yellow flex flex-col items-center justify-center p-4 text-center transition-colors duration-100 ease-in-out">
           @if ($promoter->logo_url)
             <img class="max-w-yns132" src="{{ asset($promoter->logo_url) }}" alt="{{ $promoter->name }} Logo">
           @endif
@@ -26,7 +26,7 @@
       @if (isset($existingVenues) && $existingVenues->isNotEmpty())
         @foreach ($existingVenues as $venue)
           <a href="{{ route('venue', $venue->id) }}"
-            class="flex flex-col items-center justify-center p-4 text-center transition-colors duration-100 ease-in-out hover:bg-ynsYellow">
+            class="hover:bg-yns_yellow flex flex-col items-center justify-center p-4 text-center transition-colors duration-100 ease-in-out">
             @if ($venue->logo_url)
               <img class="max-w-yns132" src="{{ asset($venue->logo_url) }}" alt="{{ $venue->name }} Logo">
             @endif
@@ -36,7 +36,7 @@
       @endif
 
       @if ($promoterWithHighestRating)
-        <a class="flex flex-col items-center justify-center p-4 text-center transition-colors duration-100 ease-in-out hover:bg-ynsYellow"
+        <a class="hover:bg-yns_yellow flex flex-col items-center justify-center p-4 text-center transition-colors duration-100 ease-in-out"
           href="{{ route('promoter', $promoterWithHighestRating->id) }}">
           @if ($promoterWithHighestRating->logo_url)
             <img class="asr1 mb-4 max-w-yns132 flex-shrink object-contain"
@@ -47,7 +47,7 @@
         </a>
       @endif
       @if ($photographerWithHighestRating)
-        <a class="flex flex-col items-center justify-center p-4 text-center transition-colors duration-100 ease-in-out hover:bg-ynsYellow"
+        <a class="hover:bg-yns_yellow flex flex-col items-center justify-center p-4 text-center transition-colors duration-100 ease-in-out"
           href="{{ route('singleService', ['serviceName' => $photographerWithHighestRating->otherServiceList->service_name, 'serviceId' => $photographerWithHighestRating->id]) }}">
           @if ($photographerWithHighestRating->logo_url)
             <img class="asr1 mb-4 max-w-yns132 flex-shrink object-contain"
@@ -58,7 +58,7 @@
         </a>
       @endif
       @if ($videographerWithHighestRating)
-        <a class="flex flex-col items-center justify-center p-4 text-center transition-colors duration-100 ease-in-out hover:bg-ynsYellow"
+        <a class="hover:bg-yns_yellow flex flex-col items-center justify-center p-4 text-center transition-colors duration-100 ease-in-out"
           href="{{ route('singleService', ['serviceName' => $videographerWithHighestRating->otherServiceList->service_name, 'serviceId' => $videographerWithHighestRating->id]) }}">
           @if ($videographerWithHighestRating->logo_url)
             <img class="asr1 mb-4 max-w-yns132 flex-shrink object-contain"
@@ -69,7 +69,7 @@
         </a>
       @endif
       @if ($bandWithHighestRating)
-        <a class="flex flex-col items-center justify-center p-4 text-center transition-colors duration-100 ease-in-out hover:bg-ynsYellow"
+        <a class="hover:bg-yns_yellow flex flex-col items-center justify-center p-4 text-center transition-colors duration-100 ease-in-out"
           href="{{ route('singleService', ['serviceName' => $bandWithHighestRating->otherServiceList->service_name, 'serviceId' => $bandWithHighestRating->id]) }}">
           @if ($bandWithHighestRating->logo_url)
             <img class="asr1 mb-4 max-w-yns132 flex-shrink object-contain"
@@ -79,7 +79,7 @@
         </a>
       @endif
       @if ($designerWithHighestRating)
-        <a class="flex flex-col items-center justify-center p-4 text-center transition-colors duration-100 ease-in-out hover:bg-ynsYellow"
+        <a class="hover:bg-yns_yellow flex flex-col items-center justify-center p-4 text-center transition-colors duration-100 ease-in-out"
           href="{{ route('singleService', ['serviceName' => $designerWithHighestRating->otherServiceList->service_name, 'serviceId' => $designerWithHighestRating->id]) }}">
           @if ($designerWithHighestRating->logo_url)
             <img class="asr1 mb-4 max-w-yns132 flex-shrink object-contain"

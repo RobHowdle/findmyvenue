@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Role;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
@@ -13,7 +14,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles, SoftDeletes;
+    use HasApiTokens;
+    use HasFactory;
+    use Notifiable;
+    use HasRoles;
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -21,9 +26,19 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
         'email',
         'password',
+        'date_of_birth',
+        'location',
+        'latitude',
+        'longitude',
+        'apple_calendar_synced',
+        'google_access_token',
+        'google_refresh_token',
+        'token_expires_at',
+        'mailing_preferences',
     ];
 
     /**
@@ -44,21 +59,58 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
-        'last_logged_in' => 'datetime'
+        'last_logged_in' => 'datetime',
+        'mailing_preferences' => 'array',
     ];
 
     protected $dates = [
         'last_logged_in',
     ];
 
-    public function services(): MorphToMany
+    public static function boot()
     {
-        return $this->morphedByMany(Serviceable::class, 'serviceable', 'service_user', 'user_id', 'serviceable_id')->whereNull('service_user.deleted_at');
+        parent::boot();
+
+        static::creating(function ($user) {
+            if (is_null($user->mailing_preferences)) {
+                $user->mailing_preferences = [
+                    'system_announcements' => true,
+                    'legal_or_policy_updates' => true,
+                    'account_notifications' => true,
+                    'event_invitations' => true,
+                    'surveys_and_feedback' => true,
+                    'birthday_anniversary_holiday' => true,
+                ];
+            }
+        });
     }
 
-    public function promoters(): MorphToMany
+
+    public function services()
     {
-        return $this->morphedByMany(Promoter::class, 'serviceable', 'service_user', 'user_id', 'serviceable_id')->whereNull('service_user.deleted_at');
+        $promoters = $this->morphedByMany(Promoter::class, 'serviceable', 'service_user', 'user_id', 'serviceable_id')
+            ->select('promoters.*', 'service_user.user_id as pivot_user_id', 'service_user.serviceable_id as pivot_serviceable_id', 'service_user.serviceable_type as pivot_serviceable_type', 'service_user.deleted_at as pivot_deleted_at')
+            ->get();
+
+        $venues = $this->morphedByMany(Venue::class, 'serviceable', 'service_user', 'user_id', 'serviceable_id')
+            ->select('venues.*', 'service_user.user_id as pivot_user_id', 'service_user.serviceable_id as pivot_serviceable_id', 'service_user.serviceable_type as pivot_serviceable_type', 'service_user.deleted_at as pivot_deleted_at')
+            ->get();
+
+        return $promoters->merge($venues);
+    }
+
+    public function promoters(string $role = null): MorphToMany
+    {
+        $query = $this->morphedByMany(Promoter::class, 'serviceable', 'service_user', 'user_id', 'serviceable_id')->whereNull('service_user.deleted_at');
+
+        if ($role) {
+            $roleId = $this->role_id;
+            if ($roleId) {
+                $query->where('serviceable_id', $roleId);
+            }
+        }
+
+        return $query;
     }
 
     public function venues(): MorphToMany
@@ -66,13 +118,66 @@ class User extends Authenticatable
         return $this->morphedByMany(Venue::class, 'serviceable', 'service_user', 'user_id', 'serviceable_id')->whereNull('service_user.deleted_at');
     }
 
-    public function otherService(): MorphToMany
+    public function otherService(string $role = null): MorphToMany
     {
-        return $this->morphedByMany(OtherService::class, 'serviceable', 'service_user', 'user_id', 'serviceable_id')->whereNull('service_user.deleted_at');
+        $query = $this->morphedByMany(OtherService::class, 'serviceable', 'service_user', 'user_id', 'serviceable_id')->whereNull('service_user.deleted_at');
+
+        if ($role) {
+            $roleId = $this->getRoleIdByRole($role);
+            if ($roleId) {
+                $query->where('serviceable_id', $roleId);
+            }
+        }
+
+        return $query;
+    }
+
+    private function getRoleIdByRole(string $role): ?int
+    {
+        $roleMapping = [
+            'photographer' => 1,
+            'videographer' => 2,
+            'designer' => 3,
+            'band' => 4,
+        ];
+
+        return $roleMapping[$role] ?? null;
     }
 
     public function todos()
     {
         return $this->morphMany(Todo::class, 'serviceable');
+    }
+
+    public function notes()
+    {
+        return $this->morphMany(Note::class, 'serviceable');
+    }
+
+    public function getRoleType()
+    {
+        $excludedRoles = ['promoter', 'venue', 'standard', 'administrator'];
+
+        if ($this->hasRole('promoter')) {
+            return Promoter::class;
+        }
+
+        if ($this->hasRole('venue')) {
+            return Venue::class;
+        }
+
+        $userRoles = $this->getRoleNames()->toArray();
+        $filteredRoles = array_diff($userRoles, $excludedRoles);
+
+        if (!empty($filteredRoles)) {
+            return OtherService::class;
+        }
+
+        return null;
+    }
+
+    public function moduleSettings()
+    {
+        return $this->hasMany(UserModuleSetting::class);
     }
 }

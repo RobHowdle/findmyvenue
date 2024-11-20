@@ -5,12 +5,14 @@
     </h1>
   </x-slot>
 
-  <div class="mx-auto w-full max-w-screen-2xl py-16">
+  <div class="mx-auto my-6 w-full max-w-screen-2xl pt-32">
     <div class="relative shadow-md sm:rounded-lg">
-      <div class="min-w-screen-xl mx-auto max-w-screen-xl bg-opac8Black px-16 py-12 text-white">
+      <div class="min-w-screen-xl mx-auto max-w-screen-xl bg-opac_8_black px-16 py-12 text-white">
         <div class="header flex gap-4">
           @if ($venue->logo_url)
             <img src="{{ asset($venue->logo_url) }}" alt="{{ $venue->name }} Logo" class="_250img">
+          @else
+            <img src="{{ asset('images/system/yns_no_image_found.png') }}" alt="No Image" class="_250img">
           @endif
           <div class="header-text flex flex-col justify-center gap-2">
             <h1 class="text-sans text-4xl">{{ $venue->name }}</h1>
@@ -19,14 +21,14 @@
               <x-contact-and-social-links :item="$venue" />
             </div>
             <div class="rating-wrapper flex flex-row items-center gap-2">
-              <p>Overall Rating ({{ $reviewCount }}): </p>
+              <p class="h-full place-content-end font-sans">Overall Rating ({{ $reviewCount }}): </p>
               <div class="ratings flex">
                 {!! $overallReviews[$venue->id] !!}
               </div>
             </div>
             <div class="leave-review">
               <button
-                class="rounded bg-gradient-to-t from-ynsDarkOrange to-ynsYellow px-6 py-2 text-sm text-black hover:bg-ynsYellow"
+                class="rounded bg-gradient-to-t from-yns_dark_orange to-yns_yellow px-6 py-2 text-sm text-black transition duration-150 ease-in-out hover:bg-yns_yellow"
                 data-modal-toggle="review-modal" type="button">Leave a review</button>
             </div>
 
@@ -39,19 +41,19 @@
               class="flex flex-wrap justify-between border-b border-gray-200 text-center text-sm font-medium text-gray-500 dark:border-gray-700 dark:text-gray-400">
               <li class="tab me-2 pl-0">
                 <a href="#" data-tab="about"
-                  class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
+                  class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
                   <span class="fas fa-info-circle mr-2"></span>About
                 </a>
               </li>
               <li class="tab me-2">
                 <a href="#" data-tab="in-house-gear"
-                  class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
+                  class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
                   <span class="fas fa-cogs mr-2"></span>In House Gear
                 </a>
               </li>
               <li class="tab me-2">
                 <a href="#" data-tab="band-types-genres"
-                  class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
+                  class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
                   <svg class="me-2 h-4 w-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
                     viewBox="0 0 20 20">
                     <path
@@ -61,13 +63,13 @@
               </li>
               <li class="tab me-2">
                 <a href="#" data-tab="reviews"
-                  class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
+                  class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
                   <span class="fas fa-star mr-2"></span> Reviews
                 </a>
               </li>
               <li class="tab me-2">
                 <a href="#" data-tab="other"
-                  class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-ynsYellow">
+                  class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
                   <span class="fas fa-plus mr-2"></span> Other
                 </a>
               </li>
@@ -76,7 +78,7 @@
 
           <div class="venue-tab-content mt-4 overflow-auto font-sans text-lg text-white">
             <div id="about">
-              @if (!$venue->description)
+              @if (empty($venue->description))
                 <p>We're still working on this! Come back later to read about us!</p>
               @else
                 <p>{{ $venue->description }}</p>
@@ -86,12 +88,12 @@
             <div id="in-house-gear" class="max-h-80 flex h-full flex-col gap-4 overflow-auto">
               @if (!$venue->in_house_gear || $venue->in_house_gear == 'None')
                 <p>We do not have any avaliable in house gear to use so you will be required to bring your own. Please
-                  <a class="underline hover:text-ynsYellow" href="mailto:{{ $venue->contact_email }}">contact
+                  <a class="underline hover:text-yns_yellow" href="mailto:{{ $venue->contact_email }}">contact
                     us.</a> if you have any questions about what you can bring.
                 </p>
               @else
                 <p>We have the following gear in house. If you require the use of anything imparticular please <a
-                    class="underline hover:text-ynsYellow" href="mailto:{{ $venue->contact_email }}">contact
+                    class="underline hover:text-yns_yellow" href="mailto:{{ $venue->contact_email }}">contact
                     us.</a>
                 </p>
                 <div class="gear-block flex flex-col">
@@ -104,11 +106,12 @@
 
             <div id="band-types-genres">
               @php
-                $bandTypes = json_decode($venue->band_type);
+                $bandTypes = json_decode($venue->band_type ?? '[]');
               @endphp
               @if (!$bandTypes)
-                <p>We don't have any specific band types listed, please <a class="underline hover:text-ynsYellow"
-                    href="mailto:{{ $venue->contact_email }}">contact us.</a> if you would like to enquire about booking
+                <p>We don't have any specific band types listed, please <a class="underline hover:text-yns_yellow"
+                    href="mailto:{{ $venue->contact_email }}">contact us.</a> if you would like to enquire about
+                  booking
                   your band.</p>
               @else
                 <p class="mb-2">The band types that we usually have at <span
@@ -138,26 +141,31 @@
                   @endforeach
                 </ul>
                 <p class="mt-2">If you would like to enquire about a show, please <a
-                    class="underline hover:text-ynsYellow" href="mailto:{{ $venue->email }}">contact us.</a></p>
+                    class="underline hover:text-yns_yellow" href="mailto:{{ $venue->email }}">contact us.</a></p>
               @endif
 
-              <p class="mt-4">The genres that we usually have at {{ $venue->name }} are:</p>
+              @if ($venue->genre)
+                <p class="mt-4">The genres that we usually have at {{ $venue->name }} are:</p>
 
-              @php
-                $genres = json_decode($venue->genre);
-              @endphp
+                @php
+                  $genres = json_decode($venue->genre ?? '[]');
+                @endphp
 
-              <!-- Split into 3 columns using Tailwind -->
-              <ul class="genre-list columns-3 gap-4">
-                @foreach ($genres as $genre)
-                  <li class="ml-6">{{ $genre }}</li>
-                @endforeach
-              </ul>
+                <ul class="genre-list columns-3 gap-4">
+                  @foreach ($genres as $genre)
+                    <li class="ml-6">{{ $genre }}</li>
+                  @endforeach
+                </ul>
 
-              <p class="mt-4">If you would like to enquire about a show, please <a
-                  class="underline hover:text-ynsYellow" href="mailto:{{ $venue->contact_email }}">contact us.</a></p>
+                <p class="mt-4">If you would like to enquire about a show, please <a
+                    class="underline hover:text-yns_yellow" href="mailto:{{ $venue->contact_email }}">contact us.</a>
+                </p>
+              @else
+                <p>We don't have a preference on genres of music at {{ $venue->name }}. If you would like to enquire
+                  about a show, please <a class="underline hover:text-yns_yellow"
+                    href="mailto:{{ $venue->contact_email }}">contact us.</a></p>
+              @endif
             </div>
-
 
             <div id="reviews">
               <p class="text-center">Want to know what we're like? Check out our reviews!</p>
@@ -206,14 +214,14 @@
                 @endif
                 <p class="bold pb-2 pt-2 text-2xl">More Info:</p>
                 <p class="pb-2">{!! nl2br(e($venue->additional_info)) !!}</p>
+              @else
+                <p>No Further Information Avaliable</p>
+              @endif
             </div>
-          @else
-            <p>No Further Information Avaliable</p>
-            @endif
           </div>
         </div>
-        <x-suggestion-block :existingPromoters="$existingPromoters" :promoterWithHighestRating="$promoterWithHighestRating" :photographerWithHighestRating="$photographerWithHighestRating" :videographerWithHighestRating="$videographerWithHighestRating" :bandWithHighestRating="$bandWithHighestRating"
-          :designerWithHighestRating="$designerWithHighestRating" />
+        {{-- <x-suggestion-block :existingPromoters="$existingPromoters" :promoterWithHighestRating="$promoterWithHighestRating" :photographerWithHighestRating="$photographerWithHighestRating" :videographerWithHighestRating="$videographerWithHighestRating" :bandWithHighestRating="$bandWithHighestRating"
+          :designerWithHighestRating="$designerWithHighestRating" /> --}}
         <x-review-modal title="{{ $venue->name }}" route="submit-venue-review" profileId="{{ $venue->id }}" />
       </div>
     </div>

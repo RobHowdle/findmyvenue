@@ -2,12 +2,26 @@
 
 use App\Models\OtherService;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\NoteController;
+use App\Http\Controllers\TodoController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\VenueController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\GigGuideController;
 use App\Http\Controllers\PromoterController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LinkedUserController;
+use App\Http\Controllers\APIRequestsController;
+use App\Http\Controllers\BandJourneyController;
 use App\Http\Controllers\OtherServiceController;
+use App\Http\Controllers\VenueJourneyController;
+use App\Http\Controllers\BandDashboardController;
+use App\Http\Controllers\VenueDashboardController;
 use App\Http\Controllers\PromoterDashboardController;
 
 /*
@@ -43,58 +57,175 @@ Route::get('/other/{serviceName}', [OtherServiceController::class, 'showGroup'])
 Route::get('/other/{serviceName}/{serviceId}', [OtherServiceController::class, 'show'])->name('singleService');
 Route::get('/other/filter', [OtherServiceController::class, 'filterCheckboxesSearch'])->name('other.filterCheckboxesSearch');
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/dashboard/promoter', [PromoterDashboardController::class, 'index'])->name('promoter.dashboard');
-    Route::get('/dashboard/promoter/users', [PromoterDashboardController::class, 'promoterUsers'])->name('promter.dashboard.users');
-    Route::get('/dashboard/promoter/finances', [PromoterDashboardController::class, 'promoterFinances'])->name('promoter.dashboard.finances');
-    Route::get('/dashboard/promoter/finances/new-budget', [PromoterDashboardController::class, 'createNewPromoterBudget'])->name('promoter.dashboard.finances.new');
-    Route::post('/dashboard/promoter/finances/save-budget', [PromoterDashboardController::class, 'saveNewPromoterBudget'])->name('promoter.dashboard.finances.saveNew');
-    Route::post('/dashboard/promoter/finances/export', [PromoterDashboardController::class, 'exportFinances'])->name('promoter.dashboard.finances.export');
-    Route::get('/dashboard/promoter/finances/{id}', [PromoterDashboardController::class, 'showSingleFinance'])->name('promoter.dashboard.finances.show');
-    Route::get('/dashboard/promoter/finances/{id}/edit', [PromoterDashboardController::class, 'editSingleFinance'])->name('promoter.dashboard.finances.edit');
-    Route::patch('/dashboard/promoter/finances/{finance}', [PromoterDashboardController::class, 'updateSingleFinance'])->name('promoter.dashboard.finances.update');
-    Route::post('/dashboard/promoter/finances/{finance}', [PromoterDashboardController::class, 'exportSingleFinanceRecord'])->name('promoter.dashboard.finances.exportSingleFinanceRecord');
-    Route::get('/dashboard/promoter/todo-list', [PromoterDashboardController::class, 'showPromoterTodos'])->name('promoter.dashboard.todo-list');
-    Route::get('/dashboard/promoter/todo-items', [PromoterDashboardController::class, 'getPromoterTodos'])->name('promoter.dashboard.todo-items');
-    Route::post('/dashboard/promoter/todolist/new', [PromoterDashboardController::class, 'addNewTodoItem'])->name('promoter.dashboard.new-todo-item');
-    Route::post('/dashboard/promoter/todo-item/{id}/complete', [PromoterDashboardController::class, 'completeTodoItem'])->name('promoter.dashboard.complete-todo-item');
-    Route::delete('/dashboard/promoter/todo-item/{id}', [PromoterDashboardController::class, 'deleteTodoItem'])->name('promoter.dashboard.delete-todo-item');
-    Route::get('/dashboard/promoter/todo-item/completed-items', [PromoterDashboardController::class, 'showCompletedTodoItems'])->name('promoter.dashboard.completed-todo-items');
+Route::get('/gig-guide', [GigGuideController::class, 'showGigGuide'])->name('gig-guide');
+Route::get('/gigs/filter', [GigGuideController::class, 'filterGigs'])->name('gigs.filter');
+Route::view('/privacy-policy', 'privacy-policy');
 
 
+Route::middleware(['auth', 'web', 'verified'])->group(function () {
+    // Dashboards - Main Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
-    // Route::post('/dashboard/approve-promoter/{reviewId}', [DashboardController::class, 'approvePromoterReview'])->name('pending-review-promoter.approve');
-    // Route::post('/dashboard/display-promoter/{reviewId}', [DashboardController::class, 'displayPromoterReview'])->name('pending-review-promoter.display');
-    // Route::post('/dashboard/hide-promoter/{reviewId}', [DashboardController::class, 'hidePromoterReview'])->name('pending-review-promoter.hide');
-    // Route::post('/dashboard/approve-display-promoter/{reviewId}', [DashboardController::class, 'approveDisplayPromoterReview'])->name('pending-review-promoter.approve-display');
-    // Route::post('/dashboard/approve-display-venue/{reviewId}', [DashboardController::class, 'approveDisplayVenueReview'])->name('pending-review-venue.approve-display');
-    // Route::post('/dashboard/approve-venue/{reviewId}', [DashboardController::class, 'approveVenueReview'])->name('pending-review-venue.approve');
-    // Route::post('/dashboard/user-service-link', [DashboardController::class, 'userServiceLink'])->name('user-service-link');
+    // Dashboards - Role Based Dashboards
+    Route::prefix('/dashboard')->group(function () {
+        Route::get('/{dashboardType}', function ($dashboardType) {
+            // Determine the appropriate controller based on the dashboard type
+            $controllerName = ucfirst($dashboardType) . 'DashboardController';
+
+            // Check if the controller class exists
+            if (class_exists("App\\Http\\Controllers\\$controllerName")) {
+                // Create an instance of the controller and call the index method
+                return app("App\\Http\\Controllers\\$controllerName")->index($dashboardType);
+            }
+
+            // Handle the case where the controller does not exist
+            abort(404);
+        })->name('dashboard');
+    });
+
+    Route::post('/dashboard/notes/store-note', [DashboardController::class, 'storeNewNote'])->name('dashboard.store-new-note');
+
+    // First Time User Routes
+    Route::prefix('/{dashboardType}')->middleware(['auth'])->group(function () {
+        Route::get('/band-journey', [BandJourneyController::class, 'index'])->name('band.journey');
+        Route::get('/band-search', [BandJourneyController::class, 'search'])->name('band.search');
+        Route::post('/band-journey/join/{id}', [BandJourneyController::class, 'joinBand'])->name('band.join');
+        Route::post('/band-journey/create', [BandJourneyController::class, 'createBand'])->name('band.create');
+    });
+
+    Route::prefix('/{dashboardType}')->middleware(['auth'])->group(function () {
+        Route::get('/users/search', [PromoterDashboardController::class, 'searchExistingPromoters'])->name('admin.dashboard.promoter.search');
+        Route::post('/link', [PromoterDashboardController::class, 'linkToExistingPromoter'])->name('admin.dashboard.promoter.link');
+        Route::post('/store', [PromoterDashboardController::class, 'storeNewPromoter'])->name('admin.dashboard.promoter.store');
+    });
+
+    Route::prefix('/{dashboardType}')->middleware(['auth'])->group(function () {
+        Route::get('/venue-journey', [VenueJourneyController::class, 'index'])->name('venue.journey');
+        Route::get('/venue-search', [VenueJourneyController::class, 'searchVenue'])->name('venue.search');
+        Route::get('/venue-select', [VenueJourneyController::class, 'selectVenue'])->name('venue.select');
+        Route::post('/venue-journey/link/{id}', [VenueJourneyController::class, 'linkVenue'])->name('venue.link');
+        Route::post('/venue/create', [VenueJourneyController::class, 'createVenue'])->name('venue.store');
+    });
+
+    // Finances
+    Route::prefix('/dashboard/{dashboardType}')->group(function () {
+        Route::get('/finances', [FinanceController::class, 'showFinances'])->name('admin.dashboard.show-finances');
+        Route::get('/finances/new-budget', [FinanceController::class, 'createFinance'])->name('admin.dashboard.create-new-finance');
+        Route::post('/finances/save-budget', [FinanceController::class, 'storeFinance'])->name('admin.dashboard.store-new-finance');
+        Route::post('/finances/export', [FinanceController::class, 'exportFinances'])->name('admin.dashboard.finances.export');
+        Route::get('/finances/{id}', [FinanceController::class, 'showSingleFinance'])->name('admin.dashboard.show-finance');
+        Route::get('/finances/{id}/edit', [FinanceController::class, 'editFinance'])->name('admin.dashboard.edit-finance');
+        Route::patch('/finances/{finance}', [FinanceController::class, 'updateFinance'])->name('admin.dashboard.update-finances');
+        Route::post('/finances/{finance}', [FinanceController::class, 'exportSingleFinance'])->name('admin.dashboard.export-finance');
+    });
+
+    // Users
+    Route::prefix('/dashboard/{dashboardType}')->group(function () {
+        Route::get('/users', [LinkedUserController::class, 'showUsers'])->name('admin.dashboard.users');
+        Route::get('/users/get', [LinkedUserController::class, 'getUsers'])->name('admin.dashboard.get-users');
+        Route::get('/users/new-user', [LinkedUserController::class, 'newUser'])->name('admin.dashboard.new-user');
+        Route::get('/users/search-users', [LinkedUserController::class, 'searchUsers'])->name('admin.dashboard.search-users');
+        Route::post('/users/add-user/{id}', [LinkedUserController::class, 'linkUser'])->name('admin.dashboard.link-user');
+        Route::delete('/users/delete-user/{id}', [LinkedUserController::class, 'deleteUser'])->name('admin.dashboard.delete-user');
+    });
+
+    // Notes
+    //TODO - Finish
+    Route::prefix('/dashboard/{dashboardType}')->group(function () {
+        Route::get('/notes', [NoteController::class, 'showNotes'])->name('admin.dashboard.show-notes');
+        Route::get('/note-items', [NoteController::class, 'getNotes'])->name('admin.dashboard.note-items');
+        Route::post('/notes/new', [NoteController::class, 'newNoteItem'])->name('admin.dashboard.new-note-item');
+        Route::post('/note-item/{id}/complete', [NoteController::class, 'completeNoteItem'])->name('admin.dashboard.complete-note');
+        Route::post('/note-item/{id}/uncomplete', [NoteController::class, 'uncompleteNoteItem'])->name('admin.dashboard.uncomplete-note-item');
+        Route::delete('/note-item/{id}', [NoteController::class, 'deleteNoteItem'])->name('admin.dashboard.delete-note');
+        Route::get('/note-item/completed-notes', [NoteController::class, 'showCompletedNoteItems'])->name('admin.dashboard.completed-notes');
+    });
+
+    // Reviews
+    Route::prefix('/dashboard/{dashboardType}')->group(function () {
+        Route::get('/reviews/{filter?}', [ReviewController::class, 'getPromoterReviews'])->name('admin.dashboard.get-reviews');
+        Route::get('/filtered-reviews/{filter?}', [ReviewController::class, 'fetchReviews'])->name('admin.dashboard.fetch-reviews');
+        Route::get('/reviews/pending', [ReviewController::class, 'showPendingReviews'])->name('admin.dashboard.show-pending-reviews');
+        Route::get('/reviews/all', [ReviewController::class, 'showAllReviews'])->name('admin.dashboard.show-all-reviews');
+        Route::post('/approve-display/{reviewId}', [ReviewController::class, 'approveDisplayReview'])->name('admin.dashboard.approve-display-review');
+        Route::post('/hide-display-review/{reviewId}', [ReviewController::class, 'hideReview'])->name('admin.dashboard.hide-display-review');
+        Route::post('/approve/{reviewId}', [ReviewController::class, 'approveReview'])->name('admin.dashboard.approve-pending-review');
+        Route::post('/unapprove-review/{reviewId}', [ReviewController::class, 'unapproveReview'])->name('admin.dashboard.unapprove-review');
+        Route::delete('/delete-review/{reviewId}', [ReviewController::class, 'deleteReview'])->name('admin.dashboard.delete-review');
+    });
+
+    // Documents
+    Route::prefix('/dashboard/{dashboardType}')->group(function () {
+        Route::get('/documents', [DocumentController::class, 'index'])->name('admin.dashboard.documents.index');
+        Route::get('/documents/new', [DocumentController::class, 'create'])->name('admin.dashboard.document.create');
+        Route::get('/documents/{id}', [DocumentController::class, 'show'])->name('admin.dashboard.document.show');
+        Route::get('/documents/{id}/edit', [DocumentController::class, 'edit'])->name('admin.dashboard.document.edit');
+        Route::post('/document/file-upload', [DocumentController::class, 'fileUpload'])->name('admin.dashboard.document.file.upload');
+        Route::post('/documents/store', [DocumentController::class, 'storeDocument'])->name('admin.dashboard.store-document');
+        Route::put('/documents/{id}', [DocumentController::class, 'update'])->name('admin.dashboard.document.update');
+        Route::delete('/documents/{id}', [DocumentController::class, 'destroy'])->name('admin.dashboard.document.delete');
+        Route::get('/documents/{id}/download', [DocumentController::class, 'download'])->name('admin.dashboard.document.download');
+    });
+
+    // Events
+    // TODO - Finish
+    Route::prefix('/dashboard/{dashboardType}')->group(function () {
+        Route::get('/events', [EventController::class, 'showEvents'])->name('admin.dashboard.show-events');
+        Route::get('/events/load-more-upcoming', [EventController::class, 'loadMoreUpcomingEvents'])->name('admin.dashboard.load-more-upcoming-events');
+        Route::get('/events/load-more-past', [EventController::class, 'loadMorePastEvents'])->name('admin.dashboard.load-more-past-events');
+        Route::get('/events/create-event', [EventController::class, 'createNewEvent'])->name('admin.dashboard.create-new-event');
+        Route::post('/events/store-event', [EventController::class, 'storeNewEvent'])->name('admin.dashboard.store-new-event');
+        Route::get('/events/search-venues', [EventController::class, 'selectVenue'])->name('admin.dashboard.search-venues');
+        Route::get('/events/search-promoters', [EventController::class, 'selectPromoter'])->name('admin.dashboard.search-promoters');
+        Route::get('/events/{id}', [EventController::class, 'showEvent'])->name('admin.dashboard.show-event');
+        Route::get('/events/{id}/edit', [EventController::class, 'editEvent'])->name('admin.dashboard.edit-event');
+        Route::put('/events/{id}/update', [EventController::class, 'updateEvent'])->name('admin.dashboard.update-event');
+        Route::post('/events/{id}/add-to-calendar', [CalendarController::class, 'addEventToCalendar'])->name('admin.dashboard.add-event-to-calendar');
+        Route::get('/events/{user}/check-linked-calendars', [CalendarController::class, 'checkLinkedCalendars']);
+        Route::delete('/events/{id}/delete', [EventController::class, 'deleteEvent'])->name('admin.dashboard.delete-event');
+    });
+
+    // To-Do List
+    Route::prefix('dashboard/{dashboardType}')->group(function () {
+        Route::get('/todo-list', [TodoController::class, 'showTodos'])->name('admin.dashboard.todo-list');
+        Route::get('/todo-items', [TodoController::class, 'getTodos'])->name('admin.dashboard.todo-items');
+        Route::post('/todo-list/new', [TodoController::class, 'newTodoItem'])->name('admin.dashboard.new-todo-item');
+        Route::post('/todo-item/{id}/complete', [TodoController::class, 'completeTodoItem'])->name('admin.dashboard.complete-todo-item');
+        Route::post('/todo-item/{id}/uncomplete', [TodoController::class, 'uncompleteTodoItem'])->name('admin.dashboard.uncomplete-todo-item');
+        Route::delete('/todo-item/{id}', [TodoController::class, 'deleteTodoItem'])->name('admin.dashboard.delete-todo-item');
+        Route::get('/todo-item/completed-items', [TodoController::class, 'showCompletedTodoItems'])->name('admin.dashboard.completed-todo-items');
+    });
 });
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile/{user}', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::put('/profile/{user}', [ProfileController::class, 'update'])->name('profile.update');
+Route::middleware(['auth', 'verified'])->group(function () {
+    // More specific routes
+    Route::put('/profile/{dashboardType}/promoter-profile-update/{user}', [ProfileController::class, 'updatePromoter'])->name('promoter.update');
+    Route::put('/profile/{dashboardType}/venue-profile-update/{user}', [ProfileController::class, 'updateVenue'])->name('venue.update');
+    Route::put('/profile/{dashboardType}/band-profile-update/{user}', [ProfileController::class, 'updateBand'])->name('band.update');
+    Route::get('/profile/{dashboardType}/settings', [ProfileController::class, 'settings'])->name('settings.index');
+    Route::post('/profile/{dashboardType}/settings/update', [ProfileController::class, 'updateModule'])->name('settings.updateModule');
+    Route::get('/profile/{dashboardType}/communications', [ProfileController::class, 'communications'])->name('communications.index');
+    Route::post('/profile/{dashboardType}/communications/update', [ProfileController::class, 'updatePreferences'])->name('communications.updatePreferences');
+
+    Route::post('/profile/{dashboardType}/{user}/add-role', [ProfileController::class, 'addRole'])->name('profile.add-role');
+    Route::post('/profile/{dashboardType}/{user}/edit-role', [ProfileController::class, 'editRole'])->name('profile.edit-role');
+    Route::delete('/profile/{dashboardType}/{user}/delete-role', [ProfileController::class, 'deleteRole'])->name('profile.delete-role');
+
+    // Calendar-specific routes
+    Route::get('/profile/events/{user}/apple/sync', [CalendarController::class, 'syncAllEventsToAppleCalendar'])->name('apple.sync');
+    Route::get('/profile/events/{user}', [APIRequestsController::class, 'getUserCalendarEvents']);
+
+    // General profile routes
+    Route::get('/profile/{dashboardType}/{id}', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile/{dashboardType}/{user}', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/admin/venues', [AdminController::class, 'getVenues'])->name('admin.venues');
-    Route::post('/admin/venues', [AdminController::class, 'saveNewVenue'])->name('admin.new-venue');
-    Route::get('/admin/venues/list', [AdminController::class, 'viewVenueList'])->name('admin.venue-list');
-    Route::get('/admin/venues/{venueId}/edit', [AdminController::class, 'editVenue'])->name('admin.edit-venues');
-    Route::post('/admin/venues/{venueId}', [AdminController::class, 'updateVenue'])->name('admin.update-venue');
-    Route::delete('/admin/venues/{venueId}', [AdminController::class, 'deleteVenue'])->name('admin.delete-venue');
-
-    Route::get('/admin/promoters', [AdminController::class, 'getPromoters'])->name('admin.promoters');
-    Route::post('/admin/promoters', [AdminController::class, 'saveNewPromoter'])->name('admin.new-promoter');
-    Route::get('/admin/promoters/list', [AdminController::class, 'viewPromoterList'])->name('admin.promoter-list');
-    Route::get('/admin/promoters/{promoterId}/edit', [AdminController::class, 'editPromoter'])->name('admin.edit-promoter');
-    Route::post('/admin/promoters/{promoterId}', [AdminController::class, 'updatePromoter'])->name('admin.update-promoter');
-    Route::delete('/admin/promoters/{promoterId}', [AdminController::class, 'deletePromoter'])->name('admin.delete-promoter');
-    Route::get('/admin/promoters/get-location-venues', [AdminController::class, 'getVenuesBySelectedLocation']);
-
-    Route::get('/admin/create-other', [AdminController::class, 'createOtherService'])->name('admin.createOther');
-    Route::post('/admin/save-other', [AdminController::class, 'saveNewOtherService'])->name('admin.save-other');
+    // Google calendar routes
+    Route::get('auth/google', [CalendarController::class, 'redirectToGoogle'])->name('google.redirect');
+    Route::get('auth/google/callback', [CalendarController::class, 'handleGoogleCallback']);
+    Route::post('google/sync', [CalendarController::class, 'syncGoogleCalendar'])->name('google.sync');
+    Route::post('google/unlink', [CalendarController::class, 'unlinkGoogle'])->name('google.unlink');
 });
+
 
 require __DIR__ . '/auth.php';

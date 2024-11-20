@@ -835,118 +835,108 @@
 </head>
 
 <x-guest-layout>
-  <div class="container-main h-[calc(100vh-96px)] w-full place-content-center">
-    <div class="grid h-full grid-cols-[1fr,2fr,1fr]">
-      <div class="home-search col-start-2 col-end-3 row-start-1 row-end-1 flex flex-col justify-center py-16">
-        <div class="bg-opac8Black p-20">
-          <h1 class="text-center font-heading text-4xl font-bold text-white md:text-5xl lg:text-6xl">
-            Find Your Next Show!
-          </h1>
-          <p class="my-2 text-center font-heading text-base capitalize text-white md:text-lg">
-            Search below to find a venue in your desired area
-          </p>
-          <form action="{{ route('venues.filterByCoordinates') }}" method="GET">
-            @csrf
-            <div class="my-4 flex justify-center">
-              <input
-                class="search map-input sm:w-100 flex justify-center rounded-bl rounded-tl border-b border-l border-r-0 border-t border-white bg-ynsLightGray font-sans text-xl focus:border-white md:w-4/6"
-                type="search" id="address-input" name="search_query" placeholder="Search..." />
-              <button type="submit" id="search-button"
-                class="search-button rounded-br rounded-tr border-b border-r border-t border-white bg-black p-4 text-white hover:bg-gray-800 hover:text-white">
-                <span class="fas fa-search"></span>
-              </button>
-            </div>
-            <div id="address-map-container" style="width: 100%; height: 400px; display: none;">
-              <div style="width: 100%; height: 100%;" id="address-map"></div>
-            </div>
-
-            <input style="display: none;" type="text" id="address-latitude" name="latitude" placeholder="Latitude">
-            <input style="display: none;" type="text" id="address-longitude" name="longitude"
-              placeholder="Longitude">
-          </form>
-
-          <h2 class="text-center font-heading text-white">Or</h2>
-          <a href="{{ url('/venues') }}"
-            class="flex justify-center font-heading text-xl text-white underline dark:hover:text-gray-400">
-            Browse all venues
-          </a>
+  <div class="flex h-screen flex-grow items-center justify-center px-2 backdrop-brightness-50">
+    <div class="rounded-lg bg-opac_8_black p-12 text-center">
+      <h1 class="text-4xl font-bold text-white md:text-5xl lg:text-6xl">
+        Find Your Next Show!
+      </h1>
+      <p class="my-2 text-base text-white md:text-lg">
+        Search a location below and find a venue in your desired area
+      </p>
+      <form action="{{ route('venues.filterByCoordinates') }}" method="GET">
+        @csrf
+        <div class="my-4 flex justify-center">
+          <input
+            class="search map-input rounded-bl rounded-tl border-b border-l border-r-0 border-t border-white bg-yns_light_gray font-sans text-xl focus:border-white md:w-4/6"
+            type="search" id="address-input" name="search_query" placeholder="Search..." />
+          <button type="submit" id="search-button"
+            class="search-button rounded-br rounded-tr border-b border-r border-t border-white bg-black p-4 text-white hover:bg-gray-800">
+            <span class="fas fa-search"></span>
+          </button>
         </div>
-      </div>
+        <div id="address-map-container" style="width: 100%; height: 400px; display: none;">
+          <div style="width: 100%; height: 100%;" id="address-map"></div>
+        </div>
+
+        <input style="display: none;" type="text" id="address-latitude" name="latitude" placeholder="Latitude">
+        <input style="display: none;" type="text" id="address-longitude" name="longitude" placeholder="Longitude">
+      </form>
+
+      <h2 class="text-white">Or</h2>
+      <a href="{{ url('/venues') }}" class="flex justify-center text-xl text-white underline">
+        Browse all venues
+      </a>
     </div>
   </div>
 
-  <div class="container-main flex h-[calc(100vh-96px)] w-full justify-center">
-    <div class="flex w-1/3 items-center justify-end py-16 text-white">
-      <div class="relative z-10 -mr-40 max-w-3xl bg-opac8Black p-8">
-        <h2 class="mb-4 font-sans text-3xl underline">So...what is it?</h2>
-        <p class="mb-3 font-sans">
-          Your Next Show is a platform specifically designed and built for bands and artists to be able to find
-          their
-          next show. Entering the location you want to search, setting your filters will return a list of venues in
-          that area you can perform at. The ability to add and link with promoters in that area and for your type of
-          music means that not only are you supporting local businesses, you are being paired with people have the
-          same tastes and interests - increasing the chances of you having a more successful show.
-        </p>
-        <p class="mb-3 font-sans">
-          We also give you the ability to have a custom dashboard designed and built specifically for you. Whether
-          you’re a promoter wanting to keep track of your events and budgets to a designer keep track of jobs you
-          have
-          all the way to bands managing their gigs through a shareable calendar, you can do it all.
-        </p>
-        <p class="font-sans">
-          Oh and did we mention? It is 100% COST and AD FREE.
-        </p>
-      </div>
-    </div>
+  <div class="flex h-screen flex-grow items-center justify-center px-2 backdrop-brightness-50">
+    <img src="{{ asset('storage/images/system/about.jpg') }}" alt="About Image"
+      class="absolute bottom-0 right-32 h-[calc(100%+0px)] w-auto object-cover" />
 
-    <div class="relative flex-1 bg-cover bg-center"
-      style="background-image: url('{{ asset('storage/images/system/about.jpg') }}'); max-width:500px; aspect-ratio: 5/7;">
+    <div class="relative max-w-3xl bg-opac_8_black p-8">
+      <h2 class="mb-4 font-sans text-3xl text-white underline">So...what is it?</h2>
+      <p class="mb-3 font-sans text-white">
+        Your Next Show is a platform specifically designed and built for bands and artists to be able to find
+        their next show. Entering the location you want to search, setting your filters will return a list of venues
+        in that area you can perform at. The ability to add and link with promoters in that area and for your type of
+        music means that not only are you supporting local businesses, you are being paired with people who have the
+        same tastes and interests - increasing the chances of you having a more successful show.
+      </p>
+      <p class="mb-3 font-sans text-white">
+        We also give you the ability to have a custom dashboard designed and built specifically for you. Whether
+        you’re a promoter wanting to keep track of your events and budgets to a designer keeping track of jobs you
+        have, all the way to bands managing their gigs through a shareable calendar, you can do it all.
+      </p>
+      <p class="font-sans text-white">
+        Oh, and did we mention? It is 100% COST and AD FREE.
+      </p>
     </div>
   </div>
 
-  <div class="container-main align-center mt-40 flex h-[calc(100vh-96px)] w-full flex-col justify-center px-yns25">
-    <div class="align-center flex flex-row-reverse justify-center gap-40 py-16">
-      <div class="text my-auto w-6/12 bg-opac8Black p-8 text-right">
-        <h2 class="mb-3 font-sans text-3xl underline">Got an idea?</h2>
-        <p class="mb-3 font-sans">
+  <div class="flex min-h-screen flex-col items-center justify-center backdrop-brightness-50">
+    <div class="flex flex-row items-center justify-center gap-14">
+      <img src="{{ asset('storage/images/system/idea.jpg') }}" alt="Idea Image"
+        class="h-[500px] w-[500px] object-contain" />
+      <div class="flex max-w-[600px] flex-col items-end bg-opac_8_black p-4 py-8 text-white">
+        <h2 class="mb-3 text-3xl underline">Got an idea?</h2>
+        <p class="mb-3 text-right font-sans">
           Your Next Show is constantly evolving. We hate it when things go stale so we will be regularly releasing new
           features, improving optimisation for all devices and keeping our security the best it can be. We already have
           some great ideas but since we have built this platform for specific groups of people it’s important to get
-          your
-          thoughts!
-        </p>
-        <p class="mb-3 font-sans">
+          your thoughts!
           If you have an idea of something you think would be great to add to the platform, you can fill out our form
-          and
-          add your suggestion to our ideas board. Not only that, you can read other peoples suggestions and if you think
-          they’re a good idea - Upvote Them.
+          and add your suggestion to our ideas board.
         </p>
 
-        <a href="#" class="mt-2 rounded bg-gradient-button p-2 font-sans text-white">Submit Idea</a>
-      </div>
-      <div class="image my-auto w-6/12">
-        <img src="{{ asset('storage/images/system/idea.jpg') }}">
+        <a href="https://github.com/RobHowdle/findmyvenue/issues/new?assignees=RobHowdle&labels=Future+Addition%2F+Request&projects=&template=feature-request.md&title=%5BUser+Feature+Request%5D"
+          target="_blank"
+          class="mt-2 rounded bg-white p-2 font-sans text-black transition duration-150 ease-in-out hover:bg-gradient-button hover:text-white">Submit
+          Idea</a>
       </div>
     </div>
-    <div class="align-center flex flex-row justify-center gap-40 py-16">
-      <div class="text my-auto w-6/12 bg-opac8Black p-8 text-left">
-        <h2 class="mb-4 font-sans text-3xl underline">Spotted a bug?</h2>
+
+    <div class="flex flex-row-reverse items-center justify-center gap-14">
+      <img src="{{ asset('storage/images/system/bug.jpg') }}" alt="Bug Image"
+        class="h-[500px] w-[500px] object-contain" />
+      <div class="flex max-h-[500px] max-w-[600px] flex-col items-start bg-opac_8_black p-4 py-8 text-white">
+        <h2 class="mb-3 text-3xl underline">Spotted a bug?</h2>
         <p class="mb-3 font-sans">
           Sometimes the gremlins get in and cause some unexpected errors. Whilst our work is fully tested before it gets
           made live sometimes things do slip through the net. If you find a bug or something that doesn’t seem quite
-          right - Let Us Know!
+          right - Let us know!
         </p>
-        <a href="#" class="rounded bg-gradient-button p-2 font-sans text-white">Report A Bug</a>
-      </div>
-      <div class="image my-auto w-6/12">
-        <img src="{{ asset('storage/images/system/bug.jpg') }}">
+        <a href="https://github.com/RobHowdle/findmyvenue/issues/new?assignees=RobHowdle&labels=bug&projects=&template=bug-report.md&title=%5BUser+Reported+Bug%5D"
+          target="_blank"
+          class="rounded bg-white p-2 font-sans text-black transition duration-150 ease-in-out hover:bg-gradient-button hover:text-white">Report
+          A
+          Bug</a>
       </div>
     </div>
   </div>
 
-  <div class="container-main align-center mt-40 flex h-[calc(100vh-96px)] w-full flex-col justify-center px-yns25">
-    <div class="bg-opac8Black p-8 text-center">
-      <h3 class="mb-4 font-sans text-3xl underline">Buy Me A Coffee</h3>
+  <div class="flex h-screen flex-col items-center justify-center backdrop-brightness-50">
+    <div class="flex max-w-screen-2xl flex-col items-center rounded-lg bg-opac_8_black p-12 text-center text-white">
+      <h3 class="mb-4 text-3xl underline">Buy Me A Coffee</h3>
       <p class="mb-4 font-sans">
         I have always wanted this website to be free for everyone. I don’t like the idea of charging people to help them
         find bands and venues, nor do I like the idea of spamming the website with ads to make a couple of quid. This
@@ -962,16 +952,19 @@
         upgrades, or even just to say
         thanks, I have created a <span class="font-bold">Buy Me A Coffee</span> link that will allow you to do so.</p>
 
-      <p class="mb-4 font-sans underline"><a href="https://buymeacoffee.com/yournextshow"
-          target="_blank">https://buymeacoffee.com/yournextshow</a></p>
+      <a class="mb-4 font-sans transition duration-150 ease-in-out hover:text-yns_yellow"
+        href="https://buymeacoffee.com/yournextshow" target="_blank">
+        <span class="fas fa-coffee mr-2 text-2xl"></span>By Me A Coffee
+      </a>
 
-      <p class="font-sans">PLEASE NOTE: You are not obligated to do anything. This website will <span
-          class="font-bold">ALWAYS</span> be
-        cost and ad-free for all users.
+      <p class="font-sans"><span class="font-bold">PLEASE NOTE:</span> You are not obligated to do anything. This
+        website will <span class="font-bold">ALWAYS</span> be
+        cost <span class="font-bold">AND</span> ad-free for all users.
         If you choose to donate, I thank you from the bottom of my heart.</p>
     </div>
   </div>
 </x-guest-layout>
+
 
 <script
   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcMjlXwDOk74oMDPgOp4YWdWxPa5xtHGA&libraries=places&callback=initialize"

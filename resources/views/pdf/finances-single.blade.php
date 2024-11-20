@@ -104,11 +104,11 @@
   <table>
     <tr>
       <th>Created At</th>
-      <td>{{ $finance->created_at->format('Y-m-d H:i:s') }}</td>
+      <td>{{ $finance->created_at->format('jS F Y H:i:s') }}</td>
     </tr>
     <tr>
       <th>Updated At</th>
-      <td>{{ $finance->updated_at->format('Y-m-d H:i:s') }}</td>
+      <td>{{ $finance->updated_at->format('jS F Y H:i:s') }}</td>
     </tr>
   </table>
 
