@@ -652,6 +652,17 @@ class ProfileController extends Controller
         $genres = $data['genres'];
         $promoterGenres = is_array($promoter->genre) ? $promoter->genre : json_decode($promoter->genre, true);
 
+        $normalizedPromoterGenres = [];
+
+        foreach ($promoterGenres as $genreName => $genreData) {
+            $normalizedPromoterGenres[$genreName] = [
+                'all' => $genreData['all'] ?? 'false',
+                'subgenres' => isset($genreData['subgenres'][0])
+                    ? (is_array($genreData['subgenres'][0]) ? $genreData['subgenres'][0] : $genreData['subgenres'])
+                    : []
+            ];
+        }
+
         return [
             'promoter' => $promoter,
             'name' => $name,
@@ -668,7 +679,7 @@ class ProfileController extends Controller
             'uniqueBands' => $uniqueBands,
             'genres' => $genres,
             'isAllGenres' => $isAllGenres,
-            'promoterGenres' => $promoterGenres,
+            'promoterGenres' => $normalizedPromoterGenres,
         ];
     }
 
@@ -1167,7 +1178,6 @@ class ProfileController extends Controller
     /**
      * Save Genres
      */
-
     public function saveGenres($dashboardType, Request $request)
     {
         $user = User::where('id', Auth::user()->id)->first();
@@ -1176,19 +1186,19 @@ class ProfileController extends Controller
         switch ($dashboardType) {
             case 'promoter':
                 $promoter = $user->promoters()->first();
-                $userType = $promoter;  // assuming 'promoter' corresponds to the authenticated user
+                $userType = $promoter;
                 break;
             case 'band':
-                $band = OtherService::where('user_id', $user->id)->first(); // Assuming Band model exists
-                $userType = $band;  // Replace with band if the dashboard type is 'band'
+                $band = OtherService::where('user_id', $user->id)->first();
+                $userType = $band;
                 break;
             case 'venue':
-                $venue = Venue::where('user_id', $user->id)->first(); // Assuming Venue model exists
-                $userType = $venue;  // Replace with venue
+                $venue = Venue::where('user_id', $user->id)->first();
+                $userType = $venue;
                 break;
             case 'photographer':
-                $photographer = OtherService::where('user_id', $user->id)->first(); // Assuming Photographer model exists
-                $userType = $photographer;  // Replace with photographer
+                $photographer = OtherService::where('user_id', $user->id)->first();
+                $userType = $photographer;
                 break;
             default:
                 return response()->json([
@@ -1197,15 +1207,20 @@ class ProfileController extends Controller
                 ]);
         }
 
-
         // Now continue with updating genres for the selected userType
         if (isset($request['genres']) && !empty($request['genres'])) {
-            $storedGenres = json_decode($userType->genre, true) ?? [];
+            // Ensure stored genres are an array before merging
+            $storedGenres = is_array($userType->genre) ? $userType->genre : json_decode($userType->genre, true); // Decode if it's a JSON string
             $newGenres = $request->input('genres');
 
-            // Check if genres need to be updated
-            if ($storedGenres !== $newGenres) {
-                $userType->update(['genre' => json_encode($newGenres)]);
+            $mergedGenres = array_merge($storedGenres, $newGenres);
+
+            // dd($mergedGenres);
+
+            // Only update if the genres have actually changed
+            if ($storedGenres !== $mergedGenres) {
+                // Save the merged genres as a JSON string
+                $userType->update(['genre' => $mergedGenres]);
 
                 return response()->json([
                     'success' => true,
@@ -1214,7 +1229,7 @@ class ProfileController extends Controller
             }
         } else {
             // Handle case where no genres are provided (set to empty array)
-            $userType->update(['genre' => json_encode([])]);
+            $userType->update(['genre' => []]);
 
             return response()->json([
                 'success' => true,

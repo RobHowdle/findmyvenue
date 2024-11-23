@@ -28,7 +28,7 @@
         class="accordion-btn flex w-full items-center justify-between py-5 text-white">
         <span class="genre-name">{{ $genre['name'] }}</span>
         <span class="check-status mr-4"></span>
-        <span id="icon-{{ $index }}" class="text-slate-800 transition-transform duration-300">
+        <span id="icon-{{ $index }}" class="accordion-icon text-slate-800 transition-transform duration-300">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="#ffffff" class="h-4 w-4">
             <path
               d="M8.75 3.75a.75.75 0 0 0-1.5 0v3.5h-3.5a.75.75 0 0 0 0 1.5h3.5v3.5a.75.75 0 0 0 1.5 0v-3.5h3.5a.75.75 0 0 0 0-1.5h-3.5v-3.5Z" />
@@ -93,47 +93,39 @@
   let promoterGenres = @json($promoterData['promoterGenres']);
 
   document.addEventListener("DOMContentLoaded", () => {
-    preCheckCheckboxes(promoterGenres);
+    setTimeout(() => {
+      preCheckCheckboxes(promoterGenres);
+    }, 500);
   });
 
+
   function preCheckCheckboxes(promoterGenres) {
-    Object.entries(promoterGenres).forEach(([genre, data]) => {
-      const normalizedGenre = genre.replace(/\s+/g, '_').toLowerCase();
-      const index = data.index || 0;
+    if (!promoterGenres || typeof promoterGenres !== "object") {
+      console.warn("No valid genres data available for pre-checking.");
+      return;
+    }
 
-      // Handle "All Genre" checkbox
-      const allGenreCheckbox = document.getElementById(`all-${normalizedGenre}-${index}`);
-      if (allGenreCheckbox && data.all) {
-        allGenreCheckbox.checked = true;
+    Object.entries(promoterGenres).forEach(([genreName, genreData], index) => {
+      // Check "All" checkbox for the genre
+      const allCheckboxId = `all-${genreName.toLowerCase().replace(/\W/g, '_')}-${index}`;
+      const allCheckbox = document.querySelector(`#${allCheckboxId}`);
+
+      if (allCheckbox) {
+        allCheckbox.checked = genreData.all === "true";
       }
 
-      // Handle subgenres
-      const genreButton = document.getElementById(`genre-${index}`);
-      const checkStatus = genreButton?.querySelector('.check-status');
-      let checkedSubgenresCount = 0;
-      const totalSubgenres = data.subgenres ? data.subgenres.length : 0;
+      // Process subgenres
+      const subgenres = Array.isArray(genreData.subgenres[0]) ?
+        genreData.subgenres[0] :
+        genreData.subgenres || [];
+      subgenres.forEach((subgenre) => {
+        const subgenreId = 'subgenre-' + subgenre.toLowerCase().replace(/\W/g, '_');
+        const subgenreCheckbox = document.querySelector(`#${subgenreId}`);
 
-      if (Array.isArray(data.subgenres)) {
-        data.subgenres.forEach((subgenre) => {
-          const subgenreSlug = subgenre.replace(/\s+/g, '_').toLowerCase();
-          const subgenreCheckbox = document.querySelector(
-            `input[data-parent="${genre}"][value="${subgenreSlug}"]`
-          );
-          if (subgenreCheckbox) {
-            subgenreCheckbox.checked = true;
-            checkedSubgenresCount++;
-          }
-        });
-      }
-
-      // Update the accordion button's check status
-      if (checkStatus) {
-        if (checkedSubgenresCount === totalSubgenres && totalSubgenres > 0) {
-          checkStatus.innerHTML = `<i class="check-icon">✔</i>`;
-        } else {
-          checkStatus.innerHTML = `${checkedSubgenresCount}/${totalSubgenres}`;
+        if (subgenreCheckbox) {
+          subgenreCheckbox.checked = true;
         }
-      }
+      });
     });
   }
 
@@ -161,13 +153,25 @@
       </svg>
     `;
 
-    // Toggle the content's max-height for smooth opening and closing
+    // Close all other accordion content panels and reset their icons
+    const allContents = document.querySelectorAll('.content');
+    const allIcons = document.querySelectorAll('.accordion-icon');
+
+    allContents.forEach((otherContent, otherIndex) => {
+      // Close the content of any other accordion (except the one clicked)
+      if (otherContent !== content) {
+        otherContent.style.maxHeight = '0';
+        allIcons[otherIndex].innerHTML = plusSVG; // Set the icon to Plus for closed panels
+      }
+    });
+
+    // Toggle the current content's max-height for smooth opening and closing
     if (content.style.maxHeight && content.style.maxHeight !== '0px') {
-      content.style.maxHeight = '0';
-      icon.innerHTML = plusSVG;
+      content.style.maxHeight = '0'; // Close it
+      icon.innerHTML = plusSVG; // Set the icon to Plus when closed
     } else {
-      content.style.maxHeight = content.scrollHeight + 'px';
-      icon.innerHTML = minusSVG;
+      content.style.maxHeight = content.scrollHeight + 'px'; // Open it
+      icon.innerHTML = minusSVG; // Set the icon to Minus when opened
     }
   }
 
@@ -189,10 +193,7 @@
   document.querySelectorAll('.genre-checkbox').forEach(function(checkbox) {
     checkbox.addEventListener('change', function() {
       if (checkbox && checkbox.dataset) {
-        console.log('all checkbox');
         sendCheckedGenres(checkbox);
-      } else {
-        console.error('Checkbox is invalid or missing dataset attributes:', checkbox);
       }
     });
   });
@@ -256,8 +257,6 @@
     // Handle "All Genres" checkbox logic
     if (checkbox === allCheckbox) {
       if (checkbox.checked) {
-        console.log('Checking all subgenres for', genre);
-
         // Mark "All" as true and add all subgenres
         genresData[genre].all = true;
 
@@ -270,8 +269,6 @@
           subgenreCheckbox.checked = true;
         });
       } else {
-        console.log('Unchecking all subgenres for', genre);
-
         // Uncheck "All" and clear subgenres
         genresData[genre].all = false;
         genresData[genre].subgenres = []; // Reset subgenres to an empty array
@@ -307,6 +304,8 @@
     // Store the updated genresData in the global object
     window.genresData = genresData;
 
+    // console.log('Updated genresData:', JSON.stringify(genresData, null, 2));
+
     // Log the updated genresData for debugging
     sendGenresData(genresData);
   }
@@ -323,11 +322,9 @@
         _token: '{{ csrf_token() }}' // CSRF token for security
       },
       success: function(response) {
-        console.log('Genres data saved successfully:', response);
         showSuccessNotification(response.message);
       },
       error: function(xhr, status, error) {
-        console.error('Error saving genres data:', error);
         showFailureNotification(error.message);
       }
     });
