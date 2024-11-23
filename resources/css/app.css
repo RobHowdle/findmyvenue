@@ -108,7 +108,7 @@
     transition: max-height 0.3s ease-in-out;
 }
 
-.check-icon {
+.status svg {
   font-size: 16px;
   color: green;
 }

@@ -27,13 +27,15 @@
       <button onclick="toggleAccordion({{ $index }})" id="genre-{{ $index }}"
         class="accordion-btn flex w-full items-center justify-between py-5 text-white">
         <span class="genre-name">{{ $genre['name'] }}</span>
-        <span class="check-status mr-4"></span>
-        <span id="icon-{{ $index }}" class="accordion-icon text-slate-800 transition-transform duration-300">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="#ffffff" class="h-4 w-4">
-            <path
-              d="M8.75 3.75a.75.75 0 0 0-1.5 0v3.5h-3.5a.75.75 0 0 0 0 1.5h3.5v3.5a.75.75 0 0 0 1.5 0v-3.5h3.5a.75.75 0 0 0 0-1.5h-3.5v-3.5Z" />
-          </svg>
-        </span>
+        <div class="group flex items-center gap-4">
+          <span class="status mr-4" data-genre={{ $genre['name'] }}></span>
+          <span id="icon-{{ $index }}" class="accordion-icon text-slate-800 transition-transform duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="#ffffff" class="h-4 w-4">
+              <path
+                d="M8.75 3.75a.75.75 0 0 0-1.5 0v3.5h-3.5a.75.75 0 0 0 0 1.5h3.5v3.5a.75.75 0 0 0 1.5 0v-3.5h3.5a.75.75 0 0 0 0-1.5h-3.5v-3.5Z" />
+            </svg>
+          </span>
+        </div>
       </button>
       <div id="subgenres-accordion-{{ $index }}"
         class="max-h-0 content grid grid-cols-2 overflow-hidden transition-all duration-300 ease-in-out">
@@ -91,13 +93,45 @@
   const genres = @json($genres);
   const dashboardType = "{{ $dashboardType }}";
   let promoterGenres = @json($promoterData['promoterGenres']);
+  let promoterBandTypes = @json($promoterData['bandTypes']);
 
   document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
       preCheckCheckboxes(promoterGenres);
+      preTickBandTypeCheckboxes(promoterBandTypes)
     }, 500);
+    updateGenreStatus();
   });
 
+  function updateGenreStatus() {
+    // Extract genres dynamically from promoterGenres
+    const genres = Object.keys(promoterGenres);
+    console.log('Genres:', genres); // Should log ['Alternative']
+
+    // Iterate over each genre
+    genres.forEach(genre => {
+      console.log('Processing genre:', genre);
+
+      // Select all elements for the current genre
+      const genreElements = document.querySelectorAll(`.subgenre[data-genre="${genre}"]`);
+      console.log('Genre Elements:', genreElements);
+
+      const totalSubgenres = genreElements.length;
+      const selectedSubgenres = Array.from(genreElements).filter(input => input.checked).length;
+
+      const statusElement = document.querySelector(`.status[data-genre="${genre}"]`);
+      if (statusElement) {
+        console.log('Found status element for genre:', genre);
+        if (selectedSubgenres === totalSubgenres) {
+          statusElement.innerHTML = '<span class="fa-solid fa-check"></span>';
+        } else {
+          statusElement.innerHTML = `<span class="count">${selectedSubgenres}/${totalSubgenres}</span>`;
+        }
+      } else {
+        console.log('No status element found for genre:', genre);
+      }
+    });
+  }
 
   function preCheckCheckboxes(promoterGenres) {
     if (!promoterGenres || typeof promoterGenres !== "object") {
@@ -126,6 +160,15 @@
           subgenreCheckbox.checked = true;
         }
       });
+    });
+  }
+
+  function preTickBandTypeCheckboxes(savedBandTypes) {
+    savedBandTypes.forEach(bandType => {
+      const checkbox = document.querySelector(`input[type="checkbox"][value="${bandType}"]`);
+      if (checkbox) {
+        checkbox.checked = true;
+      }
     });
   }
 
@@ -310,8 +353,6 @@
     sendGenresData(genresData);
   }
 
-
-
   // Send the genres data via AJAX
   function sendGenresData(genresData) {
     $.ajax({
@@ -337,7 +378,6 @@
     });
   });
 
-
   // Helper function to get the index of a genre based on its name
   function getGenreIndex(genreName) {
     for (let i = 0; i < genres.length; i++) {
@@ -352,5 +392,56 @@
   function getAllSubgenresForGenre(genreName) {
     const genre = genres.find(g => g.name === genreName);
     return genre ? genre.subgenres.map(sub => sub.toLowerCase().replace(/\s+/g, '_')) : [];
+  }
+
+  // Band Types
+  document.addEventListener("DOMContentLoaded", () => {
+    // Event listener for checkbox changes
+    const bandCheckboxes = document.querySelectorAll(".filter-checkbox");
+    bandCheckboxes.forEach(checkbox => {
+      checkbox.addEventListener("change", handleCheckboxChange);
+    });
+  });
+
+  function handleCheckboxChange() {
+    // Gather selected checkboxes
+    const selectedBandTypes = Array.from(document.querySelectorAll(".filter-checkbox:checked"))
+      .map(input => input.value);
+
+    console.log("Selected band types:", selectedBandTypes); // Debug log
+
+    // Send the data via AJAX
+    sendBandTypes(selectedBandTypes);
+  }
+
+  function sendBandTypes(bandTypes) {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    fetch(`/profile/${dashboardType}/save-band-types`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-TOKEN": csrfToken
+        },
+        body: JSON.stringify({
+          band_types: bandTypes
+        })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json(); // Convert response to JSON
+      })
+      .then(data => {
+        // Use `data.message` from the server's JSON response
+        showSuccessNotification(data.message);
+      })
+      .catch(error => {
+        // Handle the error
+        console.error("Error:", error);
+        showFailureNotification(error.message || "An error occurred");
+      });
+
   }
 </script>

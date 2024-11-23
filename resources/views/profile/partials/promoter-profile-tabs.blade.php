@@ -73,6 +73,7 @@
         'userId' => $userId,
         'promoter' => $promoterData['promoter'],
         'isAllGenres' => $promoterData['isAllGenres'],
+        'bandTypes' => $promoterData['bandTypes'],
     ])
   </div>
 </div>

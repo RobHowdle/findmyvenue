@@ -651,7 +651,6 @@ class ProfileController extends Controller
         $isAllGenres = in_array('All', $data);
         $genres = $data['genres'];
         $promoterGenres = is_array($promoter->genre) ? $promoter->genre : json_decode($promoter->genre, true);
-
         $normalizedPromoterGenres = [];
 
         foreach ($promoterGenres as $genreName => $genreData) {
@@ -662,6 +661,8 @@ class ProfileController extends Controller
                     : []
             ];
         }
+
+        $bandTypes = json_decode($promoter->band_type) ?? [];
 
         return [
             'promoter' => $promoter,
@@ -680,6 +681,7 @@ class ProfileController extends Controller
             'genres' => $genres,
             'isAllGenres' => $isAllGenres,
             'promoterGenres' => $normalizedPromoterGenres,
+            'bandTypes' => $bandTypes,
         ];
     }
 
@@ -1215,8 +1217,6 @@ class ProfileController extends Controller
 
             $mergedGenres = array_merge($storedGenres, $newGenres);
 
-            // dd($mergedGenres);
-
             // Only update if the genres have actually changed
             if ($storedGenres !== $mergedGenres) {
                 // Save the merged genres as a JSON string
@@ -1240,6 +1240,61 @@ class ProfileController extends Controller
         return response()->json([
             'success' => false,
             'message' => 'No changes to genres',
+        ]);
+    }
+
+
+    public function saveBandTypes($dashboardType, Request $request)
+    {
+        $bandTypes = $request->input('band_types');
+
+        $user = User::where('id', Auth::user()->id)->first();
+
+        // Ensure the correct user is selected based on dashboard type
+        switch ($dashboardType) {
+            case 'promoter':
+                $promoter = $user->promoters()->first();
+                $userType = $promoter;
+                break;
+            case 'band':
+                $band = OtherService::where('user_id', $user->id)->first();
+                $userType = $band;
+                break;
+            case 'venue':
+                $venue = Venue::where('user_id', $user->id)->first();
+                $userType = $venue;
+                break;
+            case 'photographer':
+                $photographer = OtherService::where('user_id', $user->id)->first();
+                $userType = $photographer;
+                break;
+            default:
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid dashboard type',
+                ]);
+        }
+
+        if (isset($bandTypes) && !empty($bandTypes)) {
+            $userType->update(['band_type' => json_encode($bandTypes)]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Band Types successfully updated',
+            ]);
+        } else {
+            // Handle case where no genres are provided (set to empty array)
+            $userType->update(['band_type' => []]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Band Types successfully reset',
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'No changes to band types',
         ]);
     }
 }
