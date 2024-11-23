@@ -1,7 +1,7 @@
 <header>
   <h2 class="text-md font-heading font-medium text-white">
     {{ __('Tell us about you... Where you started, why you started, what you do
-          etc') }}
+              etc') }}
   </h2>
 </header>
 <form method="POST" action="{{ route('promoter.update', ['dashboardType' => $dashboardType, 'user' => $user->id]) }}"
@@ -9,7 +9,6 @@
   @csrf
   @method('PUT')
   <div class="group mb-6">
-    {{-- <x-input-label-dark for="about">Tell us about you... Where you started, why you started, what you do --}}
     <x-textarea-input class="summernote" id="about" name="about"></x-textarea-input>
     @error('about')
       <p class="yns_red mt-1 text-sm">{{ $message }}</p>

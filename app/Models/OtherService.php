@@ -39,6 +39,11 @@ class OtherService extends Model
         'services'
     ];
 
+    protected $casts = [
+        'contact_links' => 'array',
+        'genre' => 'array',
+    ];
+
     /**
      * Polymorphic relation to the users.
      */

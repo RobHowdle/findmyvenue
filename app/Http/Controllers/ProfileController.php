@@ -503,19 +503,45 @@ class ProfileController extends Controller
 
         // Working Times
         if (isset($userData['working_times'])) {
-            foreach ($userData['working_times'] as $day => $time) {
-                \Log::info('Working times:', $userData['working_times']);
+            $weekDaysOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
-                // // Skip validation for 'all-day' or 'unavailable'
-                // if ($time && $time !== 'all-day' && $time !== 'unavailable') {
-                //     // Ensure start and end times are provided and valid
-                //     if (!isset($time['start']) || !isset($time['end']) || $time['start'] >= $time['end']) {
-                //         return back()->withErrors(["working_times.$day" => "Start time must be earlier than end time for $day."]);
-                //     }
-                // }
-                $photographer->update(['working_times' => json_encode($userData['working_times'])]);
+            // Sort the working times to follow the weekly order
+            $sortedWorkingTimes = array_merge(
+                array_flip($weekDaysOrder), // Create keys in the correct order
+                array_intersect_key($userData['working_times'], array_flip($weekDaysOrder)) // Add existing data
+            );
+
+            // Remove null/empty placeholders
+            $sortedWorkingTimes = array_filter($sortedWorkingTimes, fn($value) => $value !== null);
+
+            // Validate time ranges
+            foreach ($sortedWorkingTimes as $day => $time) {
+                if (is_array($time)) {
+                    $start = $time['start'] ?? null;
+                    $end = $time['end'] ?? null;
+
+                    if ($start && $end && $start >= $end) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => "Start time must be earlier than end time for $day.",
+                        ], 422);
+                    }
+                }
             }
+            // Store sorted and validated data in the database
+            $photographer->update(['working_times' => json_encode($sortedWorkingTimes)]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Working Times updated successfully',
+            ]);
         }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'No working times provided.',
+        ], 400); // Bad request
+
 
         return response()->json([
             'success' => true,
@@ -523,7 +549,6 @@ class ProfileController extends Controller
             'redirect_url' => route('profile.edit', ['dashboardType' => $dashboardType, 'id' => $user->id]),
         ]);
     }
-
 
     // Helper for JSON Fields
     protected function updateJsonField($photographer, $field, $data)
@@ -888,13 +913,30 @@ class ProfileController extends Controller
         foreach ($groupedEnvironmentTypes as $groupName => $items) {
             foreach ($items as $item) {
                 if (in_array($item, $environmentTypes)) {
-                    // If the environment type is selected, add it to the respective group
                     $groupedData[$groupName][] = $item;
                 }
             }
         }
 
         $workingTimes = is_array($photographer->working_times) ? $photographer->working_times : json_decode($photographer->working_times, true);
+        $genreList = file_get_contents(public_path('text/genre_list.json'));
+        $data = json_decode($genreList, true) ?? [];
+        $isAllGenres = in_array('All', $data);
+        $genres = $data['genres'];
+        $photographerGenres = is_array($photographer->genre) ? $photographer->genre : json_decode($photographer->genre, true);
+        $normalizedPhotographerGenres = [];
+
+        foreach ($photographerGenres as $genreName => $genreData) {
+            $normalizedPhotographerGenres[$genreName] = [
+                'all' => $genreData['all'] ?? 'false',
+                'subgenres' => isset($genreData['subgenres'][0])
+                    ? (is_array($genreData['subgenres'][0]) ? $genreData['subgenres'][0] : $genreData['subgenres'])
+                    : []
+            ];
+        }
+
+        $bandTypes = json_decode($photographer->band_type) ?? [];
+
 
         return [
             'photographer' => $photographer,
@@ -917,6 +959,10 @@ class ProfileController extends Controller
             'environmentTypes' => $environmentTypes,
             'groups' => $groupedData,
             'workingTimes' => $workingTimes,
+            'genres' => $genres,
+            'isAllGenres' => $isAllGenres,
+            'photographerGenres' => $normalizedPhotographerGenres,
+            'bandTypes' => $bandTypes,
 
         ];
     }
@@ -1191,7 +1237,7 @@ class ProfileController extends Controller
                 $userType = $promoter;
                 break;
             case 'band':
-                $band = OtherService::where('user_id', $user->id)->first();
+                $band = $user->otherService('Band')->first();
                 $userType = $band;
                 break;
             case 'venue':
@@ -1199,7 +1245,7 @@ class ProfileController extends Controller
                 $userType = $venue;
                 break;
             case 'photographer':
-                $photographer = OtherService::where('user_id', $user->id)->first();
+                $photographer = $user->otherService('Photography')->first();
                 $userType = $photographer;
                 break;
             default:
@@ -1243,12 +1289,12 @@ class ProfileController extends Controller
         ]);
     }
 
-
     public function saveBandTypes($dashboardType, Request $request)
     {
         $bandTypes = $request->input('band_types');
 
         $user = User::where('id', Auth::user()->id)->first();
+        dd($dashboardType);
 
         // Ensure the correct user is selected based on dashboard type
         switch ($dashboardType) {
@@ -1257,7 +1303,7 @@ class ProfileController extends Controller
                 $userType = $promoter;
                 break;
             case 'band':
-                $band = OtherService::where('user_id', $user->id)->first();
+                $band = $user->otherService('Band')->first();
                 $userType = $band;
                 break;
             case 'venue':
@@ -1265,7 +1311,8 @@ class ProfileController extends Controller
                 $userType = $venue;
                 break;
             case 'photographer':
-                $photographer = OtherService::where('user_id', $user->id)->first();
+                $photographer = $user->otherService('Photography')->first();
+                dd($photographer);
                 $userType = $photographer;
                 break;
             default:

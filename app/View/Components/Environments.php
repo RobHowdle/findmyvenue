@@ -4,7 +4,7 @@ namespace App\View\Components;
 
 use Illuminate\View\Component;
 
-class GroupedCheckbox extends Component
+class Environments extends Component
 {
     public $name;
     public $label;
@@ -16,11 +16,11 @@ class GroupedCheckbox extends Component
         $this->name = $name;
         $this->label = $label;
         $this->selected = $selected;
-        $this->groups = config('environment_types');  // Load from config
+        $this->groups = config('environment_types');
     }
 
     public function render()
     {
-        return view('components.grouped-checkbox');
+        return view('components.environments');
     }
 }

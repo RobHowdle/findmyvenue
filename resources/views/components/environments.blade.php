@@ -1,6 +1,6 @@
 @props(['name', 'label', 'selected', 'groups', 'dashboardType'])
 
-<x-input-label>{{ $label }}</x-input-label>
+<x-input-label class="mb-6">{{ $label }}</x-input-label>
 <div class="grid grid-cols-3">
   @foreach ($groups as $groupName => $items)
     <fieldset class="mb-4">

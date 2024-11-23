@@ -1,8 +1,7 @@
-<x-grouped-checkbox name="environment_types" label="Select Shooting Environments" :selected="old('environment_types', $environmentTypes)" :groups="$groups" />
+<x-environments name="environment_types" label="Select Shooting Environments" :selected="old('environment_types', $environmentTypes)" :groups="$groups" />
 <x-working-times :workingTimes="$workingTimes" :dashboardType="$dashboardType" :user="$user" />
 
 <script>
-  console.log(dashboardType);
   $(document).ready(function() {
     // Event listener for when checkboxes are clicked
     $('input[name="environment_type[]"]').on('change', function() {

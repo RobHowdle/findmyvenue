@@ -1,10 +1,9 @@
 <header>
   <h2 class="text-md font-heading font-medium text-white">
-    {{ __('Portfolio Link') }}
-  </h2>
+    {{ __('Upload a max of 6 images to showcase your work, add a URL to your main portfolio') }} </h2>
 </header>
 
-<div class="mb-8 grid grid-cols-3">
+<div class="mb-8 grid grid-cols-3 space-y-6">
   @foreach ($portfolioImages as $image)
     <div class="overflow-hidden rounded shadow-md">
       <img src="{{ asset('storage/' . $image) }}" alt="Portfolio Image" class="h-auto w-full">
