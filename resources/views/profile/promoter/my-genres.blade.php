@@ -4,7 +4,6 @@
   </h2>
 </header>
 
-<!-- Removed the form wrapper -->
 <x-input-label>Select your genres</x-input-label>
 <div class="grid sm:grid-cols-2 sm:gap-3 lg:grid-cols-3 lg:gap-4">
   @php
@@ -13,13 +12,30 @@
   @endphp
 
   <!-- "All Genres" checkbox -->
-  <div class="flex items-center">
-    <input id="all-genres" name="all-genres" type="checkbox" value=""
-      class="genre-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
-      {{ $isAllGenres ? 'checked' : '' }}>
-    <label for="all-genres" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">All Genres</label>
+  <div class="border-b border-slate-200">
+    <button onclick="toggleAccordion('all-genres')" id="all-genres-btn"
+      class="accordion-btn flex w-full items-center justify-between py-5 text-white">
+      <span class="genre-name">All Genres</span>
+      <div class="group flex items-center gap-4">
+        <span class="status mr-4" data-genre="All Genres"></span>
+        <span id="icon-all-genres" class="accordion-icon text-slate-800 transition-transform duration-300">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="#ffffff" class="h-4 w-4">
+            <path
+              d="M8.75 3.75a.75.75 0 0 0-1.5 0v3.5h-3.5a.75.75 0 0 0 0 1.5h3.5v3.5a.75.75 0 0 0 1.5 0v-3.5h3.5a.75.75 0 0 0 0-1.5h-3.5v-3.5Z" />
+          </svg>
+        </span>
+      </div>
+    </button>
+    <div id="subgenres-accordion-all-genres"
+      class="max-h-0 content grid grid-cols-2 overflow-hidden transition-all duration-300 ease-in-out">
+      <div class="all-genre-wrapper flex items-center gap-2 pb-2 text-sm text-white">
+        <x-input-checkbox class="all-genres-checkbox" id="all-genres-checkbox" data-genre="all" data-all="true"
+          name="all-genres-checkbox" value="all-genres">
+        </x-input-checkbox>
+        <x-input-label>All Genres</x-input-label>
+      </div>
+    </div>
   </div>
-
 
   <!-- Genres Accordion -->
   @foreach ($genres as $index => $genre)
@@ -96,6 +112,16 @@
   let promoterBandTypes = @json($promoterData['bandTypes']);
 
   document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("all-genres-checkbox")?.addEventListener("change", (e) => {
+      const allGenres = document.getElementById("all-genres-checkbox");
+
+      console.log(allGenres.dataset);
+
+      if (allGenres) {
+
+      }
+    });
+
     setTimeout(() => {
       preCheckCheckboxes(promoterGenres);
       preTickBandTypeCheckboxes(promoterBandTypes)
@@ -269,7 +295,10 @@
     let subgenreValue;
 
     // Determine if it's "All Genres" or an individual subgenre checkbox
-    if (checkbox.dataset.genre) {
+    if (checkbox.dataset.genre === 'all') {
+      genre = 'all';
+      subgenreValue = null;
+    } else if (checkbox.dataset.genre) {
       genre = checkbox.dataset.genre; // This is for the "All Genre" checkbox
       subgenreValue = getAllSubgenresForGenre(genre);
     } else if (checkbox.dataset.parent) {
@@ -298,6 +327,12 @@
     const allCheckbox = document.getElementById(`all-${genre.toLowerCase().replace(/\s+/g, '_')}`);
 
     // Handle "All Genres" checkbox logic
+    if (checkbox.dataset.genre === 'all') {
+      if (checkbox.checked) {
+        genresData[genre].all = true;
+      }
+    }
+
     if (checkbox === allCheckbox) {
       if (checkbox.checked) {
         // Mark "All" as true and add all subgenres
@@ -341,6 +376,11 @@
       // Sync the "All Genres" checkbox
       if (allCheckbox) {
         allCheckbox.checked = genresData[genre].all;
+      }
+
+      const allGenresCheckbox = document.getElementById("all-genres-checkbox");
+      if (allGenresCheckbox) {
+        allGenresCheckbox.checked = genresData[genre].all;
       }
     }
 

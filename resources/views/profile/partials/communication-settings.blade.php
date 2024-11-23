@@ -3,7 +3,7 @@
     <h2 class="font-heading text-xl font-medium text-white">
       {{ __('Communication Settings') }}
     </h2>
-    <p class="text-md mt-2 text-yns_light_gray">Control how/ if we can contact you.</p>
+    <p class="text-md mt-2 text-yns_light_gray">Control how we contact you.</p>
     <p class="text-md mt-2 text-yns_light_gray"><span class="font-bold">PLEASE NOTE: </span>We require you to be able to
       be contacted for system alerts and legal/ policy updates.</p>
   </header>
