@@ -10,16 +10,19 @@ use Illuminate\Support\Str;
 use App\Models\OtherService;
 use Illuminate\Http\Request;
 use App\Models\UserModuleSetting;
-use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Auth;
+use Intervention\Image\ImageManager;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Redirect;
 use App\Http\Requests\ProfileUpdateRequest;
+use Intervention\Image\Drivers\Imagick\Driver;
 use App\Http\Requests\BandProfileUpdateRequest;
 use App\Http\Requests\VenueProfileUpdateRequest;
 use App\Http\Requests\PromoterProfileUpdateRequest;
+use App\Http\Requests\PhotographerProfileUpdateRequest;
+
 
 class ProfileController extends Controller
 {
@@ -46,6 +49,7 @@ class ProfileController extends Controller
         $promoterData = [];
         $bandData = [];
         $venueData = [];
+        $photographerData = [];
 
         // Check if the dashboardType is 'promoter' and get promoter data
         if ($dashboardType === 'promoter') {
@@ -54,6 +58,8 @@ class ProfileController extends Controller
             $bandData = $this->getBandData($user);
         } elseif ($dashboardType === 'venue') {
             $venueData = $this->getVenueData($user);
+        } elseif ($dashboardType === 'photographer') {
+            $photographerData = $this->getPhotographerData($user);
         }
 
         // Load the modules configuration
@@ -84,6 +90,7 @@ class ProfileController extends Controller
             'promoterData' => $promoterData,
             'bandData' => $bandData,
             'venueData' => $venueData,
+            'photographerData' => $photographerData,
             'user' => $user,
             'roles' => $roles,
             'userRole' => $userRole,
@@ -152,6 +159,7 @@ class ProfileController extends Controller
                 if (isset($userData['name']) && $promoter->name !== $userData['name']) {
                     $promoter->update(['name' => $userData['name']]);
                 }
+
                 // Contact Name
                 if (isset($userData['contact_name']) && $promoter->contact_name !== $userData['contact_name']) {
                     $promoter->update(['contact_name' => $userData['contact_name']]);
@@ -197,13 +205,6 @@ class ProfileController extends Controller
                     $promoter->update(['my_venues' => $userData['myVenues']]);
                 }
 
-                // Genres
-                if (isset($userData['genres'])) {
-                    $storedGenres = json_decode($promoter->genre, true);
-                    if ($storedGenres !== $userData['genres']) {
-                        $promoter->update(['genre' => json_encode($userData['genres'])]);
-                    }
-                }
 
                 // Logo
                 if (isset($userData['logo'])) {
@@ -451,23 +452,93 @@ class ProfileController extends Controller
                     $band->update(['logo_url' => $logoUrl]);
                 }
 
-                // Portfolio Link
-                if (isset($userData['portfolio_link'])) {
-                    $band->update(['portfolio_link' => $userData['portfolio_link']]);
-                }
-
-                // Services
-                if (isset($userData['services'])) {
-                    $band->update(['services' => $userData['services']]);
-                }
-
                 // Return success message with redirect
                 return redirect()->route('profile.edit', ['dashboardType' => $dashboardType, 'id' => $user->id])->with('status', 'profile-updated');
             } else {
                 // Handle case where no promoter is linked to the user
-                return response()->json(['error' => 'Venue not found'], 404);
+                return response()->json(['error' => 'Band not found'], 404);
             }
         }
+    }
+
+    public function updatePhotographer($dashboardType, PhotographerProfileUpdateRequest $request, $user)
+    {
+        if ($dashboardType !== 'photographer') {
+            return response()->json(['error' => 'Invalid dashboard type'], 400);
+        }
+
+        $user = User::findOrFail($user);
+        $userData = $request->validated();
+
+        $photographer = OtherService::where('other_service_id', 1)
+            ->whereHas('linkedUsers', fn($query) => $query->where('user_id', $user->id))
+            ->first();
+
+        if (!$photographer) {
+            return response()->json(['error' => 'Photographer not found'], 404);
+        }
+
+        $fieldsToUpdate = ['name', 'contact_name', 'contact_email', 'contact_number', 'description'];
+        foreach ($fieldsToUpdate as $field) {
+            if (isset($userData[$field]) && $photographer->$field !== $userData[$field]) {
+                $photographer->update([$field => $userData[$field]]);
+            }
+        }
+
+        // Contact Links
+        if (isset($userData['contact_links'])) {
+            $this->updateJsonField($photographer, 'contact_link', $userData['contact_links']);
+        }
+
+        // Genres
+        if (isset($userData['genres'])) {
+            $this->updateJsonField($photographer, 'genre', $userData['genres']);
+        }
+
+        // Logo Upload
+        if (isset($userData['logo_url'])) {
+            $logoPath = $this->uploadLogo($userData['logo_url'], $userData['name']);
+            $photographer->update(['logo_url' => $logoPath]);
+        }
+
+        // Working Times
+        if (isset($userData['working_times'])) {
+            foreach ($userData['working_times'] as $day => $time) {
+                \Log::info('Working times:', $userData['working_times']);
+
+                // // Skip validation for 'all-day' or 'unavailable'
+                // if ($time && $time !== 'all-day' && $time !== 'unavailable') {
+                //     // Ensure start and end times are provided and valid
+                //     if (!isset($time['start']) || !isset($time['end']) || $time['start'] >= $time['end']) {
+                //         return back()->withErrors(["working_times.$day" => "Start time must be earlier than end time for $day."]);
+                //     }
+                // }
+                $photographer->update(['working_times' => json_encode($userData['working_times'])]);
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Photographer profile updated successfully!',
+            'redirect_url' => route('profile.edit', ['dashboardType' => $dashboardType, 'id' => $user->id]),
+        ]);
+    }
+
+
+    // Helper for JSON Fields
+    protected function updateJsonField($photographer, $field, $data)
+    {
+        $existingData = json_decode($photographer->$field, true) ?? [];
+        $updatedData = array_merge($existingData, $data);
+        $photographer->update([$field => json_encode(array_filter($updatedData))]);
+    }
+
+    // Helper for Logo Upload
+    protected function uploadLogo($file, $name)
+    {
+        $filename = Str::slug($name) . '.' . $file->getClientOriginalExtension();
+        $file->move(storage_path('app/public/images/photographer_logos'), $filename);
+        return Storage::url('images/photographer_logos/' . $filename);
     }
 
     /**
@@ -522,8 +593,10 @@ class ProfileController extends Controller
             'is_enabled' => 'required|boolean',
         ]);
 
+        $user = Auth::user();
+
         // Update the module settings in the database
-        $module = UserModuleSetting::where('module_name', $request->module)->first();
+        $module = UserModuleSetting::where('user_id', $user->id)->where('module_name', $request->module)->first();
 
         if ($module) {
             $module->is_enabled = $request->is_enabled;
@@ -574,7 +647,8 @@ class ProfileController extends Controller
         $myEvents = $promoter ? $promoter->events()->with('venues')->get() : collect();
         $uniqueBands = $this->getUniqueBandsForPromoterEvents($promoter->id);
         $genreList = file_get_contents(public_path('text/genre_list.json'));
-        $data = json_decode($genreList, true);
+        $data = json_decode($genreList, true) ?? [];
+        $isAllGenres = in_array('All', $data);
         $genres = $data['genres'];
         $promoterGenres = is_array($promoter->genre) ? $promoter->genre : json_decode($promoter->genre, true);
 
@@ -593,6 +667,7 @@ class ProfileController extends Controller
             'contact_name' => $contact_name,
             'uniqueBands' => $uniqueBands,
             'genres' => $genres,
+            'isAllGenres' => $isAllGenres,
             'promoterGenres' => $promoterGenres,
         ];
     }
@@ -736,6 +811,100 @@ class ProfileController extends Controller
             'streamLinks' => $streamLinks,
             'streamPlatformsToCheck' => $streamPlatformsToCheck,
             'members' => $members
+        ];
+    }
+
+    private function getPhotographerData(User $user)
+    {
+        $photographer = $user->otherService("Photography")->first();
+        $serviceableId = $photographer->id;
+        $serviceableType = 'App\Models\OtherService';
+
+        $name = $photographer ? $photographer->name : '';
+        $location = $photographer ? $photographer->location : '';
+        $logo = $photographer ? $photographer->logo_url : 'images/system/yns_logo.png';
+        $phone = $photographer ? $photographer->contact_number : '';
+        $contact_name = $photographer ? $photographer->contact_name : '';
+        $contact_email = $photographer ? $photographer->contact_email : '';
+        $contact_number = $photographer ? $photographer->contact_number : '';
+        $contactLinks = $photographer ? json_decode($photographer->contact_link, true) : [];
+
+        $platforms = [];
+        $platformsToCheck = ['website', 'facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+
+        // Initialize the platforms array with empty strings for each platform
+        foreach ($platformsToCheck as $platform) {
+            $platforms[$platform] = '';  // Set default to empty string
+        }
+
+        // Check if the contactLinks array exists and contains social links
+        if ($contactLinks) {
+            foreach ($platformsToCheck as $platform) {
+                // Only add the link if the platform exists in the $contactLinks array
+                if (isset($contactLinks[$platform])) {
+                    $platforms[$platform] = $contactLinks[$platform];  // Store the link for the platform
+                }
+            }
+        }
+
+        $about = $photographer ? $photographer->description : '';
+        $genreList = file_get_contents(public_path('text/genre_list.json'));
+        $data = json_decode($genreList, true);
+        $genres = $data['genres'];
+        $photographerGenres = is_array($photographer->genre) ? $photographer->genre : json_decode($photographer->genre, true);
+        $portfolioLink = $photographer ? $photographer->portfolio_link : '';
+        $portfolioImages = $photographer->portfolio_images;
+
+        // Decode the first layer
+        $portfolioImages = json_decode($portfolioImages, true);
+
+        // Check if it's still a string and decode again if necessary
+        if (is_string($portfolioImages)) {
+            $portfolioImages = json_decode($portfolioImages, true);
+        }
+
+        // Ensure it's an array
+        if (!is_array($portfolioImages)) {
+            throw new \Exception("Portfolio images could not be converted to an array.");
+        }
+
+        $groupedEnvironmentTypes = config('environment_types');
+        $environmentTypes = json_decode($photographer->environment_type, true);
+        $groupedData = [];
+
+        foreach ($groupedEnvironmentTypes as $groupName => $items) {
+            foreach ($items as $item) {
+                if (in_array($item, $environmentTypes)) {
+                    // If the environment type is selected, add it to the respective group
+                    $groupedData[$groupName][] = $item;
+                }
+            }
+        }
+
+        $workingTimes = is_array($photographer->working_times) ? $photographer->working_times : json_decode($photographer->working_times, true);
+
+        return [
+            'photographer' => $photographer,
+            'name' => $name,
+            'location' => $location,
+            'logo' => $logo,
+            'phone' => $phone,
+            'about' => $about,
+            'contact_name' => $contact_name,
+            'contact_email' => $contact_email,
+            'contact_number' => $contact_number,
+            'platforms' => $platforms,
+            'platformsToCheck' => $platformsToCheck,
+            'genres' => $genres,
+            'photographerGenres' => $photographerGenres,
+            'portfolio_link' => $portfolioLink,
+            'serviceableId' => $serviceableId,
+            'serviceableType' => $serviceableType,
+            'portfolioImages' => $portfolioImages,
+            'environmentTypes' => $environmentTypes,
+            'groups' => $groupedData,
+            'workingTimes' => $workingTimes,
+
         ];
     }
 
@@ -891,5 +1060,171 @@ class ProfileController extends Controller
             })
             ->distinct()
             ->get();
+    }
+
+    /**
+     * Photographers - Uploading Portfolio Sample Images
+     */
+
+    public function uploadPortfolioImages(Request $request)
+    {
+        // Validate the uploaded file
+        $request->validate([
+            'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        // Check if the file is uploaded
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $userId = auth()->id();
+            $user = auth()->user();
+
+            // Create a unique filename
+            $filename = time() . '_' . $file->getClientOriginalName();
+
+            // Instantiate ImageManager with correct array configuration
+            $manager = ImageManager::gd();
+
+            // Load the image
+            $image = $manager->read($file->getRealPath());
+
+            // Generate the custom watermark for the user
+            $watermarkPath = $this->generateCustomWatermark($userId); // Call the function to create the watermark
+
+            // Set custom directory for storing the file
+            $customPath = "images/photography/portfolio_images/{$userId}";
+
+            // Store the image in the specified path
+            try {
+                $path = $file->storeAs($customPath, $filename);
+
+                // Update session with the uploaded file path
+                $uploadedFiles = session()->get('uploaded_files', []);
+                $uploadedFiles[] = $path;
+                session()->put('uploaded_files', $uploadedFiles);
+
+                // Return the response with success status and file path
+                return response()->json(['success' => true, 'path' => $path]);
+            } catch (\Exception $e) {
+                // Catch any exceptions during file storage and log the error
+                \Log::error("File upload failed for user ID {$userId}: " . $e->getMessage());
+                return response()->json(['success' => false, 'message' => 'File upload failed.'], 500);
+            }
+        }
+
+        // Return an error response if no file is uploaded
+        return response()->json(['success' => false, 'message' => 'No file uploaded.'], 400);
+    }
+
+    public function generateCustomWatermark($userId)
+    {
+        $image = new ImageManager(Driver::class);
+        $watermark = $image->create(512, 512)->fill('ccc');
+
+        // Save the custom watermark
+        $watermarkPath = storage_path("app/public/images/other_services/photography/portfolio_images/watermarked/{$userId}.png");
+        $watermark->save($watermarkPath);
+
+        return $watermarkPath;
+    }
+
+    public function updateEnvironmentTypes(Request $request)
+    {
+        // Validate the incoming request
+        $request->validate([
+            'environment_type' => 'array',
+            'environment_type.*' => 'string',
+        ]);
+
+        // Get the current user (or the specific photographer)
+        $user = auth()->user();
+        $userId = $user->id;
+        $photographer = OtherService::where('other_service_id', 1)->whereHas('linkedUsers', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })->first();
+
+        // If the photographer doesn't have the environment_types field, initialize it
+        $environmentType = $photographer->environment_type ? json_decode($photographer->environment_type, true) : [];
+
+        $selectedEnvironmentTypes = $request->input('environment_types', []);
+
+        // Merge the new environment types with the existing ones
+        $updatedEnvironmentTypes = array_merge($environmentType, $selectedEnvironmentTypes);
+
+        // Store the updated environment types as JSON
+        $photographer->environment_type = json_encode($updatedEnvironmentTypes);
+
+        // Save the photographer
+        $photographer->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Environment types updated successfully!',
+            'environment_type' => $updatedEnvironmentTypes,
+        ]);
+    }
+
+    /**
+     * Save Genres
+     */
+
+    public function saveGenres($dashboardType, Request $request)
+    {
+        $user = User::where('id', Auth::user()->id)->first();
+
+        // Ensure the correct user is selected based on dashboard type
+        switch ($dashboardType) {
+            case 'promoter':
+                $promoter = $user->promoters()->first();
+                $userType = $promoter;  // assuming 'promoter' corresponds to the authenticated user
+                break;
+            case 'band':
+                $band = OtherService::where('user_id', $user->id)->first(); // Assuming Band model exists
+                $userType = $band;  // Replace with band if the dashboard type is 'band'
+                break;
+            case 'venue':
+                $venue = Venue::where('user_id', $user->id)->first(); // Assuming Venue model exists
+                $userType = $venue;  // Replace with venue
+                break;
+            case 'photographer':
+                $photographer = OtherService::where('user_id', $user->id)->first(); // Assuming Photographer model exists
+                $userType = $photographer;  // Replace with photographer
+                break;
+            default:
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid dashboard type',
+                ]);
+        }
+
+
+        // Now continue with updating genres for the selected userType
+        if (isset($request['genres']) && !empty($request['genres'])) {
+            $storedGenres = json_decode($userType->genre, true) ?? [];
+            $newGenres = $request->input('genres');
+
+            // Check if genres need to be updated
+            if ($storedGenres !== $newGenres) {
+                $userType->update(['genre' => json_encode($newGenres)]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Genres successfully updated',
+                ]);
+            }
+        } else {
+            // Handle case where no genres are provided (set to empty array)
+            $userType->update(['genre' => json_encode([])]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Genres successfully reset',
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'No changes to genres',
+        ]);
     }
 }

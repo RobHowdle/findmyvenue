@@ -1,10 +1,10 @@
 <header>
   <h2 class="text-md font-heading font-medium text-white">
-    {{ __('Promoter Details') }}
+    {{ __('Update your basic information') }}
   </h2>
 </header>
 <form method="POST" action="{{ route('promoter.update', ['dashboardType' => $dashboardType, 'user' => $user]) }}"
-  class="grid grid-cols-3 gap-x-8 gap-y-8" enctype="multipart/form-data">
+  class="grid grid-cols-3 gap-x-8 gap-y-8 space-y-6" enctype="multipart/form-data">
   @csrf
   @method('PUT')
   <div class="col-start-1 col-end-2">

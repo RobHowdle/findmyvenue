@@ -19,5 +19,22 @@ class PermissionsSeeder extends Seeder
         Permission::create(['name' => 'manage_photographer']);
         Permission::create(['name' => 'manage_videographer']);
         Permission::create(['name' => 'manage_designer']);
+        Permission::create(['name' => 'manage_modules']);
+        Permission::create(['name' => 'view_finances']);
+        Permission::create(['name' => 'manage_finances']);
+        Permission::create(['name' => 'view_events']);
+        Permission::create(['name' => 'manage_events']);
+        Permission::create(['name' => 'view_todo_list']);
+        Permission::create(['name' => 'manage_todo_list']);
+        Permission::create(['name' => 'view_reviews']);
+        Permission::create(['name' => 'manage_reviews']);
+        Permission::create(['name' => 'view_notes']);
+        Permission::create(['name' => 'manage_notes']);
+        Permission::create(['name' => 'view_documents']);
+        Permission::create(['name' => 'manage_documents']);
+        Permission::create(['name' => 'view_users']);
+        Permission::create(['name' => 'manage_users']);
+        Permission::create(['name' => 'view_jobs']);
+        Permission::create(['name' => 'manage_jobs']);
     }
 }

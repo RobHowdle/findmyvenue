@@ -120,7 +120,7 @@ class RegisteredUserController extends Controller
     protected function setDefaultModules($user, $roleName)
     {
         // Define all available modules
-        $allModules = ['events', 'todo_list', 'notes', 'finances', 'documents', 'users', 'reviews'];
+        $allModules = ['events', 'todo_list', 'notes', 'finances', 'documents', 'users', 'reviews', 'jobs'];
 
         // Define default modules based on the user role
         $defaultModules = [];
@@ -142,7 +142,7 @@ class RegisteredUserController extends Controller
             case "photographer":
             case "designer":
             case "videographer":
-                $defaultModules = ['todo_list', 'notes', 'finances', 'documents', 'reviews'];
+                $defaultModules = ['todo_list', 'notes', 'finances', 'documents', 'reviews', 'jobs'];
                 $serviceableType = 'App\Models\OtherService';
                 break;
 

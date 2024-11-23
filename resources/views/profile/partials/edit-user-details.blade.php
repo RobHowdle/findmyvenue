@@ -391,9 +391,6 @@
       });
   }
 
-
-
-
   document.addEventListener("DOMContentLoaded", function() {
     const locationInput = document.getElementById("location"); // The location text input
     const latitudeField = document.getElementById("address-latitude");

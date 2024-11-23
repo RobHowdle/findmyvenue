@@ -35,6 +35,7 @@ class OtherService extends Model
         'contact_email',
         'contact_link',
         'portfolio_link',
+        'portfolio_images',
         'services'
     ];
 
@@ -51,7 +52,15 @@ class OtherService extends Model
      */
     public static function bands()
     {
-        return self::where('other_service_id', 4); // Assuming 4 refers to bands in your `other_services` table
+        return self::where('other_service_id', 4);
+    }
+
+    /**
+     * Retrieve all photographers (other services with `other_service_id` as 1).
+     */
+    public static function photographers()
+    {
+        return self::where('other_service_id', 1);
     }
 
     /**
@@ -105,10 +114,20 @@ class OtherService extends Model
         return self::bands()->get(); // Get all band services
     }
 
+    public function getAllPhotographers()
+    {
+        return self::photographers()->get(); // Get all photographer services
+    }
+
     public function linkedUsers(): MorphToMany
     {
         return $this->morphToMany(User::class, 'serviceable', 'service_user', 'serviceable_id', 'user_id')
             ->withPivot('created_at', 'updated_at', 'role')
             ->whereNull('service_user.deleted_at');
+    }
+
+    public function jobs()
+    {
+        return $this->morphToMany(Job::class, 'serviceable', 'job_service', 'serviceable_id', 'job_id');
     }
 }

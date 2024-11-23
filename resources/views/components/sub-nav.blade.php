@@ -40,6 +40,17 @@
         {!! $overallRatingVenue !!}
       </div>
     </div>
+  @elseif ($userType === 'photographer')
+    <div>Jobs YTD: {{ $jobsCountPhotographerYtd }}</div>
+    <div class="flex">Total Profit YTD:
+      <div id="amountDisplay" class="ml-2">{{ formatCurrency($totalProfitsPhotographerYtd) ?? '£0.00' }}</div>
+    </div>
+    <div class="rating-wrapper flex flex-row items-center gap-2">
+      <p class="h-full place-content-end font-sans">Overall Rating:</p>
+      <div class="ratings flex">
+        {!! $overallPhotographerRating !!}
+      </div>
+    </div>
   @else
     <div>Invalid user type</div>
   @endif

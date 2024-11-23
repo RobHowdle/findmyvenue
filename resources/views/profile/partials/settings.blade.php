@@ -89,8 +89,6 @@
     const slider = document.querySelector(`label[for="${checkboxId}"] .slider`);
     const dashboardType = "{{ $dashboardType }}"; // Correctly pass dashboardType
 
-    console.log(moduleName + ' is now ' + (isEnabled ? 'Enabled' : 'Disabled'));
-
     // Check if checkbox was found
     if (!checkbox) {
       console.error('Checkbox not found for ID:', checkboxId);

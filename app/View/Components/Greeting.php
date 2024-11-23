@@ -30,7 +30,7 @@ class Greeting extends Component
             $this->greeting = 'Good Evening';
         }
 
-        $this->userName = Auth::check() ? Auth::user()->name : 'User';
+        $this->userName = Auth::check() ? Auth::user()->first_name : 'User';
 
         // Retrieve the associated entity based on user role
         if (Auth::check()) {
@@ -48,22 +48,22 @@ class Greeting extends Component
                     break;
 
                 case 'band':
-                    $band = $user->otherService()->first();
+                    $band = $user->otherService("Band")->first();
                     $this->associatedEntity = $band ? $band->name : null;
                     break;
 
                 case 'photographer':
-                    $band = $user->otherService()->first();
-                    $this->associatedEntity = $band ? $band->name : null;
+                    $photographer = $user->otherService("Photographer")->first();
+                    $this->associatedEntity = $photographer ? $photographer->name : null;
                     break;
 
                 case 'videographer':
-                    $band = $user->otherService()->first();
+                    $band = $user->otherService("Videographer")->first();
                     $this->associatedEntity = $band ? $band->name : null;
                     break;
 
                 case 'designer':
-                    $band = $user->otherService()->first();
+                    $band = $user->otherService("Designer")->first();
                     $this->associatedEntity = $band ? $band->name : null;
                     break;
 

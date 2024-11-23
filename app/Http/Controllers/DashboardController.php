@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Note;
 use App\Models\User;
-use App\Models\UserModuleSetting;
 use App\Models\Venue;
 use App\Models\UserService;
 use App\Models\VenueReview;
+use App\Models\OtherService;
 use Illuminate\Http\Request;
 use App\Services\TodoService;
+use App\Models\UserModuleSetting;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
@@ -34,10 +35,12 @@ class DashboardController extends Controller
         $roles = $user->roles->pluck('name');
         $roleName = $roles->first();
         $venues = Venue::all();
+        $photographers = OtherService::photographers()->get();
 
         // Get existing services
         $promoter = $user->promoters()->first();
         $band = $user->otherService("Band")->first();
+        $photographer = $user->otherService("Photographer")->first();
         $venue = $user->venues()->first();
 
         // Load genres from a JSON file
@@ -51,8 +54,6 @@ class DashboardController extends Controller
 
         // Determine dashboard type
         $dashboardType = lcfirst($roleName);
-
-        \Log::info($promoter);
 
         // Role-based redirection
         switch ($roleName) {
@@ -77,6 +78,9 @@ class DashboardController extends Controller
                 return redirect("/dashboard/{$dashboardType}")->with(['dashboardType', $dashboardType]);
                 break;
             case 'photographer':
+                if (!$photographer) {
+                    return redirect("/{$dashboardType}/photographer-journey")->with(['photographers', $photographers, 'genres', $genres, 'dashboardType', $dashboardType, 'modules', $modules]);
+                }
                 return redirect("/dashboard/{$dashboardType}")->with(['dashboardType', $dashboardType, 'modules', $modules]);
                 break;
             case 'videographer':

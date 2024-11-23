@@ -263,56 +263,56 @@ window.initialiseSummernote = function (selector, initialContent) {
                 var content = editor.summernote("code");
 
                 // Analyze and get the highlighted content
-                var highlightedContent = analyzeText(content);
+                // var highlightedContent = analyzeText(content);
 
                 // Update only if the content has changed
-                if (highlightedContent !== content) {
-                    // Get the current selection before updating the content
-                    var selection = window.getSelection();
-                    var range = selection.getRangeAt(0);
+                // if (highlightedContent !== content) {
+                //     // Get the current selection before updating the content
+                //     var selection = window.getSelection();
+                //     var range = selection.getRangeAt(0);
 
-                    // Update the content directly
-                    editor.summernote("code", highlightedContent);
+                //     // Update the content directly
+                //     editor.summernote("code", highlightedContent);
 
-                    // Restore the selection
-                    setTimeout(function () {
-                        // Get the editable area
-                        var $editable = editor.summernote("editable")[0];
+                //     // Restore the selection
+                //     setTimeout(function () {
+                //         // Get the editable area
+                //         var $editable = editor.summernote("editable")[0];
 
-                        // Set the cursor position back to where it was
-                        selection.removeAllRanges(); // Clear existing selections
-                        selection.addRange(range); // Set the new range
+                //         // Set the cursor position back to where it was
+                //         selection.removeAllRanges(); // Clear existing selections
+                //         selection.addRange(range); // Set the new range
 
-                        // Refocus on the editor
-                        $editable.focus(); // Focus the editable area
-                    }, 0); // Use a small delay to ensure the content is rendered before moving the cursor
-                }
+                //         // Refocus on the editor
+                //         $editable.focus(); // Focus the editable area
+                //     }, 0); // Use a small delay to ensure the content is rendered before moving the cursor
+                // }
             },
         },
     });
 };
 
 // Function to analyze text for venue names
-function analyzeText(inputText) {
-    const venues = [
-        {
-            name: "The Forum",
-            link: "https://www.google.com/theforummusiccenter",
-        },
-        { name: "The Turks Head", link: "https://www.google.com/theturkshead" },
-    ];
+// function analyzeText(inputText) {
+//     const venues = [
+//         {
+//             name: "The Forum",
+//             link: "https://www.google.com/theforummusiccenter",
+//         },
+//         { name: "The Turks Head", link: "https://www.google.com/theturkshead" },
+//     ];
 
-    let highlightedContent = inputText; // Start with the original input text
+//     let highlightedContent = inputText; // Start with the original input text
 
-    venues.forEach((venue) => {
-        const regex = new RegExp(`\\b(${venue.name})\\b`, "gi");
-        highlightedContent = highlightedContent.replace(
-            regex,
-            `<span class="highlight" data-link="${venue.link}">$1</span>`
-        );
-    });
-    return highlightedContent; // Return the modified content
-}
+//     venues.forEach((venue) => {
+//         const regex = new RegExp(`\\b(${venue.name})\\b`, "gi");
+//         highlightedContent = highlightedContent.replace(
+//             regex,
+//             `<span class="highlight" data-link="${venue.link}">$1</span>`
+//         );
+//     });
+//     return highlightedContent; // Return the modified content
+// }
 
 // Sweet Alert 2 Notifications
 window.showSuccessNotification = function (message) {
@@ -462,10 +462,6 @@ document.addEventListener("DOMContentLoaded", function () {
                                             event.on_the_door_ticket_price ||
                                             "N/A",
                                     })
-                                );
-                                console.log(
-                                    "Passing these events to the calendar:",
-                                    eventsArray
                                 );
                                 successCallback(eventsArray);
                             } else {

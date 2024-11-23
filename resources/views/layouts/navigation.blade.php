@@ -14,59 +14,53 @@
             class="inline-flex items-center border-b-2 font-heading text-sm text-white hover:border-b-yns_yellow hover:text-yns_yellow">Dashboard</a>
 
           @php
+            $user = auth()->user();
             $links = [
-                'manage_venue' => [
-                    'finances' => route('admin.dashboard.show-finances', ['dashboardType' => $dashboardType]),
-                    'events' => route('admin.dashboard.show-events', ['dashboardType' => $dashboardType]),
-                    'todo_list' => route('admin.dashboard.todo-list', ['dashboardType' => $dashboardType]),
-                    'reviews' => route('admin.dashboard.get-reviews', [
+                'finances' => $user->can('view_finances')
+                    ? route('admin.dashboard.show-finances', ['dashboardType' => $dashboardType])
+                    : null,
+                'events' => $user->can('view_events')
+                    ? route('admin.dashboard.show-events', ['dashboardType' => $dashboardType])
+                    : null,
+                'todo_list' => $user->can('view_todo_list')
+                    ? route('admin.dashboard.todo-list', ['dashboardType' => $dashboardType])
+                    : null,
+                'reviews' => $user->can('view_reviews')
+                    ? route('admin.dashboard.get-reviews', [
                         'filter' => 'all',
                         'dashboardType' => $dashboardType,
-                    ]),
-                    'notes' => route('admin.dashboard.show-notes', ['dashboardType' => $dashboardType]),
-                ],
-                'manage_promoter' => [
-                    'finances' => route('admin.dashboard.show-finances', ['dashboardType' => $dashboardType]),
-                    'events' => route('admin.dashboard.show-events', ['dashboardType' => $dashboardType]),
-                    'todo_list' => route('admin.dashboard.todo-list', ['dashboardType' => $dashboardType]),
-                    'reviews' => route('admin.dashboard.get-reviews', [
-                        'filter' => 'all',
-                        'dashboardType' => $dashboardType,
-                    ]),
-                    'notes' => route('admin.dashboard.show-notes', ['dashboardType' => $dashboardType]),
-                ],
-                'manage_band' => [
-                    'documents' => route('admin.dashboard.documents.index', ['dashboardType' => $dashboardType]),
-                    'events' => route('admin.dashboard.show-events', ['dashboardType' => $dashboardType]),
-                    'todo_list' => route('admin.dashboard.todo-list', ['dashboardType' => $dashboardType]),
-                    'reviews' => route('admin.dashboard.get-reviews', [
-                        'filter' => 'all',
-                        'dashboardType' => $dashboardType,
-                    ]),
-                    'notes' => route('admin.dashboard.show-notes', ['dashboardType' => $dashboardType]),
-                ],
+                    ])
+                    : null,
+                'notes' => $user->can('view_notes')
+                    ? route('admin.dashboard.show-notes', ['dashboardType' => $dashboardType])
+                    : null,
+                'documents' => $user->can('view_documents')
+                    ? route('admin.dashboard.documents.index', ['dashboardType' => $dashboardType])
+                    : null,
+                'users' => $user->can('view_users')
+                    ? route('admin.dashboard.users', ['dashboardType' => $dashboardType])
+                    : null,
+                'jobs' => $user->can('view_jobs')
+                    ? route('admin.dashboard.jobs', ['dashboardType' => $dashboardType])
+                    : null,
             ];
           @endphp
 
+          @foreach ($links as $module => $url)
+            @if ($url && isset($modules[$module]))
+              @php
+                $isEnabled = $modules[$module]['is_enabled'];
+              @endphp
 
-          @foreach ($links as $permission => $subLinks)
-            @can($permission)
-              @foreach ($subLinks as $module => $url)
-                @if (isset($modules[$module]))
-                  @php
-                    $isEnabled = $modules[$module]['is_enabled'];
-                  @endphp
-
-                  @if ($isEnabled)
-                    <a href="{{ $url }}"
-                      class="{{ request()->is('dashboard/*/' . $module . '*') ? 'border-b-yns_yellow' : '' }} inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:border-b-yns_yellow hover:text-yns_yellow">
-                      {{ ucfirst($module) }}
-                    </a>
-                  @endif
-                @endif
-              @endforeach
-            @endcan
+              @if ($isEnabled)
+                <a href="{{ $url }}"
+                  class="{{ request()->is('dashboard/*/' . $module . '*') ? 'border-b-yns_yellow' : '' }} inline-flex items-center border-b-2 font-heading text-sm text-white transition duration-150 ease-in-out hover:border-b-yns_yellow hover:text-yns_yellow">
+                  {{ ucfirst(str_replace('_', ' ', $module)) }}
+                </a>
+              @endif
+            @endif
           @endforeach
+
 
           @can(['manage_band', 'manage_photographer', 'manage_videographer', 'manage_designer'])
             @if ($modules->contains('module_name', 'other') && $modules->where('module_name', 'other')->first()->is_enabled)
