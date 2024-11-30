@@ -51,6 +51,8 @@
         {!! $overallPhotographerRating !!}
       </div>
     </div>
+  @elseif ($userType === 'standard')
+    <div>Events YTD: {{ $eventsCountStandardYtd }}</div>
   @else
     <div>Invalid user type</div>
   @endif

@@ -86,25 +86,27 @@ class VenueController extends Controller
             $urls = explode(',', $venue->contact_link);
             $platforms = [];
 
-            // // Check each URL against the platforms
-            foreach ($urls as $url) {
-                // Initialize the platform as unknown
-                $matchedPlatform = 'Unknown';
+            if ($urls) {
+                // Check each URL against the platforms
+                foreach ($urls as $url) {
+                    // Initialize the platform as unknown
+                    $matchedPlatform = 'Unknown';
 
-                // Check if the URL contains platform names
-                $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
-                foreach ($platformsToCheck as $platform) {
-                    if (stripos($url, $platform) !== false) {
-                        $matchedPlatform = $platform;
-                        break;
+                    // Check if the URL contains platform names
+                    $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+                    foreach ($platformsToCheck as $platform) {
+                        if (stripos($url, $platform) !== false) {
+                            $matchedPlatform = $platform;
+                            break;
+                        }
                     }
-                }
 
-                // Store the platform information for each URL
-                $platforms[] = [
-                    'url' => $url,
-                    'platform' => $matchedPlatform
-                ];
+                    // Store the platform information for each URL
+                    $platforms[] = [
+                        'url' => $url,
+                        'platform' => $matchedPlatform
+                    ];
+                }
             }
 
             // Add the processed data to the venue
@@ -136,31 +138,31 @@ class VenueController extends Controller
         if ($venue->contact_link) {
             $urls = explode(',', $venue->contact_link);
             $platforms = [];
-        }
 
-        // Check each URL against the platforms
-        foreach ($urls as $url) {
-            // Initialize the platform as unknown
-            $matchedPlatform = 'Unknown';
+            // Check each URL against the platforms
+            foreach ($urls as $url) {
+                // Initialize the platform as unknown
+                $matchedPlatform = 'Unknown';
 
-            // Check if the URL contains platform names
-            $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
-            foreach ($platformsToCheck as $platform) {
-                if (stripos($url, $platform) !== false) {
-                    $matchedPlatform = $platform;
-                    break; // Stop checking once a platform is found
+                // Check if the URL contains platform names
+                $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+                foreach ($platformsToCheck as $platform) {
+                    if (stripos($url, $platform) !== false) {
+                        $matchedPlatform = $platform;
+                        break;
+                    }
                 }
-            }
 
-            // Store the platform information for each URL
-            $platforms[] = [
-                'url' => $url,
-                'platform' => $matchedPlatform
-            ];
+                // Store the platform information for each URL
+                $platforms[] = [
+                    'url' => $url,
+                    'platform' => $matchedPlatform
+                ];
+            }
+            // Add the processed data to the venue
+            $venue->platforms = $platforms;
         }
 
-        // Add the processed data to the venue
-        $venue->platforms = $platforms;
         $recentReviews = VenueReview::getRecentReviewsForVenue($id);
         $venue->recentReviews = $recentReviews->isNotEmpty() ? $recentReviews : null;
 

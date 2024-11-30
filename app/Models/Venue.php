@@ -23,6 +23,7 @@ class Venue extends Model
         'postal_town',
         'longitude',
         'latitude',
+        'w3w',
         'capacity',
         'in_house_gear',
         'band_type',

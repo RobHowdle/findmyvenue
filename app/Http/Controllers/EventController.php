@@ -353,7 +353,7 @@ class EventController extends Controller
             // Main Event Creation
             $event = Event::create([
                 'user_id' => $user->id,
-                'name' => $validatedData['event_name'],
+                'event_name' => $validatedData['event_name'],
                 'event_date' => $event_date,
                 'event_start_time' => $validatedData['event_start_time'],
                 'event_end_time' => $validatedData['event_end_time'],

@@ -31,7 +31,7 @@
   @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="relative font-sans antialiased" x-data="{ sidebarOpen: false }">
+<body class="guest relative font-sans antialiased" x-data="{ sidebarOpen: false }">
   <div class="absolute inset-0 bg-cover bg-fixed bg-center bg-no-repeat"
     style="background-image: url('{{ asset('storage/images/system/hero-bg.jpg') }}'); z-index: -1;"></div>
   <div id="preloader" class="animation">

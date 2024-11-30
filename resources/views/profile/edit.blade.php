@@ -34,6 +34,10 @@
             @include('profile.partials.photographer-profile', [
                 'photographerData' => $photographerData,
             ])
+          @elseif($dashboardType == 'standard')
+            @include('profile.partials.standard-profile', [
+                'standardUserData' => $standardUserData,
+            ])
           @endif
 
           <button @click="selected = 10; selectedTab = 10" data-tab="calendar"
@@ -44,13 +48,15 @@
             <span class="relative z-10">Calendar</span>
           </button>
 
-          <button @click="selected = 11; selectedTab =11"
-            :class="{ 'bg-gradient-button': selected === 11, 'bg-yns_dark_gray': selected !== 11 }"
-            class="group relative w-full px-8 py-2 text-left text-white transition duration-150 ease-in-out">
-            <span class="absolute inset-0 transition-opacity duration-300 ease-in-out"
-              :class="{ 'opacity-100': selected === 11, 'opacity-0': selected !== 11 }"></span>
-            <span class="relative z-10">Settings</span>
-          </button>
+          @if ($dashboardType !== 'standard')
+            <button @click="selected = 11; selectedTab =11"
+              :class="{ 'bg-gradient-button': selected === 11, 'bg-yns_dark_gray': selected !== 11 }"
+              class="group relative w-full px-8 py-2 text-left text-white transition duration-150 ease-in-out">
+              <span class="absolute inset-0 transition-opacity duration-300 ease-in-out"
+                :class="{ 'opacity-100': selected === 11, 'opacity-0': selected !== 11 }"></span>
+              <span class="relative z-10">Settings</span>
+            </button>
+          @endif
 
           <button @click="selected = 12; selectedTab =12"
             :class="{ 'bg-gradient-button': selected === 12, 'bg-yns_dark_gray': selected !== 12 }"
@@ -73,6 +79,8 @@
                 'lastName' => $lastName,
                 'email' => $email,
                 'location' => $location,
+                'latitude' => $latitude,
+                'longitude' => $longitude,
             ])
           </div>
         </div>
@@ -91,6 +99,10 @@
         @elseif($dashboardType == 'photographer')
           @include('profile.partials.photographer-profile-tabs', [
               'photographerData' => $photographerData,
+          ])
+        @elseif($dashboardType == 'standard')
+          @include('profile.partials.standard-profile-tabs', [
+              'standardUserData' => $standardUserData,
           ])
         @endif
 

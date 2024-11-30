@@ -49,6 +49,10 @@ class SubNav extends Component
     public $totalProfitsPhotographerYtd;
     public $overallPhotographerRating;
 
+    // Standard
+    public $standardUserId;
+    public $eventsCountStandardYtd;
+
     /**
      * Helper function to render rating icons
      */
@@ -137,6 +141,10 @@ class SubNav extends Component
             case 'videographer':
                 $this->loadVideographerData($user);
                 break;
+
+            case 'standard':
+                $this->loadStandardUserData($user);
+                break;
             default:
                 break;
         }
@@ -152,7 +160,6 @@ class SubNav extends Component
             $this->overallRatingPromoter = $this->renderRatingIcons($this->promoterId);
         }
     }
-
     private function loadBandData($user)
     {
         $bands = $user->otherService("Band")->get();
@@ -164,7 +171,6 @@ class SubNav extends Component
             $this->totalProfitsBandYtd = $this->calculateTotalProfitsBandYtd($band->id);
         }
     }
-
     private function loadDesignerData(int $bandId)
     {
         //
@@ -192,6 +198,14 @@ class SubNav extends Component
             $this->jobsCountPhotographerYtd = $this->calculateJobsCountPhotographerYtd($photographer);
             $this->totalProfitsPhotographerYtd = $this->calculateTotalProfitsPhotographerYtd($photographer);
             $this->overallPhotographerRating = $this->renderRatingIcons($this->photographerId);
+        }
+    }
+
+    private function loadStandardUserData($user)
+    {
+        $standardUser = $user->standardUser()->first();
+        if ($standardUser) {
+            $this->eventsCountStandardYtd = $this->calculateStandardUserEventsCountYtd($standardUser);
         }
     }
 
@@ -369,6 +383,31 @@ class SubNav extends Component
         return 0;
     }
 
+    // Standard User Calculations
+    public function calculateStandardUserEventsCountYtd($standardUser)
+    {
+        if ($standardUser) {
+            $standard = $standardUser->first();
+
+            if ($standard) {
+                $startOfYear = Carbon::now()->startOfYear();
+                $endOfYear = Carbon::now()->endOfYear();
+
+                // Query the finances table for the current year's profits
+                $eventsCountYTD = DB::table('event_promoter')
+                    ->join('events', 'event_promoter.event_id', '=', 'events.id')
+                    ->where('promoter_id', $standard->id)
+                    ->whereBetween('events.event_date', [$startOfYear, $endOfYear])
+                    ->count();
+
+                return $eventsCountYTD;
+            }
+        }
+
+        // Return 0 if no promoter company or no profits found
+        return 0;
+    }
+
     /**
      * Get the view / contents that represent the component.
      */
@@ -388,6 +427,7 @@ class SubNav extends Component
             'jobsCountPhotographerYtd' => $this->userType === 'photographer' ? $this->jobsCountPhotographerYtd : null,
             'totalProfitsPhotographerYtd' => $this->totalProfitsPhotographerYtd,
             'overallPhotographerRating' => $this->overallPhotographerRating,
+            'eventsCountStandardYtd' => $this->eventsCountStandardYtd
         ]);
     }
 }

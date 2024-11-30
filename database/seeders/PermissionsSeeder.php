@@ -19,6 +19,7 @@ class PermissionsSeeder extends Seeder
         Permission::create(['name' => 'manage_photographer']);
         Permission::create(['name' => 'manage_videographer']);
         Permission::create(['name' => 'manage_designer']);
+        Permission::create(['name' => 'manage_standard_user']);
         Permission::create(['name' => 'manage_modules']);
         Permission::create(['name' => 'view_finances']);
         Permission::create(['name' => 'manage_finances']);

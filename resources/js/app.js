@@ -10,13 +10,6 @@ window.jQuery = $;
 window.Alpine = Alpine;
 Alpine.start();
 
-// window.initialize = initialize;
-
-// // Initialize Google Maps after the page is loaded
-// document.addEventListener("DOMContentLoaded", function () {
-//     initialize(); // Call here if needed
-// });
-
 // Format currency helper
 window.formatCurrency = function (value) {
     return new Intl.NumberFormat("en-GB", {
@@ -35,6 +28,7 @@ window.formatDateToDMY = function (dateString) {
     return `${day}-${month}-${year}`; // Return in DMY format
 };
 
+// Accordions
 jQuery(document).ready(function () {
     // Accordion functionality
     jQuery("[data-accordion-target]").click(function () {
@@ -383,6 +377,7 @@ window.showConfirmationNotification = function (options) {
     });
 };
 
+// Event Block
 window.showEventBlock = function (info) {
     const extendedProps = info.event._def.extendedProps;
 

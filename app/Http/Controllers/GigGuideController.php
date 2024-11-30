@@ -23,51 +23,18 @@ class GigGuideController extends Controller
         $gigs20Miles = [];
         $otherGigs = [];
 
-
+        // If the user is logged in 
         if (auth()->check()) {
-            // Attempt to get coordinates from user's location dynamically
+            // If the user has a set location
             if ($user->location) {
-                $gigsCloseToMe = Event::with('venues')
-                    ->whereHas('venues', function ($query) use ($user) {
-                        $query->where('postal_town', $user->location);
-                    })
-                    ->orderBy('event_date', 'asc')
-                    ->get();
+                $latitude = $user->latitude;
+                $longitude = $user->longitude;
+                $distance = $request->get('radius', 5);
+                $startOfWeek = now()->startOfWeek();
+                $endOfWeek = now()->endOfWeek();
 
-                $coordinates = $this->getCoordinatesFromLocation($user->location);
-                if ($coordinates) {
-                    $userLat = $coordinates['lat'];
-                    $userLng = $coordinates['lng'];
-
-                    // Fetch events within specified distances
-                    $gigs5Miles = Event::with('venues')
-                        ->whereHas('venues', function ($query) use ($userLat, $userLng) {
-                            $query->whereRaw($this->distanceQuery($userLat, $userLng, 5));
-                        })
-                        ->orderBy('event_date', 'asc')
-                        ->get();
-
-                    $gigs10Miles = Event::with('venues')
-                        ->whereHas('venues', function ($query) use ($userLat, $userLng) {
-                            $query->whereRaw($this->distanceQuery($userLat, $userLng, 10));
-                        })
-                        ->orderBy('event_date', 'asc')
-                        ->get();
-
-                    $gigs20Miles = Event::with('venues')
-                        ->whereHas('venues', function ($query) use ($userLat, $userLng) {
-                            $query->whereRaw($this->distanceQuery($userLat, $userLng, 20));
-                        })
-                        ->orderBy('event_date', 'asc')
-                        ->get();
-
-                    $otherGigs = Event::with('venues')
-                        ->whereHas('venues', function ($query) use ($userLat, $userLng) {
-                            $query->whereRaw($this->distanceQuery($userLat, $userLng, 20, '>'));
-                        })
-                        ->orderBy('event_date', 'asc')
-                        ->get();
-                }
+                // 5  Miles
+                $gigsCloseToMe = $this->fetchNearbyGigs($latitude, $longitude, $distance, $startOfWeek, $endOfWeek);
             } else {
                 // No user location set; fetch all events
                 $otherGigs = Event::with('venues')
@@ -81,7 +48,6 @@ class GigGuideController extends Controller
                 ->get();
         }
 
-        // Pass events to the view
         return view('gig-guide', [
             'gigs5Miles' => $gigs5Miles,
             'gigs10Miles' => $gigs10Miles,
@@ -92,6 +58,64 @@ class GigGuideController extends Controller
             'user' => $user,
         ]);
     }
+
+    private function fetchNearbyGigs($latitude, $longitude, $distance, $startOfWeek, $endOfWeek)
+    {
+        $gigs = DB::table('events')
+            ->join('event_venue', 'events.id', '=', 'event_venue.event_id')
+            ->join('venues', 'event_venue.venue_id', '=', 'venues.id')
+            ->select('events.*', 'venues.latitude', 'venues.longitude', 'venues.name')
+            ->get();
+
+        $userLocation = "{$latitude},{$longitude}";
+        $venues = $gigs->map(function ($gig) {
+            return "{$gig->latitude},{$gig->longitude}";
+        })->implode('|');
+
+        $apiKey = env('GOOGLE_MAPS_API_KEY');
+        $response = Http::get("https://maps.googleapis.com/maps/api/distancematrix/json", [
+            'origins' => $userLocation,
+            'destinations' => $venues,
+            'key' => $apiKey,
+            'units' => 'imperial',
+        ]);
+
+        $data = $response->json();
+        dd($data);
+
+        if (!isset($data['rows'][0]['elements'])) {
+            throw new \Exception('Error fetching distance data from Google Maps API');
+        }
+
+        $distances = $data['rows'][0]['elements'];
+
+        // Transform the gigs collection to include the distance
+        $gigs = $gigs->map(function ($gig, $index) use ($distances) {
+            $element = $distances[$index];
+
+            if ($element['status'] === 'ZERO_RESULTS') {
+                $gig->distance = null;
+            } elseif (isset($element['distance']['value'])) {
+                $gig->distance = $element['distance']['value'] / 1609.34;
+            } else {
+                $gig->distance = null;
+            }
+
+            return $gig;
+        });
+
+        dd($gigs);
+
+        // Filter gigs based on distance
+        $filteredGigs = $gigs->filter(fn($gig) => $gig->distance === null || $gig->distance <= $distance);
+
+        // Sort gigs by distance
+        $sortedGigs = $filteredGigs->sortBy('distance');
+
+        return $sortedGigs;
+    }
+
+
 
     protected function getCoordinatesFromLocation($location)
     {
@@ -113,92 +137,41 @@ class GigGuideController extends Controller
 
     public function filterGigs(Request $request)
     {
-        $distance = $request->get('distance');
-        $latitude = $request->get('latitude');
         $longitude = $request->get('longitude');
-        $earthRadius = 3959; // Earth radius in miles
+        $latitude = $request->get('latitude');
+        $distance = $request->get('distance');
         $showOtherGigs = $request->get('showOtherGigs', false);
 
-        // Ensure latitude and longitude are available
         if (!$latitude || !$longitude) {
             return response()->json(['error' => 'Location data is missing.'], 400);
         }
 
-        $userLatRad = deg2rad($latitude);
-        $userLongRad = deg2rad($longitude);
-
-
-
         $startOfWeek = now()->startOfWeek()->format('Y-m-d');
         $endOfWeek = now()->endOfWeek()->format('Y-m-d');
 
-        // Handle "Show all" case (no filter)
-        if ($distance === 'all') {
-            $gigsCloseToMe = Event::whereBetween('event_date', [$startOfWeek, $endOfWeek])->get();
-            $otherGigs = [];
-        } else {
-            // Calculate gigs within the specified distance
-            $gigsCloseToMe = DB::table('events')
-                ->join('event_venue', 'events.id', '=', 'event_venue.event_id')
-                ->join('venues', 'event_venue.venue_id', '=', 'venues.id')
-                ->whereBetween('events.event_date', [$startOfWeek, $endOfWeek])
-                ->select(
-                    'events.*',
-                    'venues.*',
-                    DB::raw("(
-                    $earthRadius * acos(
-                        cos(radians(?)) * cos(radians(venues.latitude)) *
-                        cos(radians(venues.longitude) - radians(?)) +
-                        sin(radians(?)) * sin(radians(venues.latitude))
-                    )
-                ) AS distance")
-                )
-                ->setBindings([$latitude, $longitude, $latitude], 'select') // Bind latitude and longitude
-                ->having('distance', '<=', $distance)
-                ->orderBy('distance')
-                ->get();
-
-            // Calculate gigs outside the specified distance
-            $otherGigs = DB::table('events')
-                ->join('event_venue', 'events.id', '=', 'event_venue.event_id')
-                ->join('venues', 'event_venue.venue_id', '=', 'venues.id')
-                ->whereBetween('events.event_date', [$startOfWeek, $endOfWeek])
-                ->select(
-                    'events.*',
-                    'venues.*',
-                    DB::raw("(
-                    $earthRadius * acos(
-                        cos(radians(?)) * cos(radians(venues.latitude)) *
-                        cos(radians(venues.longitude) - radians(?)) +
-                        sin(radians(?)) * sin(radians(venues.latitude))
-                    )
-                ) AS distance")
-                )
-                ->setBindings([$latitude, $longitude, $latitude], 'select') // Bind latitude and longitude
-                ->having('distance', '>', $distance)
-                ->orderBy('distance')
-                ->get();
+        if ($showOtherGigs == false) {
+            switch ($distance) {
+                case '5':
+                    $gigsCloseToMe = $this->fetchNearbyGigs($latitude, $longitude, $distance, $startOfWeek, $endOfWeek);
+                    break;
+                case '10':
+                    $gigsCloseToMe = $this->fetchNearbyGigs($latitude, $longitude, $distance, $startOfWeek, $endOfWeek);
+                    break;
+                case '20':
+                    $gigsCloseToMe = $this->fetchNearbyGigs($latitude, $longitude, $distance, $startOfWeek, $endOfWeek);
+                    break;
+                case '50':
+                    $gigsCloseToMe = $this->fetchNearbyGigs($latitude, $longitude, $distance, $startOfWeek, $endOfWeek);
+                    break;
+                case '100':
+                    $gigsCloseToMe = $this->fetchNearbyGigs($latitude, $longitude, $distance, $startOfWeek, $endOfWeek);
+                    break;
+            }
         }
-
-
-        if (!$showOtherGigs) {
-            // If showOtherGigs is not checked, empty the otherGigs array
-            $otherGigs = [];
-        }
-
-
-        // // Debugging: log the calculated distances and coordinates for each gig
-        // foreach ($gigsCloseToMe as $gig) {
-        //     \Log::info("Gig: {$gig->name}, Venue Coordinates: lat={$gig->latitude}, long={$gig->longitude}, Calculated Distance: {$gig->distance} miles");
-        // }
-
-        // foreach ($otherGigs as $gig) {
-        //     \Log::info("Gig: {$gig->name}, Venue Coordinates: lat={$gig->latitude}, long={$gig->longitude}, Calculated Distance: {$gig->distance} miles");
-        // }
 
         return response()->json([
             'gigsCloseToMe' => $gigsCloseToMe,
-            'otherGigs' => $otherGigs,
+            // 'otherGigs' => $otherGigs,
         ]);
     }
 }

@@ -58,14 +58,18 @@ class Greeting extends Component
                     break;
 
                 case 'videographer':
-                    $band = $user->otherService("Videographer")->first();
-                    $this->associatedEntity = $band ? $band->name : null;
+                    $videographer = $user->otherService("Videographer")->first();
+                    $this->associatedEntity = $videographer ? $videographer->name : null;
                     break;
 
                 case 'designer':
-                    $band = $user->otherService("Designer")->first();
-                    $this->associatedEntity = $band ? $band->name : null;
+                    $designer = $user->otherService("Designer")->first();
+                    $this->associatedEntity = $designer ? $designer->name : null;
                     break;
+
+                case 'standard':
+                    $standardUser = $user->standardUser()->first();
+                    $this->associatedEntity = $standardUser ? $standardUser->name : null;
 
                 default:
                     $this->associatedEntity = null;

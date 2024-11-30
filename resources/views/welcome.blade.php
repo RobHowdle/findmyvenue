@@ -965,49 +965,19 @@
   </div>
 </x-guest-layout>
 
-
-<script
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcMjlXwDOk74oMDPgOp4YWdWxPa5xtHGA&libraries=places&callback=initialize"
-  async defer></script>
-
 <script>
-  document.addEventListener("DOMContentLoaded", function() {
-    const searchInput = document.getElementById("address-input");
-    const searchButton = document.getElementById("search-button");
-
-    searchInput.addEventListener("keydown", function(event) {
-      if (event.key === "Enter") {
-        event.preventDefault(); // Prevent default action of Enter key
-        searchButton.click(); // Trigger the search button click
-      }
-    });
-  });
-
-  document.addEventListener("keydown", function(event) {
-    if (event.key === "/") {
-      event.preventDefault(); // Prevent default action of / key
-      searchInput.focus(); // Move cursor to search input
-    }
-  });
-
   function initialize() {
-    $('form').on('keyup keypress', function(e) {
-      var keyCode = e.keyCode || e.which;
-      if (keyCode === 13) {
-        e.preventDefault();
-        return false;
-      }
-    });
+    console.log("Google Maps API initialized");
+
     const locationInputs = document.getElementsByClassName("map-input");
-
     const autocompletes = [];
-    const geocoder = new google.maps.Geocoder;
-    for (let i = 0; i < locationInputs.length; i++) {
+    const geocoder = new google.maps.Geocoder();
 
+    for (let i = 0; i < locationInputs.length; i++) {
       const input = locationInputs[i];
       const fieldKey = input.id.replace("-input", "");
-      const isEdit = document.getElementById(fieldKey + "-latitude").value != '' && document.getElementById(fieldKey +
-        "-longitude").value != '';
+      const isEdit = document.getElementById(fieldKey + "-latitude").value != '' &&
+        document.getElementById(fieldKey + "-longitude").value != '';
 
       const latitude = parseFloat(document.getElementById(fieldKey + "-latitude").value) || 59.339024834494886;
       const longitude = parseFloat(document.getElementById(fieldKey + "-longitude").value) || 18.06650573462189;
@@ -1017,7 +987,7 @@
           lat: latitude,
           lng: longitude
         },
-        zoom: 13
+        zoom: 13,
       });
       const marker = new google.maps.Marker({
         map: map,
@@ -1031,11 +1001,12 @@
 
       const autocomplete = new google.maps.places.Autocomplete(input);
       autocomplete.key = fieldKey;
+
       autocompletes.push({
-        input: input,
-        map: map,
-        marker: marker,
-        autocomplete: autocomplete
+        input,
+        map,
+        marker,
+        autocomplete
       });
     }
 
@@ -1050,7 +1021,7 @@
         const place = autocomplete.getPlace();
 
         geocoder.geocode({
-          'placeId': place.place_id
+          placeId: place.place_id
         }, function(results, status) {
           if (status === google.maps.GeocoderStatus.OK) {
             const lat = results[0].geometry.location.lat();
@@ -1073,17 +1044,20 @@
         }
         marker.setPosition(place.geometry.location);
         marker.setVisible(true);
-
       });
     }
   }
 
   function setLocationCoordinates(key, lat, lng) {
-    const latitudeField = document.getElementById(key + "-" + "latitude");
-    const longitudeField = document.getElementById(key + "-" + "longitude");
+    const latitudeField = document.getElementById(key + "-latitude");
+    const longitudeField = document.getElementById(key + "-longitude");
     latitudeField.value = lat;
     longitudeField.value = lng;
   }
 </script>
+<!-- Google Maps API -->
+<script
+  src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places&callback=initialize"
+  async defer></script>
 
 </html>

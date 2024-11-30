@@ -4,21 +4,23 @@ namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
 use Illuminate\View\View;
+use App\Models\StandardUser;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Validation\Rules;
 use App\Models\UserModuleSetting;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Config;
 use App\Providers\RouteServiceProvider;
 use App\Http\Requests\RegisterUserRequest;
-use Illuminate\Http\Response;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 
 
 class RegisteredUserController extends Controller
@@ -60,6 +62,26 @@ class RegisteredUserController extends Controller
                     // Assign the requested role
                     $role = Role::findOrFail($request->role);
                     $user->assignRole($role->name);
+
+                    // Create Standard User Record if role type is Standard
+                    if ($user->role('standard')) {
+                        $standardUser = StandardUser::create([
+                            'name' => $user->first_name . ' ' . $user->last_name,
+                            'location' => 'United Kingdom',
+                            'postal_town' => 'United Kingdom',
+                            'longitude' => '2.4333',
+                            'latitude' => '53.5500',
+                            'band_type' => json_encode([]),
+                            'genre' => json_encode([])
+                        ]);
+
+                        $serviceUserRecord = DB::table('service_user')->insert([
+                            'user_id' => $user->id,
+                            'serviceable_id' => $standardUser->id,
+                            'serviceable_type' => 'App\Models\StandardUser',
+                            'role' => 'Standard'
+                        ]);
+                    }
 
                     // Set default modules and mailing preferences
                     $this->setDefaultModules($user, $role->name);
@@ -128,10 +150,6 @@ class RegisteredUserController extends Controller
         $role = Role::where('name', $roleName)->first();
 
         switch ($role->name) {
-            case "standard": // Standard User
-                $defaultModules = []; // No default modules
-                break;
-
             case "venue":
             case "promoter":
             case "band":
@@ -144,6 +162,11 @@ class RegisteredUserController extends Controller
             case "videographer":
                 $defaultModules = ['todo_list', 'notes', 'finances', 'documents', 'reviews', 'jobs'];
                 $serviceableType = 'App\Models\OtherService';
+                break;
+
+            case "standard":
+                $defaultModules = ['events'];
+                $serviceableType = 'App\Models\StandardUser';
                 break;
 
             case "administrator":

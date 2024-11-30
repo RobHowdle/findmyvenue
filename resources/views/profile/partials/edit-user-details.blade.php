@@ -42,28 +42,15 @@
       <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
     </div>
 
-    <div>
-      <x-input-label for="location" :value="__('Location')" />
-      <x-text-input id="location" class="mt-1 block w-full" type="text" name="location" :value="old('location', $location ?? '')" autofocus
-        autocomplete="location" />
-      <x-input-error :messages="$errors->get('location')" class="mt-2" />
+    <div class="group mb-6">
+      @php
+        $dataId = 1;
+      @endphp
+      <x-google-address-picker :dataId="$dataId" id="location_{{ $dataId }}" name="location" label="Location"
+        placeholder="Enter an address" :value="old('location', $location ?? '')" :latitude="old('latitude', $latitude ?? '')" :longitude="old('longitude', $longitude ?? '')" />
     </div>
-
-    <div class="group hidden">
-      <label>Lat</label>
-      <input type="text" id="address-latitude" name="latitude" class="hidden text-black"
-        value="{{ old('latitude', $user->latitude ?? '') }}">
-    </div>
-
-    <div class="group hidden">
-      <label>Lon</label>
-      <input type="text" id="address-longitude" name="longitude" class="hidden text-black"
-        value="{{ old('longitude', $user->longitude ?? '') }}">
-    </div>
-
 
     <div class="mt-4">
-      <!-- Table to Display Current Roles -->
       <table id="role-table" class="min-w-full table-auto border-collapse">
         <thead>
           <tr>
@@ -109,8 +96,7 @@
         </div>
         <div class="mt-4">
           <button id="save-edit-role-btn" class="rounded bg-blue-500 px-4 py-2 text-white">Save Changes</button>
-          <button onclick="closeModal('editRoleModal')"
-            class="rounded bg-gray-300 px-4 py-2 text-black">Cancel</button>
+          <button onclick="closeModal('editRoleModal')" class="rounded bg-gray-300 px-4 py-2 text-black">Cancel</button>
         </div>
       </div>
     </div>
@@ -302,7 +288,6 @@
     console.log(`Removing role ${roleId} for user ${userId}`);
   }
 
-
   function saveEditRole(roleId) {
     const newRole = document.getElementById('role').value;
     const dashboardType = "{{ $dashboardType }}";
@@ -390,62 +375,4 @@
         showFailureNotification('Error occurred while deleting role');
       });
   }
-
-  document.addEventListener("DOMContentLoaded", function() {
-    const locationInput = document.getElementById("location"); // The location text input
-    const latitudeField = document.getElementById("address-latitude");
-    const longitudeField = document.getElementById("address-longitude");
-
-    const geocoder = new google.maps.Geocoder();
-
-    const autocomplete = new google.maps.places.Autocomplete(locationInput);
-    autocomplete.addListener("place_changed", function() {
-      const place = autocomplete.getPlace();
-
-      if (!place.geometry) {
-        alert("No details available for this location.");
-        return;
-      }
-
-      // Set the input value to the selected place
-      locationInput.value = place.formatted_address;
-      console.log(locationInput.value);
-
-      // Get the latitude and longitude from the place
-      const lat = place.geometry.location.lat();
-      const lng = place.geometry.location.lng();
-
-      // Ensure the latitude and longitude values are correctly assigned to the right fields
-      latitudeField.value = lng; // Latitude goes into the latitude field
-      longitudeField.value = lat; // Longitude goes into the longitude field
-
-      console.log("Latitude:", lat);
-      console.log("Longitude:", lng);
-
-      // Optionally, center the map and zoom in on the location
-      if (place.geometry.viewport) {
-        map.fitBounds(place.geometry.viewport);
-      } else {
-        map.setCenter(place.geometry.location);
-        map.setZoom(17);
-      }
-    });
-
-    // Initialize Google Map with a marker and center it
-    const map = new google.maps.Map(document.getElementById('address-map'), {
-      zoom: 13,
-      center: {
-        lat: 59.339024834494886,
-        lng: 18.06650573462189
-      }, // Default center if no location is selected
-    });
-
-    const marker = new google.maps.Marker({
-      map: map,
-      position: {
-        lat: 59.339024834494886,
-        lng: 18.06650573462189
-      }, // Default marker
-    });
-  });
 </script>

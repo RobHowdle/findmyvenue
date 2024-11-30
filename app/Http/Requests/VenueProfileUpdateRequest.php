@@ -24,9 +24,9 @@ class VenueProfileUpdateRequest extends FormRequest
         return [
             'name' => 'nullable|string|max:255',
             'location' => 'nullable|string',
-            'postal_town' => 'nullable|string',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
+            'w3w' => 'nullable|string',
             'capacity' => 'nullable|numeric',
             'inHouseGear' => 'nullable|string',
             'band_types' => 'nullable|array',

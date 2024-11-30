@@ -31,6 +31,7 @@ class RoleSeeder extends Seeder
         $managePhotographerPermission = Permission::where('name', 'manage_photographer')->first();
         $manageVideographerPermission = Permission::where('name', 'manage_videographer')->first();
         $manageDesignerPermission = Permission::where('name', 'manage_designer')->first();
+        $manageStandardUserPermission = Permission::where('name', 'manage_standard_user')->first();
         $manageModulesPermission = Permission::where('name', 'manage_modules')->first();
         $viewFinancePermission = Permission::where('name', 'view_finances')->first();
         $manageFinancePermission = Permission::where('name', 'manage_finances')->first();
@@ -180,6 +181,13 @@ class RoleSeeder extends Seeder
                 $manageUsersPermission,
                 $viewJobsPermission,
                 $manageJobsPermission
+            ]);
+        }
+        if ($manageStandardUserPermission) {
+            Role::where('name', 'standard')->first()->syncPermissions([
+                $manageStandardUserPermission,
+                $manageModulesPermission,
+                $viewEventsPermission,
             ]);
         }
 

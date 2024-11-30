@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Role;
+use App\Models\StandardUser;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
@@ -142,6 +143,11 @@ class User extends Authenticatable
         ];
 
         return $roleMapping[$role] ?? null;
+    }
+
+    public function standardUser(): MorphToMany
+    {
+        return $this->morphedByMany(StandardUser::class, 'serviceable', 'service_user', 'user_id', 'serviceable_id')->whereNull('service_user.deleted_at');
     }
 
     public function todos()

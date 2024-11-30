@@ -12,7 +12,7 @@
       <div class="mb-4">
         <div class="card flex h-full flex-col">
           <div class="card-body flex-grow">
-            <h5 class="card-title">{{ ucfirst(str_replace('_', ' ', $preferenceKey)) }}</h5>
+            <h5 class="card-title">{{ $preference['title'] }}</h5>
             <p class="card-text">{{ $preference['description'] }}</p>
             <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" id="preferenceSwitch{{ $preferenceKey }}"
@@ -29,11 +29,8 @@
         </div>
       </div>
     @endforeach
-
-
   </div>
 </section>
-
 
 <style>
   /* Styles for the switch toggle */
@@ -114,7 +111,6 @@
     /* Prevent interaction with the slider */
   }
 </style>
-
 
 <script>
   function togglePreferences(preferenceKey, isEnabled) {

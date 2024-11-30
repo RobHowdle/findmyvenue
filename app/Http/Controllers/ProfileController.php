@@ -44,12 +44,15 @@ class ProfileController extends Controller
         $lastName = $user->last_name;
         $email = $user->email;
         $location = $user->location;
+        $longitude = $user->longitude;
+        $latitude = $user->latitude;
 
         // Initialize promoter variables
         $promoterData = [];
         $bandData = [];
         $venueData = [];
         $photographerData = [];
+        $standardUserData = [];
 
         // Check if the dashboardType is 'promoter' and get promoter data
         if ($dashboardType === 'promoter') {
@@ -60,11 +63,13 @@ class ProfileController extends Controller
             $venueData = $this->getVenueData($user);
         } elseif ($dashboardType === 'photographer') {
             $photographerData = $this->getPhotographerData($user);
+        } elseif ($dashboardType === 'standard') {
+            $standardUserData = $this->getStandardUserData($user);
         }
 
         // Load the modules configuration
         $modules = collect(config('modules.modules'))->map(function ($module) {
-            $module['is_enabled'] = $module['enabled'] ?? false; // Map 'enabled' to 'is_enabled'
+            $module['is_enabled'] = $module['enabled'] ?? false;
             return $module;
         })->toArray();
 
@@ -91,6 +96,7 @@ class ProfileController extends Controller
             'bandData' => $bandData,
             'venueData' => $venueData,
             'photographerData' => $photographerData,
+            'standardUserData' => $standardUserData,
             'user' => $user,
             'roles' => $roles,
             'userRole' => $userRole,
@@ -98,6 +104,8 @@ class ProfileController extends Controller
             'lastName' => $lastName,
             'email' => $email,
             'location' => $location,
+            'longitude' => $longitude,
+            'latitude' => $latitude,
             'modules' => $modulesWithSettings,
             'communications' => $communicationSettings,
         ]);
@@ -111,6 +119,8 @@ class ProfileController extends Controller
         $user = User::findOrFail($userId);
         $userData = $request->validated();
 
+        \Log::info($userData);
+
         if (isset($userData['firstName']) || isset($userData['lastName'])) {
             $user->first_name = $userData['firstName'];
             $user->last_name = $userData['lastName'];
@@ -120,13 +130,10 @@ class ProfileController extends Controller
             $user->email = $userData['email'];
         }
 
-        if (isset($userData['latitude']) && isset($userData['longitude'])) {
-            $user->latitude = $userData['latitude'];
-            $user->longitude = $userData['longitude'];
-        }
-
-        if (isset($userData['location'])) {
+        if (isset($userData['latitude']) && isset($userData['longitude']) && isset($userData['location'])) {
             $user->location = $userData['location'];
+            $user->latitude = $userData['location'];
+            $user->longitude = $userData['location'];
         }
 
         if ($request->has('role') && $user->hasRole($request->role)) {
@@ -241,7 +248,6 @@ class ProfileController extends Controller
 
     public function updateVenue($dashboardType, VenueProfileUpdateRequest $request, $user)
     {
-        // Fetch the user
         $user = User::findOrFail($user);
         $userId = $user->id;
         $userData = $request->validated();
@@ -252,9 +258,9 @@ class ProfileController extends Controller
                 $query->where('user_id', $userId);
             })->first();
 
-            // Check if the promoter exists
+            // Check if the venue exists
             if ($venue) {
-                // Promoter Name
+                // venue Name
                 if (isset($userData['name']) && $venue->name !== $userData['name']) {
                     $venue->update(['name' => $userData['name']]);
                 }
@@ -263,7 +269,18 @@ class ProfileController extends Controller
                     $venue->update(['contact_name' => $userData['contact_name']]);
                 }
                 // Location
+                if (isset($userData['location']) && isset($userData['latitude']) && isset($userData['longitude'])) {
+                    $venue->update([
+                        'location' => $userData['location'],
+                        'latitude' => $userData['latitude'],
+                        'longitude' => $userData['longitude'],
+                    ]);
+                }
 
+                //W3W
+                if (isset($userData['w3w'])) {
+                    $venue->update(['w3w' => $userData['w3w']]);
+                }
 
                 // Contact Email
                 if (isset($userData['contact_email']) && $venue->contact_email !== $userData['contact_email']) {
@@ -633,6 +650,7 @@ class ProfileController extends Controller
         return response()->json(['success' => false, 'message' => 'Module not found.'], 404);
     }
 
+    // Get Data for Dashboard Type User
     private function getPromoterData(User $user)
     {
         $promoter = $user->promoters()->first();
@@ -678,13 +696,15 @@ class ProfileController extends Controller
         $promoterGenres = is_array($promoter->genre) ? $promoter->genre : json_decode($promoter->genre, true);
         $normalizedPromoterGenres = [];
 
-        foreach ($promoterGenres as $genreName => $genreData) {
-            $normalizedPromoterGenres[$genreName] = [
-                'all' => $genreData['all'] ?? 'false',
-                'subgenres' => isset($genreData['subgenres'][0])
-                    ? (is_array($genreData['subgenres'][0]) ? $genreData['subgenres'][0] : $genreData['subgenres'])
-                    : []
-            ];
+        if ($promoterGenres) {
+            foreach ($promoterGenres as $genreName => $genreData) {
+                $normalizedPromoterGenres[$genreName] = [
+                    'all' => $genreData['all'] ?? 'false',
+                    'subgenres' => isset($genreData['subgenres'][0])
+                        ? (is_array($genreData['subgenres'][0]) ? $genreData['subgenres'][0] : $genreData['subgenres'])
+                        : []
+                ];
+            }
         }
 
         $bandTypes = json_decode($promoter->band_type) ?? [];
@@ -716,6 +736,9 @@ class ProfileController extends Controller
 
         $name = $venue ? $venue->name : '';
         $location = $venue ? $venue->location : '';
+        $latitude = $venue ? $venue->latitude : '';
+        $longitude = $venue ? $venue->longitude : '';
+        $w3w = $venue ? $venue->w3w : '';
         $logo = $venue && $venue->logo_url
             ? (filter_var($venue->logo_url, FILTER_VALIDATE_URL) ? $venue->logo_url : Storage::url($venue->logo_url))
             : asset('images/system/yns_no_image_found.png');
@@ -758,6 +781,9 @@ class ProfileController extends Controller
             'venue' => $venue,
             'name' => $name,
             'location' => $location,
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+            'w3w' => $w3w,
             'logo' => $logo,
             'contact_number' => $contact_number,
             'platforms' => $platforms,
@@ -964,6 +990,44 @@ class ProfileController extends Controller
             'photographerGenres' => $normalizedPhotographerGenres,
             'bandTypes' => $bandTypes,
 
+        ];
+    }
+
+    private function getStandardUserData(User $user)
+    {
+        $standardUser = $user->standardUser()->first();
+        $serviceableId = $standardUser->id;
+        $serviceableType = 'App\Models\StandardUser';
+
+        $name = $standardUser ? $standardUser->name : '';
+        $location = $standardUser ? $standardUser->location : '';
+        $genreList = file_get_contents(public_path('text/genre_list.json'));
+        $data = json_decode($genreList, true) ?? [];
+        $isAllGenres = in_array('All', $data);
+        $genres = $data['genres'];
+        $standardUserGenres = is_array($standardUser->genre) ? $standardUser->genre : json_decode($standardUser->genre, true);
+        $normalizedStandardUserGenres = [];
+
+        foreach ($standardUserGenres as $genreName => $genreData) {
+            $normalizedStandardUserGenres[$genreName] = [
+                'all' => $genreData['all'] ?? 'false',
+                'subgenres' => isset($genreData['subgenres'][0])
+                    ? (is_array($genreData['subgenres'][0]) ? $genreData['subgenres'][0] : $genreData['subgenres'])
+                    : []
+            ];
+        }
+
+        $bandTypes = json_decode($standardUser->band_type) ?? [];
+
+        return [
+            'standardUser' => $standardUser,
+            'name' => $name,
+            'location' => $location,
+            'genres' => $genres,
+            'genres' => $genres,
+            'isAllGenres' => $isAllGenres,
+            'standardUserGenres' => $normalizedStandardUserGenres,
+            'bandTypes' => $bandTypes
         ];
     }
 

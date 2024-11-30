@@ -9,7 +9,7 @@
   @method('PUT')
   <div class="col-start-1 col-end-2">
     <div class="group mb-6">
-      <x-input-label-dark for="name">Venue Name</x-input-label-dark>
+      <x-input-label-dark for="name">Venue Name:</x-input-label-dark>
       <x-text-input id="name" name="name" value="{{ old('name', $name) }}"></x-text-input>
       @error('name')
         <p class="yns_red mt-1 text-sm">{{ $message }}</p>
@@ -17,7 +17,7 @@
     </div>
 
     <div class="group mb-6">
-      <x-input-label-dark for="contact_name">Contact Name</x-input-label-dark>
+      <x-input-label-dark for="contact_name">Contact Name:</x-input-label-dark>
       <x-text-input id="contact_name" name="contact_name"
         value="{{ old('contact_name', $contact_name) }}"></x-text-input>
       @error('contact_name')
@@ -26,42 +26,18 @@
     </div>
 
     <div class="group mb-6">
-      <x-input-label-dark>Where are you based?</x-input-label-dark>
-      <x-text-input id="address-input" name="address-input" value="{{ old('location', $venueData['location']) }}"
-        class="map-input"></x-text-input>
-      @error('address-input')
-        <p class="yns_red mt-1 text-sm">{{ $message }}</p>
-      @enderror
-    </div>
-
-    <div id="address-map-container" style="width: 100%; height: 400px; display: none;">
-      <div style="width: 100%; height: 100%;" id="address-map"></div>
-    </div>
-
-    <div class="group relative z-0 mb-5 hidden w-full">
-      <input
-        class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-        type="text" id="postal-town-input" name="postal-town-input" placeholder="Postal Town Input"
-        value="{{ old('postal-town-input') }}">
-      @error('postal-town-input')
-        <p class="yns_red mt-1 text-sm">{{ $message }}</p>
-      @enderror
-      <input
-        class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-        type="text" id="address-latitude" name="latitude" placeholder="Latitude" value="{{ old('latitude') }}">
-      @error('latitude')
-        <p class="yns_red mt-1 text-sm">{{ $message }}</p>
-      @enderror
-      <input
-        class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-        type="text" id="address-longitude" name="longitude" placeholder="Longitude" value="{{ old('longitude') }}">
-      @error('longitude')
-        <p class="yns_red mt-1 text-sm">{{ $message }}</p>
-      @enderror
+      <x-google-address-picker data-id="2" id="location" name="location" label="Location"
+        placeholder="Enter an address" :value="old('location', $venueData['location'] ?? '')" :latitude="old('latitude', $venueData['latitude'] ?? '')" :longitude="old('longitude', $venueData['longitude'] ?? '')" />
     </div>
 
     <div class="group mb-6">
-      <x-input-label-dark for="email">Email</x-input-label-dark>
+      <x-input-label-dark for="w3w">What3Words:</x-input-label-dark>
+      <x-text-input id="w3w" name="w3w" value="{{ old('w3w', $venueData['w3w'] ?? '') }}"></x-text-input>
+      <div id="suggestions"></div>
+    </div>
+
+    <div class="group mb-6">
+      <x-input-label-dark for="email">Email:</x-input-label-dark>
       <x-text-input id="contact_email" name="contact_email"
         value="{{ old('contact_email', $venueData['contact_email']) }}"></x-text-input>
       @error('contact_email')
@@ -70,7 +46,7 @@
     </div>
 
     <div class="group mb-6">
-      <x-input-label-dark for="contact_number">Contact Phone</x-input-label-dark>
+      <x-input-label-dark for="contact_number">Contact Phone:</x-input-label-dark>
       <x-text-input id="contact_number" name="contact_number"
         value="{{ old('contact_number', $venueData['contact_number']) }}"></x-text-input>
       @error('contact_number')
@@ -120,14 +96,12 @@
 
   <div class="col-start-3 col-end-4">
     <div class="group mb-6 flex flex-col items-center">
-      <x-input-label-dark for="logo" class="text-left">Logo</x-input-label-dark>
+      <x-input-label-dark for="logo" class="text-left">Logo:</x-input-label-dark>
       <x-input-file id="logo" name="logo" onchange="previewLogo(event)"></x-input-file>
 
       <!-- Preview Image -->
       <img id="logo-preview" src="{{ $logo }}" alt="Logo Preview" class="mt-4 h-80 w-80 object-cover"
         style="display: {{ $logo ? 'block' : 'none' }};">
-
-
 
       @error('logo')
         <p class="yns_red mt-1 text-sm">{{ $message }}</p>
@@ -161,4 +135,46 @@
       reader.readAsDataURL(file); // Read the file as a data URL
     }
   }
+
+  $(document).ready(function() {
+    // Listen for the 'input' event on the address input field
+    $('#w3w').on('input', function() {
+      var address = $(this).val();
+      console.log(address);
+
+      if (address.length >= 7) { // Send request only if at least 3 characters are entered
+        setTimeout(function() {
+          $.ajax({
+            url: '{{ route('what3words.suggest') }}', // Route to handle the AJAX request
+            method: 'POST',
+            data: {
+              _token: '{{ csrf_token() }}', // Include CSRF token
+              w3w: address // Send the current address entered by the user
+            },
+            success: function(response) {
+              // Check if suggestions were found and display them
+              if (response.success) {
+                var suggestionsHtml = '<strong>Suggested Addresses:</strong><ul>';
+                response.suggestions.forEach(function(word) {
+                  suggestionsHtml += '<li>' + word.nearestPlace + ' - ' + word.words +
+                    '</li>';
+                });
+                suggestionsHtml += '</ul>';
+                $('#suggestions').html(suggestionsHtml);
+              } else {
+                $('#suggestions').html('<strong>No suggestions found</strong>');
+              }
+            },
+            error: function(xhr, status, error) {
+              // Handle any errors
+              $('#suggestions').html(
+                '<strong>Error occurred while processing your request.</strong>');
+            }
+          });
+        }, 2000);
+      } else {
+        $('#suggestions').empty(); // Clear suggestions if input is less than 3 characters
+      }
+    });
+  });
 </script>
