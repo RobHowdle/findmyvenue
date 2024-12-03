@@ -33,7 +33,7 @@ class SubNav extends Component
 
     // Designer
     public $designerId;
-    public $jobsDesignerYTD;
+    public $jobsCountDesignerYTD;
     public $overallRatingDesigner;
     public $totalProfitsDesignerYtd;
 
@@ -171,10 +171,20 @@ class SubNav extends Component
             $this->totalProfitsBandYtd = $this->calculateTotalProfitsBandYtd($band->id);
         }
     }
-    private function loadDesignerData(int $bandId)
+    private function loadDesignerData($user)
     {
-        //
+        $designers = $user->otherService('Designer')->get();
+        if ($designers->isNotEmpty()) {
+            $designer = $designers->first();
+            $this->designerId = $designer->id;
+            $this->jobsCountDesignerYTD = $this->calculateJobsDesignerYtd($designer);
+            $this->totalProfitsDesignerYtd = $this->calculateTotalProfitsDesignerYtd($designer);
+            $this->overallRatingDesigner = $this->renderRatingIcons($this->designerId);
+        }
+
+        return null;
     }
+
     private function loadVideographerData(int $bandId)
     {
         //
@@ -404,8 +414,61 @@ class SubNav extends Component
             }
         }
 
+        return 0;
+    }
+
+    // Designer Calculations
+    public function calculateTotalProfitsDesignerYtd($designer)
+    {
+        if ($designer) {
+            $designerCompany = $designer->first();
+
+            if ($designerCompany) {
+                $startOfYear = Carbon::now()->startOfYear();
+                $endOfYear = Carbon::now()->endOfYear();
+
+                // Query the finances table for the current year's profits
+                $totalProfitsYTD = Finance::where('serviceable_id', $designerCompany->id)
+                    ->where('serviceable_type', 'App\Models\OtherService')
+                    ->whereBetween('date_to', [$startOfYear, $endOfYear])
+                    ->sum('total_profit');
+
+                return $totalProfitsYTD;
+            }
+        }
+
         // Return 0 if no promoter company or no profits found
         return 0;
+    }
+
+    public function calculateJobsDesignerYtd($designer)
+    {
+        if ($designer) {
+            $designerCompany = $designer->first();
+
+            if ($designerCompany) {
+                $startOfYear = Carbon::now()->startOfYear();
+                $endOfYear = Carbon::now()->endOfYear();
+
+                // Query the finances table for the current year's jobs
+                $jobsCountDesignerYTD = DB::table('job_service')
+                    ->join('jobs', 'job_service.job_id', '=', 'jobs.id')
+                    ->where('serviceable_id', $designerCompany->id)
+                    ->where('serviceable_type', 'App\Models\OtherService')
+                    ->whereBetween('jobs.job_start_date', [$startOfYear, $endOfYear])
+                    ->count();
+
+                return $jobsCountDesignerYTD;
+            }
+        }
+
+        // Return 0 if no promoter company or no profits found
+        return 0;
+    }
+
+    public function calculateOverallRatingDesigner($designer)
+    {
+        //
     }
 
     /**
@@ -427,7 +490,9 @@ class SubNav extends Component
             'jobsCountPhotographerYtd' => $this->userType === 'photographer' ? $this->jobsCountPhotographerYtd : null,
             'totalProfitsPhotographerYtd' => $this->totalProfitsPhotographerYtd,
             'overallPhotographerRating' => $this->overallPhotographerRating,
-            'eventsCountStandardYtd' => $this->eventsCountStandardYtd
+            'eventsCountStandardYtd' => $this->eventsCountStandardYtd,
+            'totalProfitsDesignerYtd' => $this->totalProfitsDesignerYtd,
+            'jobsCountDesignerYTD' => $this->jobsCountDesignerYTD,
         ]);
     }
 }

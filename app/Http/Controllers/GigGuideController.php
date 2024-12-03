@@ -62,6 +62,7 @@ class GigGuideController extends Controller
     private function fetchNearbyGigs($latitude, $longitude, $distance, $startOfWeek, $endOfWeek)
     {
         $gigs = DB::table('events')
+            ->whereNull('events.deleted_at')
             ->join('event_venue', 'events.id', '=', 'event_venue.event_id')
             ->join('venues', 'event_venue.venue_id', '=', 'venues.id')
             ->select('events.*', 'venues.latitude', 'venues.longitude', 'venues.name')
@@ -81,14 +82,19 @@ class GigGuideController extends Controller
         ]);
 
         $data = $response->json();
-        dd($data);
 
         if (!isset($data['rows'][0]['elements'])) {
-            throw new \Exception('Error fetching distance data from Google Maps API');
+            \Log::info('Error fetching distance data from Google Maps API');
         }
 
-        $distances = $data['rows'][0]['elements'];
-
+        if (isset($data['rows'][0]['elements'])) {
+            $distances = $data['rows'][0]['elements'];
+        } else {
+            // Handle the case where the distance data is missing
+            \Log::error('No distance data found for the provided locations.', ['data' => $data]);
+            // You can set a default value or handle the error in another way
+            $distances = [];  // Or maybe an empty array or null, depending on your needs
+        }
         // Transform the gigs collection to include the distance
         $gigs = $gigs->map(function ($gig, $index) use ($distances) {
             $element = $distances[$index];
@@ -104,18 +110,21 @@ class GigGuideController extends Controller
             return $gig;
         });
 
-        dd($gigs);
-
         // Filter gigs based on distance
-        $filteredGigs = $gigs->filter(fn($gig) => $gig->distance === null || $gig->distance <= $distance);
+        $filteredGigs = $gigs->filter(function ($gig) use ($distance) {
+            $distanceValue = floatval($gig->distance);
+            $filterResult = $gig->distance === null || $distanceValue <= floatval($distance);
+            // Debugging output
+            // dd($gig->distance, $distance, $filterResult);
+            // dd($filterResult);
+            return $filterResult;
+        });
 
         // Sort gigs by distance
         $sortedGigs = $filteredGigs->sortBy('distance');
-
+        // dd($sortedGigs);
         return $sortedGigs;
     }
-
-
 
     protected function getCoordinatesFromLocation($location)
     {

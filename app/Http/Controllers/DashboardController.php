@@ -36,12 +36,15 @@ class DashboardController extends Controller
         $roleName = $roles->first();
         $venues = Venue::all();
         $photographers = OtherService::photographers()->get();
+        $designers = OtherService::designers()->get();
 
         // Get existing services
         $promoter = $user->promoters()->first();
         $band = $user->otherService("Band")->first();
         $photographer = $user->otherService("Photographer")->first();
         $venue = $user->venues()->first();
+        $designer = $user->otherService("Designer")->first();
+        $videographer = $user->otherService("Videographer")->first();
 
         // Load genres from a JSON file
         $genreList = file_get_contents(public_path('text/genre_list.json'));
@@ -87,6 +90,9 @@ class DashboardController extends Controller
                 return redirect("/dashboard/{$dashboardType}")->with(['dashboardType', $dashboardType, 'modules', $modules]);
                 break;
             case 'designer':
+                if (!$designer) {
+                    return redirect("/{$dashboardType}/designer-journey")->with(['designers', $designers, 'genres', $genres, 'dashboardType', $dashboardType, 'modules', $modules]);
+                }
                 return redirect("/dashboard/{$dashboardType}")->with(['dashboardType', $dashboardType, 'modules', $modules]);
                 break;
             case 'standard':

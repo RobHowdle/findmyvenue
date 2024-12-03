@@ -22,7 +22,7 @@
       </div>
     </div>
   @elseif ($userType === 'designer')
-    <div>Total Projects: {{ $totalProjects }}</div>
+    <div>Total Projects: {{ $jobsCountDesignerYTD }}</div>
     <div class="rating-wrapper flex flex-row items-center gap-2">
       <p class="h-full place-content-end font-sans">Overall Rating:</p>
       <div class="ratings flex">

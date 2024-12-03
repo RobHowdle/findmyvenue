@@ -88,7 +88,6 @@
     $(document).on('click', '.join-band-btn', function(e) {
       e.preventDefault();
       let bandId = $(this).data('band-id');
-      console.log(bandId);
 
       $.ajax({
         url: `/${dashboardType}/band-journey/join/${bandId}`,

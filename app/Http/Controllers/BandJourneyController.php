@@ -78,7 +78,7 @@ class BandJourneyController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Successfully joined the band!',
+            'message' => 'Successfully linked!',
             'redirect' => route('dashboard', ['dashboardType' => $dashboardType])
         ], 200);
     }

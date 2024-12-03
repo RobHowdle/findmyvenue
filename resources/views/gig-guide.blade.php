@@ -72,58 +72,113 @@
 <script>
   let userLatitude = {{ $user->latitude ?? 'null' }};
   let userLongitude = {{ $user->longitude ?? 'null' }};
+  const loader = document.createElement('div'); // Loader Element for Feedback
+  loader.innerHTML = '<p class="text-white">Fetching your location...</p>';
 
   if (!userLatitude || !userLongitude) {
-    getUserLocation((userLatitude, userLongitude));
+    getUserLocation((lat, long) => {
+      userLatitude = lat;
+      userLongitude = long;
+      console.log("Location retrieved via browser: ", userLatitude, userLongitude);
+    });
   }
 
   function getUserLocation(callback) {
     if (userLatitude && userLongitude) {
-      console.log("Using stored location: Lat " + userLatitude + ", Long " + userLongitude);
       callback(userLatitude, userLongitude);
     } else {
       console.log("No stored location. Attempting to get geolocation from the browser...");
       if (navigator.geolocation) {
-        console.log('hit');
+        // Show loading feedback
+        document.body.appendChild(loader);
+
         navigator.geolocation.getCurrentPosition(
           function(position) {
-            console.log('hit2');
-            userLatitude = position.coords.latitude;
-            userLongitude = position.coords.longitude;
-            console.log("Geolocation obtained: Lat " + userLatitude + ", Long " + userLongitude);
-            callback(userLatitude, userLongitude);
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            document.body.removeChild(loader); // Remove loader
+            callback(latitude, longitude);
+            fetchGigs(getSelectedDistance(), latitude, longitude, isShowOtherChecked());
           },
           function(error) {
-            console.log('Error handler hit');
-            switch (error.code) {
-              case error.PERMISSION_DENIED:
-                alert("User denied the request for Geolocation.");
-                break;
-              case error.POSITION_UNAVAILABLE:
-                alert("Location information is unavailable.");
-                break;
-              case error.TIMEOUT:
-                alert("The request to get user location timed out.");
-                break;
-              case error.UNKNOWN_ERROR:
-                alert("An unknown error occurred.");
-                break;
-            }
-          }
+            document.body.removeChild(loader); // Remove loader on error
+            console.log("Error handler hit");
+            handleGeolocationError(error);
+            fallbackToManualLocation();
+          }, {
+            timeout: 10000
+          } // Timeout after 10 seconds
         );
       } else {
         alert("Geolocation is not supported by this browser.");
+        fallbackToManualLocation();
       }
     }
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    let distanceInput = document.getElementById('distance');
-    distanceInput.addEventListener('change', () => {
-      const distance = distanceInput.value;
+  function handleGeolocationError(error) {
+    switch (error.code) {
+      case error.PERMISSION_DENIED:
+        showFailureNotification(
+          "Unable to get your location. Please enable location settings to find gigs near you."
+        );
+        break;
+      case error.POSITION_UNAVAILABLE:
+        showFailureNotification(
+          "Something went wrong, and we couldn't get the gigs. Please try again later!"
+        );
+        break;
+      case error.TIMEOUT:
+        showFailureNotification("Request Timed Out - Sorry about that!");
+        break;
+      case error.UNKNOWN_ERROR:
+        showFailureNotification(
+          "Well, this is awkward. Something went wrong - we'll take a look."
+        );
+        break;
+    }
+  }
+
+  function fallbackToManualLocation() {
+    const manualLocationInput = prompt(
+      "We couldn't fetch your location. Please enter your city or postcode:"
+    );
+    if (manualLocationInput) {
+      fetch(`/gigs/manual-location?query=${encodeURIComponent(manualLocationInput)}`)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.latitude && data.longitude) {
+            console.log("Fallback manual location retrieved: ", data.latitude, data.longitude);
+            fetchGigs(getSelectedDistance(), data.latitude, data.longitude, isShowOtherChecked());
+          } else {
+            showFailureNotification(
+              "Unable to determine your location from the provided input. Please try again."
+            );
+          }
+        })
+        .catch((error) => {
+          console.error("Error processing manual location:", error);
+          showFailureNotification("Something went wrong. Please try again later.");
+        });
+    }
+  }
+
+  function getSelectedDistance() {
+    const distanceInput = document.getElementById("distance");
+    return distanceInput.value;
+  }
+
+  function isShowOtherChecked() {
+    return document.getElementById("show-other-gigs").checked;
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const distanceInput = document.getElementById("distance");
+    distanceInput.addEventListener("change", () => {
+      const distance = getSelectedDistance();
       const latitude = userLatitude;
       const longitude = userLongitude;
-      const showOther = document.getElementById('show-other-gigs').checked;
+      const showOther = isShowOtherChecked();
 
       fetchGigs(distance, latitude, longitude, showOther);
     });
@@ -131,8 +186,8 @@
 
   function fetchGigs(distance, latitude, longitude, showOther) {
     fetch(`/gigs/filter?distance=${distance}&latitude=${latitude}&longitude=${longitude}&showOther=${showOther}`)
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         if (data.error) {
           console.error(data.error);
           return;
@@ -140,30 +195,49 @@
 
         console.log(data);
 
-        const tableBody = document.getElementById('gigsTableBody');
-        tableBody.innerHTML = '';
+        const tableBody = document.getElementById("gigsTableBody");
+        tableBody.innerHTML = "";
 
-        data.gigsCloseToMe.forEach(event => {
+        data.gigsCloseToMe.forEach((event) => {
           const roundedDistance = parseFloat(event.distance).toFixed(2);
           tableBody.innerHTML += createRow(event, `${roundedDistance} miles`);
         });
 
         if (data.otherGigs) {
-          data.otherGigs.forEach(event => {
-            tableBody.innerHTML += createRow(event, 'All');
+          data.otherGigs.forEach((event) => {
+            tableBody.innerHTML += createRow(event, "All");
           });
         }
       })
-      .catch(error => console.error('Error fetching gigs:', error));
+      .catch((error) => console.error("Error fetching gigs:", error));
   }
 
+  function formatDate(eventDate, eventStartTime) {
+    const date = new Date(eventDate);
+    const options = {
+      day: '2-digit',
+      month: '2-digit',
+      year: '2-digit'
+    };
+    const formattedDate = new Intl.DateTimeFormat('en-GB', options).format(date);
+    return `${formattedDate} ${eventStartTime}`;
+  }
+
+
   function createRow(event, distanceLabel) {
+    const formattedDateTime = formatDate(event.event_date, event.event_start_time);
+    const eventUrl = `/events/${event.id}`;
+    const venueUrl = `/venues/${event.name.replace(/\s+/g, '-').toLowerCase()}`;
     return `
         <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
-            <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 md:px-6 md:py-2 lg:px-8 lg:py-4">${event.event_name}</td>
-            <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 md:px-6 md:py-2 lg:px-8 lg:py-4">${event.name}</td>
+           <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 md:px-6 md:py-2 lg:px-8 lg:py-4">
+                <a href="${eventUrl}" class="text-blue-400 hover:text-blue-600 underline">${event.event_name}</a>
+            </td>
+            <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 md:px-6 md:py-2 lg:px-8 lg:py-4">
+                <a href="${venueUrl}" class="text-blue-400 hover:text-blue-600 underline">${event.name}</a>
+            </td>            
             <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 md:px-6 md:py-2 lg:px-8 lg:py-4">${distanceLabel}</td>
-            <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 md:px-6 md:py-2 lg:px-8 lg:py-4">${event.event_date}</td>
+            <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 md:px-6 md:py-2 lg:px-8 lg:py-4">${formattedDateTime}</td>
         </tr>
     `;
   }

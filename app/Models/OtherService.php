@@ -53,19 +53,35 @@ class OtherService extends Model
     }
 
     /**
-     * Retrieve all bands (other services with `other_service_id` as 4).
-     */
-    public static function bands()
-    {
-        return self::where('other_service_id', 4);
-    }
-
-    /**
      * Retrieve all photographers (other services with `other_service_id` as 1).
      */
     public static function photographers()
     {
         return self::where('other_service_id', 1);
+    }
+
+    /**
+     * Retrieve all videogrphers (other services with `other_service_id` as 2).
+     */
+    public static function videogrphers()
+    {
+        return self::where('other_service_id', 2);
+    }
+
+    /**
+     * Retrieve all designers (other services with `other_service_id` as 3).
+     */
+    public static function designers()
+    {
+        return self::where('other_service_id', 3);
+    }
+
+    /**
+     * Retrieve all bands (other services with `other_service_id` as 4).
+     */
+    public static function bands()
+    {
+        return self::where('other_service_id', 4);
     }
 
     /**

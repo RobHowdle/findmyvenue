@@ -25,6 +25,7 @@ use App\Http\Controllers\OtherServiceController;
 use App\Http\Controllers\VenueJourneyController;
 use App\Http\Controllers\BandDashboardController;
 use App\Http\Controllers\VenueDashboardController;
+use App\Http\Controllers\DesignerJourneyController;
 use App\Http\Controllers\PromoterDashboardController;
 use App\Http\Controllers\PhotographerJourneyController;
 
@@ -65,6 +66,9 @@ Route::get('/other/filter', [OtherServiceController::class, 'filterCheckboxesSea
 Route::get('/gig-guide', [GigGuideController::class, 'showGigGuide'])->name('gig-guide');
 Route::get('/gigs/filter', [GigGuideController::class, 'filterGigs'])->name('gigs.filter');
 Route::view('/privacy-policy', 'privacy-policy');
+
+Route::get('/events', [EventController::class, 'getPublicEvents'])->name('public-events');
+Route::get('/events/{eventId}', [EventController::class, 'getSinglePublicEvent'])->name('public-event');
 
 
 Route::middleware(['auth', 'web', 'verified'])->group(function () {
@@ -118,6 +122,13 @@ Route::middleware(['auth', 'web', 'verified'])->group(function () {
         Route::get('/photographer-select', [PhotographerJourneyController::class, 'selectPhotogrpher'])->name('photographer.select');
         Route::post('/photographer-journey/link/{id}', [PhotographerJourneyController::class, 'linkPhotographer'])->name('photographer.link');
         Route::post('/photographer/create', [PhotographerJourneyController::class, 'createPhotographer'])->name('photographer.store');
+    });
+
+    Route::prefix('/{dashboardType}')->middleware(['auth'])->group(function () {
+        Route::get('/designer-journey', [DesignerJourneyController::class, 'index'])->name('designer.journey');
+        Route::get('/designer-search', [DesignerJourneyController::class, 'search'])->name('designer.search');
+        Route::post('/designer-journey/join/{id}', [DesignerJourneyController::class, 'joinDesigner'])->name('designer.join');
+        Route::post('/designer-journey/create', [DesignerJourneyController::class, 'createDesigner'])->name('designer.create');
     });
 
     // Finances
