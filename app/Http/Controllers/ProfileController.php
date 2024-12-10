@@ -53,6 +53,7 @@ class ProfileController extends Controller
         $venueData = [];
         $photographerData = [];
         $standardUserData = [];
+        $designerUserData = [];
 
         // Check if the dashboardType is 'promoter' and get promoter data
         if ($dashboardType === 'promoter') {
@@ -65,6 +66,8 @@ class ProfileController extends Controller
             $photographerData = $this->getPhotographerData($user);
         } elseif ($dashboardType === 'standard') {
             $standardUserData = $this->getStandardUserData($user);
+        } elseif ($dashboardType === 'designer') {
+            $designerUserData = $this->getDesignerData($user);
         }
 
         // Load the modules configuration
@@ -97,6 +100,7 @@ class ProfileController extends Controller
             'venueData' => $venueData,
             'photographerData' => $photographerData,
             'standardUserData' => $standardUserData,
+            'designerUserData' => $designerUserData,
             'user' => $user,
             'roles' => $roles,
             'userRole' => $userRole,
@@ -1028,6 +1032,119 @@ class ProfileController extends Controller
             'isAllGenres' => $isAllGenres,
             'standardUserGenres' => $normalizedStandardUserGenres,
             'bandTypes' => $bandTypes
+        ];
+    }
+
+    private function getDesignerData(User $user)
+    {
+        $designer = $user->otherService("Designer")->first();
+        $serviceableId = $designer->id;
+        $serviceableType = 'App\Models\OtherService';
+
+        $name = $designer ? $designer->name : '';
+        $location = $designer ? $designer->location : '';
+        $logo = $designer ? $designer->logo_url : 'images/system/yns_logo.png';
+        $phone = $designer ? $designer->contact_number : '';
+        $contact_name = $designer ? $designer->contact_name : '';
+        $contact_email = $designer ? $designer->contact_email : '';
+        $contact_number = $designer ? $designer->contact_number : '';
+        $contactLinks = $designer ? json_decode($designer->contact_link, true) : [];
+
+        $platforms = [];
+        $platformsToCheck = ['website', 'facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+
+        // Initialize the platforms array with empty strings for each platform
+        foreach ($platformsToCheck as $platform) {
+            $platforms[$platform] = '';  // Set default to empty string
+        }
+
+        // Check if the contactLinks array exists and contains social links
+        if ($contactLinks) {
+            foreach ($platformsToCheck as $platform) {
+                // Only add the link if the platform exists in the $contactLinks array
+                if (isset($contactLinks[$platform])) {
+                    $platforms[$platform] = $contactLinks[$platform];  // Store the link for the platform
+                }
+            }
+        }
+
+        $about = $designer ? $designer->description : '';
+        $genreList = file_get_contents(public_path('text/genre_list.json'));
+        $data = json_decode($genreList, true);
+        $genres = $data['genres'];
+        $designerGenres = is_array($designer->genre) ? $designer->genre : json_decode($designer->genre, true);
+        $portfolioLink = $designer ? $designer->portfolio_link : '';
+        $portfolioImages = $designer->portfolio_images;
+
+        // Decode the first layer
+        $portfolioImages = json_decode($portfolioImages, true);
+
+        // Check if it's still a string and decode again if necessary
+        if (is_string($portfolioImages)) {
+            $portfolioImages = json_decode($portfolioImages, true);
+        }
+
+        // Ensure it's an array
+        if (!is_array($portfolioImages)) {
+            throw new \Exception("Portfolio images could not be converted to an array.");
+        }
+
+        $groupedEnvironmentTypes = config('environment_types');
+        $environmentTypes = json_decode($designer->environment_type, true);
+        $groupedData = [];
+
+        foreach ($groupedEnvironmentTypes as $groupName => $items) {
+            foreach ($items as $item) {
+                if (in_array($item, $environmentTypes)) {
+                    $groupedData[$groupName][] = $item;
+                }
+            }
+        }
+
+        $workingTimes = is_array($designer->working_times) ? $designer->working_times : json_decode($designer->working_times, true);
+        $genreList = file_get_contents(public_path('text/genre_list.json'));
+        $data = json_decode($genreList, true) ?? [];
+        $isAllGenres = in_array('All', $data);
+        $genres = $data['genres'];
+        $designerGenres = is_array($designer->genre) ? $designer->genre : json_decode($designer->genre, true);
+        $normalizedPhotographerGenres = [];
+
+        foreach ($designerGenres as $genreName => $genreData) {
+            $normalizedPhotographerGenres[$genreName] = [
+                'all' => $genreData['all'] ?? 'false',
+                'subgenres' => isset($genreData['subgenres'][0])
+                    ? (is_array($genreData['subgenres'][0]) ? $genreData['subgenres'][0] : $genreData['subgenres'])
+                    : []
+            ];
+        }
+
+        $bandTypes = json_decode($designer->band_type) ?? [];
+
+        return [
+            'designer' => $designer,
+            'name' => $name,
+            'location' => $location,
+            'logo' => $logo,
+            'phone' => $phone,
+            'about' => $about,
+            'contact_name' => $contact_name,
+            'contact_email' => $contact_email,
+            'contact_number' => $contact_number,
+            'platforms' => $platforms,
+            'platformsToCheck' => $platformsToCheck,
+            'genres' => $genres,
+            'designerGenres' => $designerGenres,
+            'portfolio_link' => $portfolioLink,
+            'serviceableId' => $serviceableId,
+            'serviceableType' => $serviceableType,
+            'portfolioImages' => $portfolioImages,
+            'environmentTypes' => $environmentTypes,
+            'groups' => $groupedData,
+            'workingTimes' => $workingTimes,
+            'genres' => $genres,
+            'isAllGenres' => $isAllGenres,
+            'photographerGenres' => $normalizedPhotographerGenres,
+            'bandTypes' => $bandTypes,
         ];
     }
 

@@ -38,6 +38,14 @@
             @include('profile.partials.standard-profile', [
                 'standardUserData' => $standardUserData,
             ])
+          @elseif($dashboardType == 'designer')
+            @include('profile.partials.designer-profile', [
+                'designerUserData' => $designerUserData,
+            ])
+            {{-- @elseif($dashboardType == 'videographer')
+          @include('profile.partials.videographer-profile', [
+              'standardUserData' => $standardUserData,
+          ]) --}}
           @endif
 
           <button @click="selected = 10; selectedTab = 10" data-tab="calendar"
@@ -104,6 +112,14 @@
           @include('profile.partials.standard-profile-tabs', [
               'standardUserData' => $standardUserData,
           ])
+        @elseif($dashboardType == 'designer')
+          @include('profile.partials.designer-profile-tabs', [
+              'designerUserData' => $designerUserData,
+          ])
+          {{-- @elseif($dashboardType == 'videographer')
+          @include('profile.partials.videographer-profile-tabs', [
+              'standardUserData' => $standardUserData,
+          ]) --}}
         @endif
 
         <div x-show="selectedTab === 10" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>

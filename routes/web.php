@@ -238,11 +238,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/what3words/suggest', [What3WordsController::class, 'suggest'])->name('what3words.suggest');
 
     // More specific routes
+    // Profile Updates
     Route::put('/profile/{dashboardType}/promoter-profile-update/{user}', [ProfileController::class, 'updatePromoter'])->name('promoter.update');
     Route::put('/profile/{dashboardType}/venue-profile-update/{user}', [ProfileController::class, 'updateVenue'])->name('venue.update');
     Route::put('/profile/{dashboardType}/band-profile-update/{user}', [ProfileController::class, 'updateBand'])->name('band.update');
     Route::put('/profile/{dashboardType}/photographer-profile-update/{user}', [ProfileController::class, 'updatePhotographer'])->name('photographer.update');
     Route::put('/profile/{dashboardType}/standard-user-update/{user}', [ProfileController::class, 'updateStandardUser'])->name('standard-user.update');
+    Route::put('/profile/{dashboardType}/designer-user-update/{user}', [ProfileController::class, 'updateDesigner'])->name('designer.update');
     Route::post('/profile/{dashboardType}/photographer-image-upload', [ProfileController::class, 'uploadPortfolioImages'])->name('photographer.upload');
     Route::get('/profile/{dashboardType}/settings', [ProfileController::class, 'settings'])->name('settings.index');
     Route::post('/profile/{dashboardType}/photographer-environment-types', [ProfileController::class, 'updateEnvironmentTypes'])->name('photographer.environment-types');

@@ -1,9 +1,9 @@
 <header>
   <h2 class="text-md font-heading font-medium text-white">
-    {{ __('Band Details') }}
+    {{ __('Designer Details') }}
   </h2>
 </header>
-<form method="POST" action="{{ route('band.update', ['dashboardType' => $dashboardType, 'user' => $user]) }}"
+<form method="POST" action="{{ route('designer.update', ['dashboardType' => $dashboardType, 'user' => $user]) }}"
   class="grid grid-cols-3 gap-x-8 gap-y-8" enctype="multipart/form-data">
   @csrf
   @method('PUT')
@@ -27,7 +27,7 @@
 
     <div class="group mb-6">
       <x-input-label-dark>Where are you based?</x-input-label-dark>
-      <x-text-input id="address-input" name="address-input" value="{{ old('location', $bandData['location']) }}"
+      <x-text-input id="address-input" name="address-input" value="{{ old('location', $designerUserData['location']) }}"
         class="map-input"></x-text-input>
       @error('address-input')
         <p class="yns_red mt-1 text-sm">{{ $message }}</p>
@@ -63,7 +63,7 @@
     <div class="group mb-6">
       <x-input-label-dark for="email">Email</x-input-label-dark>
       <x-text-input id="contact_email" name="contact_email"
-        value="{{ old('contact_email', $bandData['contact_email']) }}"></x-text-input>
+        value="{{ old('contact_email', $designerUserData['contact_email']) }}"></x-text-input>
       @error('contact_email')
         <p class="yns_red mt-1 text-sm">{{ $message }}</p>
       @enderror
@@ -72,7 +72,7 @@
     <div class="group mb-6">
       <x-input-label-dark for="contact_number">Contact Phone</x-input-label-dark>
       <x-text-input id="contact_number" name="contact_number"
-        value="{{ old('contact_number', $bandData['contact_number']) }}"></x-text-input>
+        value="{{ old('contact_number', $designerUserData['contact_number']) }}"></x-text-input>
       @error('contact_number')
         <p class="yns_red mt-1 text-sm">{{ $message }}</p>
       @enderror
