@@ -14,27 +14,22 @@
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
   <script src="https://kit.fontawesome.com/dd6bff54df.js" crossorigin="anonymous"></script>
-
-  <!-- Styles -->
-  <style>
-
-  </style>
 </head>
 
 <x-guest-layout>
-  {{-- <div class="flex h-screen flex-grow items-center justify-center px-2 backdrop-brightness-50">
-    <div class="rounded-lg bg-opac_8_black p-12 text-center">
-      <h1 class="text-4xl font-bold text-white md:text-5xl lg:text-6xl">
+  <div class="flex h-screen flex-grow items-center justify-center px-2 backdrop-brightness-50">
+    <div class="rounded-lg bg-opac_8_black p-6 text-center lg:p-8 xl:p-10 2xl:p-12">
+      <h1 class="text-3xl font-bold text-white md:text-4xl xl:text-5xl 2xl:text-6xl">
         Find Your Next Show!
       </h1>
-      <p class="my-2 text-base text-white md:text-lg">
+      <p class="my-2 text-base text-white lg:text-lg">
         Search a location below and find a venue in your desired area
       </p>
       <form action="{{ route('venues.filterByCoordinates') }}" method="GET">
         @csrf
         <div class="my-4 flex justify-center">
           <input
-            class="search map-input rounded-bl rounded-tl border-b border-l border-r-0 border-t border-white bg-yns_light_gray font-sans text-xl focus:border-white md:w-4/6"
+            class="search map-input w-full rounded-bl rounded-tl border-b border-l border-r-0 border-t border-white bg-yns_light_gray font-sans text-xl focus:border-white md:w-4/6"
             type="search" id="address-input" name="search_query" placeholder="Search..." />
           <button type="submit" id="search-button"
             class="search-button rounded-br rounded-tr border-b border-r border-t border-white bg-black p-4 text-white hover:bg-gray-800">
@@ -54,102 +49,114 @@
         Browse all venues
       </a>
     </div>
-  </div> --}}
+  </div>
 
-  {{-- <div class="flex h-screen flex-grow items-center justify-center px-2 backdrop-brightness-50">
+  <div class="flex h-screen flex-grow items-center justify-center px-2 backdrop-brightness-50">
     <img src="{{ asset('storage/images/system/about.jpg') }}" alt="About Image"
-      class="absolute bottom-0 right-32 h-[calc(100%+0px)] w-auto object-cover" />
+      class="absolute bottom-0 right-0 hidden h-[calc(100%+0px)] w-auto object-cover xl:block 3xl:right-32" />
 
-    <div class="relative max-w-3xl bg-opac_8_black p-8">
-      <h2 class="mb-4 font-sans text-3xl text-white underline">So...what is it?</h2>
-      <p class="mb-3 font-sans text-white">
+    <div class="relative bg-opac_8_black p-4 text-center lg:p-8 lg:text-left xl:mr-40 xl:max-w-xl 4xl:max-w-3xl">
+      <h2 class="mb-4 font-sans text-2xl text-white underline xl:text-3xl">So...what is it?</h2>
+      <p class="mb-3 font-sans text-base text-white lg:text-lg">
         Your Next Show is a platform specifically designed and built for bands and artists to be able to find
         their next show. Entering the location you want to search, setting your filters will return a list of venues
         in that area you can perform at. The ability to add and link with promoters in that area and for your type of
         music means that not only are you supporting local businesses, you are being paired with people who have the
         same tastes and interests - increasing the chances of you having a more successful show.
       </p>
-      <p class="mb-3 font-sans text-white">
+      <p class="mb-3 font-sans text-base text-white lg:text-lg">
         We also give you the ability to have a custom dashboard designed and built specifically for you. Whether
         you’re a promoter wanting to keep track of your events and budgets to a designer keeping track of jobs you
         have, all the way to bands managing their gigs through a shareable calendar, you can do it all.
       </p>
-      <p class="font-sans text-white">
+      <p class="font-sans text-base text-white lg:text-lg">
         Oh, and did we mention? It is 100% COST and AD FREE.
       </p>
     </div>
   </div>
 
-  <div class="flex min-h-screen flex-col items-center justify-center backdrop-brightness-50">
-    <div class="flex flex-row items-center justify-center gap-14">
-      <img src="{{ asset('storage/images/system/idea.jpg') }}" alt="Idea Image"
-        class="h-[500px] w-[500px] object-contain" />
-      <div class="flex max-w-[600px] flex-col items-end bg-opac_8_black p-4 py-8 text-white">
-        <h2 class="mb-3 text-3xl underline">Got an idea?</h2>
-        <p class="mb-3 text-right font-sans">
-          Your Next Show is constantly evolving. We hate it when things go stale so we will be regularly releasing new
-          features, improving optimisation for all devices and keeping our security the best it can be. We already have
-          some great ideas but since we have built this platform for specific groups of people it’s important to get
-          your thoughts!
-          If you have an idea of something you think would be great to add to the platform, you can fill out our form
-          and add your suggestion to our ideas board.
-        </p>
+  <div class="flex min-h-screen flex-col items-center justify-center px-4 backdrop-brightness-50">
+    <div class="flex flex-col items-center gap-4 xl:grid xl:grid-cols-2 2xl:gap-12 3xl:gap-14">
+      <div class="max-h-auto max-w-[600px] xl:max-w-[400px] 2xl:max-w-[500px]">
+        <img src="{{ asset('storage/images/system/idea.jpg') }}" alt="Idea Image" class="object-contain" />
+      </div>
+      <div class="h-auto max-w-[600px]">
+        <div
+          class="flex flex-col items-center justify-center gap-3 bg-opac_8_black p-6 text-center text-white md:items-end lg:text-right">
+          <h2 class="text-center text-2xl underline lg:text-right xl:text-3xl">Got an idea?</h2>
+          <p class="font-sans text-base lg:text-lg">
+            Your Next Show is constantly evolving. We hate it when things go stale so we will be regularly releasing new
+            features, improving optimisation for all devices and keeping our security the best it can be. We already
+            have
+            some great ideas but since we have built this platform for specific groups of people it’s important to get
+            your thoughts!
+            If you have an idea of something you think would be great to add to the platform, you can fill out our form
+            and add your suggestion to our ideas board.
+          </p>
 
-        <a href="https://github.com/RobHowdle/findmyvenue/issues/new?assignees=RobHowdle&labels=Future+Addition%2F+Request&projects=&template=feature-request.md&title=%5BUser+Feature+Request%5D"
-          target="_blank"
-          class="mt-2 rounded bg-white p-2 font-sans text-black transition duration-150 ease-in-out hover:bg-gradient-button hover:text-white">Submit
-          Idea</a>
+          <a href="https://form.jotform.com/243454726787369" target="_blank"
+            class="rounded bg-white p-2 font-sans text-black transition duration-150 ease-in-out hover:bg-gradient-button hover:text-white">Submit
+            Idea</a>
+        </div>
       </div>
     </div>
 
-    <div class="flex flex-row-reverse items-center justify-center gap-14">
-      <img src="{{ asset('storage/images/system/bug.jpg') }}" alt="Bug Image"
-        class="h-[500px] w-[500px] object-contain" />
-      <div class="flex max-h-[500px] max-w-[600px] flex-col items-start bg-opac_8_black p-4 py-8 text-white">
-        <h2 class="mb-3 text-3xl underline">Spotted a bug?</h2>
-        <p class="mb-3 font-sans">
+    <div class="mt-4 flex flex-col items-center gap-4 xl:grid xl:grid-cols-2 2xl:gap-12 3xl:gap-14">
+      <div
+        class="order-2 flex h-auto max-w-[600px] flex-col items-center justify-center gap-3 bg-opac_8_black p-6 text-center text-white md:items-start xl:order-1">
+        <h2 class="text-2xl underline xl:text-3xl">Spotted a bug?</h2>
+        <p class="text-center font-sans text-base md:text-left lg:text-lg">
           Sometimes the gremlins get in and cause some unexpected errors. Whilst our work is fully tested before it gets
           made live sometimes things do slip through the net. If you find a bug or something that doesn’t seem quite
           right - Let us know!
         </p>
-        <a href="https://github.com/RobHowdle/findmyvenue/issues/new?assignees=RobHowdle&labels=bug&projects=&template=bug-report.md&title=%5BUser+Reported+Bug%5D"
-          target="_blank"
-          class="rounded bg-white p-2 font-sans text-black transition duration-150 ease-in-out hover:bg-gradient-button hover:text-white">Report
-          A
-          Bug</a>
+        <a href="https://form.jotform.com/243456695713365" target="_blank"
+          class="rounded bg-white p-2 font-sans text-black transition duration-150 ease-in-out hover:bg-gradient-button hover:text-white">
+          Report A Bug
+        </a>
+      </div>
+      <div class="max-h-auto order-1 max-w-[600px] justify-self-end xl:order-2 xl:max-w-[400px] 2xl:max-w-[500px]">
+        <img src="{{ asset('storage/images/system/bug.jpg') }}" alt="Bug Image" class="object-contain" />
       </div>
     </div>
   </div>
 
+
   <div class="flex h-screen flex-col items-center justify-center backdrop-brightness-50">
-    <div class="flex max-w-screen-2xl flex-col items-center rounded-lg bg-opac_8_black p-12 text-center text-white">
-      <h3 class="mb-4 text-3xl underline">Buy Me A Coffee</h3>
-      <p class="mb-4 font-sans">
-        I have always wanted this website to be free for everyone. I don’t like the idea of charging people to help them
+    <div
+      class="flex max-w-screen-2xl flex-col items-center gap-4 rounded-lg bg-opac_8_black p-4 text-center text-white md:p-6 lg:p-8 xl:p-12">
+      <h3 class="text-2xl underline xl:text-3xl">Buy Me A Coffee</h3>
+      <p class="font-sans text-base lg:text-lg">
+        I have always wanted this website to be free for everyone. I don’t like the idea of charging people to help
+        them
         find bands and venues, nor do I like the idea of spamming the website with ads to make a couple of quid. This
         ongoing project is <span class="font-bold">entirely self-funded.</span> I will never ask members for financial
         contributions to this website
         or its operations.</p>
 
-      <p class="mb-4 font-sans">With that said, I am not blind to the fact that things do cost money, and some people
+      <p class="font-sans text-base lg:text-lg">With that said, I am not blind to the fact that things do cost money,
+        and some people
         have
         offered numerous
-        times to donate to the website. While this is not necessary, if you feel this website has helped you in any way
-        and you want to donate a <span class="font-bold">small amount</span> to help with server costs, staffing costs,
+        times to donate to the website. While this is not necessary, if you feel this website has helped you in any
+        way
+        and you want to donate a <span class="font-bold">small amount</span> to help with server costs, staffing
+        costs,
         upgrades, or even just to say
         thanks, I have created a <span class="font-bold">Buy Me A Coffee</span> link that will allow you to do so.</p>
 
-      <a class="mb-4 font-sans transition duration-150 ease-in-out hover:text-yns_yellow"
+      <a class="font-sans text-base transition duration-150 ease-in-out hover:text-yns_yellow lg:text-lg"
         href="https://buymeacoffee.com/yournextshow" target="_blank">
         <span class="fas fa-coffee mr-2 text-2xl"></span>By Me A Coffee
       </a>
 
-      <p class="font-sans"><span class="font-bold">PLEASE NOTE:</span> You are not obligated to do anything. This
+      <p class="font-sans text-base lg:text-lg"><span class="font-bold">PLEASE NOTE:</span> You are not obligated to
+        do anything. This
         website will <span class="font-bold">ALWAYS</span> be
         cost <span class="font-bold">AND</span> ad-free for all users.
         If you choose to donate, I thank you from the bottom of my heart.</p>
     </div>
-  </div> --}}
+  </div>
 </x-guest-layout>
 
 <script>
