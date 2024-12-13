@@ -3,30 +3,33 @@
     <h1 class="text-center font-heading text-6xl text-white">Venues</h1>
   </x-slot>
 
-  <x-venue-table :venues="$venues" :genres="$genres">
+  <x-venue-table :venues="$venues" :genres="$genres" :venuePromoterCount="$venuePromoterCount">
     @forelse ($venues as $venue)
       <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
         <th scope="row"
-          class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
+          class="whitespace-nowrap px-2 py-2 font-sans text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
           <a href="{{ route('venue', $venue->id) }}" class="venue-link hover:text-yns_yellow">{{ $venue->name }}</a>
         </th>
-        <td class="rating-wrapper flex whitespace-nowrap sm:py-3 sm:text-base md:py-2 lg:py-4">{!! $overallReviews[$venue->id] !!}
+        <td
+          class="rating-wrapper px:2 py:2 hidden whitespace-nowrap sm:text-base md:px-6 md:py-3 lg:flex lg:px-8 lg:py-4">
+          {!! $overallReviews[$venue->id] !!}
         </td>
         <td
-          class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
+          class="whitespace-nowrap px-2 py-2 font-sans text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
           {{ $venue->postal_town }}
         </td>
-        <td class="whitespace-nowrap align-middle text-white sm:py-3 sm:text-base md:py-2 lg:py-4">
+        <td
+          class="hidden whitespace-nowrap px-2 py-2 align-middle text-white md:block md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
           <x-contact-and-social-links :item="$venue" />
         </td>
-        <td
-          class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
-          @if ($venue->promoters)
+        @if ($venuePromoterCount != 0)
+          <td
+            class="{{ $promoters ? 'md:block' : 'hidden' }} whitespace-nowrap px-2 py-2 font-sans text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
             @foreach ($venue->promoters as $promoter)
               <a class="hover:text-yns_yellow" href="{{ url('promoters', $promoter->id) }}">{{ $promoter['name'] }}</a>
             @endforeach
-          @endif
-        </td>
+          </td>
+        @endif
       </tr>
     @empty
       <tr class="border-b odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
@@ -252,19 +255,21 @@
     var rowsHtml = filteredVenues.map(function(venue) {
       var venueRoute = "{{ route('venue', ':venueId') }}";
       var ratingHtml = getRatingHtml(venue.average_rating); // Function to generate rating HTML
+      var promotersCount = {{ $venuePromoterCount }};
+      const className = promotersCount > 0 ? 'md:block' : 'hidden';
 
       return `
             <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
-                <th scope="row" class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
+                <th scope="row" class="whitespace-nowrap font-sans text-white px-2 py-2 md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
                     <a href="${venueRoute.replace(':venueId', venue.id)}" class="venue-link hover:text-yns_yellow">${venue.name}</a>
                 </th>
-                <td class="rating-wrapper flex whitespace-nowrap sm:py-3 sm:text-base md:py-2 lg:py-4">
+                <td class="rating-wrapper hidden whitespace-nowrap px-2 py-2 sm:text-base md:px-6 md:py-3 lg:flex lg:px-8 lg:py-4">
                     ${ratingHtml}
                 </td>
-                <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
+                <td class="whitespace-nowrap font-sans text-white px-2 py-2 md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
                     ${venue.postal_town}
                 </td>
-                <td class="flex gap-4 whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
+                <td class="hidden whitespace-nowrap align-middle text-white px-2 py-2 md:block md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
                     ${venue.contact_number ? '<a href="tel:' + venue.contact_number + '" class="hover:text-yns_yellow"><span class="fas fa-phone"></span></a>' : ''}
                     ${venue.contact_email ? '<a href="mailto:' + venue.contact_email + '" class="hover:text-yns_yellow"><span class="fas fa-envelope"></span></a>' : ''}
                     ${venue.platforms ? venue.platforms.map(function(platform) {
@@ -286,7 +291,7 @@
                         }
                     }).join('') : ''}
                 </td>
-                <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
+                <td class="whitespace-nowrap ${className} font-sans  text-white px-2 py-2 md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
                     ${venue.promoters ? venue.promoters.map(function(promoter) {
                         return '<a href="' + promoter.url + '">' + promoter.name + '</a>';
                     }).join('') : ''}

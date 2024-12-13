@@ -1519,7 +1519,7 @@ iframe {
     .filter-search {
         grid-template-columns: 1fr;
         grid-template-rows: repeat(2, 1fr);
-        grid-gap: 2rem;
+        grid-gap: 1rem;
     }
 
     .search-bar {

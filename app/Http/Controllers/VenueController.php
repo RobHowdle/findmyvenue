@@ -56,7 +56,6 @@ class VenueController extends Controller
     /**
      * Display a listing of the resource.
      */
-
     public function index(Request $request)
     {
         $searchQuery = $request->input('search_query');
@@ -119,7 +118,9 @@ class VenueController extends Controller
             $overallScore = VenueReview::calculateOverallScore($venue->id);
             $overallReviews[$venue->id] = $this->renderRatingIcons($overallScore);
         }
-        return view('venues', compact('venues', 'genres', 'overallReviews'));
+
+        $venuePromoterCount = count($venue['promoters']);
+        return view('venues', compact('venues', 'genres', 'overallReviews', 'venuePromoterCount'));
     }
 
     /**
@@ -324,10 +325,9 @@ class VenueController extends Controller
         if ($request->has('band_type')) {
             $bandType = $request->input('band_type');
             if (!empty($bandType)) {
-                $bandType = array_map('trim', $bandType); // Ensure no extra spaces
+                $bandType = array_map('trim', $bandType);
                 $query->where(function ($query) use ($bandType) {
                     foreach ($bandType as $type) {
-                        // Ensure the type is properly formatted
                         $query->orWhereRaw('JSON_CONTAINS(band_type, ?)', [json_encode([$type])]);
                     }
                 });
