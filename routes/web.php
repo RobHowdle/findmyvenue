@@ -1,7 +1,9 @@
 <?php
 
 use App\Models\OtherService;
+use App\Services\What3WordsService;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\JobsController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\TodoController;
 use App\Http\Controllers\AdminController;
@@ -16,13 +18,17 @@ use App\Http\Controllers\GigGuideController;
 use App\Http\Controllers\PromoterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LinkedUserController;
+use App\Http\Controllers\What3WordsController;
 use App\Http\Controllers\APIRequestsController;
 use App\Http\Controllers\BandJourneyController;
 use App\Http\Controllers\OtherServiceController;
 use App\Http\Controllers\VenueJourneyController;
 use App\Http\Controllers\BandDashboardController;
 use App\Http\Controllers\VenueDashboardController;
+use App\Http\Controllers\DesignerJourneyController;
 use App\Http\Controllers\PromoterDashboardController;
+use App\Http\Controllers\PhotographerJourneyController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -60,6 +66,9 @@ Route::get('/other/filter', [OtherServiceController::class, 'filterCheckboxesSea
 Route::get('/gig-guide', [GigGuideController::class, 'showGigGuide'])->name('gig-guide');
 Route::get('/gigs/filter', [GigGuideController::class, 'filterGigs'])->name('gigs.filter');
 Route::view('/privacy-policy', 'privacy-policy');
+
+Route::get('/events', [EventController::class, 'getPublicEvents'])->name('public-events');
+Route::get('/events/{eventId}', [EventController::class, 'getSinglePublicEvent'])->name('public-event');
 
 
 Route::middleware(['auth', 'web', 'verified'])->group(function () {
@@ -105,6 +114,21 @@ Route::middleware(['auth', 'web', 'verified'])->group(function () {
         Route::get('/venue-select', [VenueJourneyController::class, 'selectVenue'])->name('venue.select');
         Route::post('/venue-journey/link/{id}', [VenueJourneyController::class, 'linkVenue'])->name('venue.link');
         Route::post('/venue/create', [VenueJourneyController::class, 'createVenue'])->name('venue.store');
+    });
+
+    Route::prefix('/{dashboardType}')->middleware(['auth'])->group(function () {
+        Route::get('/photographer-journey', [PhotographerJourneyController::class, 'index'])->name('photographer.journey');
+        Route::get('/photographer-search', [PhotographerJourneyController::class, 'searchPhotographer'])->name('photographer.search');
+        Route::get('/photographer-select', [PhotographerJourneyController::class, 'selectPhotogrpher'])->name('photographer.select');
+        Route::post('/photographer-journey/link/{id}', [PhotographerJourneyController::class, 'linkPhotographer'])->name('photographer.link');
+        Route::post('/photographer/create', [PhotographerJourneyController::class, 'createPhotographer'])->name('photographer.store');
+    });
+
+    Route::prefix('/{dashboardType}')->middleware(['auth'])->group(function () {
+        Route::get('/designer-journey', [DesignerJourneyController::class, 'index'])->name('designer.journey');
+        Route::get('/designer-search', [DesignerJourneyController::class, 'search'])->name('designer.search');
+        Route::post('/designer-journey/join/{id}', [DesignerJourneyController::class, 'joinDesigner'])->name('designer.join');
+        Route::post('/designer-journey/create', [DesignerJourneyController::class, 'createDesigner'])->name('designer.create');
     });
 
     // Finances
@@ -186,7 +210,7 @@ Route::middleware(['auth', 'web', 'verified'])->group(function () {
     });
 
     // To-Do List
-    Route::prefix('dashboard/{dashboardType}')->group(function () {
+    Route::prefix('/dashboard/{dashboardType}')->group(function () {
         Route::get('/todo-list', [TodoController::class, 'showTodos'])->name('admin.dashboard.todo-list');
         Route::get('/todo-items', [TodoController::class, 'getTodos'])->name('admin.dashboard.todo-items');
         Route::post('/todo-list/new', [TodoController::class, 'newTodoItem'])->name('admin.dashboard.new-todo-item');
@@ -195,17 +219,40 @@ Route::middleware(['auth', 'web', 'verified'])->group(function () {
         Route::delete('/todo-item/{id}', [TodoController::class, 'deleteTodoItem'])->name('admin.dashboard.delete-todo-item');
         Route::get('/todo-item/completed-items', [TodoController::class, 'showCompletedTodoItems'])->name('admin.dashboard.completed-todo-items');
     });
+
+    // Jobs
+    Route::prefix('/dashboard/{dashboardType}')->group(function () {
+        Route::get('/jobs', [JobsController::class, 'showJobs'])->name('admin.dashboard.jobs');
+        // Route::get('/job-items', [JobsController::class, 'getJobs'])->name('admin.dashboard.job-items');
+        Route::get('/jobs/new', [JobsController::class, 'newJob'])->name('admin.dashboard.jobs.create');
+        Route::post('/jobs/store', [JobsController::class, 'storeJob'])->name('admin.dashboard.jobs.store');
+        Route::get('/job/{id}', [JobsController::class, 'viewJob'])->name('admin.dashboard.job.view');
+        Route::put('/jobs/{id}/update', [JobsController::class, 'updateJob'])->name('admin.dashboard.jobs.update');
+        Route::delete('/jobs/{id}/delete', [JobsController::class, 'deleteJob'])->name('admin.dashboard.jobs.delete');
+        Route::get('/jobs/search-clients', [JobsController::class, 'searchClients'])->name('admin.dashboard.jobs.client-search');
+    });
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    // What3Words
+    Route::post('/what3words/suggest', [What3WordsController::class, 'suggest'])->name('what3words.suggest');
+
     // More specific routes
+    // Profile Updates
     Route::put('/profile/{dashboardType}/promoter-profile-update/{user}', [ProfileController::class, 'updatePromoter'])->name('promoter.update');
     Route::put('/profile/{dashboardType}/venue-profile-update/{user}', [ProfileController::class, 'updateVenue'])->name('venue.update');
     Route::put('/profile/{dashboardType}/band-profile-update/{user}', [ProfileController::class, 'updateBand'])->name('band.update');
+    Route::put('/profile/{dashboardType}/photographer-profile-update/{user}', [ProfileController::class, 'updatePhotographer'])->name('photographer.update');
+    Route::put('/profile/{dashboardType}/standard-user-update/{user}', [ProfileController::class, 'updateStandardUser'])->name('standard-user.update');
+    Route::put('/profile/{dashboardType}/designer-user-update/{user}', [ProfileController::class, 'updateDesigner'])->name('designer.update');
+    Route::post('/profile/{dashboardType}/photographer-image-upload', [ProfileController::class, 'uploadPortfolioImages'])->name('photographer.upload');
     Route::get('/profile/{dashboardType}/settings', [ProfileController::class, 'settings'])->name('settings.index');
+    Route::post('/profile/{dashboardType}/photographer-environment-types', [ProfileController::class, 'updateEnvironmentTypes'])->name('photographer.environment-types');
     Route::post('/profile/{dashboardType}/settings/update', [ProfileController::class, 'updateModule'])->name('settings.updateModule');
     Route::get('/profile/{dashboardType}/communications', [ProfileController::class, 'communications'])->name('communications.index');
     Route::post('/profile/{dashboardType}/communications/update', [ProfileController::class, 'updatePreferences'])->name('communications.updatePreferences');
+    Route::post('/profile/{dashboardType}/save-genres', [ProfileController::class, 'saveGenres'])->name('save-genres');
+    Route::post('/profile/{dashboardType}/save-band-types', [ProfileController::class, 'saveBandTypes'])->name('save-band-types');
 
     Route::post('/profile/{dashboardType}/{user}/add-role', [ProfileController::class, 'addRole'])->name('profile.add-role');
     Route::post('/profile/{dashboardType}/{user}/edit-role', [ProfileController::class, 'editRole'])->name('profile.edit-role');

@@ -67,5 +67,14 @@ return [
             'settings' => [],
             'dependencies' => [],
         ],
+        'jobs' => [
+            'name' => 'Jobs',
+            'description' => 'This module provides the user with the ability to create and manage jobs linked to their service',
+            'enabled' => true,
+            'version' => '1.0',
+            'author' => 'Robert Howdle',
+            'settings' => [],
+            'dependencies' => [],
+        ],
     ],
 ];

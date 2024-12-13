@@ -16,7 +16,19 @@
           @endif
           <div class="header-text flex flex-col justify-center gap-2">
             <h1 class="text-sans text-4xl">{{ $venue->name }}</h1>
-            <p class="font-sans text-2xl">{{ $venue->postal_town }}</p>
+            @if ($venue->location)
+              <div class="group flex flex-row items-center gap-2">
+                <i class="fa-solid fa-location-dot mr-2"></i>
+                <a class="font-sans text-2xl transition duration-150 ease-in-out hover:text-yns_yellow"
+                  href="javascript:void(0)" target="_blank" id="open-map-link">{{ $venue->location }}</a>
+              </div>
+            @endif
+            @if ($venue->w3w)
+              <div class="flow-row group flex items-center gap-2">
+                <a class="font-sans text-xl transition duration-150 ease-in-out hover:text-yns_yellow"
+                  href="javascript:void(0)" target="_blank" id="open-w3w-link">{{ $venue->w3w }}</a>
+              </div>
+            @endif
             <div>
               <x-contact-and-social-links :item="$venue" />
             </div>
@@ -227,3 +239,34 @@
     </div>
   </div>
 </x-guest-layout>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const openMapLink = document.getElementById("open-map-link");
+    const openW3WLink = document.getElementById("open-w3w-link");
+    const venueLatitude = "{{ $venue->latitude }}";
+    const venueLongitude = "{{ $venue->longitude }}";
+    const w3wAddress = "{{ $venue->w3w }}";
+
+    // Function to open the What3Words link
+    function openW3W() {
+      const geoURI = `https://what3words.com/${w3wAddress}`;
+      window.open(geoURI, '_blank');
+    }
+
+    // Function to open the map
+    function openMap() {
+      const geoURI = `geo:${venueLatitude},${venueLongitude}`;
+
+      window.location.href = geoURI;
+
+      // Fallback to Google Maps after 2 seconds
+      setTimeout(() => {
+        window.open(`https://www.google.com/maps?q=${venueLatitude},${venueLongitude}`, '_blank');
+      }, 2000);
+    }
+
+    // Attach click event listeners
+    openMapLink.addEventListener("click", openMap);
+    openW3WLink.addEventListener("click", openW3W);
+  });
+</script>

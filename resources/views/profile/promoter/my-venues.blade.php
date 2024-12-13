@@ -1,13 +1,13 @@
 <header>
   <h2 class="text-md font-heading font-medium text-white">
-    {{ __('Your Venues') }}
+    {{ __('Tell us about the venues you\'ve worked with') }}
   </h2>
 </header>
-<form method="POST" action="{{ route('promoter.update', ['dashboardType' => $dashboardType, 'user' => $user->id]) }}">
+<form method="POST" action="{{ route('promoter.update', ['dashboardType' => $dashboardType, 'user' => $user->id]) }}"
+  class="space-y-8">
   @csrf
   @method('PUT')
   <div class="group mb-6">
-    <x-input-label-dark for="myVenues">Tell us about the venues you've worked with</x-input-label-dark>
     <x-textarea-input class="summernote" id="myVenues" name="myVenues"></x-textarea-input>
     @error('myVenues')
       <p class="yns_red mt-1 text-sm">{{ $message }}</p>

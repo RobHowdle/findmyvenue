@@ -35,6 +35,7 @@ class Promoter extends Model
 
     protected $casts = [
         'contact_links' => 'array',
+        'genre' => 'array',
     ];
 
     public function venues()

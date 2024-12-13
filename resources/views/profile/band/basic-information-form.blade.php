@@ -1,6 +1,6 @@
 <header>
   <h2 class="text-md font-heading font-medium text-white">
-    {{ __('Venue Details') }}
+    {{ __('Band Details') }}
   </h2>
 </header>
 <form method="POST" action="{{ route('band.update', ['dashboardType' => $dashboardType, 'user' => $user]) }}"

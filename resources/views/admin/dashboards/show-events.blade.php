@@ -8,10 +8,16 @@
       <div class="min-w-screen-xl mx-auto max-w-screen-xl rounded-lg border border-white bg-yns_dark_gray text-white">
         <div class="header border-b border-b-white px-8 pt-8">
           <div class="flex flex-row justify-between">
-            <h1 class="font-heading text-4xl font-bold">My Events {{ $dashboardType }}</h1>
-            <a href="{{ route('admin.dashboard.create-new-event', ['dashboardType' => $dashboardType]) }}"
-              class="rounded-lg bg-white px-4 py-2 text-black transition duration-300 hover:bg-gradient-to-t hover:from-yns_dark_orange hover:to-yns_yellow">New
-              Event</a>
+            <h1 class="font-heading text-4xl font-bold">My Events</h1>
+            @if ($dashboardType != 'standard')
+              <a href="{{ route('admin.dashboard.create-new-event', ['dashboardType' => $dashboardType]) }}"
+                class="rounded-lg bg-white px-4 py-2 text-black transition duration-300 hover:bg-gradient-to-t hover:from-yns_dark_orange hover:to-yns_yellow">New
+                Event</a>
+            @else
+              <a href="{{ route('gig-guide') }}"
+                class="rounded-lg bg-white px-4 py-2 text-black transition duration-300 hover:bg-gradient-to-t hover:from-yns_dark_orange hover:to-yns_yellow">Find
+                Events</a>
+            @endif
           </div>
 
           <div class="mt-8 flex gap-x-8">

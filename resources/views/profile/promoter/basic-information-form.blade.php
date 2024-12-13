@@ -1,10 +1,10 @@
 <header>
   <h2 class="text-md font-heading font-medium text-white">
-    {{ __('Promoter Details') }}
+    {{ __('Update your basic information') }}
   </h2>
 </header>
 <form method="POST" action="{{ route('promoter.update', ['dashboardType' => $dashboardType, 'user' => $user]) }}"
-  class="grid grid-cols-3 gap-x-8 gap-y-8" enctype="multipart/form-data">
+  class="grid grid-cols-3 gap-x-8 gap-y-8 space-y-6" enctype="multipart/form-data">
   @csrf
   @method('PUT')
   <div class="col-start-1 col-end-2">
@@ -34,31 +34,8 @@
       @enderror
     </div>
 
-    <div id="address-map-container" style="width: 100%; height: 400px; display: none;">
-      <div style="width: 100%; height: 100%;" id="address-map"></div>
-    </div>
+    {{-- <x-google-address-picker id="location" name="location" label="Venue Location" placeholder="Enter an address" /> --}}
 
-    <div class="group relative z-0 mb-5 hidden w-full">
-      <input
-        class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-        type="text" id="postal-town-input" name="postal-town-input" placeholder="Postal Town Input"
-        value="{{ old('postal-town-input') }}">
-      @error('postal-town-input')
-        <p class="yns_red mt-1 text-sm">{{ $message }}</p>
-      @enderror
-      <input
-        class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-        type="text" id="address-latitude" name="latitude" placeholder="Latitude" value="{{ old('latitude') }}">
-      @error('latitude')
-        <p class="yns_red mt-1 text-sm">{{ $message }}</p>
-      @enderror
-      <input
-        class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-        type="text" id="address-longitude" name="longitude" placeholder="Longitude" value="{{ old('longitude') }}">
-      @error('longitude')
-        <p class="yns_red mt-1 text-sm">{{ $message }}</p>
-      @enderror
-    </div>
 
     <div class="group mb-6">
       <x-input-label-dark for="email">Email</x-input-label-dark>

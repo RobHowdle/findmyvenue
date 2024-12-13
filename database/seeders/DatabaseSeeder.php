@@ -38,7 +38,7 @@ class DatabaseSeeder extends Seeder
             // PromoterVenueTestPivotSeeder::class, // For Testing Data
             // PromoterReviewTestSeeder::class, // For Testing Data
             OtherServicesListSeeder::class,
-            // OtherServiceSeeder::class,
+            OtherServiceSeeder::class,
             // FinanceTestDataSeeder::class,
             // UserServiceSeeder::class,
             // TodoTestDataSeeder::class,

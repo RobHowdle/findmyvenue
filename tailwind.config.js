@@ -43,7 +43,7 @@ export default {
                 "gradient-button": "linear-gradient(to top, #F03F37 , #D59220)",
             },
             gap: {
-                275: "2.75rem", // You can name this anything you want
+                275: "2.75rem",
             },
             width: {
                 400: "25rem",
@@ -55,7 +55,7 @@ export default {
                 50: "50px",
             },
             opacity: {
-                disabled: "0.5", // or whatever opacity you want
+                disabled: "0.5",
             },
             cursor: {
                 "not-allowed": "not-allowed",

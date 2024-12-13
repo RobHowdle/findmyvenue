@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BandReviews;
+use App\Models\PhotographerReviews;
 use App\Models\OtherService;
 use Illuminate\Http\Request;
 use App\Models\OtherServiceList;
@@ -259,14 +260,21 @@ class OtherServiceController extends Controller
             $bandAveragePromotionRating = BandReviews::calculateAverageScore($serviceId, 'promotion_rating');
             $bandAverageGigQualityRating = BandReviews::calculateAverageScore($serviceId, 'gig_quality_rating');
             $bandReviewCount = BandReviews::getReviewCount($serviceId);
+        } elseif ($singleService->services == "Photographer") {
+            $recentReviews = PhotographerReviews::getRecentReviewsForBand($serviceId);
+            $singleService->recentReviews = $recentReviews->isNotEmpty() ? $recentReviews : null;
+            $overallScore = PhotographerReviews::calculateOverallScore($serviceId);
+            $overallReviews[$serviceId] = $this->renderRatingIcons($overallScore);
+            $photographerAverageCommunicationRating = PhotographerReviews::calculateAverageScore($serviceId, 'communication_rating');
+            $photographerAverageReliabilityRating = PhotographerReviews::calculateAverageScore($serviceId, 'reliability_rating');
+            $photographerAveragePricingRating = PhotographerReviews::calculateAverageScore($serviceId, 'pricing_rating');
+            $photographerAverageQualityRating = PhotographerReviews::calculateAverageScore($serviceId, 'quality_rating');
+            $photographerReviewCount = PhotographerReviews::getReviewCount($serviceId);
         }
 
         $genres = json_decode($singleService->genre);
         $services = json_decode($singleService->packages);
         $bandType = json_decode($singleService->band_type);
-        $genre = json_decode($singleService->genre);
-
-
 
         return view('single-service', compact(
             'singleService',

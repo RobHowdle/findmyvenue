@@ -33,7 +33,7 @@ class SubNav extends Component
 
     // Designer
     public $designerId;
-    public $jobsDesignerYTD;
+    public $jobsCountDesignerYTD;
     public $overallRatingDesigner;
     public $totalProfitsDesignerYtd;
 
@@ -42,6 +42,16 @@ class SubNav extends Component
     public $eventsCountVenueYtd;
     public $overallRatingVenue;
     public $totalProfitsVenueYtd;
+
+    // Photographer
+    public $photographerId;
+    public $jobsCountPhotographerYtd;
+    public $totalProfitsPhotographerYtd;
+    public $overallPhotographerRating;
+
+    // Standard
+    public $standardUserId;
+    public $eventsCountStandardYtd;
 
     /**
      * Helper function to render rating icons
@@ -131,6 +141,10 @@ class SubNav extends Component
             case 'videographer':
                 $this->loadVideographerData($user);
                 break;
+
+            case 'standard':
+                $this->loadStandardUserData($user);
+                break;
             default:
                 break;
         }
@@ -146,7 +160,6 @@ class SubNav extends Component
             $this->overallRatingPromoter = $this->renderRatingIcons($this->promoterId);
         }
     }
-
     private function loadBandData($user)
     {
         $bands = $user->otherService("Band")->get();
@@ -158,11 +171,20 @@ class SubNav extends Component
             $this->totalProfitsBandYtd = $this->calculateTotalProfitsBandYtd($band->id);
         }
     }
-
-    private function loadDesignerData(int $bandId)
+    private function loadDesignerData($user)
     {
-        //
+        $designers = $user->otherService('Designer')->get();
+        if ($designers->isNotEmpty()) {
+            $designer = $designers->first();
+            $this->designerId = $designer->id;
+            $this->jobsCountDesignerYTD = $this->calculateJobsDesignerYtd($designer);
+            $this->totalProfitsDesignerYtd = $this->calculateTotalProfitsDesignerYtd($designer);
+            $this->overallRatingDesigner = $this->renderRatingIcons($this->designerId);
+        }
+
+        return null;
     }
+
     private function loadVideographerData(int $bandId)
     {
         //
@@ -177,9 +199,24 @@ class SubNav extends Component
             $this->overallRatingVenue = $this->renderRatingIcons($this->venueId);
         }
     }
-    private function loadPhotographerData(int $bandId)
+    private function loadPhotographerData($user)
     {
-        //
+        $photographers = $user->otherService("Photography")->get();
+        if ($photographers->isNotEmpty()) {
+            $photographer = $photographers->first();
+            $this->photographerId = $photographer->id;
+            $this->jobsCountPhotographerYtd = $this->calculateJobsCountPhotographerYtd($photographer);
+            $this->totalProfitsPhotographerYtd = $this->calculateTotalProfitsPhotographerYtd($photographer);
+            $this->overallPhotographerRating = $this->renderRatingIcons($this->photographerId);
+        }
+    }
+
+    private function loadStandardUserData($user)
+    {
+        $standardUser = $user->standardUser()->first();
+        if ($standardUser) {
+            $this->eventsCountStandardYtd = $this->calculateStandardUserEventsCountYtd($standardUser);
+        }
     }
 
     // Promoter Calculations
@@ -223,6 +260,55 @@ class SubNav extends Component
                     ->count();
 
                 return $eventsCountYTD;
+            }
+        }
+
+        // Return 0 if no promoter company or no profits found
+        return 0;
+    }
+
+    // Photograher Calculations
+    public function calculateJobsCountPhotographerYtd($photographer)
+    {
+        if ($photographer) {
+            $photographerCompany = $photographer->first();
+
+            if ($photographerCompany) {
+                $startOfYear = Carbon::now()->startOfYear();
+                $endOfYear = Carbon::now()->endOfYear();
+
+                // Query the finances table for the current year's jobs
+                $jobsCountYTD = DB::table('job_service')
+                    ->join('jobs', 'job_service.job_id', '=', 'jobs.id')
+                    ->where('serviceable_id', $photographerCompany->id)
+                    ->where('serviceable_type', 'App\Models\OtherService')
+                    ->whereBetween('jobs.job_start_date', [$startOfYear, $endOfYear])
+                    ->count();
+
+                return $jobsCountYTD;
+            }
+        }
+
+        // Return 0 if no promoter company or no profits found
+        return 0;
+    }
+
+    public function calculateTotalProfitsPhotographerYtd($photographer)
+    {
+        if ($photographer) {
+            $photographerCompany = $photographer->first();
+
+            if ($photographerCompany) {
+                $startOfYear = Carbon::now()->startOfYear();
+                $endOfYear = Carbon::now()->endOfYear();
+
+                // Query the finances table for the current year's profits
+                $totalProfitsYTD = Finance::where('serviceable_id', $photographerCompany->id)
+                    ->where('serviceable_type', 'App\Models\OtherService')
+                    ->whereBetween('date_to', [$startOfYear, $endOfYear])
+                    ->sum('total_profit');
+
+                return $totalProfitsYTD;
             }
         }
 
@@ -307,6 +393,84 @@ class SubNav extends Component
         return 0;
     }
 
+    // Standard User Calculations
+    public function calculateStandardUserEventsCountYtd($standardUser)
+    {
+        if ($standardUser) {
+            $standard = $standardUser->first();
+
+            if ($standard) {
+                $startOfYear = Carbon::now()->startOfYear();
+                $endOfYear = Carbon::now()->endOfYear();
+
+                // Query the finances table for the current year's profits
+                $eventsCountYTD = DB::table('event_promoter')
+                    ->join('events', 'event_promoter.event_id', '=', 'events.id')
+                    ->where('promoter_id', $standard->id)
+                    ->whereBetween('events.event_date', [$startOfYear, $endOfYear])
+                    ->count();
+
+                return $eventsCountYTD;
+            }
+        }
+
+        return 0;
+    }
+
+    // Designer Calculations
+    public function calculateTotalProfitsDesignerYtd($designer)
+    {
+        if ($designer) {
+            $designerCompany = $designer->first();
+
+            if ($designerCompany) {
+                $startOfYear = Carbon::now()->startOfYear();
+                $endOfYear = Carbon::now()->endOfYear();
+
+                // Query the finances table for the current year's profits
+                $totalProfitsYTD = Finance::where('serviceable_id', $designerCompany->id)
+                    ->where('serviceable_type', 'App\Models\OtherService')
+                    ->whereBetween('date_to', [$startOfYear, $endOfYear])
+                    ->sum('total_profit');
+
+                return $totalProfitsYTD;
+            }
+        }
+
+        // Return 0 if no promoter company or no profits found
+        return 0;
+    }
+
+    public function calculateJobsDesignerYtd($designer)
+    {
+        if ($designer) {
+            $designerCompany = $designer->first();
+
+            if ($designerCompany) {
+                $startOfYear = Carbon::now()->startOfYear();
+                $endOfYear = Carbon::now()->endOfYear();
+
+                // Query the finances table for the current year's jobs
+                $jobsCountDesignerYTD = DB::table('job_service')
+                    ->join('jobs', 'job_service.job_id', '=', 'jobs.id')
+                    ->where('serviceable_id', $designerCompany->id)
+                    ->where('serviceable_type', 'App\Models\OtherService')
+                    ->whereBetween('jobs.job_start_date', [$startOfYear, $endOfYear])
+                    ->count();
+
+                return $jobsCountDesignerYTD;
+            }
+        }
+
+        // Return 0 if no promoter company or no profits found
+        return 0;
+    }
+
+    public function calculateOverallRatingDesigner($designer)
+    {
+        //
+    }
+
     /**
      * Get the view / contents that represent the component.
      */
@@ -323,6 +487,12 @@ class SubNav extends Component
             'totalProfitsVenueYtd' => $this->totalProfitsVenueYtd,
             'eventsCountVenueYtd' => $this->eventsCountVenueYtd,
             'overallRatingVenue' => $this->overallRatingVenue,
+            'jobsCountPhotographerYtd' => $this->userType === 'photographer' ? $this->jobsCountPhotographerYtd : null,
+            'totalProfitsPhotographerYtd' => $this->totalProfitsPhotographerYtd,
+            'overallPhotographerRating' => $this->overallPhotographerRating,
+            'eventsCountStandardYtd' => $this->eventsCountStandardYtd,
+            'totalProfitsDesignerYtd' => $this->totalProfitsDesignerYtd,
+            'jobsCountDesignerYTD' => $this->jobsCountDesignerYTD,
         ]);
     }
 }
