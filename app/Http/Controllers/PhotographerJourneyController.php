@@ -74,7 +74,7 @@ class PhotographerJourneyController extends Controller
         }
 
         // Add the user to the band
-        $user->otherService('band')->attach($photographerId);
+        $user->otherService('artist')->attach($photographerId);
 
         return response()->json([
             'success' => true,

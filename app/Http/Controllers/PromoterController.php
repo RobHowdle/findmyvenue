@@ -199,7 +199,7 @@ class PromoterController extends Controller
             'venueWithHighestRating' => $suggestions['venue'],
             'photographerWithHighestRating' => $suggestions['photographer'],
             'videographerWithHighestRating' => $suggestions['videographer'],
-            'bandWithHighestRating' => $suggestions['band'],
+            'bandWithHighestRating' => $suggestions['artist'],
             'designerWithHighestRating' => $suggestions['designer'],
             'existingVenues' => $existingVenues,
             'renderRatingIcons' => [$this, 'renderRatingIcons']

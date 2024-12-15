@@ -1,10 +1,11 @@
-@props(['venues', 'genres', 'venuePromoterCount'])
+@props(['singleServices', 'genres', 'serviceName'])
 
 <div class="mx-auto min-h-screen w-full max-w-screen-2xl px-2 pt-24 md:pt-32">
-  <h1 class="py-4 text-center font-heading text-3xl text-white md:py-6 md:text-4xl xl:text-5xl 4xl:text-6xl">Venues</h1>
+  <h1 class="py-8 text-center font-heading text-6xl text-white">{{ $serviceName }}
+  </h1>
   <div class="relative shadow-md sm:rounded-lg">
-    <div class="search-wrapper flex justify-center border border-white bg-black">
-      <form class="filter-search flex items-center px-2 py-2 md:p-3" action="{{ route('venues.filterCheckboxesSearch') }}"
+    <div class="search-wrapper flex justify-center border border-white dark:bg-black">
+      <form class="filter-search flex items-center sm:p-1 md:p-3" action="{{ route('other.filterCheckboxesSearch') }}"
         method="GET">
         <div class="filters relative flex items-center">
           <div id="accordion-collapse" class="w-full" data-accordion="collapse">
@@ -23,7 +24,7 @@
             </h2>
             <div id="accordion-collapse-body-1" class="absolute hidden" aria-labelledby="accordion-collapse-heading-1">
               <div
-                class="filter-content max-h-40rem overflow-y-auto border-2 border-gray-100 p-5 dark:border-gray-300 dark:bg-gray-900">
+                class="filter-content max-h-40rem overflow-y-auto border border-b-0 border-gray-200 p-5 dark:border-gray-700 dark:bg-gray-900">
                 <div class="group relative z-0 mb-5 w-full">
                   <label class="text-sm font-medium text-gray-900 dark:text-gray-300">Preferred Band Types</label>
                   <div class="sm-gap:3 mt-4 grid sm:grid-cols-2 lg:grid-cols-3 lg:gap-4">
@@ -118,11 +119,11 @@
       </form>
     </div>
     <div class="relative z-0 overflow-x-auto">
-      <table class="w-full border border-white text-left font-sans rtl:text-right" id="venues">
+      <table class="w-full border border-white text-left font-sans rtl:text-right" id="otherServices">
         <thead class="text-white underline dark:bg-black">
           <tr>
             <th scope="col" class="px-2 py-2 text-base md:px-6 md:py-3 md:text-xl lg:px-8 lg:py-4 lg:text-2xl">
-              Venue
+              Name
             </th>
             <th scope="col" class="px-2 py-2 text-base md:px-6 md:py-3 md:text-xl lg:px-8 lg:py-4 lg:text-2xl">
               Rating
@@ -134,13 +135,6 @@
               class="hidden px-2 py-2 text-base md:block md:px-6 md:py-3 md:text-xl lg:px-8 lg:py-4 lg:text-2xl">
               Contact
             </th>
-            @php
-              $promoters = $venuePromoterCount != 0;
-            @endphp
-            <th scope="col"
-              class="md-text-2xl {{ $promoters ? 'md:block' : 'hidden' }} px-2 py-2 sm:text-xl md:px-6 md:py-3 lg:px-8 lg:py-4">
-              Promoter
-            </th>
           </tr>
         </thead>
         <tbody>
@@ -150,7 +144,6 @@
     </div>
   </div>
 </div>
-<!-- Pagination links -->
 <div class="mt-4 bg-yns_dark_gray px-4 py-4">
-  {{ $venues->links() }}
+  {{ $singleServices->links() }}
 </div>

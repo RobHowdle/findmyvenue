@@ -48,7 +48,7 @@ class BandDashboardController extends Controller
             'dashboardType' => $dashboardType,
             'modules' => $modules,
             'pendingReviews' => $pendingReviews,
-            'band' => $band,
+            'artist' => $band,
             'todoItemsCount' => $todoItemsCount,
             'eventsCount' => $eventsCount,
         ]);

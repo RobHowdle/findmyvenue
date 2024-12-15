@@ -27,7 +27,7 @@ class OtherServicesListSeeder extends Seeder
                 'image_url' => asset('storage/images/system/designer.jpg'),
             ],
             [
-                'service_name' => 'Band',
+                'service_name' => 'Artist',
                 'image_url' => asset('storage/images/system/band.jpg'),
             ],
         ]);

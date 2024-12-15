@@ -48,8 +48,8 @@ class ReviewController extends Controller
                 $query->where('review_approved', 0);
             }
             $reviews = $query->orderBy('created_at', 'DESC')->get();
-        } elseif ($dashboardType === 'band') {
-            $query = OtherServicesReview::where('other_services_id', $user->otherService("Band")->pluck('other_services.id'))
+        } elseif ($dashboardType === 'artist') {
+            $query = OtherServicesReview::where('other_services_id', $user->otherService("Artist")->pluck('other_services.id'))
                 ->where('other_services_list_id', 4);
 
             if ($filter === 'pending') {
@@ -83,7 +83,7 @@ class ReviewController extends Controller
 
                 return response()->json(['success' => true, 'message' => 'Review displayed successfully']);
             }
-        } elseif ($dashboardType === 'band') {
+        } elseif ($dashboardType === 'artist') {
             $review = OtherServicesReview::findOrFail($reviewId);
 
             if ($review) {
@@ -120,7 +120,7 @@ class ReviewController extends Controller
 
                 return response()->json(['success' => true, 'message' => 'Review approved successfully']);
             }
-        } elseif ($dashboardType === 'band') {
+        } elseif ($dashboardType === 'artist') {
             $review = OtherServicesReview::findOrFail($reviewId);
 
             if ($review) {
@@ -155,7 +155,7 @@ class ReviewController extends Controller
 
                 return response()->json(['success' => true, 'message' => 'Review displayed successfully']);
             }
-        } elseif ($dashboardType === 'band') {
+        } elseif ($dashboardType === 'artist') {
             $review = OtherServicesReview::findOrFail($reviewId);
 
             if ($review && $review->review_approved == 1) {
@@ -190,7 +190,7 @@ class ReviewController extends Controller
 
                 return response()->json(['success' => true, 'message' => 'Review hidden successfully.']);
             }
-        } elseif ($dashboardType === 'band') {
+        } elseif ($dashboardType === 'artist') {
             $review = OtherServicesReview::findOrFail($reviewId);
 
             if ($review && $review->display == true) {
@@ -225,7 +225,7 @@ class ReviewController extends Controller
 
                 return response()->json(['success' => true, 'message' => 'Review unapproved and hidden.']);
             }
-        } elseif ($dashboardType === 'band') {
+        } elseif ($dashboardType === 'artist') {
             $review = OtherServicesReview::findOrFail($reviewId);
 
             if ($review) {
@@ -259,7 +259,7 @@ class ReviewController extends Controller
 
                 return response()->json(['success' => true, 'message' => 'Review deleted successfully.']);
             }
-        } elseif ($dashboardType === 'band') {
+        } elseif ($dashboardType === 'artist') {
             $review = OtherServicesReview::findOrFail($reviewId);
 
             if ($review) {

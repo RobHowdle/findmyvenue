@@ -50,7 +50,7 @@
         'genres' => $bandData['genres'],
         'promoterGenres' => $bandData['bandGenres'],
         'userId' => $userId,
-        'band' => $bandData['band'],
+        'artist' => $bandData['artist'],
     ]) </div>
 </div>
 <div x-show="selectedTab === 7" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>

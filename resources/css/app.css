@@ -1308,6 +1308,7 @@ video {
 .service-block img {
     max-width: 250px;
     height: 100%;
+    /* aspect-ratio: 1/1; */
     object-fit: cover;
     object-position: center;
 }
@@ -1508,11 +1509,19 @@ iframe {
     ._250img {
         max-width: 200px;
     }
+
+    .service-block img {
+        max-width: 200px;
+    }
 }
 
 @media only screen and (max-width: 991px) {
     .filter-search {
         grid-template-columns: 450px 1fr;
+    }
+
+    .service-block img {
+        max-width: 250px;
     }
 }
 
@@ -1541,6 +1550,10 @@ iframe {
 
     #accordion-collapse #accordion-collapse-body-1 {
         width: 100%;
+    }
+
+    .service-block img {
+        max-width: 150px;
     }
 }
 

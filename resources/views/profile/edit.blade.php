@@ -22,7 +22,7 @@
             @include('profile.partials.promoter-profile', [
                 'promoterData' => $promoterData,
             ])
-          @elseif($dashboardType == 'band')
+          @elseif($dashboardType == 'artist')
             @include('profile.partials.band-profile', [
                 'bandData' => $bandData,
             ])
@@ -96,7 +96,7 @@
           @include('profile.partials.promoter-profile-tabs', [
               'promoterData' => $promoterData,
           ])
-        @elseif($dashboardType == 'band')
+        @elseif($dashboardType == 'artist')
           @include('profile.partials.band-profile-tabs', [
               'bandData' => $bandData,
           ])

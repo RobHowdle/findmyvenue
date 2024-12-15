@@ -79,28 +79,20 @@ class OtherServiceController extends Controller
         return view('other', compact('otherServices', 'serviceCounts'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
     public function showGroup(Request $request, $serviceName)
     {
         $otherServiceIds = OtherServiceList::where('service_name', $serviceName)->pluck('id');
+        $searchQuery = $request->input('search_query');
+
         $singleServices = OtherService::with('otherServiceList')
             ->whereIn('other_service_id', $otherServiceIds)
-            ->get();
+            ->when($searchQuery, function ($query, $searchQuery) {
+                // Apply search query condition only if search_query is present
+                return $query->whereHas('otherServiceList', function ($query) use ($searchQuery) {
+                    $query->where('postal_town', 'like', "%$searchQuery%");
+                });
+            })
+            ->paginate(10);
 
         // Fetch genres for initial page load
         $genreList = file_get_contents(public_path('text/genre_list.json'));
@@ -109,8 +101,8 @@ class OtherServiceController extends Controller
 
         if ($request->ajax()) {
             return response()->json([
-                'otherServices' => $otherServices,
-                'view' => view('partials.otherServices-list', compact('otherServices', 'genres'))->render()
+                'singleServices' => $singleServices,
+                'view' => view('partials.otherServices-list', compact('singleServices', 'genres'))->render()
             ]);
         }
 
@@ -128,11 +120,15 @@ class OtherServiceController extends Controller
                         break;
                     }
                 }
-                $platforms[] = ['url' => $url, 'platform' => $matchedPlatform];
+                $platforms[] = [
+                    'url' => $url,
+                    'platform' => $matchedPlatform
+                ];
             }
+
+            $singleServices->platforms = $platforms;
         }
 
-        $singleServices->platforms = $platforms;
         $overallReviews = []; // Array to store overall reviews for each venue
 
         foreach ($singleServices as $service) {
@@ -146,189 +142,99 @@ class OtherServiceController extends Controller
         return view('single-service-group', compact('singleServices', 'genres', 'overallReviews', 'serviceName'));
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show($serviceName, $serviceId)
+    public function filterCheckboxesSearch(Request $request)
     {
-        $singleService = OtherService::where('id', $serviceId)->with('otherServiceList')->first();
-        $singleServiceTitle =
-            OtherService::where('id', $serviceId)->with('otherServiceList')->first();
+        $query = OtherService::query();
 
-        $customKeys = [
-            'Photography' => 'photography',
-            'Designer' => 'designer',
-            'Videography' => 'videography',
-            'Band' => 'band',
-        ];
-
-        $normalizedServiceName = ucfirst(strtolower(($serviceName)));
-        $key = $customKeys[$normalizedServiceName] ?? $normalizedServiceName;
-        $suggestions = app('suggestions', [$key => $serviceName]);
-
-        // Default empty suggestions array
-        $promoterWithHighestRating = $photographerWithHighestRating = $videographerWithHighestRating = $bandWithHighestRating = $designerWithHighestRating = null;
-
-        // Check if the relevant suggestions exist
-        if (isset($suggestions['promoter'])) {
-            $promoterWithHighestRating = $suggestions['promoter'];
-        }
-        if (isset($suggestions['photographer'])) {
-            $photographerWithHighestRating = $suggestions['photographer'];
-        }
-        if (isset($suggestions['videographer'])) {
-            $videographerWithHighestRating = $suggestions['videographer'];
-        }
-        if (isset($suggestions['band'])) {
-            $bandWithHighestRating = $suggestions['band'];
-        }
-        if (isset($suggestions['designer'])) {
-            $designerWithHighestRating = $suggestions['designer'];
+        // Search Results
+        $searchQuery = $request->input('search_query');
+        if ($searchQuery) {
+            $query->where(function ($query) use ($searchQuery) {
+                $query->where('postal_town', 'LIKE', "%$searchQuery%")
+                    ->orWhere('name', 'LIKE', "%$searchQuery%");
+            });
         }
 
-        // If contact_link is a JSON string, decode it into an array.
-        if ($singleService->contact_link) {
-            // Decode the JSON if it's in JSON format, otherwise use it as a plain string
-            $urls = is_array($singleService->contact_link)
-                ? $singleService->contact_link
-                : json_decode($singleService->contact_link, true);
-
-            // If the JSON decoding results in null (i.e., invalid JSON), use explode as a fallback.
-            if ($urls === null) {
-                $urls = explode(',', $singleService->contact_link);
+        // Band Type Filter
+        if ($request->has('band_type')) {
+            $bandType = $request->input('band_type');
+            if (!empty($bandType)) {
+                $bandType = array_map('trim', $bandType);
+                $query->where(function ($query) use ($bandType) {
+                    foreach ($bandType as $type) {
+                        $query->orWhereRaw('JSON_CONTAINS(band_type, ?)', [json_encode([$type])]);
+                    }
+                });
             }
-
-            $platforms = []; // Initialize the array to store platforms
         }
 
-        // Now process each URL to associate with its platform
-        foreach ($urls as $url) {
-            // Initialize the platform as unknown
-            $matchedPlatform = 'Unknown';
+        // Genre Filter
+        if ($request->has('genres')) {
+            $genres = $request->input('genres');
+            if (!empty($genres)) {
+                $genres = array_map('trim', $genres); // Ensure no extra spaces
+                $query->where(function ($query) use ($genres) {
+                    foreach ($genres as $genre) {
+                        // Ensure the genre is properly formatted
+                        $query->orWhereRaw('JSON_CONTAINS(genre, ?)', [json_encode([$genre])]);
+                    }
+                });
+            }
+        }
 
-            // Check if the URL contains platform names
-            $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
-            foreach ($platformsToCheck as $platform) {
-                if (stripos($url, $platform) !== false) {
-                    $matchedPlatform = $platform;
-                    break; // Stop checking once a platform is found
+        // Get the venues with pagination
+        $otherServices = $query->paginate(10);
+
+        // Process each venue
+        $transformedData = $otherServices->getCollection()->map(function ($other) {
+            // Split the field containing multiple URLs into an array
+            $urls = explode(',', $other->contact_link);
+            $platforms = [];
+
+            // Check each URL against the platforms
+            foreach ($urls as $url) {
+                // Initialize the platform as unknown
+                $matchedPlatform = 'Unknown';
+
+                // Check if the URL contains platform names
+                $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+                foreach ($platformsToCheck as $platform) {
+                    if (stripos($url, $platform) !== false) {
+                        $matchedPlatform = $platform;
+                        break;
+                    }
                 }
+
+                // Store the platform information for each URL
+                $platforms[] = [
+                    'url' => $url,
+                    'platform' => $matchedPlatform
+                ];
             }
 
-            // Store the platform information for each URL
-            $platforms[] = [
-                'url' => $url,
-                'platform' => $matchedPlatform
+            // Use the static method to calculate the overall score
+            $overallScore = \App\Models\OtherServicesReview::calculateOverallScore($other->id);
+
+            return [
+                'id' => $other->id,
+                'name' => $other->name,
+                'postal_town' => $other->postal_town,
+                'contact_number' => $other->contact_number,
+                'contact_email' => $other->contact_email,
+                'platforms' => $platforms,
+                'average_rating' => $overallScore,
             ];
-        }
+        });
 
-        // Store the platform information as an array (no need for json_decode anymore)
-        $singleService->platforms = $platforms;
-
-
-        $recentReviews = OtherServicesReview::getRecentReviewsForOtherService($serviceId);
-        $singleService->recentReviews = $recentReviews->isNotEmpty() ? $recentReviews : null;
-
-        $overallScore = OtherServicesReview::calculateOverallScore($serviceId);
-        $overallReviews[$serviceId] = $this->renderRatingIcons($overallScore);
-
-        // Get Review Scores
-        $averageCommunicationRating = OtherServicesReview::calculateAverageScore($serviceId, 'communication_rating');
-        $averageRopRating = OtherServicesReview::calculateAverageScore($serviceId, 'rop_rating');
-        $averagePromotionRating = OtherServicesReview::calculateAverageScore($serviceId, 'promotion_rating');
-        $averageQualityRating = OtherServicesReview::calculateAverageScore($serviceId, 'quality_rating');
-        $reviewCount = OtherServicesReview::getReviewCount($serviceId);
-
-        $members = null;
-        $streamUrls = [];
-        $recentReviews = null;
-        $bandAverageCommunicationRating = null;
-        $bandAverageMusicRating = null;
-        $bandAveragePromotionRating = null;
-        $bandAverageGigQualityRating = null;
-        $bandReviewCount = 0;
-
-        if ($singleService->services == "Band") {
-            $members = json_decode($singleService->members);
-            $streamUrls = json_decode($singleService->stream_urls) ?? [];
-            $recentReviews = BandReviews::getRecentReviewsForBand($serviceId);
-            $singleService->recentReviews = $recentReviews->isNotEmpty() ? $recentReviews : null;
-            $overallScore = BandReviews::calculateOverallScore($serviceId);
-            $overallReviews[$serviceId] = $this->renderRatingIcons($overallScore);
-            $bandAverageCommunicationRating = BandReviews::calculateAverageScore($serviceId, 'communication_rating');
-            $bandAverageMusicRating = BandReviews::calculateAverageScore($serviceId, 'music_rating');
-            $bandAveragePromotionRating = BandReviews::calculateAverageScore($serviceId, 'promotion_rating');
-            $bandAverageGigQualityRating = BandReviews::calculateAverageScore($serviceId, 'gig_quality_rating');
-            $bandReviewCount = BandReviews::getReviewCount($serviceId);
-        } elseif ($singleService->services == "Photographer") {
-            $recentReviews = PhotographerReviews::getRecentReviewsForBand($serviceId);
-            $singleService->recentReviews = $recentReviews->isNotEmpty() ? $recentReviews : null;
-            $overallScore = PhotographerReviews::calculateOverallScore($serviceId);
-            $overallReviews[$serviceId] = $this->renderRatingIcons($overallScore);
-            $photographerAverageCommunicationRating = PhotographerReviews::calculateAverageScore($serviceId, 'communication_rating');
-            $photographerAverageReliabilityRating = PhotographerReviews::calculateAverageScore($serviceId, 'reliability_rating');
-            $photographerAveragePricingRating = PhotographerReviews::calculateAverageScore($serviceId, 'pricing_rating');
-            $photographerAverageQualityRating = PhotographerReviews::calculateAverageScore($serviceId, 'quality_rating');
-            $photographerReviewCount = PhotographerReviews::getReviewCount($serviceId);
-        }
-
-        $genres = json_decode($singleService->genre);
-        $services = json_decode($singleService->packages);
-        $bandType = json_decode($singleService->band_type);
-
-        return view('single-service', compact(
-            'singleService',
-            'singleServiceTitle',
-            'genres',
-            'services',
-            'overallScore',
-            'overallReviews',
-            'averageCommunicationRating',
-            'averageRopRating',
-            'averagePromotionRating',
-            'averageQualityRating',
-            'reviewCount',
-            'members',
-            'streamUrls',
-            'bandType',
-            'genres',
-            'bandAverageCommunicationRating',
-            'bandAverageMusicRating',
-            'bandAveragePromotionRating',
-            'bandAverageGigQualityRating',
-            'bandReviewCount',
-        ))
-            ->with([
-                'promoterWithHighestRating' => $promoterWithHighestRating,
-                'photographerWithHighestRating' => $photographerWithHighestRating,
-                'videographerWithHighestRating' => $videographerWithHighestRating,
-                'bandWithHighestRating' => $bandWithHighestRating,
-                'designerWithHighestRating' => $designerWithHighestRating,
-                'renderRatingIcons' => [$this, 'renderRatingIcons']
-            ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(OtherService $otherService)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, OtherService $otherService)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(OtherService $otherService)
-    {
-        //
+        // Return the transformed data with pagination info
+        return response()->json([
+            'otherServices' => $transformedData,
+            'pagination' => [
+                'current_page' => $otherServices->currentPage(),
+                'last_page' => $otherServices->lastPage(),
+                'total' => $otherServices->total(),
+                'per_page' => $otherServices->perPage(),
+            ]
+        ]);
     }
 }

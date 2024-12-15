@@ -85,12 +85,8 @@ class VenueController extends Controller
             $urls = explode(',', $venue->contact_link);
             $platforms = [];
 
-            // Check each URL against the platforms
             foreach ($urls as $url) {
-                // Initialize the platform as unknown
                 $matchedPlatform = 'Unknown';
-
-                // Check if the URL contains platform names
                 $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
                 foreach ($platformsToCheck as $platform) {
                     if (stripos($url, $platform) !== false) {
@@ -193,7 +189,7 @@ class VenueController extends Controller
                 'promoterWithHighestRating' => $suggestions['promoter'],
                 'photographerWithHighestRating' => $suggestions['photographer'],
                 'videographerWithHighestRating' => $suggestions['videographer'],
-                'bandWithHighestRating' => $suggestions['band'],
+                'bandWithHighestRating' => $suggestions['artist'],
                 'designerWithHighestRating' => $suggestions['designer'],
                 'existingPromoters' => $existingPromoters,
                 'renderRatingIcons' => [$this, 'renderRatingIcons']

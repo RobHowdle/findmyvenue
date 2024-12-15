@@ -58,7 +58,7 @@ class ProfileController extends Controller
         // Check if the dashboardType is 'promoter' and get promoter data
         if ($dashboardType === 'promoter') {
             $promoterData = $this->getPromoterData($user);
-        } elseif ($dashboardType === 'band') {
+        } elseif ($dashboardType === 'artist') {
             $bandData = $this->getBandData($user);
         } elseif ($dashboardType === 'venue') {
             $venueData = $this->getVenueData($user);
@@ -378,7 +378,7 @@ class ProfileController extends Controller
         $userId = $user->id;
         $userData = $request->validated();
 
-        if ($dashboardType == 'band') {
+        if ($dashboardType == 'artist') {
             // Fetch the promoter associated with the user via the service_user pivot table
             $band = OtherService::where('other_service_id', 4)->whereHas('linkedUsers', function ($query) use ($userId) {
                 $query->where('user_id', $userId);
@@ -807,7 +807,7 @@ class ProfileController extends Controller
 
     private function getBandData(User $user)
     {
-        $band = $user->otherService("Band")->first();
+        $band = $user->otherService("Artist")->first();
 
         $name = $band ? $band->name : '';
         $location = $band ? $band->location : '';
@@ -862,7 +862,7 @@ class ProfileController extends Controller
         $members = is_array($band->members) ? $band->members : json_decode($band->members, true);
 
         return [
-            'band' => $band,
+            'artist' => $band,
             'name' => $name,
             'location' => $location,
             'logo' => $logo,
@@ -1417,8 +1417,8 @@ class ProfileController extends Controller
                 $promoter = $user->promoters()->first();
                 $userType = $promoter;
                 break;
-            case 'band':
-                $band = $user->otherService('Band')->first();
+            case 'artist':
+                $band = $user->otherService('Artist')->first();
                 $userType = $band;
                 break;
             case 'venue':
@@ -1483,8 +1483,8 @@ class ProfileController extends Controller
                 $promoter = $user->promoters()->first();
                 $userType = $promoter;
                 break;
-            case 'band':
-                $band = $user->otherService('Band')->first();
+            case 'artist':
+                $band = $user->otherService('Artist')->first();
                 $userType = $band;
                 break;
             case 'venue':

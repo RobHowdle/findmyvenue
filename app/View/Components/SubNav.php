@@ -122,7 +122,7 @@ class SubNav extends Component
                 $this->loadPromoterData($user);
                 break;
 
-            case 'band':
+            case 'artist':
                 $this->loadBandData($user);
                 break;
 
@@ -162,7 +162,7 @@ class SubNav extends Component
     }
     private function loadBandData($user)
     {
-        $bands = $user->otherService("Band")->get();
+        $bands = $user->otherService("Artist")->get();
         if ($bands->isNotEmpty()) {
             $band = $bands->first();
             $this->bandId = $band->id;

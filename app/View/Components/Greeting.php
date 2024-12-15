@@ -47,8 +47,8 @@ class Greeting extends Component
                     $this->associatedEntity = $venue ? $venue->name : null;
                     break;
 
-                case 'band':
-                    $band = $user->otherService("Band")->first();
+                case 'artist':
+                    $band = $user->otherService("Artist")->first();
                     $this->associatedEntity = $band ? $band->name : null;
                     break;
 

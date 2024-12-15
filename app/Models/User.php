@@ -139,7 +139,7 @@ class User extends Authenticatable
             'photographer' => 1,
             'videographer' => 2,
             'designer' => 3,
-            'band' => 4,
+            'artist' => 4,
         ];
 
         return $roleMapping[$role] ?? null;

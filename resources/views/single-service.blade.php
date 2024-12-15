@@ -24,7 +24,7 @@
             </div>
             <div class="rating-wrapper flex flex-row items-center gap-2">
               <p class="h-full place-content-end font-sans">Overall Rating
-                (@if ($singleService->services == 'Band')
+                (@if ($singleService->services == 'Artist')
                   {{ $bandReviewCount }}@else{{ $reviewCount }}
                 @endif):
               </p>
@@ -42,7 +42,7 @@
         </div>
 
         <div class="body">
-          @if ($singleService->services == 'Band')
+          @if ($singleService->services == 'Artist')
             <div class="h-auto py-4">
               <ul
                 class="flex flex-wrap justify-between border-b border-gray-200 text-center text-sm font-medium text-gray-500 dark:border-gray-700 dark:text-gray-400">
@@ -113,7 +113,7 @@
             </div>
           @endif
 
-          @if ($singleService->services == 'Band')
+          @if ($singleService->services == 'Artist')
             <div class="venue-tab-content mt-4 overflow-auto font-sans text-lg text-white">
               <div id="about">
                 @if (!$singleService->description)

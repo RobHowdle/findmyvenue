@@ -38,8 +38,8 @@ class LinkedUserController extends Controller
 
         if ($dashboardType == 'promoter') {
             $relatedUsers = $user->promoters->load(['linkedUsers']);
-        } elseif ($dashboardType == 'band') {
-            $relatedUsers = $user->otherService("Band")->get();
+        } elseif ($dashboardType == 'artist') {
+            $relatedUsers = $user->otherService("Artist")->get();
         }
 
         return response()->json([
@@ -69,9 +69,9 @@ class LinkedUserController extends Controller
                 $currentServiceId = $user->venues->first()->id ?? null;
                 break;
 
-            case 'band':
-                $service = $user->otherService("Band")->first();
-                $currentServiceId = $user->otherService("Band")->first()->id ?? null;
+            case 'artist':
+                $service = $user->otherService("Artist")->first();
+                $currentServiceId = $user->otherService("Artist")->first()->id ?? null;
                 break;
 
             case 'photographer':
@@ -117,9 +117,9 @@ class LinkedUserController extends Controller
         if ($dashboardType == 'promoter') {
             $serviceType = 'App\Models\Promoter';
             $serviceId = $user->promoters->first()->id ?? null;
-        } elseif ($dashboardType == 'band') {
+        } elseif ($dashboardType == 'artist') {
             $serviceType = 'App\Models\OtherService';
-            $serviceId = $user->otherService("Band")->first()->id ?? null;
+            $serviceId = $user->otherService("Artist")->first()->id ?? null;
         } elseif ($dashboardType == 'designer') {
             $serviceType = 'App\Models\OtherService';
             $serviceId = $user->otherService("Designer")->first()->id ?? null;
@@ -179,7 +179,7 @@ class LinkedUserController extends Controller
                 $serviceType = Promoter::class;
             } elseif ($dashboardType == 'venue') {
                 $serviceType = Venue::class;
-            } elseif (in_array($dashboardType, ['band', 'designer', 'photographer', 'videographer'])) {
+            } elseif (in_array($dashboardType, ['artist', 'designer', 'photographer', 'videographer'])) {
                 $serviceType = OtherService::class;
             } else {
                 return response()->json(['message' => 'Invalid dashboard type.'], 400);
