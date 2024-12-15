@@ -85,27 +85,25 @@ class VenueController extends Controller
             $urls = explode(',', $venue->contact_link);
             $platforms = [];
 
-            if ($urls) {
-                // Check each URL against the platforms
-                foreach ($urls as $url) {
-                    // Initialize the platform as unknown
-                    $matchedPlatform = 'Unknown';
+            // Check each URL against the platforms
+            foreach ($urls as $url) {
+                // Initialize the platform as unknown
+                $matchedPlatform = 'Unknown';
 
-                    // Check if the URL contains platform names
-                    $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
-                    foreach ($platformsToCheck as $platform) {
-                        if (stripos($url, $platform) !== false) {
-                            $matchedPlatform = $platform;
-                            break;
-                        }
+                // Check if the URL contains platform names
+                $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+                foreach ($platformsToCheck as $platform) {
+                    if (stripos($url, $platform) !== false) {
+                        $matchedPlatform = $platform;
+                        break;
                     }
-
-                    // Store the platform information for each URL
-                    $platforms[] = [
-                        'url' => $url,
-                        'platform' => $matchedPlatform
-                    ];
                 }
+
+                // Store the platform information for each URL
+                $platforms[] = [
+                    'url' => $url,
+                    'platform' => $matchedPlatform
+                ];
             }
 
             // Add the processed data to the venue

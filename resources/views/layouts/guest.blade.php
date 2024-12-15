@@ -88,6 +88,45 @@
               </path>
             </svg>
           </button>
+
+          <div x-show="sidebarOpen" class="fixed inset-0 z-50 flex justify-end" style="top: 0; left: auto;"
+            x-transition:enter="transition transform ease-out duration-300" x-transition:enter-start="translate-x-full"
+            x-transition:enter-end="translate-x-0" x-transition:leave="transition transform ease-in duration-300"
+            x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full"
+            class="fixed inset-0 z-50 flex justify-end" x-cloak>
+            <div class="relative w-screen bg-gray-800 text-white shadow-lg md:w-64">
+              <button @click="sidebarOpen = false" class="absolute left-4 top-12 text-gray-400 hover:text-white">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                  </path>
+                </svg>
+              </button>
+              <div class="mt-24 space-y-4">
+                <a href="{{ url('/venues') }}"
+                  class="{{ request()->is('venues*') ? 'dark:text-yns_yellow' : '' }} block px-4 py-2 text-center hover:text-yns_yellow lg:hidden">Venues</a>
+                <a href="{{ url('/promoters') }}"
+                  class="{{ request()->is('promoters*') ? 'dark:text-yns_yellow' : '' }} block px-4 py-2 text-center hover:text-yns_yellow lg:hidden">Promoters</a>
+                <a href="{{ url('/other') }}"
+                  class="{{ request()->is('other*') ? 'dark:text-yns_yellow' : '' }} block px-4 py-2 text-center hover:text-yns_yellow lg:hidden">Other</a>
+                @auth
+                  <a href="{{ url('/dashboard') }}"
+                    class="block px-4 py-2 text-center hover:text-yns_yellow lg:hidden">Dashboard</a>
+                @else
+                  <a href="{{ url('/login') }}"
+                    class="block px-4 py-2 text-center hover:text-yns_yellow lg:hidden">Login</a>
+                @endauth
+                @guest
+                  <a href="{{ route('register') }}"
+                    class="block px-4 py-2 text-center hover:text-yns_yellow">Register</a>
+                @endguest
+                <a href="{{ route('gig-guide') }}" class="block px-4 py-2 text-center hover:text-yns_yellow">Gig
+                  Guide</a>
+              </div>
+            </div>
+            <div @click="sidebarOpen = false" class="flex-1 bg-black opacity-50"></div>
+          </div>
+
         </div>
       </div>
     </nav>
@@ -96,42 +135,6 @@
   <div class="flex min-h-screen flex-col">
     <div class="flex-grow backdrop-brightness-50">
       {{ $slot }}
-    </div>
-
-    <div x-show="sidebarOpen" class="fixed inset-0 z-50 flex justify-end" style="top: 0; left: auto;"
-      x-transition:enter="transition transform ease-out duration-300" x-transition:enter-start="translate-x-full"
-      x-transition:enter-end="translate-x-0" x-transition:leave="transition transform ease-in duration-300"
-      x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full"
-      class="fixed inset-0 z-50 flex justify-end" x-cloak>
-      <div class="relative w-screen bg-gray-800 text-white shadow-lg md:w-64">
-        <button @click="sidebarOpen = false" class="absolute left-4 top-12 text-gray-400 hover:text-white">
-          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-            </path>
-          </svg>
-        </button>
-        <div class="mt-24 space-y-4">
-          <a href="{{ url('/venues') }}"
-            class="{{ request()->is('venues*') ? 'dark:text-yns_yellow' : '' }} block px-4 py-2 text-center hover:text-yns_yellow lg:hidden">Venues</a>
-          <a href="{{ url('/promoters') }}"
-            class="{{ request()->is('promoters*') ? 'dark:text-yns_yellow' : '' }} block px-4 py-2 text-center hover:text-yns_yellow lg:hidden">Promoters</a>
-          <a href="{{ url('/other') }}"
-            class="{{ request()->is('other*') ? 'dark:text-yns_yellow' : '' }} block px-4 py-2 text-center hover:text-yns_yellow lg:hidden">Other</a>
-          @auth
-            <a href="{{ url('/dashboard') }}"
-              class="block px-4 py-2 text-center hover:text-yns_yellow lg:hidden">Dashboard</a>
-          @else
-            <a href="{{ url('/login') }}" class="block px-4 py-2 text-center hover:text-yns_yellow lg:hidden">Login</a>
-          @endauth
-          @guest
-            <a href="{{ route('register') }}" class="block px-4 py-2 text-center hover:text-yns_yellow">Register</a>
-          @endguest
-          <a href="{{ route('gig-guide') }}" class="block px-4 py-2 text-center hover:text-yns_yellow">Gig
-            Guide</a>
-        </div>
-      </div>
-      <div @click="sidebarOpen = false" class="flex-1 bg-black opacity-50"></div>
     </div>
   </div>
 

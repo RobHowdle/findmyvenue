@@ -39,7 +39,7 @@
   </x-venue-table>
 </x-guest-layout>
 <script
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcMjlXwDOk74oMDPgOp4YWdWxPa5xtHGA&libraries=places&callback=initialize"
+  src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places&callback=initialize"
   async defer></script>
 <script>
   // Search Bar
@@ -315,10 +315,6 @@
     var emptyIcon = "{{ asset('storage/images/system/ratings/empty.png') }}";
     var fullIcon = "{{ asset('storage/images/system/ratings/full.png') }}";
     var hotIcon = "{{ asset('storage/images/system/ratings/hot.png') }}";
-
-    console.log(emptyIcon); // Check the generated URL
-
-
 
     // Special case: all icons are hot
     if (rating === totalIcons) {
