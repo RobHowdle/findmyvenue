@@ -19,14 +19,25 @@
           <div class="header-text flex flex-col justify-center gap-2">
             <h1 class="text-sans text-center text-xl md:text-left xl:text-2xl 2xl:text-4xl">{{ $venue->name }}</h1>
             @if ($venue->location)
-              <div class="group flex flex-row justify-center gap-1 md:justify-start xl:gap-2">
+              <div class="group flex flex-row items-center justify-center gap-1 md:justify-start xl:gap-2">
                 <i class="fa-solid fa-location-dot mr-2"></i>
                 <a class="text-md text-center font-sans underline transition duration-150 ease-in-out hover:text-yns_yellow md:text-left lg:text-lg xl:text-xl 2xl:text-2xl"
                   href="javascript:void(0)" target="_blank" id="open-map-link">{{ $venue->location }}</a>
               </div>
             @endif
             @if ($venue->w3w)
-              <div class="flow-row group flex justify-center gap-1 md:justify-start xl:gap-2">
+              <div class="group flex flex-row items-center justify-center gap-1 md:justify-start xl:gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="50 50 50 50" width="16" height="20"
+                  class="w3w-icon" fill="currentColor">
+                  <path fill="#FFFFFF"
+                    d="M67.6525,92.3346a2.7455,2.7455,0,0,1-2.602-3.61L76.0212,55.812a2.7429,2.7429,0,0,1,5.2041,1.7356L70.2546,90.46A2.7429,2.7429,0,0,1,67.6525,92.3346Z" />
+                  <path fill="#FFFFFF"
+                    d="M51.1965,92.3346a2.7456,2.7456,0,0,1-2.6021-3.61L59.5651,55.812a2.743,2.743,0,0,1,5.2042,1.7356L53.7985,90.46A2.7429,2.7429,0,0,1,51.1965,92.3346Z" />
+                  <path fill="#FFFFFF"
+                    d="M84.1086,92.3346a2.7456,2.7456,0,0,1-2.6021-3.61L92.4772,55.812a2.743,2.743,0,0,1,5.2042,1.7356L86.7107,90.46A2.743,2.743,0,0,1,84.1086,92.3346Z" />
+
+                </svg>
+
                 <a class="text-md text-center font-sans underline transition duration-150 ease-in-out hover:text-yns_yellow md:text-left lg:text-lg xl:text-xl 2xl:text-2xl"
                   href="javascript:void(0)" target="_blank" id="open-w3w-link">{{ $venue->w3w }}</a>
               </div>

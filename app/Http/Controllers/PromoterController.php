@@ -120,7 +120,9 @@ class PromoterController extends Controller
             $overallScore = PromoterReview::calculateOverallScore($promoter->id);
             $overallReviews[$promoter->id] = $this->renderRatingIcons($overallScore);
         }
-        return view('promoters', compact('promoters', 'genres', 'overallReviews'));
+
+        $promoterVenueCount = count($promoter['venues']);
+        return view('promoters', compact('promoters', 'genres', 'overallReviews', 'promoterVenueCount'));
     }
 
     /**
