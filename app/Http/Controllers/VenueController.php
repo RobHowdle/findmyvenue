@@ -113,6 +113,7 @@ class VenueController extends Controller
             $overallReviews[$venue->id] = $this->renderRatingIcons($overallScore);
         }
 
+        dd($venues);
         $venuePromoterCount = count($venue['promoters']);
         return view('venues', compact('venues', 'genres', 'overallReviews', 'venuePromoterCount'));
     }

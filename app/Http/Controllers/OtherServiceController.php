@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\BandReviews;
-use App\Models\PhotographerReviews;
 use App\Models\OtherService;
 use Illuminate\Http\Request;
+use App\Models\DesignerReviews;
 use App\Models\OtherServiceList;
+use App\Models\PhotographyReviews;
+use App\Models\VideographyReviews;
 use Illuminate\Support\Facades\DB;
 use App\Models\OtherServicesReview;
+use App\Models\PhotographerReviews;
 
 class OtherServiceController extends Controller
 {
@@ -142,6 +145,50 @@ class OtherServiceController extends Controller
         return view('single-service-group', compact('singleServices', 'genres', 'overallReviews', 'serviceName'));
     }
 
+    public function show(Request $request, $serviceName, $serviceId)
+    {
+        $singleService = OtherService::where('id', $serviceId)->first();
+
+        $singleArtistData = [];
+        $singlePhotographerData = [];
+        $singleVideographerData = [];
+        $singleDesignerData = [];
+
+        // Fetch genres for initial page load
+        $genreList = file_get_contents(public_path('text/genre_list.json'));
+        $data = json_decode($genreList, true);
+        $genres = $data['genres'];
+
+        switch ($serviceName) {
+            case 'Artist':
+                $singleArtistData = $this->getArtistData($singleService);
+                break;
+            case 'Photography':
+                $singlePhotographerData = $this->getPhotographerData($singleService);
+                break;
+            case 'Videographer':
+                $singleVideographerData = $this->getVideographerData($singleService);
+                break;
+            case 'Designer':
+                $singleDesignerData = $this->getDesignerData($singleService);
+                break;
+        }
+
+        $overallReviews = [];
+        $overallScore = OtherServicesReview::calculateOverallScore($singleService->id);
+        $overallReviews[$singleService->id] = $this->renderRatingIcons($overallScore);
+
+        return view('single-service', [
+            'singleService' => $singleService,
+            'genres' => $genres,
+            'overallReviews' => $overallReviews,
+            'singleArtistData' => $singleArtistData,
+            'singlePhotographerData' => $singlePhotographerData,
+            'singleVideographerData' => $singleVideographerData,
+            'singleDesignerData' => $singleDesignerData,
+        ]);
+    }
+
     public function filterCheckboxesSearch(Request $request)
     {
         $query = OtherService::query();
@@ -236,5 +283,135 @@ class OtherServiceController extends Controller
                 'per_page' => $otherServices->perPage(),
             ]
         ]);
+    }
+
+    /**
+     * Get single service specific data
+     */
+    private function getArtistData(OtherService $singleService)
+    {
+        $service = $singleService;
+        $serviceId = $service->id;
+
+        $members = $service->linkedUsers()->get();
+
+        $overallScore = OtherServicesReview::calculateOverallScore($serviceId);
+        $overallReviews[$serviceId] = $this->renderRatingIcons($overallScore);
+
+        $bandAverageCommunicationRating = BandReviews::calculateAverageScore($serviceId, 'communication_rating');
+        $bandAverageMusicRating = BandReviews::calculateAverageScore($serviceId, 'music_rating');
+        $bandAveragePromotionRating = BandReviews::calculateAverageScore($serviceId, 'promotion_rating');
+        $bandAverageGigQualityRating = BandReviews::calculateAverageScore($serviceId, 'gig_quality_rating');
+        $reviewCount = BandReviews::getReviewCount($serviceId);
+
+        return [
+            'members' => $members,
+            'overallScore' => $overallScore,
+            'overallReviews' => $overallReviews,
+            'bandAverageCommunicationRating' => $bandAverageCommunicationRating,
+            'bandAverageMusicRating' => $bandAverageMusicRating,
+            'bandAveragePromotionRating' => $bandAveragePromotionRating,
+            'bandAverageGigQualityRating' => $bandAverageGigQualityRating,
+            'renderRatingIcons' => [$this, 'renderRatingIcons'],
+            'reviewCount' => $reviewCount,
+        ];
+    }
+
+    private function getPhotographerData(OtherService $singleService)
+    {
+        $service = $singleService;
+        $serviceId = $service->id;
+
+        $description = $service ? $service->description : '';
+        $packages = json_decode($service->packages);
+
+        $overallScore = OtherServicesReview::calculateOverallScore($serviceId);
+        $overallReviews[$serviceId] = $this->renderRatingIcons($overallScore);
+
+        $photographerAverageCommunicationRating = PhotographyReviews::calculateAverageScore($serviceId, 'communication_rating');
+        $photographerAverageFlexibilityRating = PhotographyReviews::calculateAverageScore($serviceId, 'flexibility_rating');
+        $photographerAverageProfessionalismRating = PhotographyReviews::calculateAverageScore($serviceId, 'professionalism_rating');
+        $photographerAveragePhotoQualityRating = PhotographyReviews::calculateAverageScore($serviceId, 'photo_quality_rating');
+        $photographerAveragePriceRating = PhotographyReviews::calculateAverageScore($serviceId, 'price_rating');
+        $reviewCount = PhotographyReviews::getReviewCount($serviceId);
+
+        return [
+            'description' => $description,
+            'packages' => $packages,
+            'overallScore' => $overallScore,
+            'overallReviews' => $overallReviews,
+            'photographerAverageCommunicationRating' => $photographerAverageCommunicationRating,
+            'photographerAverageFlexibilityRating' => $photographerAverageFlexibilityRating,
+            'photographerAverageProfessionalismRating' => $photographerAverageProfessionalismRating,
+            'photographerAveragePhotoQualityRating' => $photographerAveragePhotoQualityRating,
+            'photographerAveragePriceRating' => $photographerAveragePriceRating,
+            'renderRatingIcons' => [$this, 'renderRatingIcons'],
+            'reviewCount' => $reviewCount,
+        ];
+    }
+
+    private function getVideographerData(OtherService $singleService)
+    {
+        $service = $singleService;
+        $serviceId = $service->id;
+
+        $description = $service ? $service->description : '';
+        $packages = json_decode($service->packages);
+
+        $overallScore = OtherServicesReview::calculateOverallScore($serviceId);
+        $overallReviews[$serviceId] = $this->renderRatingIcons($overallScore);
+
+        $videographyAverageCommunicationRating = VideographyReviews::calculateAverageScore($serviceId, 'communication_rating');
+        $videographyAverageFlexibilityRating = VideographyReviews::calculateAverageScore($serviceId, 'flexibility_rating');
+        $videographyAverageProfessionalismRating = VideographyReviews::calculateAverageScore($serviceId, 'professionalism_rating');
+        $videographyAverageVideoQualityRating = VideographyReviews::calculateAverageScore($serviceId, 'video_quality_rating');
+        $videographyAveragePriceRating = VideographyReviews::calculateAverageScore($serviceId, 'price_rating');
+        $reviewCount = VideographyReviews::getReviewCount($serviceId);
+
+        return [
+            'description' => $description,
+            'packages' => $packages,
+            'overallScore' => $overallScore,
+            'overallReviews' => $overallReviews,
+            'videographyAverageCommunicationRating' => $videographyAverageCommunicationRating,
+            'videographyAverageFlexibilityRating' => $videographyAverageFlexibilityRating,
+            'videographyAverageProfessionalismRating' => $videographyAverageProfessionalismRating,
+            'videographyAverageVideoQualityRating' => $videographyAverageVideoQualityRating,
+            'videographyAveragePriceRating' => $videographyAveragePriceRating,
+            'renderRatingIcons' => [$this, 'renderRatingIcons'],
+            'reviewCount' => $reviewCount,
+        ];
+    }
+    private function getDesignerData(OtherService $singleService)
+    {
+        $service = $singleService;
+        $serviceId = $service->id;
+
+        $description = $service ? $service->description : '';
+        $packages = json_decode($service->packages);
+
+        $overallScore = OtherServicesReview::calculateOverallScore($serviceId);
+        $overallReviews[$serviceId] = $this->renderRatingIcons($overallScore);
+
+        $designerAverageCommunicationRating = DesignerReviews::calculateAverageScore($serviceId, 'communication_rating');
+        $designerAverageFlexibilityRating = DesignerReviews::calculateAverageScore($serviceId, 'flexibility_rating');
+        $designerAverageProfessionalismRating = DesignerReviews::calculateAverageScore($serviceId, 'professionalism_rating');
+        $designerAverageDesignQualityRating = DesignerReviews::calculateAverageScore($serviceId, 'design_quality_rating');
+        $designerAveragePriceRating = DesignerReviews::calculateAverageScore($serviceId, 'price_rating');
+        $reviewCount = DesignerReviews::getReviewCount($serviceId);
+
+        return [
+            'description' => $description,
+            'packages' => $packages,
+            'overallScore' => $overallScore,
+            'overallReviews' => $overallReviews,
+            'designerAverageCommunicationRating' => $designerAverageCommunicationRating,
+            'designerAverageFlexibilityRating' => $designerAverageFlexibilityRating,
+            'designerAverageProfessionalismRating' => $designerAverageProfessionalismRating,
+            'designerAverageDesignQualityRating' => $designerAverageDesignQualityRating,
+            'designerAveragePriceRating' => $designerAveragePriceRating,
+            'renderRatingIcons' => [$this, 'renderRatingIcons'],
+            'reviewCount' => $reviewCount,
+        ];
     }
 }

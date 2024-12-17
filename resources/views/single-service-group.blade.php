@@ -1,13 +1,13 @@
 <x-guest-layout>
   <x-slot name="header">
-    <h1 class="text-center font-heading text-6xl text-white">{{ $serviceName }}</h1>
+    <h1 class="text-whitel text-center font-heading text-6xl">
+      {{ $serviceName }}</h1>
   </x-slot>
 
   <x-other-service-table :singleServices="$singleServices" :genres="$genres" :serviceName="$serviceName">
     @forelse ($singleServices as $service)
       <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
-        <th scope="row"
-          class="whitespace-nowrap px-2 py-2 font-sans text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
+        <th scope="row" class="px-2 py-2 font-sans text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
           <a href="{{ route('singleService', ['serviceName' => $service->services, 'serviceId' => $service->id]) }}"
             class="hover:text-yns_yellow">{{ $service->name }}</a>
         </th>
@@ -252,7 +252,7 @@
 
       return `
             <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
-                <th scope="row" class="whitespace-nowrap font-sans text-white px-2 py-2 md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
+                <th scope="row" class="font-sans text-white px-2 py-2 md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
                     <a href="${otherRoute.replace(':otherId', otherService.id)}" class="venue-link hover:text-yns_yellow">${otherService.name}</a>
                 </th>
                 <td class="rating-wrapper hidden whitespace-nowrap px-2 py-2 sm:text-base md:px-6 md:py-3 lg:flex lg:px-8 lg:py-4">

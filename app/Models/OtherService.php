@@ -151,4 +151,9 @@ class OtherService extends Model
     {
         return $this->morphToMany(Job::class, 'serviceable', 'job_service', 'serviceable_id', 'job_id');
     }
+
+    public function review()
+    {
+        return $this->hasMany(OtherServicesReview::class);
+    }
 }

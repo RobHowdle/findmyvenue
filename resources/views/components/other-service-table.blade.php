@@ -1,8 +1,8 @@
 @props(['singleServices', 'genres', 'serviceName'])
 
 <div class="mx-auto min-h-screen w-full max-w-screen-2xl px-2 pt-24 md:pt-32">
-  <h1 class="py-8 text-center font-heading text-6xl text-white">{{ $serviceName }}
-  </h1>
+  <h1 class="py-4 text-center font-heading text-3xl text-white md:py-6 md:text-4xl xl:text-5xl 4xl:text-6xl">
+    {{ $serviceName }}</h1>
   <div class="relative shadow-md sm:rounded-lg">
     <div class="search-wrapper flex justify-center border border-white dark:bg-black">
       <form class="filter-search flex items-center sm:p-1 md:p-3" action="{{ route('other.filterCheckboxesSearch') }}"
@@ -125,7 +125,8 @@
             <th scope="col" class="px-2 py-2 text-base md:px-6 md:py-3 md:text-xl lg:px-8 lg:py-4 lg:text-2xl">
               Name
             </th>
-            <th scope="col" class="px-2 py-2 text-base md:px-6 md:py-3 md:text-xl lg:px-8 lg:py-4 lg:text-2xl">
+            <th scope="col"
+              class="hidden px-2 py-2 text-base md:px-6 md:py-3 md:text-xl lg:block lg:px-8 lg:py-4 lg:text-2xl">
               Rating
             </th>
             <th scope="col" class="px-2 py-2 text-base md:px-6 md:py-3 md:text-xl lg:px-8 lg:py-4 lg:text-2xl">
