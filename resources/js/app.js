@@ -132,24 +132,26 @@ document.addEventListener("DOMContentLoaded", function () {
     // Function to show the modal
     function showModal(modalId) {
         const modal = document.getElementById(modalId);
-        const backdrop = document.querySelector(".fixed");
 
-        if (modal && backdrop) {
+        if (modal) {
             modal.classList.remove("hidden");
-            backdrop.setAttribute("aria-hidden", "false");
+            modal.classList.add("flex"); // Add 'flex' for display
+            modal.setAttribute("aria-hidden", "false");
             modal.focus();
         }
     }
 
+    // Function to hide the modal
     function hideModal(modalId) {
         const modal = document.getElementById(modalId);
-        const backdrop = document.querySelector(".fixed");
 
-        if (modal && backdrop) {
+        if (modal) {
+            modal.classList.remove("flex"); // Remove 'flex'
             modal.classList.add("hidden");
-            backdrop.setAttribute("aria-hidden", "true");
+            modal.setAttribute("aria-hidden", "true");
         }
     }
+
     // Event listener for buttons to show the modal
     document.querySelectorAll("[data-modal-toggle]").forEach((button) => {
         button.addEventListener("click", function () {
@@ -168,8 +170,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Close modal when clicking outside of it
     document.addEventListener("click", function (event) {
-        if (event.target.classList.contains("fixed")) {
-            hideModal(event.target.id);
+        const modal = event.target.closest(".fixed"); // Check for modal clicks
+        if (modal && event.target === modal) {
+            hideModal(modal.id);
         }
     });
 });

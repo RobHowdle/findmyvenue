@@ -1,204 +1,361 @@
 <x-guest-layout>
   <x-slot name="header">
-    <h1 class="text-center font-heading text-6xl text-white">
-      {{ $singleServices }}
-    </h1>
+    <h1 class="text-whitel text-center font-heading text-6xl">
+      {{ $serviceName }}</h1>
   </x-slot>
 
-  <div class="mx-auto min-h-screen w-full max-w-screen-2xl pt-32">
-    <h1 class="py-8 text-center font-heading text-6xl text-white">{{ $serviceName }}
-    </h1>
-    <div class="relative shadow-md sm:rounded-lg">
-      <div class="search-wrapper flex justify-center border border-white dark:bg-black">
-        <form class="filter-search flex items-center sm:p-1 md:p-3" action="{{ route('other.filterCheckboxesSearch') }}"
-          method="GET">
-          <div class="filters relative flex items-center">
-            <div id="accordion-collapse" class="w-full" data-accordion="collapse">
-              <h2 id="accordion-collapse-heading-1">
-                <button type="button"
-                  class="filter-button flex h-full w-full items-center justify-between gap-3 rounded-t-xl text-xl font-medium text-white sm:p-1 md:p-3 lg:p-5"
-                  data-accordion-target="#accordion-collapse-body-1" aria-expanded="false"
-                  aria-controls="accordion-collapse-body-1">
-                  <span>Filters <span class="fas fa-filter"></span></span>
-                  <svg data-accordion-icon class="icon h-3 w-3 shrink-0 rotate-180" aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M9 5 5 1 1 5" />
-                  </svg>
-                </button>
-              </h2>
-              <div id="accordion-collapse-body-1" class="absolute hidden"
-                aria-labelledby="accordion-collapse-heading-1">
-                <div
-                  class="filter-content max-h-40rem overflow-y-auto border border-b-0 border-gray-200 p-5 dark:border-gray-700 dark:bg-gray-900">
-                  <div class="group relative z-0 mb-5 w-full">
-                    <label class="text-sm font-medium text-gray-900 dark:text-gray-300">Preferred Band Types</label>
-                    <div class="sm-gap:3 mt-4 grid sm:grid-cols-2 lg:grid-cols-3 lg:gap-4">
-                      <div class="flex items-center">
-                        <input id="all-bands" name="band_type[]" type="checkbox" value="all"
-                          class="filter-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800" />
-                        <label for="all-bands" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">All
-                          Types</label>
-                      </div>
-                      <div class="flex items-center">
-                        <input id="original-bands" name="original-bands" type="checkbox" value="original-bands"
-                          class="filter-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800" />
-                        <label for="original-bands"
-                          class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Original</label>
-                      </div>
-                      <div class="flex items-center">
-                        <input id="cover-bands" name="cover-bands" type="checkbox" value="cover-bands"
-                          class="filter-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800" />
-                        <label for="cover-bands"
-                          class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Covers</label>
-                      </div>
-                      <div class="flex items-center">
-                        <input id="tribute-bands" name="tribute-bands" type="checkbox" value="tribute-bands"
-                          class="filter-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800" />
-                        <label for="tribute-bands"
-                          class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Tributes</label>
-                      </div>
-                      @error('floating_band_type')
-                        <span class="text-danger">{{ $message }}</span>
-                      @enderror
-                    </div>
-                  </div>
-                  <div class="group relative z-0 mb-5 w-full">
-                    <label class="text-sm font-medium text-gray-900 dark:text-gray-300">Preferred Genre(s) -
-                      <span>Yes,
-                        there
-                        is a lot</span></label>
-                    <div class="mt-4 grid sm:grid-cols-2 sm:gap-3 lg:grid-cols-3 lg:gap-4">
-                      <!-- "All Genres" checkbox -->
-                      <div>
-                        <div class="flex items-center">
-                          <input id="all-genres" name="all-genres" type="checkbox" value=""
-                            class="genre-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800" />
-                          <label for="all-genres" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">All
-                            Genres</label>
-                        </div>
-                      </div>
-                      <!-- Genres -->
-                      @foreach ($genres as $index => $genre)
-                        <div>
-                          <div class="accordion" id="accordion-container">
-                            <div class="accordion-item">
-                              <input type="checkbox"
-                                class="genre-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
-                                id="all-genre-{{ $index }}" name="genres[]" value="All {{ $genre['name'] }}"
-                                {{ in_array('All ' . $genre['name'], old('genres', [])) ? 'checked' : '' }}>
-                              <label for="all-genre-{{ $index }}"
-                                class="accordion-title ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">All
-                                {{ $genre['name'] }}</label>
-                              @error('genres[]')
-                                <span class="text-danger">{{ $message }}</span>
-                              @enderror
+  <x-other-service-table :singleServices="$singleServices" :genres="$genres" :serviceName="$serviceName">
+    @forelse ($singleServices as $service)
+      <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+        <th scope="row" class="px-2 py-2 font-sans text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
+          <a href="{{ route('singleService', ['serviceName' => $service->services, 'serviceId' => $service->id]) }}"
+            class="hover:text-yns_yellow">{{ $service->name }}</a>
+        </th>
+        <td
+          class="rating-wrapper px:2 py:2 hidden whitespace-nowrap sm:text-base md:px-6 md:py-3 lg:flex lg:px-8 lg:py-4">
+          {!! $overallReviews[$service->id] !!}
+        </td>
+        <td
+          class="whitespace-nowrap px-2 py-2 font-sans text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
+          {{ $service->postal_town }}
+        </td>
 
-                              <div class="accordion-content">
-                                @foreach ($genre['subgenres'] as $subIndex => $subgenre)
-                                  <div class="checkbox-wrapper">
-                                    <input type="checkbox"≈
-                                      class="subgenre-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
-                                      id="genre-{{ $index }}-subgenre-{{ $subIndex }}" name="genres[]"
-                                      value="{{ $subgenre }}"
-                                      {{ in_array($subgenre, old('genres', [])) ? 'checked' : '' }}
-                                      data-parent-genre="{{ $genre['name'] }}">
-                                    <label class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100"
-                                      for="subgenre-{{ $index }}-{{ $subIndex }}">{{ $subgenre }}</label>
-                                  </div>
-                                @endforeach
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      @endforeach
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="search-bar flex items-center justify-end rounded border border-white">
-            <input class="search flex w-full justify-center bg-opac_black font-sans text-xl text-white" type="search"
-              id="address-input" name="search_query" placeholder="Search..." value="{{ $searchQuery ?? '' }}" />
-          </div>
-        </form>
-      </div>
-      <div class="relative z-0 overflow-x-auto">
-        <table class="w-full border border-white text-left font-sans rtl:text-right" id="otherServices">
-          <thead class="text-white underline dark:bg-black">
-            <tr>
-              <th scope="col" class="md-text-2xl sm:px-2 sm:py-2 sm:text-xl md:px-6 md:py-3 lg:px-8 lg:py-4">Name
-              </th>
-              <th scope="col" class="md-text-2xl sm:px-2 sm:py-2 sm:text-xl md:px-6 md:py-3 lg:px-8 lg:py-4">Rating
-              </th>
-              <th scope="col" class="md-text-2xl sm:px-2 sm:py-2 sm:text-xl md:px-6 md:py-3 lg:px-8 lg:py-4">
-                Location
-              </th>
-              <th scope="col" class="md-text-2xl sm:px-2 sm:py-2 sm:text-xl md:px-6 md:py-3 lg:px-8 lg:py-4">
-                Contact
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            @forelse ($singleServices as $service)
-              <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
-                <th scope="row"
-                  class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
-                  <a href="{{ route('singleService', ['serviceName' => $service->services, 'serviceId' => $service->id]) }}"
-                    class="hover:text-yns_yellow">{{ $service->name }}</a>
-                </th>
-                <td class="rating-wrapper flex whitespace-nowrap sm:py-3 sm:text-base md:py-2 lg:py-4">
-                  {!! $overallReviews[$service->id] !!}
-                </td>
-                <td
-                  class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
-                  {{ $service->postal_town }}
-                </td>
-
-                <td
-                  class="flex gap-4 whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
-                  @if ($service->contact_number)
-                    <a class="hover:text-yns_yellow" href="tel:{{ $service->contact_number }}"><span
-                        class="fas fa-phone"></span></a>
-                  @endif
-                  @if ($service->contact_email)
-                    <a class="hover:text-yns_yellow" href="mailto:{{ $service->contact_email }}"><span
-                        class="fas fa-envelope"></span></a>
-                  @endif
-                  @if ($service->platforms)
-                    @foreach ($service->platforms as $platform)
-                      @if ($platform['platform'] == 'facebook')
-                        <a class="mr-2 hover:text-yns_yellow" href="{{ $platform['url'] }}" target=_blank><span
-                            class="fab fa-facebook"></span></a>
-                      @elseif($platform['platform'] == 'twitter')
-                        <a class="mr-2 hover:text-yns_yellow" href="{{ $platform['url'] }}" target=_blank><span
-                            class="fab fa-twitter"></span></a>
-                      @elseif($platform['platform'] == 'instagram')
-                        <a class="mr-2 hover:text-yns_yellow" href="{{ $platform['url'] }}" target=_blank><span
-                            class="fab fa-instagram"></span></a>
-                      @elseif($platform['platform'] == 'snapchat')
-                        <a class="mr-2 hover:text-yns_yellow" href="{{ $platform['url'] }}" target=_blank><span
-                            class="fab fa-snapchat-ghost"></span></a>
-                      @elseif($platform['platform'] == 'tiktok')
-                        <a class="mr-2 hover:text-yns_yellow" href="{{ $platform['url'] }}" target=_blank><span
-                            class="fab fa-tiktok"></span></a>
-                      @elseif($platform['platform'] == 'youtube')
-                        <a class="mr-2 hover:text-yns_yellow" href="{{ $platform['url'] }}" target=_blank><span
-                            class="fab fa-youtube"></span></a>
-                      @endif
-                    @endforeach
-                  @endif
-                </td>
-              </tr>
-            @empty
-              <tr>
-                <td colspan="4" class="py-4 text-center">No services found</td>
-              </tr>
-            @endforelse
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+        <td
+          class="hidden whitespace-nowrap px-2 py-2 align-middle text-white md:block md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
+          <x-contact-and-social-links :item="$service" />
+        </td>
+      </tr>
+    @empty
+      <tr class="border-b odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+        <td colspan="4" class="text-center text-2xl text-white dark:bg-gray-900">No service found</td>
+      </tr>
+    @endforelse
+  </x-other-service-table>
 </x-guest-layout>
+<script
+  src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places&callback=initialize"
+  async defer></script>
+<script>
+  // Search Bar
+  function initialize() {
+    $('form').on('keyup keypress', function(e) {
+      var keyCode = e.keyCode || e.which;
+      if (keyCode === 13) {
+        return false;
+      }
+    });
+    const locationInputs = document.getElementsByClassName("map-input");
+
+    const autocompletes = [];
+    const geocoder = new google.maps.Geocoder;
+    for (let i = 0; i < locationInputs.length; i++) {
+
+      const input = locationInputs[i];
+      const fieldKey = input.id.replace("-input", "");
+      const isEdit = document.getElementById(fieldKey + "-latitude").value != '' && document.getElementById(fieldKey +
+        "-longitude").value != '';
+
+      const latitude = parseFloat(document.getElementById(fieldKey + "-latitude").value) || 59.339024834494886;
+      const longitude = parseFloat(document.getElementById(fieldKey + "-longitude").value) || 18.06650573462189;
+
+      const map = new google.maps.Map(document.getElementById(fieldKey + '-map'), {
+        center: {
+          lat: latitude,
+          lng: longitude
+        },
+        zoom: 13
+      });
+      const marker = new google.maps.Marker({
+        map: map,
+        position: {
+          lat: latitude,
+          lng: longitude
+        },
+      });
+
+      marker.setVisible(isEdit);
+
+      const autocomplete = new google.maps.places.Autocomplete(input);
+      autocomplete.key = fieldKey;
+      autocompletes.push({
+        input: input,
+        map: map,
+        marker: marker,
+        autocomplete: autocomplete
+      });
+    }
+
+    for (let i = 0; i < autocompletes.length; i++) {
+      const input = autocompletes[i].input;
+      const autocomplete = autocompletes[i].autocomplete;
+      const map = autocompletes[i].map;
+      const marker = autocompletes[i].marker;
+
+      google.maps.event.addListener(autocomplete, 'place_changed', function() {
+        marker.setVisible(false);
+        const place = autocomplete.getPlace();
+
+        geocoder.geocode({
+          'placeId': place.place_id
+        }, function(results, status) {
+          if (status === google.maps.GeocoderStatus.OK) {
+            const lat = results[0].geometry.location.lat();
+            const lng = results[0].geometry.location.lng();
+            setLocationCoordinates(autocomplete.key, lat, lng);
+          }
+        });
+
+        if (!place.geometry) {
+          window.alert("No details available for input: '" + place.name + "'");
+          input.value = "";
+          return;
+        }
+
+        if (place.geometry.viewport) {
+          map.fitBounds(place.geometry.viewport);
+        } else {
+          map.setCenter(place.geometry.location);
+          map.setZoom(17);
+        }
+        marker.setPosition(place.geometry.location);
+        marker.setVisible(true);
+      });
+    }
+  }
+
+  // Attach event listener for filter checkboxes
+  $('.filter-checkbox').change(function() {
+    applyFilters();
+  });
+
+  // Attach event listener for search input
+  $('#address-input').on('input', function() {
+    applyFilters();
+  });
+
+  // Event handler for "All Types" checkbox
+  $("#all-bands").change(function() {
+    var isChecked = $(this).prop("checked");
+    $(".filter-checkbox").prop("checked", isChecked);
+  });
+
+  // Event handler for "All Genres" checkbox
+  $("#all-genres").change(function() {
+    var isChecked = $(this).prop("checked");
+    $(".genre-checkbox").prop("checked", isChecked);
+
+    // If "All Genres" checkbox is checked, select all subgenres of each genre
+    if (isChecked) {
+      $(".accordion-item .subgenre-checkbox").prop("checked", true); // Uncheck subgenres
+    }
+    applyFilters();
+  })
+
+  // Attach event listener for genre checkboxes
+  $('.genre-checkbox').change(function() {
+    var isChecked = $(this).prop('checked');
+    var genreId = $(this).attr('id');
+
+    var genreIdParts = genreId.split('-');
+    var genreIndex = genreIdParts[2];
+
+    var subgenreCheckboxes = $('input[type="checkbox"][id*="genre-' + genreIndex + '-subgenre"]');
+
+    subgenreCheckboxes.prop('checked', isChecked);
+
+    applyFilters();
+  });
+
+  // Attach event listener for subgenre checkboxes
+  $('.subgenre-checkbox').change(function() {
+    // If a subgenre checkbox is selected, deselect the "All Genres" checkbox
+    $('#all-genres').prop('checked', false);
+    applyFilters();
+  });
+
+  function applyFilters() {
+    // Get selected filter values
+    var bandTypeValue = [];
+    var allTypesSelected = false;
+    var searchQuery = $('#address-input').val();
+    $('.filter-checkbox:checked').each(function() {
+      var filterValue = $(this).val();
+
+      // Check if "All Types" is selected
+      if (filterValue === 'all') {
+        // If "All Types" is selected, populate the array with all individual values
+        allTypesSelected = true;
+        return false;
+      }
+
+      // If "All Types" is not selected and it was selected before, clear the array
+      if (allTypesSelected) {
+        bandTypeValue = [];
+        allTypesSelected = false; // Reset the flag
+      }
+
+      // Push the filter value into the array
+      bandTypeValue.push(filterValue);
+    });
+
+    // If "All Types" is selected, populate the array with all individual values
+    if (allTypesSelected) {
+      $('.filter-checkbox').each(function() {
+        var filterValue = $(this).val();
+        if (filterValue !== 'all') {
+          bandTypeValue.push(filterValue);
+        }
+      });
+    }
+
+    var selectedGenres = [];
+    $('.genre-checkbox:checked').each(function() {
+      selectedGenres.push($(this).val());
+    });
+
+    var selectedSubgenres = [];
+    $('.subgenre-checkbox:checked').each(function() {
+      selectedSubgenres.push($(this).val());
+    });
+
+    var mergedGenres = selectedGenres.concat(selectedSubgenres)
+
+    // Send AJAX request to fetch filtered data
+    $.ajax({
+      url: '/other/filter',
+      method: 'GET',
+      data: {
+        search_query: searchQuery,
+        band_type: bandTypeValue,
+        genres: mergedGenres,
+      },
+      success: function(data) {
+        // Update table with filtered data
+        updateTable(data);
+      },
+      error: function(err) {
+        console.error('Error applying filters:', err);
+      }
+    });
+  }
+
+  function updateVenuesTable(filteredOtherServices) {
+    if (!Array.isArray(filteredOtherServices)) {
+      console.error("filteredOtherServices is not an array:", filteredOtherServices);
+      return;
+    }
+
+    // Generate HTML for the filtered venues
+    var rowsHtml = filteredOtherServices.map(function(otherService) {
+      var otherRoute = "{{ route('other', ':otherId') }}";
+      var ratingHtml = getRatingHtml(otherService.average_rating);
+
+      return `
+            <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+                <th scope="row" class="font-sans text-white px-2 py-2 md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
+                    <a href="${otherRoute.replace(':otherId', otherService.id)}" class="venue-link hover:text-yns_yellow">${otherService.name}</a>
+                </th>
+                <td class="rating-wrapper hidden whitespace-nowrap px-2 py-2 sm:text-base md:px-6 md:py-3 lg:flex lg:px-8 lg:py-4">
+                    ${ratingHtml}
+                </td>
+                <td class="whitespace-nowrap font-sans text-white px-2 py-2 md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
+                    ${otherService.postal_town}
+                </td>
+                <td class="hidden whitespace-nowrap align-middle text-white px-2 py-2 md:block md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
+                    ${otherService.contact_number ? '<a href="tel:' + otherService.contact_number + '" class="hover:text-yns_yellow"><span class="fas fa-phone"></span></a>' : ''}
+                    ${otherService.contact_email ? '<a href="mailto:' + otherService.contact_email + '" class="hover:text-yns_yellow"><span class="fas fa-envelope"></span></a>' : ''}
+                    ${otherService.platforms ? otherService.platforms.map(function(platform) {
+                        switch (platform.platform) {
+                            case 'facebook':
+                                return '<a class="hover:text-yns_yellow" href="' + platform.url + '" target=_blank><span class="fab fa-facebook"></span></a>';
+                            case 'twitter':
+                                return '<a class="hover:text-yns_yellow" href="' + platform.url + '" target=_blank><span class="fab fa-twitter"></span></a>';
+                            case 'instagram':
+                                return '<a class="hover:text-yns_yellow" href="' + platform.url + '" target=_blank><span class="fab fa-instagram"></span></a>';
+                            case 'snapchat':
+                                return '<a class="hover:text-yns_yellow" href="' + platform.url + '" target=_blank><span class="fab fa-snapchat-ghost"></span></a>';
+                            case 'tiktok':
+                                return '<a class="hover:text-yns_yellow" href="' + platform.url + '" target=_blank><span class="fab fa-tiktok"></span></a>';
+                            case 'youtube':
+                                return '<a class="hover:text-yns_yellow" href="' + platform.url + '" target=_blank><span class="fab fa-youtube"></span></a>';
+                            default:
+                                return '';
+                        }
+                    }).join('') : ''}
+                </td>
+            </tr>
+        `;
+    }).join('');
+
+    // Replace the existing HTML content with the new HTML
+    $('#otherServices tbody').html(rowsHtml);
+  }
+
+  // Function to generate HTML for the rating
+  function getRatingHtml(rating) {
+    if (rating === undefined || rating === null) return ''; // Return empty if no rating
+
+    var ratingHtml = '';
+    var totalIcons = 5;
+    var fullIcons = Math.floor(rating);
+    var fraction = rating - fullIcons;
+    var emptyIcon = "{{ asset('storage/images/system/ratings/empty.png') }}";
+    var fullIcon = "{{ asset('storage/images/system/ratings/full.png') }}";
+    var hotIcon = "{{ asset('storage/images/system/ratings/hot.png') }}";
+
+    // Special case: all icons are hot
+    if (rating === totalIcons) {
+      ratingHtml = Array(totalIcons).fill('<img src="' + hotIcon + '" alt="Hot Icon" />').join('');
+    } else {
+      // Add full icons
+      for (var i = 0; i < fullIcons; i++) {
+        ratingHtml += '<img src="' + fullIcon + '" alt="Full Icon" />';
+      }
+
+      // Handle the fractional icon
+      if (fraction > 0) {
+        ratingHtml += '<div class="partially-filled-icon" style="width: ' + (fraction * 48) +
+          'px; overflow: hidden; display:inline-block;">' +
+          '<img src="' + fullIcon + '" alt="Partial Full Icon" />' +
+          '</div>';
+      }
+
+      // Add empty icons to fill the rest
+      var iconsDisplayed = fullIcons + (fraction > 0 ? 1 : 0);
+      var remainingIcons = totalIcons - iconsDisplayed;
+
+      for (var j = 0; j < remainingIcons; j++) {
+        ratingHtml += '<img src="' + emptyIcon + '" alt="Empty Icon" />';
+      }
+    }
+
+    return ratingHtml;
+  }
+
+  // Update the updateTable function to pass the filtered venues to updateVenuesTable
+  function updateTable(data) {
+    var otherServices = data.otherServices;
+    var pagination = data.pagination;
+
+    // Check if data is not null or empty array
+    if (data.otherServices && data.otherServices.length > 0) {
+      // Append new rows based on filtered data
+      updateVenuesTable(data.otherServices);
+    } else {
+      // Display message if no venues found
+      var noOtherServicesRow = `
+            <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+                <td colspan="5" class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4 uppercase text-center">No Services Found</td>
+            </tr>
+        `;
+      $('#otherServices tbody').html(noOtherServicesRow);
+    }
+  }
+
+  function setLocationCoordinates(key, lat, lng) {
+    const latitudeField = document.getElementById(key + "-" + "latitude");
+    const longitudeField = document.getElementById(key + "-" + "longitude");
+    latitudeField.value = lat;
+    longitudeField.value = lng;
+  }
+</script>

@@ -28,7 +28,7 @@ class EventController extends Controller
         $role = $user->roles->first()->name;
 
         // Determine the service based on the user's role
-        if ($role === "band") {
+        if ($role === "artist") {
             $service = $user->otherService(ucfirst($role))->first();
             if (is_null($service)) {
                 return view('admin.dashboards.show-events', [
@@ -79,7 +79,7 @@ class EventController extends Controller
                 })
                 ->orderBy('event_date', 'asc')
                 ->get();
-        } elseif ($role === "band") {
+        } elseif ($role === "artist") {
             // Bands can see their own events or those associated with their promoter
             $upcomingEvents = Event::where('event_date', '>', now())
                 ->where('user_id', $user->id) // events created by this band
@@ -196,7 +196,7 @@ class EventController extends Controller
             case 'promoter':
                 $role = $user->promoters()->first();
                 break;
-            case 'band':
+            case 'artist':
                 $role = $user->otherService('service')->first();
                 break;
             case 'designer':
@@ -284,7 +284,7 @@ class EventController extends Controller
                 'headliner_id' => 'required|integer',
                 'mainSupport' => 'required|string',
                 'main_support_id' => 'required|integer',
-                'band' => 'nullable|array',
+                'artist' => 'nullable|array',
                 'band.*' => 'nullable|string',
                 'band_id' => 'required|array',
                 'band_id.*' => 'required|integer',
@@ -313,7 +313,7 @@ class EventController extends Controller
             if (!empty($request->band_id)) {
                 foreach ($request->band_id as $bandId) {
                     if (!empty($bandId)) {
-                        $bandsArray[] = ['role' => 'Band', 'band_id' => $bandId];
+                        $bandsArray[] = ['role' => 'Artist', 'band_id' => $bandId];
                     }
                 }
             }
@@ -449,7 +449,7 @@ class EventController extends Controller
                     case 'Main Support':
                         $mainSupport = $band;
                         break;
-                    case 'Band':
+                    case 'Artist':
                         $otherBands[] = $band;
                         break;
                     case 'Opener':
@@ -511,7 +511,7 @@ class EventController extends Controller
                 case 'Opener':
                     $openerId = $band['band_id'];
                     break;
-                case 'Band':
+                case 'Artist':
                     $bands[] = $band['band_id'];
                     break;
             }
@@ -573,7 +573,7 @@ class EventController extends Controller
             if (!empty($request->band_id)) {
                 foreach ($request->band_id as $bandId) {
                     if (!empty($bandId)) {
-                        $bandsArray[] = ['role' => 'Band', 'band_id' => $bandId];
+                        $bandsArray[] = ['role' => 'Artist', 'band_id' => $bandId];
                     }
                 }
             }

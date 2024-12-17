@@ -10,7 +10,7 @@
         {!! $overallRatingPromoter !!}
       </div>
     </div>
-  @elseif ($userType === 'band')
+  @elseif ($userType === 'artist')
     <div>Gigs YTD: {{ $gigsCountBandYtd }}</div>
     <div class="flex">Total Profit YTD:
       <div id="amountDisplay" class="ml-2">{{ formatCurrency($totalProfitsBandYtd) ?? '£0.00' }}</div>

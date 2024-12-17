@@ -14,6 +14,7 @@ export default {
             maxWidth: {
                 yns132: "132px",
                 yns250: "250px",
+                yns22: "22rem",
             },
             padding: {
                 yns25: "25rem",

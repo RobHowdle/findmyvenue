@@ -54,7 +54,7 @@ class Event extends Model
     {
         return $this->services()
             ->where('other_service_id', 4)
-            ->where('services', 'Band');
+            ->where('services', 'Artist');
     }
 
     public function getBandsAttribute($value)

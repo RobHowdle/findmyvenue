@@ -56,7 +56,6 @@ class VenueController extends Controller
     /**
      * Display a listing of the resource.
      */
-
     public function index(Request $request)
     {
         $searchQuery = $request->input('search_query');
@@ -86,27 +85,21 @@ class VenueController extends Controller
             $urls = explode(',', $venue->contact_link);
             $platforms = [];
 
-            if ($urls) {
-                // Check each URL against the platforms
-                foreach ($urls as $url) {
-                    // Initialize the platform as unknown
-                    $matchedPlatform = 'Unknown';
-
-                    // Check if the URL contains platform names
-                    $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
-                    foreach ($platformsToCheck as $platform) {
-                        if (stripos($url, $platform) !== false) {
-                            $matchedPlatform = $platform;
-                            break;
-                        }
+            foreach ($urls as $url) {
+                $matchedPlatform = 'Unknown';
+                $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+                foreach ($platformsToCheck as $platform) {
+                    if (stripos($url, $platform) !== false) {
+                        $matchedPlatform = $platform;
+                        break;
                     }
-
-                    // Store the platform information for each URL
-                    $platforms[] = [
-                        'url' => $url,
-                        'platform' => $matchedPlatform
-                    ];
                 }
+
+                // Store the platform information for each URL
+                $platforms[] = [
+                    'url' => $url,
+                    'platform' => $matchedPlatform
+                ];
             }
 
             // Add the processed data to the venue
@@ -119,7 +112,10 @@ class VenueController extends Controller
             $overallScore = VenueReview::calculateOverallScore($venue->id);
             $overallReviews[$venue->id] = $this->renderRatingIcons($overallScore);
         }
-        return view('venues', compact('venues', 'genres', 'overallReviews'));
+
+        dd($venues);
+        $venuePromoterCount = count($venue['promoters']);
+        return view('venues', compact('venues', 'genres', 'overallReviews', 'venuePromoterCount'));
     }
 
     /**
@@ -194,7 +190,7 @@ class VenueController extends Controller
                 'promoterWithHighestRating' => $suggestions['promoter'],
                 'photographerWithHighestRating' => $suggestions['photographer'],
                 'videographerWithHighestRating' => $suggestions['videographer'],
-                'bandWithHighestRating' => $suggestions['band'],
+                'bandWithHighestRating' => $suggestions['artist'],
                 'designerWithHighestRating' => $suggestions['designer'],
                 'existingPromoters' => $existingPromoters,
                 'renderRatingIcons' => [$this, 'renderRatingIcons']
@@ -324,10 +320,9 @@ class VenueController extends Controller
         if ($request->has('band_type')) {
             $bandType = $request->input('band_type');
             if (!empty($bandType)) {
-                $bandType = array_map('trim', $bandType); // Ensure no extra spaces
+                $bandType = array_map('trim', $bandType);
                 $query->where(function ($query) use ($bandType) {
                     foreach ($bandType as $type) {
-                        // Ensure the type is properly formatted
                         $query->orWhereRaw('JSON_CONTAINS(band_type, ?)', [json_encode([$type])]);
                     }
                 });

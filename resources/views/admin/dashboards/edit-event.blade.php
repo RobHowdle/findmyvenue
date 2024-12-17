@@ -381,7 +381,7 @@
       input.addEventListener('input', function() {
         const query = this.value.trim();
         if (query.length > 0) {
-          searchBand(query, `band-suggestions-${bandRowCount}`, 'band', `band_id_${bandRowCount}`,
+          searchBand(query, `band-suggestions-${bandRowCount}`, 'artist', `band_id_${bandRowCount}`,
             bandRowCount);
         } else {
           suggestionsList.classList.add('hidden');
@@ -396,7 +396,7 @@
             id: event.target.dataset.id,
             name: event.target.textContent
           };
-          selectBand(band, suggestionsList, 'band', `band_id_${bandRowCount}`);
+          selectBand(band, suggestionsList, 'artist', `band_id_${bandRowCount}`);
         }
       });
     });
@@ -441,7 +441,7 @@
     bandInput.addEventListener('input', function() {
       const query = this.value;
       if (query.length > 0) {
-        searchBand(query, `band-suggestions-${bandRowCount}`, 'band', `band_id_${bandRowCount}`);
+        searchBand(query, `band-suggestions-${bandRowCount}`, 'artist', `band_id_${bandRowCount}`);
       } else {
         suggestionsList.classList.add('hidden');
         suggestionsList.innerHTML = ''; // Clear previous suggestions
@@ -482,7 +482,7 @@
         inputId: `band_${i}`,
         suggestionsId: `band-suggestions-${i}`,
         hiddenInputId: `band_id_${i}`,
-        fieldType: 'band'
+        fieldType: 'artist'
       });
     }
 
@@ -577,7 +577,7 @@
       case 'main-support':
         inputFieldId = 'mainSupport-search';
         break;
-      case 'band':
+      case 'artist':
         const bandIndex = hiddenInputId.split('_')[2];
         inputFieldId = `band_${bandIndex}`;
         break;

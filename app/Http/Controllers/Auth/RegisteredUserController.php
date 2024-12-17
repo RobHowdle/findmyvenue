@@ -152,7 +152,7 @@ class RegisteredUserController extends Controller
         switch ($role->name) {
             case "venue":
             case "promoter":
-            case "band":
+            case "artist":
                 $defaultModules = $allModules; // All modules for these roles
                 $serviceableType = 'App\Models\\' . ucfirst($role->name);
                 break;

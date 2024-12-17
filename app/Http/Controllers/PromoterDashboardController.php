@@ -145,7 +145,7 @@ class PromoterDashboardController extends Controller
                     case 'Main Support':
                         $mainSupport = $band;
                         break;
-                    case 'Band':
+                    case 'Artist':
                         $otherBands[] = $band;
                         break;
                     case 'Opener':
@@ -200,7 +200,7 @@ class PromoterDashboardController extends Controller
                 case 'Opener':
                     $openerId = $band['band_id'];
                     break;
-                case 'Band':
+                case 'Artist':
                     $bands[] = $band['band_id'];
                     break;
             }
@@ -249,7 +249,7 @@ class PromoterDashboardController extends Controller
             'headliner_id' => 'required|integer',
             'mainSupport' => 'required|string',
             'main_support_id' => 'required|integer',
-            'band' => 'nullable|array',
+            'artist' => 'nullable|array',
             'band.*' => 'nullable|string',
             'band_id' => 'required|array',
             'band_id.*' => 'required|integer',
@@ -275,7 +275,7 @@ class PromoterDashboardController extends Controller
             'headliner_id',
             'mainSupport',
             'main_support_id',
-            'band',
+            'artist',
             'band.*',
             'band_id',
             'band_id.*',

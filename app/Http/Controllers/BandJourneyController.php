@@ -43,7 +43,7 @@ class BandJourneyController extends Controller
 
         $html = '';
         foreach ($bands as $band) {
-            $html .= view('admin.dashboards.partials.band-row', compact('band'))->render();
+            $html .= view('admin.dashboards.partials.band-row', compact('artist'))->render();
         }
 
         return response()->json(['html' => $html]);
@@ -66,7 +66,7 @@ class BandJourneyController extends Controller
         }
 
         // Check if the user is already part of the band
-        if ($user->otherService('band')->where('serviceable_id', $bandId)->exists()) {
+        if ($user->otherService('artist')->where('serviceable_id', $bandId)->exists()) {
             return response()->json([
                 'success' => false,
                 'message' => 'You are already a member of this band.'
@@ -74,7 +74,7 @@ class BandJourneyController extends Controller
         }
 
         // Add the user to the band
-        $user->otherService('band')->attach($bandId);
+        $user->otherService('artist')->attach($bandId);
 
         return response()->json([
             'success' => true,

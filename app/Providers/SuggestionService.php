@@ -32,7 +32,7 @@ class SuggestionService extends ServiceProvider
                     'promoter' => null,
                     'photograper' => null,
                     'videographer' => null,
-                    'band' => null,
+                    'artist' => null,
                     'designer' => null
                 ];
             }
@@ -78,7 +78,7 @@ class SuggestionService extends ServiceProvider
             // Band Block
             $bandWithHighestRating = null;
             if ($currentRoute !== 'singleService') {
-                $bandWithHighestRating = OtherService::getHighestRatedService('Band', $location);
+                $bandWithHighestRating = OtherService::getHighestRatedService('Artist', $location);
             }
 
             // Designer Block
@@ -92,7 +92,7 @@ class SuggestionService extends ServiceProvider
                 'promoter' => $promoterWithHighestRating,
                 'photographer' => $photographerWithHighestRating,
                 'videographer' => $videographerWithHighestRating,
-                'band' => $bandWithHighestRating,
+                'artist' => $bandWithHighestRating,
                 'designer' => $designerWithHighestRating
             ];
         });

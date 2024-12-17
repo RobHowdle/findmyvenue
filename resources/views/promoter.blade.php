@@ -6,63 +6,64 @@
   </x-slot>
 
   <div class="mx-auto my-6 w-full max-w-screen-2xl pt-32">
-    <div class="relative shadow-md sm:rounded-lg">
-      <div class="min-w-screen-xl mx-auto max-w-screen-xl bg-opac_8_black px-16 py-12 text-white">
-        <div class="header flex gap-4">
+    <div class="relative px-2 shadow-md sm:rounded-lg">
+      <div
+        class="min-w-screen-xl mx-auto max-w-screen-xl bg-opac_8_black px-4 py-4 text-white md:px-6 md:py-4 lg:px-8 lg:py-6 xl:px-10 xl:py-8 2xl:px-12 2xl:py-10 3xl:px-16 3xl:py-12">
+        <div class="header flex justify-center md:justify-start md:gap-4">
           @if ($promoter->logo_url)
-            <img src="{{ asset($promoter->logo_url) }}" alt="{{ $promoter->name }} Logo" class="_250img">
+            <img src="{{ asset($promoter->logo_url) }}" alt="{{ $promoter->name }} Logo" class="_250img hidden md:block">
           @else
-            <img src="{{ asset('images/system/yns_no_image_found.png') }}" alt="No Image" class="_250img">
+            <img src="{{ asset('images/system/yns_no_image_found.png') }}" alt="No Image"
+              class="_250img hidden md:block">
           @endif
           <div class="header-text flex flex-col justify-center gap-2">
-            <h1 class="text-sans text-4xl">{{ $promoter->name }}</h1>
-            <p class="font-sans text-2xl">{{ $promoter->postal_town }}</p>
-            <div>
+            <h1 class="text-sans text-center text-xl md:text-left xl:text-2xl 2xl:text-4xl">{{ $promoter->name }}</h1>
+            @if ($promoter->location)
+              <div class="group flex flex-row items-center justify-center gap-1 md:justify-start xl:gap-2">
+                <i class="fa-solid fa-location-dot mr-2"></i>
+                <a class="text-md text-center font-sans underline transition duration-150 ease-in-out hover:text-yns_yellow md:text-left lg:text-lg xl:text-xl 2xl:text-2xl"
+                  href="javascript:void(0)" target="_blank" id="open-map-link">{{ $promoter->location }}</a>
+              </div>
+            @endif
+            <div class="text-center md:text-left">
               <x-contact-and-social-links :item="$promoter" />
             </div>
-            <div class="rating-wrapper flex flex-row items-center gap-2">
-              <p class="h-full place-content-end font-sans">Overall Rating ({{ $reviewCount }}): </p>
+            <div class="rating-wrapper flex flex-row justify-center gap-1 md:justify-start xl:gap-2">
+              <p class="h-full place-content-center font-sans md:place-content-end">Overall Rating
+                ({{ $reviewCount }}): </p>
               <div class="ratings flex">
                 {!! $overallReviews[$promoter->id] !!}
               </div>
             </div>
             <div class="leave-review">
               <button
-                class="rounded bg-gradient-to-t from-yns_dark_orange to-yns_yellow px-6 py-2 text-sm text-black hover:bg-yns_yellow"
+                class="w-full rounded bg-gradient-to-t from-yns_dark_orange to-yns_yellow px-6 py-2 text-sm text-black transition duration-150 ease-in-out hover:bg-yns_yellow md:w-auto"
                 data-modal-toggle="review-modal" type="button">Leave a review</button>
             </div>
           </div>
         </div>
 
         <div class="body">
-          <div class="h-auto py-4">
-            <ul
-              class="flex flex-wrap justify-between border-b border-gray-200 text-center text-sm font-medium text-gray-500 dark:border-gray-700 dark:text-gray-400">
-              <li class="tab me-2 pl-0">
-                <a href="#" data-tab="about"
-                  class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
+          <div class="h-auto border-b border-gray-700 py-4">
+            <ul class="align-center flex text-center text-sm font-medium text-gray-400 sm:flex-wrap">
+              <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
+                <a href="#" data-tab="about" class="tabLinks text-base text-white hover:text-yns_yellow">
                   <span class="fas fa-info-circle mr-2"></span>About
                 </a>
               </li>
-              <li class="tab me-2">
-                <a href="#" data-tab="my-venues"
-                  class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
+              <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
+                <a href="#" data-tab="my-venues" class="tabLinks text-base text-white hover:text-yns_yellow">
                   <span class="fas fa-cogs mr-2"></span>My Venues
                 </a>
               </li>
-              <li class="tab me-2">
+              <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
                 <a href="#" data-tab="bands-and-genres"
-                  class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
-                  <svg class="me-2 h-4 w-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
-                    viewBox="0 0 20 20">
-                    <path
-                      d="M5 11.424V1a1 1 0 1 0-2 0v10.424a3.228 3.228 0 0 0 0 6.152V19a1 1 0 1 0 2 0v-1.424a3.228 3.228 0 0 0 0-6.152ZM19.25 14.5A3.243 3.243 0 0 0 17 11.424V1a1 1 0 0 0-2 0v10.424a3.227 3.227 0 0 0 0 6.152V19a1 1 0 1 0 2 0v-1.424a3.243 3.243 0 0 0 2.25-3.076Zm-6-9A3.243 3.243 0 0 0 11 2.424V1a1 1 0 0 0-2 0v1.424a3.228 3.228 0 0 0 0 6.152V19a1 1 0 1 0 2 0V8.576A3.243 3.243 0 0 0 13.25 5.5Z" />
-                  </svg>Bands & Genres
+                  class="tabLinks text-base text-white hover:text-yns_yellow">
+                  <span class="fas fa-guitar mr-2"></span>Genre & Types
                 </a>
               </li>
-              <li class="tab me-2">
-                <a href="#" data-tab="reviews"
-                  class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
+              <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
+                <a href="#" data-tab="reviews" class="tabLinks text-base text-white hover:text-yns_yellow">
                   <span class="fas fa-star mr-2"></span> Reviews
                 </a>
               </li>
@@ -182,3 +183,31 @@
     </div>
   </div>
 </x-guest-layout>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const openMapLink = document.getElementById("open-map-link");
+    const promoterLatitude = "{{ $promoter->latitude }}";
+    const promoterLongitude = "{{ $promoter->longitude }}";
+
+    // Function to detect if the user is on a mobile device
+    function isMobileDevice() {
+      return /Mobi|Android/i.test(navigator.userAgent);
+    }
+
+    // Function to open the map
+    function openMap() {
+      // First, check if it's a mobile device
+      if (isMobileDevice()) {
+        // For mobile, try geo URI
+        const geoURI = `geo:${promoterLatitude},${promoterLongitude}`;
+        window.location.href = geoURI;
+      } else {
+        // If not mobile, fall back to Google Maps
+        window.open(`https://www.google.com/maps?q=${promoterLatitude},${promoterLongitude}`, '_blank');
+      }
+    }
+
+    // Attach click event listeners
+    openMapLink.addEventListener("click", openMap);
+  });
+</script>

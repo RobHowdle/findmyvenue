@@ -123,8 +123,6 @@ select {
 [type="submit"],
 button {
     -webkit-appearance: button;
-    background-color: transparent;
-    background-image: none;
 }
 
 :-moz-focusring {
@@ -1280,6 +1278,11 @@ video {
     height: 100%;
 }
 
+.review-popup {
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
 .review p {
     padding-bottom: 1rem;
 }
@@ -1305,6 +1308,7 @@ video {
 .service-block img {
     max-width: 250px;
     height: 100%;
+    /* aspect-ratio: 1/1; */
     object-fit: cover;
     object-position: center;
 }
@@ -1501,11 +1505,23 @@ iframe {
 
 /* @media only screen and (max-width: 1366px) {} */
 
-/* @media only screen and (max-width: 1199px) {} */
+@media only screen and (max-width: 1199px) {
+    ._250img {
+        max-width: 200px;
+    }
+
+    .service-block img {
+        max-width: 200px;
+    }
+}
 
 @media only screen and (max-width: 991px) {
     .filter-search {
         grid-template-columns: 450px 1fr;
+    }
+
+    .service-block img {
+        max-width: 250px;
     }
 }
 
@@ -1519,7 +1535,7 @@ iframe {
     .filter-search {
         grid-template-columns: 1fr;
         grid-template-rows: repeat(2, 1fr);
-        grid-gap: 2rem;
+        grid-gap: 1rem;
     }
 
     .search-bar {
@@ -1534,6 +1550,10 @@ iframe {
 
     #accordion-collapse #accordion-collapse-body-1 {
         width: 100%;
+    }
+
+    .service-block img {
+        max-width: 150px;
     }
 }
 

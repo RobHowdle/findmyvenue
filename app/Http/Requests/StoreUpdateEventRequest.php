@@ -28,7 +28,7 @@ class StoreUpdateEventRequest extends FormRequest
             'headliner_id' => 'required|integer',
             'mainSupport' => 'required|string',
             'main_support_id' => 'required|integer',
-            'band' => 'nullable|array',
+            'artist' => 'nullable|array',
             'band.*' => 'nullable|string',
             'band_id' => 'required|array',
             'band_id.*' => 'required|integer',

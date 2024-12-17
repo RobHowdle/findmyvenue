@@ -40,7 +40,7 @@ class DashboardController extends Controller
 
         // Get existing services
         $promoter = $user->promoters()->first();
-        $band = $user->otherService("Band")->first();
+        $band = $user->otherService("Artist")->first();
         $photographer = $user->otherService("Photographer")->first();
         $venue = $user->venues()->first();
         $designer = $user->otherService("Designer")->first();
@@ -66,7 +66,7 @@ class DashboardController extends Controller
                 }
                 return redirect("/dashboard/{$dashboardType}")->with(['dashboardType', $dashboardType, 'modules', $modules]);
                 break;
-            case 'band':
+            case 'artist':
                 if (!$band) {
                     return
                         redirect("/{$dashboardType}/band-journey")->with(['venues', $venues, 'genres', $genres, 'dashboardType', $dashboardType, 'modules', $modules]);

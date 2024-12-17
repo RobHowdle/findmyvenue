@@ -25,8 +25,8 @@ class FinanceController extends Controller
         if ($dashboardType == 'promoter') {
             $service = $user->promoters()->first();
             $serviceType = 'App\Models\Promoter';
-        } elseif ($dashboardType == 'band') {
-            $service = $user->otherService("Band")->first();
+        } elseif ($dashboardType == 'artist') {
+            $service = $user->otherService("Artist")->first();
             $serviceType = 'App\Models\OtherService';
         } elseif ($dashboardType == 'designer') {
             $service = $user->otherService("Designer")->first();
@@ -77,8 +77,8 @@ class FinanceController extends Controller
         if ($dashboardType == 'promoter') {
             $service = $user->promoters()->first();
             $serviceType = 'App\Models\Promoter';
-        } elseif ($dashboardType == 'band') {
-            $service = $user->otherService("Band")->first();
+        } elseif ($dashboardType == 'artist') {
+            $service = $user->otherService("Artist")->first();
             $serviceType = 'App\Models\OtherService';
         } elseif ($dashboardType == 'designer') {
             $service = $user->otherService("Designer")->first();

@@ -32,9 +32,9 @@ class NoteController extends Controller
                 ->where('completed', false)
                 ->orderBy('created_at', 'DESC')
                 ->paginate($perPage, ['*'], 'page', $page);
-        } elseif ($dashboardType === 'band') {
+        } elseif ($dashboardType === 'artist') {
             $notes = Note::where('serviceable_type', OtherService::class)
-                ->whereIn('serviceable_id', $user->otherService("Band")->pluck('other_services.id'))
+                ->whereIn('serviceable_id', $user->otherService("Artist")->pluck('other_services.id'))
                 ->where('completed', false)
                 ->orderBy('created_at', 'DESC')
                 ->paginate($perPage, ['*'], 'page', $page);
@@ -81,8 +81,8 @@ class NoteController extends Controller
 
                 break;
 
-            case 'band':
-                $bandServices = $user->otherService("Band")->get();
+            case 'artist':
+                $bandServices = $user->otherService("Artist")->get();
                 $serviceableId = $bandServices->pluck('other_services.id');
 
                 if ($bandServices->isEmpty()) {
@@ -148,9 +148,9 @@ class NoteController extends Controller
         if ($dashboardType === 'promoter') {
             $servicealeableType = Promoter::class;
             $serviceableId = $user->promoters->first()->id;
-        } elseif ($dashboardType === 'band') {
+        } elseif ($dashboardType === 'artist') {
             $servicealeableType = OtherService::class;
-            $serviceableId = $user->otherService('Band')->first()->id;
+            $serviceableId = $user->otherService('Artist')->first()->id;
         } elseif ($dashboardType === 'designer') {
             $servicealeableType = OtherService::class;
             $serviceableId = $user->otherService('Designer')->first()->id;
@@ -241,8 +241,8 @@ class NoteController extends Controller
                     ->paginate($perPage);
                 break;
 
-            case 'band':
-                $bandServices = $user->otherService("Band");
+            case 'artist':
+                $bandServices = $user->otherService("Artist");
                 $serviceableId = $bandServices->pluck('other_services.id');
 
                 if (!$bandServices) {

@@ -18,7 +18,7 @@ class RoleSeeder extends Seeder
         Role::create(['name' => 'standard']);
         Role::create(['name' => 'venue']);
         Role::create(['name' => 'promoter']);
-        Role::create(['name' => 'band']);
+        Role::create(['name' => 'artist']);
         Role::create(['name' => 'photographer']);
         Role::create(['name' => 'videographer']);
         Role::create(['name' => 'designer']);
@@ -96,7 +96,7 @@ class RoleSeeder extends Seeder
             ]);
         }
         if ($manageBandPermission) {
-            Role::where('name', 'band')->first()->syncPermissions([
+            Role::where('name', 'artist')->first()->syncPermissions([
                 $manageBandPermission,
                 $manageModulesPermission,
                 $viewFinancePermission,

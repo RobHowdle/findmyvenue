@@ -5,28 +5,39 @@
     </h1>
   </x-slot>
   <div class="mx-auto my-6 w-full max-w-screen-2xl pt-32">
-    <div class="relative shadow-md sm:rounded-lg">
-      <div class="min-w-screen-xl mx-auto max-w-screen-xl bg-opac_8_black px-16 py-12 text-white">
-        <div class="header flex gap-4">
+    <div class="relative px-2 shadow-md sm:rounded-lg">
+      <div
+        class="min-w-screen-xl mx-auto max-w-screen-xl bg-opac_8_black px-4 py-4 text-white md:px-6 md:py-4 lg:px-8 lg:py-6 xl:px-10 xl:py-8 2xl:px-12 2xl:py-10 3xl:px-16 3xl:py-12">
+        <div class="header flex justify-center md:justify-start md:gap-4">
           @php
             $imagePath = public_path($singleService->logo_url);
           @endphp
           @if ($singleService->logo_url && file_exists($imagePath))
-            <img src="{{ asset($singleService->logo_url) }}" alt="{{ $singleService->name }} Logo" class="_250img">
+            <img src="{{ asset($singleService->logo_url) }}" alt="{{ $singleService->name }} Logo"
+              class="_250img hidden md:block">
           @else
-            <img src="{{ asset('images/system/yns_no_image_found.png') }}" alt="No Image" class="_250img">
+            <img src="{{ asset('images/system/yns_no_image_found.png') }}" alt="No Image"
+              class="_250img hidden md:block">
           @endif
           <div class="header-text flex flex-col justify-center gap-2">
-            <h1 class="text-sans text-4xl">{{ $singleService->name }}</h1>
-            <p class="font-sans text-2xl">{{ $singleService->postal_town }}</p>
-            <div>
-              <x-contact-and-social-links :item="$singleService" />
-            </div>
-            <div class="rating-wrapper flex flex-row items-center gap-2">
-              <p class="h-full place-content-end font-sans">Overall Rating
-                (@if ($singleService->services == 'Band')
-                  {{ $bandReviewCount }}@else{{ $reviewCount }}
-                @endif):
+            <h1 class="text-sans text-center text-xl md:text-left xl:text-2xl 2xl:text-4xl">{{ $singleService->name }}
+            </h1>
+            @if ($singleService->location)
+              <p class="font-sans text-2xl">{{ $singleService->location }}</p>
+              <div class="text-center md:text-left">
+                <x-contact-and-social-links :item="$singleService" />
+              </div>
+            @endif
+            <div class="rating-wrapper flex flex-row justify-center gap-1 md:justify-start xl:gap-2">
+              <p class="h-full place-content-center font-sans md:place-content-end">Overall Rating
+                @if ($singleService->services == 'Artist')
+                  ({{ $singleArtistData['reviewCount'] }})
+                @elseif($singleService->services == 'Photography')
+                  ({{ $singlePhotographerData['reviewCount'] }})
+                @elseif($singleService->services == 'Videographer')
+                  ({{ $singleVideographerData['reviewCount'] }})
+                @elseif($singleService->services == 'Designer')
+                @endif
               </p>
               <div class="ratings flex">
                 {!! $overallReviews[$singleService->id] !!}
@@ -34,7 +45,7 @@
             </div>
             <div class="leave-review">
               <button
-                class="rounded-lg bg-gradient-to-t from-yns_dark_orange to-yns_yellow px-6 py-2 text-sm text-black hover:bg-yns_yellow"
+                class="w-full rounded bg-gradient-to-t from-yns_dark_orange to-yns_yellow px-6 py-2 text-sm text-black transition duration-150 ease-in-out hover:bg-yns_yellow md:w-auto"
                 data-modal-toggle="review-modal" type="button">Leave a review</button>
             </div>
 
@@ -42,119 +53,141 @@
         </div>
 
         <div class="body">
-          @if ($singleService->services == 'Band')
-            <div class="h-auto py-4">
-              <ul
-                class="flex flex-wrap justify-between border-b border-gray-200 text-center text-sm font-medium text-gray-500 dark:border-gray-700 dark:text-gray-400">
-                <li class="tab me-2 pl-0">
-                  <a href="#" data-tab="about"
-                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
+          @if ($singleService->services == 'Artist')
+            <div class="h-auto border-b border-gray-700 py-4">
+              <ul class="align-center flex text-center text-sm font-medium text-gray-400 sm:flex-wrap">
+                <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
+                  <a href="#" data-tab="about" class="tabLinks text-base text-white hover:text-yns_yellow">
                     <span class="fas fa-info-circle mr-2"></span>About
                   </a>
                 </li>
-                <li class="tab me-2">
-                  <a href="#" data-tab="members"
-                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
+                <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
+                  <a href="#" data-tab="members" class="tabLinks text-base text-white hover:text-yns_yellow">
                     <span class="fas fa-users mr-2"></span>Members
                   </a>
                 </li>
-                <li class="tab me-2">
-                  <a href="#" data-tab="music"
-                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
+                <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
+                  <a href="#" data-tab="music" class="tabLinks text-base text-white hover:text-yns_yellow">
                     <span class="fas fa-music mr-2"></span>Music
                   </a>
                 </li>
-                <li class="tab me-2">
-                  <a href="#" data-tab="reviews"
-                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
+                <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
+                  <a href="#" data-tab="reviews" class="tabLinks text-base text-white hover:text-yns_yellow">
                     <span class="fas fa-star mr-2"></span>Reviews
                   </a>
                 </li>
-                <li class="tab me-2">
-                  <a href="#" data-tab="socials"
-                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
+                <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
+                  <a href="#" data-tab="socials" class="tabLinks text-base text-white hover:text-yns_yellow">
                     <span class="fas fa-icons mr-2"></span>Socials
                   </a>
                 </li>
               </ul>
             </div>
-          @else
-            <div class="h-auto py-4">
+          @elseif ($singleService->services == 'Photography')
+            <div class="h-auto border-b border-gray-700 py-4">
               @php
                 $spotifyUrl = 'https://open.spotify.com/track/4PTG3Z6ehGkBFwjybzWkR8?si=23c6845e25df4307';
               @endphp
-              <ul
-                class="flex flex-wrap justify-between border-b border-gray-200 text-center text-sm font-medium text-gray-500 dark:border-gray-700 dark:text-gray-400">
-                <li class="tab me-2 pl-0">
-                  <a href="#" data-tab="overview"
-                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
+              <ul class="align-center flex text-center text-sm font-medium text-gray-400 sm:flex-wrap">
+                <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
+                  <a href="#" data-tab="overview" class="tabLinks text-base text-white hover:text-yns_yellow">
                     <span class="fas fa-info-circle mr-2"></span>Overview
                   </a>
                 </li>
-                <li class="tab me-2">
-                  <a href="#" data-tab="services"
-                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
+                <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
+                  <a href="#" data-tab="services" class="tabLinks text-base text-white hover:text-yns_yellow">
                     <span class="fas fa-cog mr-2"></span>Services
                   </a>
                 </li>
-                <li class="tab me-2">
-                  <a href="#" data-tab="reviews"
-                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
-                    <span class="fas fa-star mr-2"></span> Reviews
+                <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
+                  <a href="#" data-tab="reviews" class="tabLinks text-base text-white hover:text-yns_yellow">
+                    <span class="fas fa-star mr-2"></span>Reviews
                   </a>
                 </li>
-                <li class="tab me-2">
-                  <a href="#" data-tab="socials"
-                    class="tabLinks group inline-flex items-center justify-center rounded-t-lg border-b-2 border-transparent text-lg text-white hover:text-yns_yellow">
-                    <span class="fas fa-plus mr-2"></span> Socials
+                <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
+                  <a href="#" data-tab="socials" class="tabLinks text-base text-white hover:text-yns_yellow">
+                    <span class="fas fa-plus mr-2"></span>Socials
+                  </a>
+                </li>
+              </ul>
+            </div>
+          @elseif ($singleService->services == 'Videography')
+            <div class="h-auto border-b border-gray-700 py-4">
+              @php
+                $spotifyUrl = 'https://open.spotify.com/track/4PTG3Z6ehGkBFwjybzWkR8?si=23c6845e25df4307';
+              @endphp
+              <ul class="align-center flex text-center text-sm font-medium text-gray-400 sm:flex-wrap">
+                <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
+                  <a href="#" data-tab="overview" class="tabLinks text-base text-white hover:text-yns_yellow">
+                    <span class="fas fa-info-circle mr-2"></span>Overview
+                  </a>
+                </li>
+                <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
+                  <a href="#" data-tab="services" class="tabLinks text-base text-white hover:text-yns_yellow">
+                    <span class="fas fa-cog mr-2"></span>Services
+                  </a>
+                </li>
+                <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
+                  <a href="#" data-tab="reviews" class="tabLinks text-base text-white hover:text-yns_yellow">
+                    <span class="fas fa-star mr-2"></span>Reviews
+                  </a>
+                </li>
+                <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
+                  <a href="#" data-tab="socials" class="tabLinks text-base text-white hover:text-yns_yellow">
+                    <span class="fas fa-plus mr-2"></span>Socials
+                  </a>
+                </li>
+              </ul>
+            </div>
+          @elseif ($singleService->services == 'Designer')
+            <div class="h-auto border-b border-gray-700 py-4">
+              @php
+                $spotifyUrl = 'https://open.spotify.com/track/4PTG3Z6ehGkBFwjybzWkR8?si=23c6845e25df4307';
+              @endphp
+              <ul class="align-center flex text-center text-sm font-medium text-gray-400 sm:flex-wrap">
+                <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
+                  <a href="#" data-tab="overview" class="tabLinks text-base text-white hover:text-yns_yellow">
+                    <span class="fas fa-info-circle mr-2"></span>Overview
+                  </a>
+                </li>
+                <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
+                  <a href="#" data-tab="services" class="tabLinks text-base text-white hover:text-yns_yellow">
+                    <span class="fas fa-cog mr-2"></span>Services
+                  </a>
+                </li>
+                <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
+                  <a href="#" data-tab="reviews" class="tabLinks text-base text-white hover:text-yns_yellow">
+                    <span class="fas fa-star mr-2"></span>Reviews
+                  </a>
+                </li>
+                <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
+                  <a href="#" data-tab="socials" class="tabLinks text-base text-white hover:text-yns_yellow">
+                    <span class="fas fa-plus mr-2"></span>Socials
                   </a>
                 </li>
               </ul>
             </div>
           @endif
 
-          @if ($singleService->services == 'Band')
+          @if ($singleService->services == 'Artist')
             <div class="venue-tab-content mt-4 overflow-auto font-sans text-lg text-white">
-              <div id="about">
-                @if (!$singleService->description)
+              <div id="about" class="text-center md:text-left">
+                @if (empty($singleService->description))
                   <p>We're still working on this! Come back later to read about us!</p>
                 @else
-                  <p class="underline">About</p>
-                  <p class="mb-4">{{ $singleService->description }}</p>
-
-                  <p class="underline"> Genre & Type</p>
-                  <p>We are {{ a0rAn($genres[0]) }}
-                    @if (is_array($genres))
-                      @foreach ($genres as $index => $type)
-                        {{ $type }}@if (!$loop->last)
-                          ,
-                        @endif
-                      @endforeach
-                    @else
-                      Unknown type
-                    @endif
-                    that play
-                    @if (is_array($bandType))
-                      @foreach ($bandType as $index => $type)
-                        {{ $type }}@if (!$loop->last)
-                          ,
-                        @endif
-                      @endforeach
-                    @else
-                      Unknown type
-                    @endif
-                    music.
-                  </p>
+                  <p>{{ $singleService->description }}</p>
                 @endif
               </div>
 
-              <div id="members" class="flex flex-wrap gap-4 overflow-auto">
-                @if ($members)
+              <div id="members" class="max-h-80 flex h-full flex-col gap-4 overflow-auto text-center md:text-left">
+                @if ($singleArtistData['members'])
                   <div class="service min-w-[calc(50%-1rem)] flex-1">
-                    <p>{!! $members !!}</p>
+                    @foreach ($singleArtistData['members'] as $member)
+                      <p>{{ $member->first_name . ' ' . $member->last_name }}</p>
+                    @endforeach
                   </div>
                 @else
-                  <p>We haven't got our services set up yet! Come back soon!</p>
+                  <p>We haven't got our members listed yet! Come back soon!</p>
                 @endif
               </div>
 
@@ -164,16 +197,12 @@
                   follow to stay updated with our releases!</p>
 
                 @php
-                  // Assuming $streamUrls is an object (stdClass) and not an array
                   $streamUrls = $streamUrls ?? new stdClass();
-
-                  // Initialize URLs for platforms
                   $spotifyUrl = isset($streamUrls->spotify[0])
                       ? $streamUrls->spotify[0]
                       : 'https://open.spotify.com/track/4PTG3Z6ehGkBFwjybzWkR8?si=23c6845e25df4307';
                   $otherLinks = [];
 
-                  // Collect other platforms (non-Spotify)
                   foreach ($streamUrls as $platform => $links) {
                       if ($platform !== 'spotify' && isset($links[0]) && $links[0] !== null) {
                           $otherLinks[] = ['platform' => $platform, 'url' => $links[0]];
@@ -184,7 +213,6 @@
                 @if ($spotifyUrl)
                   <p class="my-4 text-center">Listen on Spotify:</p>
                   <div id="embed-iframe" class="mb-4 text-center">
-                    <!-- Instead of embedding Spotify directly, use a clickable link or embed player -->
                     <a href="{{ $spotifyUrl }}" target="_blank" class="text-blue-600 underline"
                       rel="noopener noreferrer">
                       Open in Spotify
@@ -192,23 +220,23 @@
                   </div>
                 @endif
 
-                <p class="my-4 text-center text-2xl font-bold">Also Catch Us On</p>
-
                 @php
                   $linkCount = count($otherLinks);
                 @endphp
-
-                <div
-                  class="streaming-platforms grid-cols-{{ $linkCount }} grid place-items-center items-center gap-4">
-                  @foreach ($otherLinks as $link)
-                    <a href="{{ $link['url'] }}" target="_blank" class="streaming-platforms"
-                      rel="noopener noreferrer">
-                      <img
-                        src="{{ asset('storage/images/system/streaming/' . strtolower($link['platform']) . '.png') }}"
-                        alt="{{ ucfirst($link['platform']) }} Streaming Link" class="streaming-platform-logo">
-                    </a>
-                  @endforeach
-                </div>
+                @if ($linkCount > 0)
+                  <p class="my-4 text-center text-2xl font-bold">Also Catch Us On</p>
+                  <div
+                    class="streaming-platforms grid-cols-{{ $linkCount }} grid place-items-center items-center gap-4">
+                    @foreach ($otherLinks as $link)
+                      <a href="{{ $link['url'] }}" target="_blank" class="streaming-platforms"
+                        rel="noopener noreferrer">
+                        <img
+                          src="{{ asset('storage/images/system/streaming/' . strtolower($link['platform']) . '.png') }}"
+                          alt="{{ ucfirst($link['platform']) }} Streaming Link" class="streaming-platform-logo">
+                      </a>
+                    @endforeach
+                  </div>
+                @endif
               </div>
 
               <div id="reviews">
@@ -216,22 +244,25 @@
                 <div class="ratings-block mt-4 flex flex-col items-center gap-4">
                   <p class="grid grid-cols-2">Communication:
                     <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $renderRatingIcons($bandAverageCommunicationRating) !!}
+                      {!! $singleArtistData['renderRatingIcons']($singleArtistData['bandAverageCommunicationRating']) !!}
                     </span>
                   </p>
                   <p class="grid grid-cols-2">Music:
                     <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $renderRatingIcons($bandAverageMusicRating) !!}
+                      {!! $singleArtistData['renderRatingIcons']($singleArtistData['bandAverageMusicRating']) !!}
+
                     </span>
                   </p>
                   <p class="grid grid-cols-2">Promotion:
                     <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $renderRatingIcons($bandAveragePromotionRating) !!}
+                      {!! $singleArtistData['renderRatingIcons']($singleArtistData['bandAveragePromotionRating']) !!}
+
                     </span>
                   </p>
                   <p class="grid grid-cols-2">Gig Quality:
                     <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $renderRatingIcons($bandAverageGigQualityRating) !!}
+                      {!! $singleArtistData['renderRatingIcons']($singleArtistData['bandAverageGigQualityRating']) !!}
+
                     </span>
                   </p>
                 </div>
@@ -287,32 +318,34 @@
                 @endif
               </div>
             </div>
-          @elseif ($singleService->services == 'Photographer')
+          @elseif ($singleService->services == 'Photography')
             <div class="venue-tab-content mt-4 overflow-auto font-sans text-lg text-white">
-              <div id="overview">
-                @if (!$singleService->description)
+              <div id="about" class="text-center md:text-left">
+                @if (empty($singlePhotographerData['description']))
                   <p>We're still working on this! Come back later to read about us!</p>
                 @else
-                  <p>{{ $singleService->description }}</p>
+                  <p>{{ $singlePhotographerData['description'] }}</p>
                 @endif
               </div>
 
-              <div id="services" class="flex flex-wrap gap-4 overflow-auto">
-                @if ($services)
-                  @foreach ($services as $service)
-                    <div class="service min-w-[calc(50%-1rem)] flex-1">
-                      <p class="font-semibold">{{ $service->packageTitle }}</p>
+              <div id="services" class="overflow-auto md:flex md:flex-wrap md:gap-8">
+                @if ($singlePhotographerData['packages'])
+                  @foreach ($singlePhotographerData['packages'] as $package)
+                    @foreach ($package as $p)
+                      <div class="service mb-6 min-w-[calc(50%-1rem)] md:mb-0 md:flex-1">
+                        <p class="font-semibold">{{ $p->title }}</p>
 
-                      @if (is_array($service->packageDescription))
-                        <ul class="list-inside list-disc">
-                          @foreach ($service->packageDescription as $bullet)
-                            <li>{{ $bullet }}</li>
-                          @endforeach
-                        </ul>
-                      @endif
+                        @if (is_array($p->details))
+                          <ul class="list-inside list-disc">
+                            @foreach ($p->details as $bullet)
+                              <li>{{ $bullet }}</li>
+                            @endforeach
+                          </ul>
+                        @endif
 
-                      <p class="mt-4 text-lg font-bold">From {{ $service->packageCost }}</p>
-                    </div>
+                        <p class="mt-4 text-lg font-bold">From {{ formatCurrency($p->price) }}</p>
+                      </div>
+                    @endforeach
                   @endforeach
                   <p class="mt-4">All services are subject to location and travel costs. Please <a
                       class="underline hover:text-yns_yellow"
@@ -333,22 +366,39 @@
                 <div class="ratings-block mt-4 flex flex-col items-center gap-4">
                   <p class="grid grid-cols-2">Communication:
                     <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $renderRatingIcons($averageCommunicationRating) !!}
+                      {!! $singlePhotographerData['renderRatingIcons'](
+                          $singlePhotographerData['photographerAverageCommunicationRating'],
+                      ) !!}
+                    </span>
+                  </p>
+                  <p class="grid grid-cols-2">Flexibility:
+                    <span class="rating-wrapper flex flex-row gap-3">
+                      {!! $singlePhotographerData['renderRatingIcons'](
+                          $singlePhotographerData['photographerAverageFlexibilityRating'],
+                      ) !!}
+
+                    </span>
+                  </p>
+                  <p class="grid grid-cols-2">Professionalism:
+                    <span class="rating-wrapper flex flex-row gap-3">
+                      {!! $singlePhotographerData['renderRatingIcons'](
+                          $singlePhotographerData['photographerAverageProfessionalismRating'],
+                      ) !!}
+
+                    </span>
+                  </p>
+                  <p class="grid grid-cols-2">Photo Quality:
+                    <span class="rating-wrapper flex flex-row gap-3">
+                      {!! $singlePhotographerData['renderRatingIcons'](
+                          $singlePhotographerData['photographerAveragePhotoQualityRating'],
+                      ) !!}
                     </span>
                   </p>
                   <p class="grid grid-cols-2">Price:
                     <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $renderRatingIcons($averageRopRating) !!}
-                    </span>
-                  </p>
-                  <p class="grid grid-cols-2">Promotion:
-                    <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $renderRatingIcons($averagePromotionRating) !!}
-                    </span>
-                  </p>
-                  <p class="grid grid-cols-2">Quality:
-                    <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $renderRatingIcons($averageQualityRating) !!}
+                      {!! $singlePhotographerData['renderRatingIcons'](
+                          $singlePhotographerData['photographerAveragePhotoQualityRating'],
+                      ) !!}
                     </span>
                   </p>
                 </div>
@@ -406,30 +456,32 @@
             </div>
           @elseif ($singleService->services == 'Designer')
             <div class="venue-tab-content mt-4 overflow-auto font-sans text-lg text-white">
-              <div id="overview">
-                @if (!$singleService->description)
+              <div id="about" class="text-center md:text-left">
+                @if (empty($singleDesignerData['description']))
                   <p>We're still working on this! Come back later to read about us!</p>
                 @else
-                  <p>{{ $singleService->description }}</p>
+                  <p>{{ $singleDesignerData['description'] }}</p>
                 @endif
               </div>
 
-              <div id="services" class="flex flex-wrap gap-4 overflow-auto">
-                @if ($services)
-                  @foreach ($services as $service)
-                    <div class="service min-w-[calc(50%-1rem)] flex-1">
-                      <p class="font-semibold">{{ $service->packageTitle }}</p>
+              <div id="services" class="overflow-auto md:flex md:flex-wrap md:gap-8">
+                @if ($singleDesignerData['packages'])
+                  @foreach ($singleDesignerData['packages'] as $package)
+                    @foreach ($package as $p)
+                      <div class="service mb-6 min-w-[calc(50%-1rem)] md:mb-0 md:flex-1">
+                        <p class="font-semibold">{{ $p->title }}</p>
 
-                      @if (is_array($service->packageDescription))
-                        <ul class="list-inside list-disc">
-                          @foreach ($service->packageDescription as $bullet)
-                            <li>{{ $bullet }}</li>
-                          @endforeach
-                        </ul>
-                      @endif
+                        @if (is_array($p->details))
+                          <ul class="list-inside list-disc">
+                            @foreach ($p->details as $bullet)
+                              <li>{{ $bullet }}</li>
+                            @endforeach
+                          </ul>
+                        @endif
 
-                      <p class="mt-4 text-lg font-bold">From {{ $service->packageCost }}</p>
-                    </div>
+                        <p class="mt-4 text-lg font-bold">From {{ formatCurrency($p->price) }}</p>
+                      </div>
+                    @endforeach
                   @endforeach
                   <p class="mt-4">All services are subject to location and travel costs. Please <a
                       class="underline hover:text-yns_yellow"
@@ -450,22 +502,29 @@
                 <div class="ratings-block mt-4 flex flex-col items-center gap-4">
                   <p class="grid grid-cols-2">Communication:
                     <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $renderRatingIcons($averageCommunicationRating) !!}
+                      {!! $singleDesignerData['renderRatingIcons']($singleDesignerData['designerAverageCommunicationRating']) !!}
+                    </span>
+                  </p>
+                  <p class="grid grid-cols-2">Flexibility:
+                    <span class="rating-wrapper flex flex-row gap-3">
+                      {!! $singleDesignerData['renderRatingIcons']($singleDesignerData['designerAverageFlexibilityRating']) !!}
+
+                    </span>
+                  </p>
+                  <p class="grid grid-cols-2">Professionalism:
+                    <span class="rating-wrapper flex flex-row gap-3">
+                      {!! $singleDesignerData['renderRatingIcons']($singleDesignerData['designerAverageProfessionalismRating']) !!}
+
+                    </span>
+                  </p>
+                  <p class="grid grid-cols-2">Design Quality:
+                    <span class="rating-wrapper flex flex-row gap-3">
+                      {!! $singleDesignerData['renderRatingIcons']($singleDesignerData['designerAverageDesignQualityRating']) !!}
                     </span>
                   </p>
                   <p class="grid grid-cols-2">Price:
                     <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $renderRatingIcons($averageRopRating) !!}
-                    </span>
-                  </p>
-                  <p class="grid grid-cols-2">Promotion:
-                    <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $renderRatingIcons($averagePromotionRating) !!}
-                    </span>
-                  </p>
-                  <p class="grid grid-cols-2">Quality:
-                    <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $renderRatingIcons($averageQualityRating) !!}
+                      {!! $singleDesignerData['renderRatingIcons']($singleDesignerData['designerAveragePriceRating']) !!}
                     </span>
                   </p>
                 </div>
@@ -523,30 +582,32 @@
             </div>
           @elseif ($singleService->servies == 'Videographer')
             <div class="venue-tab-content mt-4 overflow-auto font-sans text-lg text-white">
-              <div id="overview">
-                @if (!$singleService->description)
+              <div id="about" class="text-center md:text-left">
+                @if (empty($singleVideographerData['description']))
                   <p>We're still working on this! Come back later to read about us!</p>
                 @else
-                  <p>{{ $singleService->description }}</p>
+                  <p>{{ $singleVideographerData['description'] }}</p>
                 @endif
               </div>
 
-              <div id="services" class="flex flex-wrap gap-4 overflow-auto">
-                @if ($services)
-                  @foreach ($services as $service)
-                    <div class="service min-w-[calc(50%-1rem)] flex-1">
-                      <p class="font-semibold">{{ $service->packageTitle }}</p>
+              <div id="services" class="overflow-auto md:flex md:flex-wrap md:gap-8">
+                @if ($singleVideographerData['packages'])
+                  @foreach ($singleVideographerData['packages'] as $package)
+                    @foreach ($package as $p)
+                      <div class="service mb-6 min-w-[calc(50%-1rem)] md:mb-0 md:flex-1">
+                        <p class="font-semibold">{{ $p->title }}</p>
 
-                      @if (is_array($service->packageDescription))
-                        <ul class="list-inside list-disc">
-                          @foreach ($service->packageDescription as $bullet)
-                            <li>{{ $bullet }}</li>
-                          @endforeach
-                        </ul>
-                      @endif
+                        @if (is_array($p->details))
+                          <ul class="list-inside list-disc">
+                            @foreach ($p->details as $bullet)
+                              <li>{{ $bullet }}</li>
+                            @endforeach
+                          </ul>
+                        @endif
 
-                      <p class="mt-4 text-lg font-bold">From {{ $service->packageCost }}</p>
-                    </div>
+                        <p class="mt-4 text-lg font-bold">From {{ formatCurrency($p->price) }}</p>
+                      </div>
+                    @endforeach
                   @endforeach
                   <p class="mt-4">All services are subject to location and travel costs. Please <a
                       class="underline hover:text-yns_yellow"
@@ -567,22 +628,35 @@
                 <div class="ratings-block mt-4 flex flex-col items-center gap-4">
                   <p class="grid grid-cols-2">Communication:
                     <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $renderRatingIcons($averageCommunicationRating) !!}
+                      {!! $singleVideographerData['renderRatingIcons'](
+                          $singleVideographerData['videographyAverageCommunicationRating'],
+                      ) !!}
+                    </span>
+                  </p>
+                  <p class="grid grid-cols-2">Flexibility:
+                    <span class="rating-wrapper flex flex-row gap-3">
+                      {!! $singleVideographerData['renderRatingIcons']($singleVideographerData['videographyAverageFlexibilityRating']) !!}
+
+                    </span>
+                  </p>
+                  <p class="grid grid-cols-2">Professionalism:
+                    <span class="rating-wrapper flex flex-row gap-3">
+                      {!! $singleVideographerData['renderRatingIcons'](
+                          $singleVideographerData['videographyAverageProfessionalismRating'],
+                      ) !!}
+
+                    </span>
+                  </p>
+                  <p class="grid grid-cols-2">Video Quality:
+                    <span class="rating-wrapper flex flex-row gap-3">
+                      {!! $singleVideographerData['renderRatingIcons'](
+                          $singleVideographerData['videographyAverageVideoQualityRating'],
+                      ) !!}
                     </span>
                   </p>
                   <p class="grid grid-cols-2">Price:
                     <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $renderRatingIcons($averageRopRating) !!}
-                    </span>
-                  </p>
-                  <p class="grid grid-cols-2">Promotion:
-                    <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $renderRatingIcons($averagePromotionRating) !!}
-                    </span>
-                  </p>
-                  <p class="grid grid-cols-2">Quality:
-                    <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $renderRatingIcons($averageQualityRating) !!}
+                      {!! $singleVideographerData['renderRatingIcons']($singleVideographerData['videographyAveragePriceRating']) !!}
                     </span>
                   </p>
                 </div>
