@@ -1077,15 +1077,6 @@ class ProfileController extends Controller
         $portfolioLink = $designer ? $designer->portfolio_link : '';
         $waterMarkedPortfolioImages = $designer->portfolio_images;
 
-        // Decode the first layer
-        // $portfolioImages = json_decode($portfolioImages, true);
-
-
-        // Check if it's still a string and decode again if necessary
-        // if (is_string($portfolioImages)) {
-        //     $portfolioImages = json_decode($portfolioImages, true);
-        // }
-
         // Ensure it's an array
         if (!is_array($waterMarkedPortfolioImages)) {
             throw new \Exception("Portfolio images could not be converted to an array.");
@@ -1362,7 +1353,6 @@ class ProfileController extends Controller
         // Load the uploaded image using GD
         if (!file_exists($imageRealPath)) {
             throw new \Exception('Image file not found: ' . $imageRealPath);
-        }
         $image = imagecreatefromjpeg($imageRealPath);
 
         $watermarkText = 'Your Next Show';
