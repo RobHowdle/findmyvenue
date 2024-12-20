@@ -86,7 +86,6 @@
           <x-input-label-dark for="{{ $platform }}">{{ ucfirst($platform) }}:</x-input-label-dark>
 
           @php
-            // Ensure the links for the platform are correctly handled as an array
             $links =
                 isset($platforms[$platform]) && is_array($platforms[$platform])
                     ? $platforms[$platform]
@@ -101,7 +100,6 @@
             </x-text-input>
           @endforeach
 
-          <!-- If no links exist, provide a way to add one -->
           @if (empty($links))
             <x-text-input id="{{ $platform }}-new" name="contact_links[{{ $platform }}][]"
               value="{{ old('contact_links.' . $platform . '.new', '') }}"
@@ -122,11 +120,8 @@
       <x-input-label-dark for="logo" class="text-left">Logo</x-input-label-dark>
       <x-input-file id="logo" name="logo" onchange="previewLogo(event)"></x-input-file>
 
-      <!-- Preview Image -->
       <img id="logo-preview" src="{{ $logo }}" alt="Logo Preview" class="mt-4 h-80 w-80 object-cover"
         style="display: {{ $logo ? 'block' : 'none' }};">
-
-
 
       @error('logo')
         <p class="yns_red mt-1 text-sm">{{ $message }}</p>

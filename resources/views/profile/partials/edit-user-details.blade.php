@@ -78,7 +78,7 @@
       </div>
     </div>
 
-    <div id="editRoleModal" class="fixed inset-0 flex hidden items-center justify-center bg-gray-500 bg-opacity-75">
+    <div id="editRoleModal" class="fixed inset-0 hidden items-center justify-center bg-gray-500 bg-opacity-75">
       <div class="rounded bg-black p-4 text-white shadow-md">
         <h2 id="editModalTitle" class="text-lg font-semibold">Edit Role</h2>
         <input type="hidden" id="edit-role-id" />
@@ -105,30 +105,43 @@
       $userRoleIds = $userRole->pluck('id')->toArray();
     @endphp
 
-    <div id="addRoleModal" class="fixed inset-0 flex hidden items-center justify-center bg-gray-500 bg-opacity-75">
-      <div class="w-96 rounded bg-black p-8 text-white shadow-md">
-        <h2 id="addModalTitle" class="text-lg font-semibold">Add Role</h2>
-        <input type="hidden" id="add-role-id" />
-        <div class="mt-2">
-          <label for="role-name">Select Role</label>
-          <select id="new-role" name="role"
-            class="mt-1 block w-full rounded-md border-yns_red shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-indigo-600 dark:focus:ring-indigo-600"
-            required autofocus autocomplete="role">
-            @foreach ($roles as $role)
-              <option value="{{ $role->id }}" @if (in_array($role->id, $userRoleIds)) disabled @endif>
-                {{ ucfirst($role->name) }}</option>
-            @endforeach
-          </select>
-          <x-input-error :messages="$errors->get('role')" class="mt-2" />
-        </div>
-        <div class="mt-4 flex flex-row gap-6">
-          <x-button id="save-add-role-btn" label="Add Role"></x-button>
-          <x-button onclick="closeModal('addRoleModal')" label="Cancel"></x-button>
+    <div id="addRoleModal" tabindex="-1" class="fixed inset-0 z-[9999] hidden place-items-center px-4">
+      <div class="relative mx-auto w-full max-w-4xl border border-white bg-white dark:bg-black">
+        <div class="review-popup relative rounded-lg bg-white dark:bg-black">
+          <div class="flex items-center justify-between rounded-t border-b p-4 md:p-5">
+            <div class="group">
+              <h3 class="text-xl font-semibold">
+                Add Role
+              </h3>
+              <span>Add a new role to your account</span>
+            </div>
+            <button type="button" data-modal-hide="review-modal" class="text-white hover:text-yns_light_gray">
+              <span class="fas fa-times"></span>
+              <span class="sr-only">Close modal</span>
+            </button>
+          </div>
+          <div class="p-4 md:p-5">
+            <input type="hidden" id="add-role-id" />
+            <select type="select" id="new-role" name="role"
+              class="w-full rounded-md border-yns_red shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-yns_red dark:bg-gray-900 dark:text-gray-300 dark:focus:border-indigo-600 dark:focus:ring-indigo-600"
+              required autofocus autocomplete="role">
+              @foreach ($roles as $role)
+                <option value="{{ $role->id }}" @if (in_array($role->id, $userRoleIds)) disabled @endif>
+                  {{ ucfirst($role->name) }}</option>
+              @endforeach
+            </select>
+            <x-input-error :messages="$errors->get('role')" class="mt-2" />
+
+            <div class="mt-4 flex flex-row gap-6">
+              <x-button id="save-add-role-btn" label="Add Role"></x-button>
+              <x-button onclick="closeModal('addRoleModal')" label="Cancel"></x-button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <div id="deleteRoleModal" class="fixed inset-0 flex hidden items-center justify-center bg-gray-500 bg-opacity-75">
+    <div id="deleteRoleModal" class="fixed inset-0 hidden items-center justify-center bg-gray-500 bg-opacity-75">
       <div class="w-96 rounded bg-black p-8 text-white shadow-md">
         <h2 id="deleteModalTitle" class="text-lg font-semibold">Delete Role</h2>
         <input type="hidden" id="add-role-id" />
@@ -176,11 +189,11 @@
     const saveEditButton = document.getElementById('save-edit-role-btn');
 
     editModalTitle.textContent = 'Edit Role';
-    editRoleInput.value = roleName; // Set the existing role name
-    document.getElementById('edit-role-id').value = roleId; // Store the role ID
+    editRoleInput.value = roleName;
+    document.getElementById('edit-role-id').value = roleId;
 
     saveEditButton.onclick = function() {
-      saveEditRole(roleId); // Define this function to handle saving the edited role
+      saveEditRole(roleId);
     };
 
     // Remove the hidden class to show the edit modal
@@ -193,18 +206,18 @@
     const dashboardType = "{{ $dashboardType }}";
     const userId = "{{ $user->id }}";
 
-    addModalTitle.textContent = 'Add Role';
-
     saveAddButton.onclick = function() {
-      const roleSelect = document.getElementById('new-role'); // Get the role select element
+      const roleSelect = document.getElementById('new-role');
       saveAddRole(roleSelect.value);
     };
 
     // Remove the hidden class to show the add modal
     document.getElementById('addRoleModal').classList.remove('hidden');
+    document.getElementById('addRoleModal').classList.add('flex');
   }
 
   function showDeleteRoleModal(roleId, roleName) {
+    console.log('hit');
     const deleteModalTitle = document.getElementById('deleteModalTitle');
     const saveDeleteButton = document.getElementById('save-delete-role-btn');
 
@@ -217,7 +230,7 @@
     // Update the button's onclick to handle deletion
     saveDeleteButton.onclick = function() {
       const roleId = saveDeleteButton.getAttribute('data-role-id');
-      saveDeleteRole(roleId); // Implement role deletion logic here
+      saveDeleteRole(roleId);
     };
 
     // Show the modal
@@ -282,9 +295,7 @@
       });
   }
 
-  // Example removeRole function (if you want to remove the role later)
   function removeRole(userId, roleId) {
-    // Logic for removing the role, which can involve another AJAX call to the backend
     console.log(`Removing role ${roleId} for user ${userId}`);
   }
 
@@ -312,19 +323,19 @@
           showSuccessNotification(data.message);
 
           // Add new row to the table
-          const table = document.getElementById('role-table'); // Assuming your table has this ID
-          const newRow = table.insertRow(); // Insert a new row
+          const table = document.getElementById('role-table');
+          const newRow = table.insertRow();
 
           // Insert cells into the row and populate with the new role data
           const roleCell = newRow.insertCell(0);
           const actionCell = newRow.insertCell(1);
 
-          roleCell.textContent = newRole; // Populate with the new role name
+          roleCell.textContent = newRole;
 
           // You can also add an action button (e.g., delete/edit) to this row
           const editButton = document.createElement('button');
           editButton.textContent = 'Edit';
-          editButton.className = 'btn btn-warning'; // Add your button classes here
+          editButton.className = 'btn btn-warning';
           editButton.onclick = () => {
             // Trigger the edit role modal, passing the current role data
             openEditRoleModal(roleId, newRole);
@@ -333,7 +344,7 @@
           actionCell.appendChild(editButton);
 
           // Optional: You may also want to clear the form or reset the inputs
-          document.getElementById('role').value = ''; // Reset the role input field
+          document.getElementById('role').value = '';
         } else {
           showFailureNotification(data.message);
         }
@@ -365,7 +376,7 @@
         if (data.success) {
           showSuccessNotification('Role deleted successfully');
           closeModal('deleteRoleModal');
-          location.reload(); // Optionally reload the page to reflect the changes
+          location.reload();
         } else {
           showFailureNotification('Failed to delete role');
         }

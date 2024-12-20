@@ -16,57 +16,75 @@
           </div>
         </div>
         <table class="w-full border border-white text-left font-sans rtl:text-right" id="jobs">
-          <thead class="text-white underline dark:bg-black">
+          <thead class="border border-b-white bg-black text-white underline">
             <tr>
-              <th scope="col" class="md-text-2xl sm:px-2 sm:py-2 sm:text-xl md:px-6 md:py-3 lg:px-8 lg:py-4">Client
+              <th scope="col" class="px-2 py-2 text-base md:px-6 md:py-3 md:text-xl lg:px-8 lg:py-4 lg:text-2xl">
+                Client
               </th>
-              <th scope="col" class="md-text-2xl sm:px-2 sm:py-2 sm:text-xl md:px-6 md:py-3 lg:px-8 lg:py-4">Job Type
+              <th scope="col" class="px-2 py-2 text-base md:px-6 md:py-3 md:text-xl lg:px-8 lg:py-4 lg:text-2xl">Job
+                Type
               </th>
-              <th scope="col" class="md-text-2xl sm:px-2 sm:py-2 sm:text-xl md:px-6 md:py-3 lg:px-8 lg:py-4">Amount
+              <th scope="col" class="px-2 py-2 text-base md:px-6 md:py-3 md:text-xl lg:px-8 lg:py-4 lg:text-2xl">
+                Deadline
               </th>
-              <th scope="col" class="md-text-2xl sm:px-2 sm:py-2 sm:text-xl md:px-6 md:py-3 lg:px-8 lg:py-4">Deadline
+              <th scope="col" class="px-2 py-2 text-base md:px-6 md:py-3 md:text-xl lg:px-8 lg:py-4 lg:text-2xl">
+                Status
               </th>
-              <th scope="col" class="md-text-2xl sm:px-2 sm:py-2 sm:text-xl md:px-6 md:py-3 lg:px-8 lg:py-4">Status
-              </th>
-              <th scope="col" class="md-text-2xl sm:px-2 sm:py-2 sm:text-xl md:px-6 md:py-3 lg:px-8 lg:py-4">Actions
+              <th scope="col" class="px-2 py-2 text-base md:px-6 md:py-3 md:text-xl lg:px-8 lg:py-4 lg:text-2xl">
+                Actions
               </th>
             </tr>
           </thead>
           <tbody>
-            @forelse ($jobs as $job)
-              <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
-                <th scope="row"
-                  class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
-                  {{-- {{ $job->services->name }} --}}
-                </th>
-                <td class="rating-wrapper flex whitespace-nowrap sm:py-3 sm:text-base md:py-2 lg:py-4">
-                  {{ $job->job_type }}
-                </td>
-                <td
-                  class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
-                  {{ $job->estimated_amount }}
-                </td>
-                <td class="whitespace-nowrap align-middle text-white sm:py-3 sm:text-base md:py-2 lg:py-4">
-                  {{ $job->job_end_date }}
-                </td>
-                <td
-                  class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
-                  {{ $job->job_status }}
-                </td>
+            @if ($jobs)
+              @forelse ($jobs as $job)
+                <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+                  <th scope="row"
+                    class="whitespace-nowrap px-2 py-2 font-sans text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
+                    {{ $job->name }}
+                  </th>
+                  <td
+                    class="whitespace-nowrap px-2 py-2 font-sans text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
+                    {{ Str::of($job->job_type)->replace(['-', '_'], ' ')->title() }}
+                  </td>
+                  @php
+                    $jobEndDate = \Carbon\Carbon::parse($job->job_end_date);
 
-                <td
-                  class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">
-                  <button>View</button>
-                  <button>Edit</button>
-                  <button>Delete</button>
-                </td>
-              </tr>
-            @empty
-              <tr
-                class="border-b odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
-                <td colspan="6" class="text-center text-2xl text-white dark:bg-gray-900">No jobs found</td>
-              </tr>
-            @endforelse
+                    $className = '';
+
+                    if ($jobEndDate->isPast()) {
+                        $className = 'text-yns_red';
+                    } elseif ($jobEndDate->isFuture()) {
+                        $className = 'text-white';
+                    }
+
+                    $formattedJobEndDate = $jobEndDate->format('jS F Y');
+                  @endphp
+                  <td
+                    class="{{ $className }} whitespace-nowrap px-2 py-2 font-sans md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
+                    {{ $formattedJobEndDate }}
+                  </td>
+                  <td
+                    class="wwhitespace-nowrap px-2 py-2 font-sans text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
+                    {{ Str::of($job->job_status)->replace(['-', '_'], ' ')->title() }}
+                  </td>
+                  <td
+                    class="flex flex-col gap-2 px-2 py-2 font-sans text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
+                    <button
+                      class="w-full rounded-lg bg-white px-4 py-2 font-heading text-black transition duration-150 ease-in-out hover:text-yns_yellow">View</button>
+                    <button
+                      class="w-full rounded-lg bg-white px-4 py-2 font-heading text-black transition duration-150 ease-in-out hover:text-yns_dark_orange">Edit</button>
+                    <button
+                      class="w-full rounded-lg bg-white px-4 py-2 font-heading text-black transition duration-150 ease-in-out hover:text-yns_red">Delete</button>
+                  </td>
+                </tr>
+              @empty
+                <tr
+                  class="border-b odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+                  <td colspan="6" class="text-center text-2xl text-white dark:bg-gray-900">No jobs found</td>
+                </tr>
+              @endforelse
+            @endif
           </tbody>
         </table>
 

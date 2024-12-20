@@ -29,8 +29,22 @@ class JobsController extends Controller
         $role = $user->roles->first()->name;
         $service = $user->otherService(ucfirst($role))->first();
 
-        $jobs = Job::with('services')->find(1);
-        // dd($job->services);
+        $jobs = DB::table('jobs')
+            ->join('job_service', 'jobs.id', '=', 'job_service.job_id')
+            ->join('other_services', function ($join) {
+                $join->on('job_service.serviceable_id', '=', 'other_services.id')
+                    ->where('job_service.serviceable_type', '=', \App\Models\OtherService::class);
+            })
+            ->where('jobs.user_id', '=', Auth::id())
+            ->select(
+                'jobs.*',
+                'other_services.*',
+                'job_service.job_id as pivot_job_id',
+                'job_service.serviceable_id as pivot_serviceable_id',
+                'job_service.serviceable_type as pivot_serviceable_type'
+            )
+            ->paginate(10);
+
 
         return view('admin.dashboards.show-jobs', [
             'userId' => $this->getUserId(),
@@ -121,7 +135,8 @@ class JobsController extends Controller
         $validated = $request->validated();
 
         $jobName =  $validated['client_name'] . ' - ' . $validated['job_type'] . ' - ' . Carbon::now();
-        if ($validated['job_scope_file']) {
+        $jobFileUrl = '';
+        if (isset($validated['job_scope_file'])) {
             $jobFile = $validated['job_scope_file'];
             $jobFileExtension = $jobFile->getClientOriginalExtension() ?: $jobFile->guessExtension();
             $jobFileName = Str::slug($jobName . '.' . $jobFileExtension);

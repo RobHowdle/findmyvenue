@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DesignerReviews;
 use Carbon\Carbon;
+use App\Models\Job;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -22,18 +24,11 @@ class DesignerDashboardController extends Controller
         $todoItemsCount = $designer->otherService()->with(['todos' => function ($query) {
             $query->where('completed', 0)->whereNull('deleted_at');
         }])->get()->pluck('todos')->flatten()->count();
+        $jobCount = Job::where('user_id', $this->getUserId())->whereNotIn('job_status', ['done', 'cancelled'])->count();
+        $pendingReviews = DesignerReviews::with('otherService')->where('review_approved', '0')->whereNull('deleted_at')->count();
 
         $startOfWeek = Carbon::now()->startOfWeek();
         $endOfWeek = Carbon::now()->endOfWeek();
-
-        $jobsCount = $designer->promoters()
-            ->with(['jobs' => function ($query) use ($startOfWeek, $endOfWeek) {
-                $query->whereBetween('job_end_date', [$startOfWeek, $endOfWeek]);
-            }])
-            ->get()
-            ->pluck('jobs')
-            ->flatten()
-            ->count();
 
         return view('admin.dashboards.designer-dash', [
             'userId' => $this->getUserId(),
@@ -41,7 +36,8 @@ class DesignerDashboardController extends Controller
             'modules' => $modules,
             'designer' => $designer,
             'todoItemsCount' => $todoItemsCount,
-            'jobsCount' => $jobsCount,
+            'jobCount' => $jobCount,
+            'pendingReviews' => $pendingReviews,
         ]);
     }
 }

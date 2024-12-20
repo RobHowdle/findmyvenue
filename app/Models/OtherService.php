@@ -42,6 +42,7 @@ class OtherService extends Model
     protected $casts = [
         'contact_links' => 'array',
         'genre' => 'array',
+        'portfolio_images' => 'array',
     ];
 
     /**
@@ -149,7 +150,8 @@ class OtherService extends Model
 
     public function jobs()
     {
-        return $this->morphToMany(Job::class, 'serviceable', 'job_service', 'serviceable_id', 'job_id');
+        return $this->morphToMany(Job::class, 'serviceable', 'job_service', 'serviceable_id', 'job_id')
+            ->wherePivot('serviceable_type', '=', Job::class);
     }
 
     public function review()

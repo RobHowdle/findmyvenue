@@ -11,13 +11,14 @@ use App\Models\OtherService;
 use Illuminate\Http\Request;
 use App\Models\UserModuleSetting;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Intervention\Image\ImageManager;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Redirect;
+use Intervention\Image\Drivers\Gd\Driver;
 use App\Http\Requests\ProfileUpdateRequest;
-use Intervention\Image\Drivers\Imagick\Driver;
 use App\Http\Requests\BandProfileUpdateRequest;
 use App\Http\Requests\VenueProfileUpdateRequest;
 use App\Http\Requests\PromoterProfileUpdateRequest;
@@ -122,8 +123,6 @@ class ProfileController extends Controller
     {
         $user = User::findOrFail($userId);
         $userData = $request->validated();
-
-        \Log::info($userData);
 
         if (isset($userData['firstName']) || isset($userData['lastName'])) {
             $user->first_name = $userData['firstName'];
@@ -1043,7 +1042,9 @@ class ProfileController extends Controller
 
         $name = $designer ? $designer->name : '';
         $location = $designer ? $designer->location : '';
-        $logo = $designer ? $designer->logo_url : 'images/system/yns_logo.png';
+        $logo = $designer && $designer->logo_url
+            ? (filter_var($designer->logo_url, FILTER_VALIDATE_URL) ? $designer->logo_url : Storage::url($designer->logo_url))
+            : asset('images/system/yns_no_image_found.png');
         $phone = $designer ? $designer->contact_number : '';
         $contact_name = $designer ? $designer->contact_name : '';
         $contact_email = $designer ? $designer->contact_email : '';
@@ -1074,20 +1075,22 @@ class ProfileController extends Controller
         $genres = $data['genres'];
         $designerGenres = is_array($designer->genre) ? $designer->genre : json_decode($designer->genre, true);
         $portfolioLink = $designer ? $designer->portfolio_link : '';
-        $portfolioImages = $designer->portfolio_images;
+        $waterMarkedPortfolioImages = $designer->portfolio_images;
 
         // Decode the first layer
-        $portfolioImages = json_decode($portfolioImages, true);
+        // $portfolioImages = json_decode($portfolioImages, true);
+
 
         // Check if it's still a string and decode again if necessary
-        if (is_string($portfolioImages)) {
-            $portfolioImages = json_decode($portfolioImages, true);
-        }
+        // if (is_string($portfolioImages)) {
+        //     $portfolioImages = json_decode($portfolioImages, true);
+        // }
 
         // Ensure it's an array
-        if (!is_array($portfolioImages)) {
+        if (!is_array($waterMarkedPortfolioImages)) {
             throw new \Exception("Portfolio images could not be converted to an array.");
         }
+
 
         $groupedEnvironmentTypes = config('environment_types');
         $environmentTypes = json_decode($designer->environment_type, true);
@@ -1137,7 +1140,7 @@ class ProfileController extends Controller
             'portfolio_link' => $portfolioLink,
             'serviceableId' => $serviceableId,
             'serviceableType' => $serviceableType,
-            'portfolioImages' => $portfolioImages,
+            'waterMarkedPortfolioImages' => $waterMarkedPortfolioImages,
             'environmentTypes' => $environmentTypes,
             'groups' => $groupedData,
             'workingTimes' => $workingTimes,
@@ -1303,10 +1306,10 @@ class ProfileController extends Controller
     }
 
     /**
-     * Photographers - Uploading Portfolio Sample Images
+     * Uploading Portfolio Sample Images
      */
 
-    public function uploadPortfolioImages(Request $request)
+    public function uploadPortfolioImages($dashboardType, Request $request)
     {
         // Validate the uploaded file
         $request->validate([
@@ -1322,32 +1325,25 @@ class ProfileController extends Controller
             // Create a unique filename
             $filename = time() . '_' . $file->getClientOriginalName();
 
-            // Instantiate ImageManager with correct array configuration
-            $manager = ImageManager::gd();
-
-            // Load the image
-            $image = $manager->read($file->getRealPath());
-
-            // Generate the custom watermark for the user
-            $watermarkPath = $this->generateCustomWatermark($userId); // Call the function to create the watermark
-
             // Set custom directory for storing the file
-            $customPath = "images/photography/portfolio_images/{$userId}";
+            if ($dashboardType !== 'promoter' && $dashboardType !== 'venue') {
+                $customPath = "images/other_services/{$dashboardType}/portfolio_images/{$userId}";
+            } else {
+                $customPath = "images/{$dashboardType}/portfolio_images/{$userId}";
+            }
 
             // Store the image in the specified path
             try {
                 $path = $file->storeAs($customPath, $filename);
 
-                // Update session with the uploaded file path
-                $uploadedFiles = session()->get('uploaded_files', []);
-                $uploadedFiles[] = $path;
-                session()->put('uploaded_files', $uploadedFiles);
+                // Add watermark to the image
+                $watermarkedImagePath = $this->addWatermarkToImage($path, $userId);
 
                 // Return the response with success status and file path
-                return response()->json(['success' => true, 'path' => $path]);
+                return response()->json(['success' => true, 'path' => $watermarkedImagePath]);
             } catch (\Exception $e) {
                 // Catch any exceptions during file storage and log the error
-                \Log::error("File upload failed for user ID {$userId}: " . $e->getMessage());
+                \Log::error('File upload failed: ' . $e->getMessage());
                 return response()->json(['success' => false, 'message' => 'File upload failed.'], 500);
             }
         }
@@ -1356,16 +1352,106 @@ class ProfileController extends Controller
         return response()->json(['success' => false, 'message' => 'No file uploaded.'], 400);
     }
 
-    public function generateCustomWatermark($userId)
+    public function addWatermarkToImage($imagePath, $userId)
     {
-        $image = new ImageManager(Driver::class);
-        $watermark = $image->create(512, 512)->fill('ccc');
+        \Log::info('Adding watermark to image for user: ' . $userId);
 
-        // Save the custom watermark
-        $watermarkPath = storage_path("app/public/images/other_services/photography/portfolio_images/watermarked/{$userId}.png");
-        $watermark->save($watermarkPath);
+        // Get the real path of the uploaded image
+        $imageRealPath = storage_path('app/public/' . $imagePath);
 
-        return $watermarkPath;
+        // Load the uploaded image using GD
+        if (!file_exists($imageRealPath)) {
+            throw new \Exception('Image file not found: ' . $imageRealPath);
+        }
+        $image = imagecreatefromjpeg($imageRealPath);
+
+        $watermarkText = 'Your Next Show';
+        $fontPath = public_path('fonts/ralewaysemibold.ttf'); // Ensure this font exists
+        $textColor = imagecolorallocate($image, 255, 255, 255); // White color for watermark
+
+        // Get image dimensions
+        $imageWidth = imagesx($image);
+        $imageHeight = imagesy($image);
+
+        // Calculate dynamic font size based on image dimensions (e.g., 5% of the image height)
+        $fontSize = max(10, min(ceil($imageHeight * 0.05), ceil($imageWidth * 0.05))); // Scale font size, with a minimum of 10px
+
+        // Calculate the bounding box for the text with the dynamic font size
+        $textBox = imagettfbbox($fontSize, 0, $fontPath, $watermarkText);
+        $textWidth = $textBox[2] - $textBox[0];
+        $textHeight = $textBox[1] - $textBox[7];
+
+        // Calculate the position to center the text
+        $xStart = ($imageWidth / 2) - ($textWidth / 2); // Center horizontally
+        $yStart = ($imageHeight / 2) + ($textHeight / 2); // Center vertically (adjusted for baseline)
+
+        // Add the watermark text
+        imagettftext($image, $fontSize, 0, $xStart, $yStart, $textColor, $fontPath, $watermarkText);
+        $directoryPath = $imagePath . '/watermarked/' . $userId;
+
+        // dd($directoryPath);
+        if (!file_exists($directoryPath)) {
+            mkdir($directoryPath, 0777, true);
+        }
+
+        // Save the watermarked image
+        $watermarkedImagePath = $directoryPath . "/watermark_{$userId}.jpg";
+        imagejpeg($image, $watermarkedImagePath);
+
+        // Clean up
+        imagedestroy($image);
+
+        // Return the relative path of the saved watermarked image
+        return $watermarkedImagePath;
+    }
+
+    public function savePortfolio($dashboardType, $userId, Request $request)
+    {
+        $user = User::find($userId); // Retrieve user by ID
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'User not found'], 404);
+        }
+
+        $validated = $request->validate([
+            'portfolio_image_path' => 'nullable|json',
+            'portfolio_link' => 'nullable|string'
+        ]);
+
+        $portfolioImages = $validated['portfolio_image_path'];
+
+        // If portfolio images are passed as a string, decode them into an array
+        if (is_string($portfolioImages)) {
+            $portfolioImages = json_decode($portfolioImages, true); // Decode JSON into an array
+        }
+
+        // Ensure portfolio images are an array
+        if (!is_array($portfolioImages)) {
+            return response()->json(['success' => false, 'message' => 'Invalid portfolio images format.'], 400);
+        }
+
+        $otherServiceUser = $user->otherService(strtoupper((string) $dashboardType))->first();
+
+        if ($otherServiceUser) {
+            // Save portfolio images as an array in the database
+            $otherServiceUser->update([
+                'portfolio_link' => $validated['portfolio_link'],
+                'portfolio_images' => $portfolioImages, // Directly save the array
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Portfolio Updated',
+                'redirect_url' => route('profile.edit', [
+                    'dashboardType' => $dashboardType,
+                    'id' => $user->id,
+                ]),
+            ]);
+        }
+
+        return redirect()->route('profile.edit', [
+            'dashboardType' => $dashboardType,
+            'id' => $user->id
+        ])->with('status', 'Error saving portfolio');
     }
 
     public function updateEnvironmentTypes(Request $request)
