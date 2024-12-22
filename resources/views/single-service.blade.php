@@ -184,7 +184,6 @@
                   <p>{{ $singleService->description }}</p>
                 @endif
               </div>
-
               <div id="members" class="max-h-80 flex h-full flex-col gap-4 overflow-auto text-center md:text-left">
                 @if ($singleArtistData['members'])
                   <div class="service min-w-[calc(50%-1rem)] flex-1">

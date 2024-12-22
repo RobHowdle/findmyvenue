@@ -116,7 +116,7 @@ class OtherServiceController extends Controller
 
             foreach ($urls as $url) {
                 $matchedPlatform = 'Unknown';
-                $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+                $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube', 'bluesky'];
                 foreach ($platformsToCheck as $platform) {
                     if (stripos($url, $platform) !== false) {
                         $matchedPlatform = $platform;
@@ -244,7 +244,7 @@ class OtherServiceController extends Controller
                 $matchedPlatform = 'Unknown';
 
                 // Check if the URL contains platform names
-                $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+                $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube', 'bluesky'];
                 foreach ($platformsToCheck as $platform) {
                     if (stripos($url, $platform) !== false) {
                         $matchedPlatform = $platform;
@@ -293,7 +293,7 @@ class OtherServiceController extends Controller
         $service = $singleService;
         $serviceId = $service->id;
 
-        $members = $service->linkedUsers()->get();
+        $members = $service->linkedUsers()->get() ?? [];
         $streamUrls = $service->stream_urls;
 
         $overallScore = OtherServicesReview::calculateOverallScore($serviceId);
