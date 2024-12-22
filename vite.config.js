@@ -1,6 +1,5 @@
 import { defineConfig } from "vite";
 import laravel from "laravel-vite-plugin";
-import jquery from "jquery";
 
 export default defineConfig({
     plugins: [
