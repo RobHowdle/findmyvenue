@@ -25,7 +25,7 @@ return [
         'Midday',
         'Twilight',
     ],
-    'People Photography Contexts' => [
+    'People, Photography Contexts' => [
         'Fashion and Modeling',
         'Family Portraits',
         'Couple Portraits',

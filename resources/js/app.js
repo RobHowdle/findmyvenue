@@ -427,6 +427,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     var userId = calendarEl.getAttribute("data-user-id");
+    var dashboardType = calendarEl.getAttribute("data-dashboard-type");
     var calendar;
 
     const calendarTabButton = document.querySelector(
@@ -440,7 +441,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 initialView: "dayGridMonth",
                 events: function (fetchInfo, successCallback, failureCallback) {
                     fetch(
-                        `/profile/events/${userId}?view=calendar&start=${fetchInfo.startStr}&end=${fetchInfo.endStr}`
+                        `/profile/${dashboardType}/events/${userId}?view=calendar&start=${fetchInfo.startStr}&end=${fetchInfo.endStr}`
                     )
                         .then((response) => response.json())
                         .then((data) => {

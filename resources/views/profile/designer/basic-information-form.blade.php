@@ -84,7 +84,6 @@
       @foreach ($platformsToCheck as $platform)
         <div class="group mb-6">
           <x-input-label-dark for="{{ $platform }}">{{ ucfirst($platform) }}:</x-input-label-dark>
-
           @php
             $links =
                 isset($platforms[$platform]) && is_array($platforms[$platform])

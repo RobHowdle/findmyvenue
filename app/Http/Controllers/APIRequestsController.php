@@ -30,30 +30,71 @@ class APIRequestsController extends Controller
      * Get Users Calendar Events
      */
 
-    public function getUserCalendarEvents(Request $request, $user)
+    public function getUserCalendarEvents($dashboardType, Request $request, $userId)
     {
-        // Verify that a promoter exists for the logged-in user
-        $currentUser = Auth::user();  // Get the current user
-        $promoter = $currentUser->promoters()->first();  // Get the promoter for this user
+        // Fetch the current user along with relationships
+        $currentUser = User::with(['promoters', 'venues', 'otherService'])->find($userId);
 
-        if (!$promoter) {
-            return response()->json(['success' => false, 'message' => 'Promoter Not Found'], 404);
+        $service = '';
+        switch ($dashboardType) {
+            case 'promoter':
+                $service = $currentUser->promoters()->first();
+                break;
+            case 'venue':
+                $service = $currentUser->venues()->first();
+                break;
+            case 'artist':
+                $service = $currentUser->otherService('Artist')->first();
+                break;
+            case 'designer':
+                $service = $currentUser->otherService('Designer')->first();
+                break;
+            case 'photographer':
+                $service = $currentUser->otherService('Photographer')->first();
+                break;
+            case 'videographer':
+                $service = $currentUser->otherService('Videographer')->first();
+                break;
+            default:
+                return response()->json(['success' => false, 'message' => 'Invalid Dashboard Type'], 400);
+        }
+
+        if (!$service) {
+            return response()->json(['success' => false, 'message' => 'Service Not Found'], 404);
         }
 
         if ($request->query('view') === 'calendar') {
             $start = $request->query('start');
             $end = $request->query('end');
 
-            // Fetch events based on the date range
-            $events = Event::with(['bands', 'services', 'venues'])
-                ->whereHas('promoters', function ($query) use ($promoter) {
-                    $query->where('promoter_id', $promoter->id);
+            // Fetch events based on the service type
+            $events = Event::with(['artist', 'services', 'venues'])
+                ->where(function ($query) use ($dashboardType, $service) {
+                    switch ($dashboardType) {
+                        case 'promoter':
+                            $query->whereHas('promoters', function ($subQuery) use ($service) {
+                                $subQuery->where('promoter_id', $service->id);
+                            });
+                            break;
+                        case 'venue':
+                            $query->whereHas('venues', function ($subQuery) use ($service) {
+                                $subQuery->where('venue_id', $service->id);
+                            });
+                            break;
+                        case 'artist':
+                            $query->whereHas('bands', function ($subQuery) use ($service) {
+                                $subQuery->where('band_id', $service->id);
+                            });
+                            break;
+                        default:
+                            break;
+                    }
                 })
                 ->whereBetween('event_date', [$start, $end])
                 ->get();
 
+            // Format events for the calendar view
             $formattedEvents = $events->map(function ($event) {
-                // Only use the event date
                 $eventDate = Carbon::parse($event->event_date)->format('Y-m-d');
 
                 return [
@@ -65,7 +106,7 @@ class APIRequestsController extends Controller
                     'bands' => $event->services->map(function ($band) {
                         return $band->name;
                     })->toArray(),
-                    'location' => $event->venues->first()->location,
+                    'location' => $event->venues->first()->location ?? 'No location provided',
                     'ticket_url' => $event->ticket_url,
                     'on_the_door_ticket_price' => $event->on_the_door_ticket_price,
                 ];

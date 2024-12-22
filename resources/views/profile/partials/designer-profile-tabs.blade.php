@@ -56,14 +56,12 @@
 </div>
 <div x-show="selectedTab === 6" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
   <div class="w-full">
-    <p class="text-xl font-bold">Environments & Working Times</p>
-    @include('profile.designer.environments-and-times', [
+    <p class="text-xl font-bold">Design Styles, Print Mediums & Working Times</p>
+    @include('profile.designer.styles-and-times', [
         'dashboardType' => $dashboardType,
         'userRole' => $userRole,
         'userId' => $userId,
         'designer' => $designerUserData['designer'],
-        'environmentTypes' => $designerUserData['environmentTypes'],
-        'groups' => $designerUserData['groups'],
         'workingTimes' => $designerUserData['workingTimes'],
     ])
   </div>

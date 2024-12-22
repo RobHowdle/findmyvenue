@@ -357,6 +357,8 @@ class OtherServiceController extends Controller
 
         $description = $service ? $service->description : '';
         $packages = json_decode($service->packages);
+        $portfolioImages = $service->portfolio_images;
+        $portfolioLink = $service->portfolio_link;
 
         $overallScore = OtherServicesReview::calculateOverallScore($serviceId);
         $overallReviews[$serviceId] = $this->renderRatingIcons($overallScore);
@@ -380,6 +382,8 @@ class OtherServiceController extends Controller
             'videographyAveragePriceRating' => $videographyAveragePriceRating,
             'renderRatingIcons' => [$this, 'renderRatingIcons'],
             'reviewCount' => $reviewCount,
+            'portfolioImages' => $portfolioImages,
+            'portfolioLink' => $portfolioLink,
         ];
     }
     private function getDesignerData(OtherService $singleService)

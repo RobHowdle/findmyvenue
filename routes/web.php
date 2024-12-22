@@ -261,7 +261,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Calendar-specific routes
     Route::get('/profile/events/{user}/apple/sync', [CalendarController::class, 'syncAllEventsToAppleCalendar'])->name('apple.sync');
-    Route::get('/profile/events/{user}', [APIRequestsController::class, 'getUserCalendarEvents']);
+    Route::get('/profile/{dashboardType}/events/{user}', [APIRequestsController::class, 'getUserCalendarEvents']);
 
     // General profile routes
     Route::get('/profile/{dashboardType}/{id}', [ProfileController::class, 'edit'])->name('profile.edit');

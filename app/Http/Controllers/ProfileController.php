@@ -671,7 +671,7 @@ class ProfileController extends Controller
         $contact_name = $promoter ? $promoter->contact_name : '';
 
         $platforms = [];
-        $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+        $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube', 'bluesky'];
 
         // Initialize the platforms array with empty strings for each platform
         foreach ($platformsToCheck as $platform) {
@@ -753,7 +753,7 @@ class ProfileController extends Controller
         $contact_name = $venue ? $venue->contact_name : '';
 
         $platforms = [];
-        $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+        $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube', 'bluesky'];
 
         // Initialize the platforms array with empty strings for each platform
         foreach ($platformsToCheck as $platform) {
@@ -818,7 +818,7 @@ class ProfileController extends Controller
         $contactLinks = $band ? json_decode($band->contact_link, true) : [];
 
         $platforms = [];
-        $platformsToCheck = ['website', 'facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+        $platformsToCheck = ['website', 'facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube', 'bluesky'];
 
         // Initialize the platforms array with empty strings for each platform
         foreach ($platformsToCheck as $platform) {
@@ -897,7 +897,7 @@ class ProfileController extends Controller
         $contactLinks = $photographer ? json_decode($photographer->contact_link, true) : [];
 
         $platforms = [];
-        $platformsToCheck = ['website', 'facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+        $platformsToCheck = ['website', 'facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube', 'bluesky'];
 
         // Initialize the platforms array with empty strings for each platform
         foreach ($platformsToCheck as $platform) {
@@ -1052,7 +1052,7 @@ class ProfileController extends Controller
         $contactLinks = $designer ? json_decode($designer->contact_link, true) : [];
 
         $platforms = [];
-        $platformsToCheck = ['website', 'facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+        $platformsToCheck = ['website', 'facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube', 'bluesky'];
 
         // Initialize the platforms array with empty strings for each platform
         foreach ($platformsToCheck as $platform) {
@@ -1081,7 +1081,6 @@ class ProfileController extends Controller
         if (!is_array($waterMarkedPortfolioImages)) {
             throw new \Exception("Portfolio images could not be converted to an array.");
         }
-
 
         $groupedEnvironmentTypes = config('environment_types');
         $environmentTypes = json_decode($designer->environment_type, true);
@@ -1345,14 +1344,14 @@ class ProfileController extends Controller
 
     public function addWatermarkToImage($imagePath, $userId)
     {
-        \Log::info('Adding watermark to image for user: ' . $userId);
-
         // Get the real path of the uploaded image
         $imageRealPath = storage_path('app/public/' . $imagePath);
 
         // Load the uploaded image using GD
         if (!file_exists($imageRealPath)) {
             throw new \Exception('Image file not found: ' . $imageRealPath);
+        }
+
         $image = imagecreatefromjpeg($imageRealPath);
 
         $watermarkText = 'Your Next Show';
@@ -1363,7 +1362,6 @@ class ProfileController extends Controller
         $imageWidth = imagesx($image);
         $imageHeight = imagesy($image);
 
-        // Calculate dynamic font size based on image dimensions (e.g., 5% of the image height)
         $fontSize = max(10, min(ceil($imageHeight * 0.05), ceil($imageWidth * 0.05))); // Scale font size, with a minimum of 10px
 
         // Calculate the bounding box for the text with the dynamic font size
@@ -1372,14 +1370,13 @@ class ProfileController extends Controller
         $textHeight = $textBox[1] - $textBox[7];
 
         // Calculate the position to center the text
-        $xStart = ($imageWidth / 2) - ($textWidth / 2); // Center horizontally
-        $yStart = ($imageHeight / 2) + ($textHeight / 2); // Center vertically (adjusted for baseline)
+        $xStart = ($imageWidth / 2) - ($textWidth / 2);
+        $yStart = ($imageHeight / 2) + ($textHeight / 2);
 
         // Add the watermark text
         imagettftext($image, $fontSize, 0, $xStart, $yStart, $textColor, $fontPath, $watermarkText);
         $directoryPath = $imagePath . '/watermarked/' . $userId;
 
-        // dd($directoryPath);
         if (!file_exists($directoryPath)) {
             mkdir($directoryPath, 0777, true);
         }
@@ -1397,6 +1394,7 @@ class ProfileController extends Controller
 
     public function savePortfolio($dashboardType, $userId, Request $request)
     {
+
         $user = User::find($userId); // Retrieve user by ID
         if (!$user) {
             return response()->json(['success' => false, 'message' => 'User not found'], 404);
