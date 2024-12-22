@@ -1,7 +1,7 @@
+import $ from "jquery";
 // import "../../node_modules/summernote/dist/summernote-lite.js";
 // import "../../node_modules/summernote/dist/summernote-lite.css";
 import Swal from "../../node_modules/sweetalert2";
-import $ from "jquery";
 
 // import Alpine from "alpinejs";
 window.$ = $;
