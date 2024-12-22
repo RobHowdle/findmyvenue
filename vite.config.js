@@ -12,6 +12,7 @@ export default defineConfig({
     resolve: {
         alias: {
             $: "jquery",
+            jquery: "jquery",
         },
     },
     build: {
