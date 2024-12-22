@@ -1,5 +1,4 @@
 <x-guest-layout>
-  {{-- <div class="flex w-full items-center justify-center "> --}}
   <div class="mx-auto min-h-screen w-full max-w-xl pt-44">
     <p class="px-8 py-8 text-center font-heading text-4xl font-bold text-white">Login</p>
     <div class="rounded bg-black p-8 font-sans">
@@ -46,5 +45,4 @@
       </form>
     </div>
   </div>
-  {{-- </div> --}}
 </x-guest-layout>

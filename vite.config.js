@@ -14,9 +14,6 @@ export default defineConfig({
             jquery: "jquery",
         },
     },
-    define: {
-        "window.jQuery": "jquery",
-    },
     build: {
         rollupOptions: {
             external: ["jquery", "summernote/dist/summernote-lite.js"],
