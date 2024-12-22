@@ -760,13 +760,20 @@
         </div>
       </div>
     </div>
+  </div>
 </x-guest-layout>
 <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
 <script>
   window.onSpotifyIframeApiReady = (IFrameAPI) => {
     const element = document.getElementById('embed-iframe');
+    if (!element) {
+      console.error('Embed iframe element not found.');
+      return;
+    } else {
+      console.log('found it');
+    }
     const options = {
-      uri: '{{ $spotifyUrl }}'
+      uri: `{{ $spotifyUrl ?? 'https://open.spotify.com/track/4PTG3Z6ehGkBFwjybzWkR8?si=23c6845e25df4307' }}`
     };
     const callback = (EmbedController) => {};
     IFrameAPI.createController(element, options, callback);
