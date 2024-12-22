@@ -190,8 +190,6 @@
     </div>
 
   </footer>
-  @stack('scripts')
-  <script></script>
 </body>
 
 </html>

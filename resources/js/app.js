@@ -1,4 +1,7 @@
 import jQuery from "jquery";
+
+console.log("jQuery version:", $.fn.jquery);
+
 // import "../../node_modules/summernote/dist/summernote-lite.js";
 // import "../../node_modules/summernote/dist/summernote-lite.css";
 import * as Swal from "../../node_modules/sweetalert2";
