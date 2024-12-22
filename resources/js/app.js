@@ -1,14 +1,44 @@
-import $ from "jquery";
+import jQuery from "jquery";
 // import "../../node_modules/summernote/dist/summernote-lite.js";
 // import "../../node_modules/summernote/dist/summernote-lite.css";
-import Swal from "../../node_modules/sweetalert2";
+import * as Swal from "../../node_modules/sweetalert2";
 
 // import Alpine from "alpinejs";
-window.$ = $;
-window.jQuery = $;
+// window.$ = jQuery;
 
 // window.Alpine = Alpine;
 // Alpine.start();
+
+jQuery(document).ready(function () {
+    var startTime = performance.now(); // Record the start time when the document is ready
+
+    // Function to hide the loader and overlay
+    function hideLoader() {
+        jQuery("#preloader").delay(100).removeClass("animation").addClass("over");
+        jQuery(".pre-overlay").css({
+            height: "0%",
+        });
+    }
+
+    // Function to calculate loading time and decide whether to show the loader
+    function checkLoadingTime() {
+        var endTime = performance.now(); // Record the end time after the document is fully loaded
+        var loadingTime = endTime - startTime; // Calculate the loading time in milliseconds
+        // Check if the loading time exceeds a threshold (e.g., 1000 milliseconds)
+        if (loadingTime > 1000) {
+            // Show the loader if loading time exceeds the threshold
+            setTimeout(hideLoader, 4000);
+        } else {
+            // Hide the loader if loading time is fast
+            hideLoader();
+        }
+    }
+
+    // Call the function to check loading time when the document is fully loaded
+    jQuery(window).on("load", function () {
+        checkLoadingTime();
+    });
+});
 
 // // Format currency helper
 // window.formatCurrency = function (value) {
