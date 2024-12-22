@@ -1,4 +1,3 @@
-import $ from "jquery";
 import "../../node_modules/summernote/dist/summernote-lite.js";
 import "../../node_modules/summernote/dist/summernote-lite.css";
 import Swal from "sweetalert2";
