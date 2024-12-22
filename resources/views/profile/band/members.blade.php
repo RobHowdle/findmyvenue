@@ -25,7 +25,7 @@
 </form>
 <script>
   var memberContent = @json(old('members', $members));
-  $(document).ready(function() {
+  jQuery(document).ready(function() {
     initialiseSummernote("#members", memberContent);
   });
 </script>

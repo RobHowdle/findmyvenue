@@ -101,10 +101,10 @@
 </x-app-layout>
 
 <script>
-  $(document).ready(function() {
+  jQuery(document).ready(function() {
     // Designer search functionality
-    $('#designer-search').on('keyup', function() {
-      let query = $(this).val();
+    jQuery('#designer-search').on('keyup', function() {
+      let query = jQuery(this).val();
       const dashboardType = "{{ $dashboardType }}";
 
 
@@ -116,12 +116,12 @@
           query: query
         },
         success: function(data) {
-          $('#designer-results').html('');
-          $('#result-count').text('');
+          jQuery('#designer-results').html('');
+          jQuery('#result-count').text('');
 
           if (data.count > 0) {
-            $('#create-designer-form').hide(); // Explicitly hide the form
-            $('#designer-results').html(data.results.map(designer => `
+            jQuery('#create-designer-form').hide(); // Explicitly hide the form
+            jQuery('#designer-results').html(data.results.map(designer => `
         <li class="flex px-2 flex-row items-center justify-between">
             <p>${designer.name}</p>
             <button class="bg-white text-black rounded-lg px-4 py-2 font-heading transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow" data-id="${designer.id}">
@@ -129,19 +129,19 @@
             </button>
         </li>
     `).join(''));
-            $('#result-count').text(`${data.count} results found`);
+            jQuery('#result-count').text(`${data.count} results found`);
           } else {
-            $('#create-designer-form').show(); // Explicitly show the form
-            $('#designer-results').html('<li>No designer found</li>');
-            $('#result-count').text('0 results');
+            jQuery('#create-designer-form').show(); // Explicitly show the form
+            jQuery('#designer-results').html('<li>No designer found</li>');
+            jQuery('#result-count').text('0 results');
           }
         }
       });
     });
 
     // Event delegation for dynamically created buttons
-    $('#designer-results').on('click', 'button', function() {
-      const designerId = $(this).data('id'); // Retrieve the id from data-id attribute
+    jQuery('#designer-results').on('click', 'button', function() {
+      const designerId = jQuery(this).data('id'); // Retrieve the id from data-id attribute
       linkUserToDesigner(designerId); // Call your function
     });
 

@@ -65,41 +65,41 @@
   </div>
 </x-app-layout>
 <script>
-  $(document).ready(function() {
+  jQuery(document).ready(function() {
     let currentPage = 1;
     let dashboardType = "{{ $dashboardType }}";
 
     // loadNotes(currentPage);
 
-    $('#load-more-btn').on('click', function() {
+    jQuery('#load-more-btn').on('click', function() {
       currentPage++;
       loadNotes(currentPage);
     });
 
-    $(document).on('click', '.complete-note-btn', function() {
-      const noteId = $(this).data('note-id');
-      const noteElement = $(this).closest('.note-item')
+    jQuery(document).on('click', '.complete-note-btn', function() {
+      const noteId = jQuery(this).data('note-id');
+      const noteElement = jQuery(this).closest('.note-item')
       completeNote(noteId);
 
-      $('#notes').empty();
+      jQuery('#notes').empty();
       currentPage = 1;
     });
 
-    $(document).on('click', '.delete-note-btn', function() {
-      const noteId = $(this).data('note-id');
-      const noteElement = $(this).closest('.note-item')
+    jQuery(document).on('click', '.delete-note-btn', function() {
+      const noteId = jQuery(this).data('note-id');
+      const noteElement = jQuery(this).closest('.note-item')
       deleteNote(noteId);
 
-      $('#notes').empty();
+      jQuery('#notes').empty();
       currentPage = 1;
     });
 
-    $(document).on('click', '.uncomplete-note-btn', function() {
-      const noteId = $(this).data('note-id');
-      const noteElement = $(this).closest('.note-item')
+    jQuery(document).on('click', '.uncomplete-note-btn', function() {
+      const noteId = jQuery(this).data('note-id');
+      const noteElement = jQuery(this).closest('.note-item')
       uncompleteNote(noteId);
 
-      $('#notes').empty();
+      jQuery('#notes').empty();
       currentPage = 1;
     });
 
@@ -114,14 +114,14 @@
           page: page
         },
         success: function(response) {
-          $('#notes').empty();
-          $('#notes').append(response.view);
-          $('#completed-notes-btn').show();
-          $('#uncompleted-notes-btn').hide();
-          $('#load-more-btn').show();
+          jQuery('#notes').empty();
+          jQuery('#notes').append(response.view);
+          jQuery('#completed-notes-btn').show();
+          jQuery('#uncompleted-notes-btn').hide();
+          jQuery('#load-more-btn').show();
 
           if (!response.hasMore) {
-            $('#load-more-btn').hide();
+            jQuery('#load-more-btn').hide();
           }
         },
         error: function(xhr) {
@@ -131,14 +131,14 @@
     }
 
     // Handle new note submission
-    $('#newNote').on('submit', function(e) {
+    jQuery('#newNote').on('submit', function(e) {
       e.preventDefault();
 
       // Get values from the input fields
-      let noteName = $('#noteInput').val();
-      let noteText = $('#textInput').val();
-      let noteDate = $('#dateInput').val();
-      let isTodo = $('#isTodoInput').is(':checked') ? 1 : 0;
+      let noteName = jQuery('#noteInput').val();
+      let noteText = jQuery('#textInput').val();
+      let noteDate = jQuery('#dateInput').val();
+      let isTodo = jQuery('#isTodoInput').is(':checked') ? 1 : 0;
 
       $.ajax({
         url: '{{ route('admin.dashboard.new-note-item', ['dashboardType' => '__dashboardType__']) }}'
@@ -153,10 +153,10 @@
           is_todo: isTodo
         },
         success: function(response) {
-          $('#noteInput').val('');
-          $('#textInput').val('');
-          $('#dateInput').val('');
-          $('#isTodoInput').prop('checked', false);
+          jQuery('#noteInput').val('');
+          jQuery('#textInput').val('');
+          jQuery('#dateInput').val('');
+          jQuery('#isTodoInput').prop('checked', false);
           currentPage = 1;
           loadNotes(currentPage);
           showSuccessNotification(response.message);
@@ -189,7 +189,7 @@
       });
     }
 
-    $('#completed-notes-btn').on('click', function() {
+    jQuery('#completed-notes-btn').on('click', function() {
       currentPage = 1;
       loadCompletedNotes(currentPage);
     });
@@ -238,7 +238,7 @@
       });
     }
 
-    $('#uncompleted-notes-btn').on('click', function() {
+    jQuery('#uncompleted-notes-btn').on('click', function() {
       currentPage = 1;
       loadNotes(currentPage);
     });
@@ -249,14 +249,14 @@
           .replace('__dashboardType__', dashboardType),
         type: 'GET',
         success: function(response) {
-          $('#notes').empty();
-          $('#notes').append(response.view);
-          $('#completed-notes-btn').hide(); // Hide completed button
-          $('#uncompleted-notes-btn').show(); // Show uncompleted button
-          $('#load-more-btn').show();
+          jQuery('#notes').empty();
+          jQuery('#notes').append(response.view);
+          jQuery('#completed-notes-btn').hide(); // Hide completed button
+          jQuery('#uncompleted-notes-btn').show(); // Show uncompleted button
+          jQuery('#load-more-btn').show();
 
           if (!response.hasMore) {
-            $('#load-more-btn').hide();
+            jQuery('#load-more-btn').hide();
           }
         },
         error: function(xhr) {

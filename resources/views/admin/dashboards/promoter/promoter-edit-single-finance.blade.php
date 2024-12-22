@@ -199,7 +199,7 @@
 </x-app-layout>
 
 <script>
-  $(document).ready(function() {
+  jQuery(document).ready(function() {
     let incomeCount = {{ count($otherIncoming) }};
     let outgoingCount = {{ count($otherOutgoing) }};
 
@@ -207,18 +207,22 @@
     calculateTotals();
 
     function calculateTotals() {
-      let desiredProfit = parseFloat($('#desired_profit').val()) || 0;
-      let incomePresale = parseFloat($('#incoming\\[income_presale\\]').val()) || 0;
-      let incomeOtd = parseFloat($('#incoming\\[income_otd\\]').val()) || 0; // Corrected the ID selector
-      let incomeOther = Array.from($('input[name^="other["]')).reduce((sum, input) => sum + (parseFloat($(input)
+      let desiredProfit = parseFloat(jQuery('#desired_profit').val()) || 0;
+      let incomePresale = parseFloat(jQuery('#incoming\\[income_presale\\]').val()) || 0;
+      let incomeOtd = parseFloat(jQuery('#incoming\\[income_otd\\]').val()) || 0; // Corrected the ID selector
+      let incomeOther = Array.from(jQuery('input[name^="other["]')).reduce((sum, input) => sum + (parseFloat(jQuery(
+          input)
         .val()) || 0), 0);
 
-      let outgoingVenue = parseFloat($('#outgoing\\[outgoing_venue\\]').val()) || 0; // Corrected the ID selector
-      let outgoingBand = parseFloat($('#outgoing\\[outgoing_band\\]').val()) || 0; // Corrected the ID selector
-      let outgoingPromotion = parseFloat($('#outgoing\\[outgoing_promotion\\]').val()) ||
+      let outgoingVenue = parseFloat(jQuery('#outgoing\\[outgoing_venue\\]').val()) ||
+      0; // Corrected the ID selector
+      let outgoingBand = parseFloat(jQuery('#outgoing\\[outgoing_band\\]').val()) || 0; // Corrected the ID selector
+      let outgoingPromotion = parseFloat(jQuery('#outgoing\\[outgoing_promotion\\]').val()) ||
         0; // Corrected the ID selector
-      let outgoingRider = parseFloat($('#outgoing\\[outgoing_rider\\]').val()) || 0; // Corrected the ID selector
-      let outgoingOther = Array.from($('input[name^="other["]')).reduce((sum, input) => sum + (parseFloat($(input)
+      let outgoingRider = parseFloat(jQuery('#outgoing\\[outgoing_rider\\]').val()) ||
+      0; // Corrected the ID selector
+      let outgoingOther = Array.from(jQuery('input[name^="other["]')).reduce((sum, input) => sum + (parseFloat(
+        jQuery(input)
         .val()) || 0), 0);
 
       // Calculate totals
@@ -245,25 +249,25 @@
       }
 
       // Update displayed values
-      $('#preview_income_presale').text(formatCurrency(incomePresale));
-      $('#preview_income_otd').text(formatCurrency(incomeOtd));
-      $('#preview_income_other').text(formatCurrency(incomeOther));
-      $('#preview_outgoing_venue').text(formatCurrency(outgoingVenue));
-      $('#preview_outgoing_band').text(formatCurrency(outgoingBand));
-      $('#preview_outgoing_promotion').text(formatCurrency(outgoingPromotion));
-      $('#preview_outgoing_rider').text(formatCurrency(outgoingRider));
-      $('#preview_outgoing_other').text(formatCurrency(outgoingOther));
-      $('#income_total').text(formatCurrency(incomeTotal));
-      $('#outgoing_total').text(formatCurrency(outgoingTotal));
-      $('#profit_total').text(formatCurrency(profitTotal));
-      $('#desired_profit_remaining').text(remainingDesiredProfit);
+      jQuery('#preview_income_presale').text(formatCurrency(incomePresale));
+      jQuery('#preview_income_otd').text(formatCurrency(incomeOtd));
+      jQuery('#preview_income_other').text(formatCurrency(incomeOther));
+      jQuery('#preview_outgoing_venue').text(formatCurrency(outgoingVenue));
+      jQuery('#preview_outgoing_band').text(formatCurrency(outgoingBand));
+      jQuery('#preview_outgoing_promotion').text(formatCurrency(outgoingPromotion));
+      jQuery('#preview_outgoing_rider').text(formatCurrency(outgoingRider));
+      jQuery('#preview_outgoing_other').text(formatCurrency(outgoingOther));
+      jQuery('#income_total').text(formatCurrency(incomeTotal));
+      jQuery('#outgoing_total').text(formatCurrency(outgoingTotal));
+      jQuery('#profit_total').text(formatCurrency(profitTotal));
+      jQuery('#desired_profit_remaining').text(remainingDesiredProfit);
 
       // Prepare for form submission
-      $('#finances-form').data('numericValue', numericValue);
+      jQuery('#finances-form').data('numericValue', numericValue);
     }
 
     // Recalculate on input changes
-    $('#finances-form').on('input', 'input', function() {
+    jQuery('#finances-form').on('input', 'input', function() {
       calculateTotals();
     });
 
@@ -308,7 +312,7 @@
     });
 
     // Handle form submission for editing
-    $('#finances-form').on('submit', function(event) {
+    jQuery('#finances-form').on('submit', function(event) {
       event.preventDefault(); // Prevent the default form submission
       const formData = new FormData(this);
 
@@ -316,34 +320,34 @@
       if (formData instanceof FormData) {
         formData.delete('other_income[]'); // Corrected to match your naming
         // Add individual income_other values
-        $('.income_other').each(function() {
-          const value = parseFloat($(this).val()) || 0; // Get the value, default to 0 if NaN
+        jQuery('.income_other').each(function() {
+          const value = parseFloat(jQuery(this).val()) || 0; // Get the value, default to 0 if NaN
           formData.append('other_income[]', value); // Append as an array
         });
 
         // Clear previous values for outgoing_other
         formData.delete('other_outgoing[]'); // Corrected to match your naming
         // Add individual outgoing_other values
-        $('.outgoing_other').each(function() {
-          const value = parseFloat($(this).val()) || 0; // Get the value, default to 0 if NaN
+        jQuery('.outgoing_other').each(function() {
+          const value = parseFloat(jQuery(this).val()) || 0; // Get the value, default to 0 if NaN
           formData.append('other_outgoing[]', value); // Append as an array
         });
       }
 
       // Append isolated numeric values
-      const numericValue = $('#finances-form').data('numericValue'); // Retrieve the stored numeric value
+      const numericValue = jQuery('#finances-form').data('numericValue'); // Retrieve the stored numeric value
       formData.append('desired_profit_remaining', numericValue);
 
       // Other values
-      formData.append('income_total', $('#income_total').text().replace(/[^0-9.-]+/g, ""));
-      formData.append('outgoing_total', $('#outgoing_total').text().replace(/[^0-9.-]+/g, ""));
-      formData.append('profit_total', $('#profit_total').text().replace(/[^0-9.-]+/g, ""));
+      formData.append('income_total', jQuery('#income_total').text().replace(/[^0-9.-]+/g, ""));
+      formData.append('outgoing_total', jQuery('#outgoing_total').text().replace(/[^0-9.-]+/g, ""));
+      formData.append('profit_total', jQuery('#profit_total').text().replace(/[^0-9.-]+/g, ""));
 
 
       // Ensure CSRF token is set for AJAX requests
       $.ajaxSetup({
         headers: {
-          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
         }
       });
 

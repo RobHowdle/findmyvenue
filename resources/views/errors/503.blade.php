@@ -49,13 +49,13 @@
   </div>
 
   <script>
-    $(document).ready(function() {
+    jQuery(document).ready(function() {
       var startTime = performance.now(); // Record the start time when the document is ready
 
       // Function to hide the loader and overlay
       function hideLoader() {
-        $("#preloader").delay(100).removeClass("animation").addClass("over");
-        $(".pre-overlay").css({
+        jQuery("#preloader").delay(100).removeClass("animation").addClass("over");
+        jQuery(".pre-overlay").css({
           "height": "0%"
         });
       }
@@ -76,7 +76,7 @@
       }
 
       // Call the function to check loading time when the document is fully loaded
-      $(window).on('load', function() {
+      jQuery(window).on('load', function() {
         checkLoadingTime();
       });
     });

@@ -55,7 +55,7 @@
 <script>
   const dashboardType = "{{ $dashboardType }}";
 
-  $(document).ready(function() {
+  jQuery(document).ready(function() {
     function fetchBands(query = '') {
       $.ajax({
         url: `/${dashboardType}/band-search`,
@@ -65,11 +65,11 @@
         },
         success: function(data) {
           if (data.html.trim() === '') {
-            $('#bandsTable tbody').empty();
-            $('#noBandsMessage').removeClass('hidden');
+            jQuery('#bandsTable tbody').empty();
+            jQuery('#noBandsMessage').removeClass('hidden');
           } else {
-            $('#bandsTable tbody').html(data.html);
-            $('#noBandsMessage').addClass('hidden');
+            jQuery('#bandsTable tbody').html(data.html);
+            jQuery('#noBandsMessage').addClass('hidden');
           }
         }
       });
@@ -79,15 +79,15 @@
     fetchBands();
 
     // Search functionality
-    $('#bandSearch').on('keyup', function() {
-      let query = $(this).val();
+    jQuery('#bandSearch').on('keyup', function() {
+      let query = jQuery(this).val();
       fetchBands(query);
     });
 
     // Join band functionality
-    $(document).on('click', '.join-band-btn', function(e) {
+    jQuery(document).on('click', '.join-band-btn', function(e) {
       e.preventDefault();
-      let bandId = $(this).data('band-id');
+      let bandId = jQuery(this).data('band-id');
 
       $.ajax({
         url: `/${dashboardType}/band-journey/join/${bandId}`,

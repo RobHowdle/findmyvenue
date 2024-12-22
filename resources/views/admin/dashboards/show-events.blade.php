@@ -106,18 +106,18 @@
   });
 
   // Load more past events
-  $('#past-tab').on('click', function() {
-    $('#load-more-upcoming').addClass('hidden');
-    $('#load-more-past').removeClass('hidden');
+  jQuery('#past-tab').on('click', function() {
+    jQuery('#load-more-upcoming').addClass('hidden');
+    jQuery('#load-more-past').removeClass('hidden');
   });
 
-  $('#upcoming-tab').on('click', function() {
-    $('#load-more-past').addClass('hidden');
-    $('#load-more-upcoming').removeClass('hidden');
+  jQuery('#upcoming-tab').on('click', function() {
+    jQuery('#load-more-past').addClass('hidden');
+    jQuery('#load-more-upcoming').removeClass('hidden');
   });
 
   // Load More Upcoming Events
-  $('#load-more-upcoming').on('click', function(e) {
+  jQuery('#load-more-upcoming').on('click', function(e) {
     e.preventDefault(); // Prevent the default button action if it's a button
 
     upcomingPage++; // Increment the page number for the next load
@@ -125,7 +125,7 @@
 
     $.ajaxSetup({
       headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
       }
     });
 
@@ -136,9 +136,9 @@
         page: upcomingPage
       },
       success: function(data) {
-        $('#upcoming-events .grid').append(data.html);
+        jQuery('#upcoming-events .grid').append(data.html);
         if (!data.hasMorePages) {
-          $('#load-more-upcoming').hide();
+          jQuery('#load-more-upcoming').hide();
         }
       },
       error: function(xhr) {
@@ -148,13 +148,13 @@
   });
 
   // Load More Past Events
-  $('#load-more-past').on('click', function(e) {
+  jQuery('#load-more-past').on('click', function(e) {
     e.preventDefault();
     upcomingPage++;
 
     $.ajaxSetup({
       headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
       }
     });
 
@@ -165,10 +165,10 @@
         page: upcomingPage
       },
       success: function(data) {
-        $('#upcoming-events .grid').append(data.html);
+        jQuery('#upcoming-events .grid').append(data.html);
 
         if (!data.hasMorePages) {
-          $('#load-more-past').hide();
+          jQuery('#load-more-past').hide();
         }
       },
       error: function(xhr) {
@@ -180,8 +180,8 @@
 
 
   // Delete Event
-  $(document).on('click', '.delete-event', function() {
-    const eventId = $(this).data('id'); // Get event ID from data attribute
+  jQuery(document).on('click', '.delete-event', function() {
+    const eventId = jQuery(this).data('id'); // Get event ID from data attribute
     console.log(eventId);
     // Show confirmation notification
     showConfirmationNotification({
@@ -192,12 +192,13 @@
           url: `/dashboard/promoter/events/${eventId}`, // Your delete route
           type: 'DELETE',
           headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
           },
           success: function(response) {
             showSuccessNotification(response.message); // Assuming response has a message property
             console.log(eventId);
-            $(`.event-card[data-id="${eventId}"]`).remove(); // This line should work if the ID matches
+            jQuery(`.event-card[data-id="${eventId}"]`)
+          .remove(); // This line should work if the ID matches
           },
           error: function(xhr) {
             showFailureNotification(xhr.responseJSON.message ||
@@ -205,8 +206,8 @@
           }
         });
 
-        $(`.event-card[data-id="${eventId}"]`).fadeOut(300, function() {
-          $(this).remove(); // Remove the element after the fade-out effect
+        jQuery(`.event-card[data-id="${eventId}"]`).fadeOut(300, function() {
+          jQuery(this).remove(); // Remove the element after the fade-out effect
         });
       }
     });

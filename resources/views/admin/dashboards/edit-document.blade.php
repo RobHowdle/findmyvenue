@@ -89,8 +89,8 @@
 </x-app-layout>
 
 <script>
-  $(document).ready(function() {
-    $('#tags').select2({
+  jQuery(document).ready(function() {
+    jQuery('#tags').select2({
       placeholder: 'Select tags',
       allowClear: true,
       tags: true, // Allow users to add custom tags
@@ -99,6 +99,6 @@
     const selectedTags = @json(old('tags', $categories));
     console.log('Selected tags:', selectedTags);
 
-    $('#tags').val(selectedTags).trigger('change');
+    jQuery('#tags').val(selectedTags).trigger('change');
   });
 </script>

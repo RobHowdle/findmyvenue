@@ -1,7 +1,7 @@
 <header>
   <h2 class="text-md font-heading font-medium text-white">
     {{ __('Tell us about you... Where you started, why you started, what you do
-                  etc') }} </h2>
+                      etc') }} </h2>
 </header>
 <form method="POST" action="{{ route('photographer.update', ['dashboardType' => $dashboardType, 'user' => $user->id]) }}"
   class="space-y-6">
@@ -25,7 +25,7 @@
 </form>
 <script>
   var aboutContent = @json(old('about', $about));
-  $(document).ready(function() {
+  jQuery(document).ready(function() {
     initialiseSummernote("#about", aboutContent);
   });
 </script>

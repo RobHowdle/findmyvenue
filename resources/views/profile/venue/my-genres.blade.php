@@ -64,8 +64,8 @@
 
   let selectedGenres = "{{ json_encode($venueGenres) }}";
 
-  $('.genre-checkbox, .subgenre-checkbox').each(function() {
-    $(this).prop('checked', selectedGenres.includes($(this).val()));
+  jQuery('.genre-checkbox, .subgenre-checkbox').each(function() {
+    jQuery(this).prop('checked', selectedGenres.includes(jQuery(this).val()));
   });
 
   // Initialize variables
@@ -80,13 +80,13 @@
     let selectedSubgenres = [];
 
     // Gather selected genres
-    $('.genre-checkbox:checked').each(function() {
-      selectedGenres.push($(this).val());
+    jQuery('.genre-checkbox:checked').each(function() {
+      selectedGenres.push(jQuery(this).val());
     });
 
     // Gather selected subgenres
-    $('.subgenre-checkbox:checked').each(function() {
-      selectedSubgenres.push($(this).val());
+    jQuery('.subgenre-checkbox:checked').each(function() {
+      selectedSubgenres.push(jQuery(this).val());
     });
 
     let mergedGenres = selectedGenres.concat(selectedSubgenres);
@@ -106,32 +106,32 @@
   }
 
   // Handle All Genres checkbox
-  $('#all-genres').change(function() {
+  jQuery('#all-genres').change(function() {
     activeCheckbox = true; // User is actively selecting
-    var isChecked = $(this).prop('checked');
-    $(".genre-checkbox, .subgenre-checkbox").prop("checked", isChecked);
+    var isChecked = jQuery(this).prop('checked');
+    jQuery(".genre-checkbox, .subgenre-checkbox").prop("checked", isChecked);
   });
 
   // Handle individual genre checkboxes
-  $('.genre-checkbox').change(function() {
+  jQuery('.genre-checkbox').change(function() {
     activeCheckbox = true; // User is actively selecting
-    var isChecked = $(this).prop('checked');
-    var genreIndex = $(this).attr('id').split('-')[2];
+    var isChecked = jQuery(this).prop('checked');
+    var genreIndex = jQuery(this).attr('id').split('-')[2];
 
-    $('input[type="checkbox"][id*="genre-' + genreIndex + '-subgenre"]').prop('checked', isChecked);
+    jQuery('input[type="checkbox"][id*="genre-' + genreIndex + '-subgenre"]').prop('checked', isChecked);
     updateAllGenresCheckbox();
   });
 
   // Handle individual subgenre checkboxes
-  $('.subgenre-checkbox').change(function() {
+  jQuery('.subgenre-checkbox').change(function() {
     activeCheckbox = true; // User is actively selecting
-    $('#all-genres').prop('checked', false); // Uncheck "All Genres"
+    jQuery('#all-genres').prop('checked', false); // Uncheck "All Genres"
     updateAllGenresCheckbox();
   });
 
   // Update "All Genres" checkbox based on other selections
   function updateAllGenresCheckbox() {
-    const allGenresChecked = $(".genre-checkbox").length === $(".genre-checkbox:checked").length;
-    $('#all-genres').prop('checked', allGenresChecked);
+    const allGenresChecked = jQuery(".genre-checkbox").length === jQuery(".genre-checkbox:checked").length;
+    jQuery('#all-genres').prop('checked', allGenresChecked);
   }
 </script>

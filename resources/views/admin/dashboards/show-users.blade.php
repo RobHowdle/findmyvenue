@@ -39,7 +39,7 @@
   </div>
 </x-app-layout>
 <script>
-  $(document).ready(function() {
+  jQuery(document).ready(function() {
     const dashboardType = "{{ $dashboardType }}";
 
     function fetchUsers() {
@@ -50,7 +50,7 @@
         success: function(response) {
           console.log(response);
 
-          const userList = $('#user-list');
+          const userList = jQuery('#user-list');
           userList.empty();
 
           // Check if relatedUsers exists and has entries
@@ -92,11 +92,11 @@
 
     fetchUsers();
 
-    $('#user-list').on('click', '.remove-user-btn', function(e) {
+    jQuery('#user-list').on('click', '.remove-user-btn', function(e) {
       e.preventDefault();
 
-      const userId = $(this).data('user-id');
-      const serviceId = $(this).data('service-id');
+      const userId = jQuery(this).data('user-id');
+      const serviceId = jQuery(this).data('service-id');
       const url =
         '{{ route('admin.dashboard.delete-user', ['dashboardType' => '__dashboardType__', 'id' => '__userId__']) }}'
         .replace('__dashboardType__', dashboardType)

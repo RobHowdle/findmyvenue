@@ -29,7 +29,7 @@
 @push('scripts')
   <script>
     var inHouseGearContent = @json(old('inHouseGear', $inHouseGear));
-    $(document).ready(function() {
+    jQuery(document).ready(function() {
       initialiseSummernote("#inHouseGear", inHouseGearContent);
     });
   </script>

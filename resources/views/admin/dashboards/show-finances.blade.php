@@ -53,7 +53,7 @@
 </x-app-layout>
 
 <script>
-  $(document).ready(function() {
+  jQuery(document).ready(function() {
     var serviceableId = "{{ $service->id }}";
     var serviceableType = "{{ $serviceType }}";
 
@@ -79,15 +79,15 @@
     let totalProfit = [];
 
     // Listen for filter changes
-    $('#finance-filter').change(function() {
-      let filter = $(this).val();
+    jQuery('#finance-filter').change(function() {
+      let filter = jQuery(this).val();
       adjustDatePicker(filter);
     });
 
     // Fetch data when filters change
-    $('#finance-filter, #date-picker').change(function() {
-      let filter = $('#finance-filter').val();
-      let date = $('#date-picker').val();
+    jQuery('#finance-filter, #date-picker').change(function() {
+      let filter = jQuery('#finance-filter').val();
+      let date = jQuery('#date-picker').val();
 
       $.ajax({
         url: '/api/dashboard/promoter/finances',
@@ -108,9 +108,9 @@
           totalProfit = response.totalProfit;
 
           // Display totals
-          $('#totalIncoming').text('Total Income: ' + formatCurrency(sumArray(totalIncome)));
-          $('#totalOutgoing').text('Total Outgoing: ' + formatCurrency(sumArray(totalOutgoing)));
-          $('#totalProfit').text('Total Profit: ' + formatCurrency(sumArray(totalProfit)));
+          jQuery('#totalIncoming').text('Total Income: ' + formatCurrency(sumArray(totalIncome)));
+          jQuery('#totalOutgoing').text('Total Outgoing: ' + formatCurrency(sumArray(totalOutgoing)));
+          jQuery('#totalProfit').text('Total Profit: ' + formatCurrency(sumArray(totalProfit)));
 
           // Generate links for individual finance records
           let financeLinks = '';
@@ -120,7 +120,7 @@
           });
 
           // Display finance links in a specific element
-          $('#financeRecords').html(financeLinks);
+          jQuery('#financeRecords').html(financeLinks);
         }
       });
     });
@@ -308,10 +308,10 @@
       });
     }
 
-    $('#exportButton').on('click', function() {
+    jQuery('#exportButton').on('click', function() {
       event.preventDefault();
-      let date = $('#date-picker').val();
-      let filter = $('#finance-filter').val();
+      let date = jQuery('#date-picker').val();
+      let filter = jQuery('#finance-filter').val();
 
       // Gather the data from the graphs
       const graphData = {
@@ -328,7 +328,7 @@
         method: 'POST',
         data: graphData,
         headers: {
-          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Include CSRF token
+          'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content') // Include CSRF token
         },
         xhrFields: {
           responseType: 'blob' // Set response type to blob for binary data
