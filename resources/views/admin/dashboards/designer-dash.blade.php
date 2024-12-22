@@ -13,7 +13,7 @@
           <a href="{{ route('admin.dashboard.jobs', ['dashboardType' => $dashboardType]) }}"
             class="flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-yns_yellow">
             <span class="fa-solid fa-pen-ruler mb-4 h-14 w-14"></span>
-            {{ $jobsCount }} Job{{ $jobsCount !== 1 ? 's' : '' }}
+            {{ $jobCount }} Job{{ $jobCount !== 1 ? 's' : '' }}
           </a>
           <a href="#"
             class="pointer-events-none flex cursor-not-allowed flex-col items-center text-center opacity-disabled transition duration-150 ease-in-out hover:text-yns_yellow">
@@ -23,7 +23,7 @@
           <a href="{{ route('admin.dashboard.get-reviews', ['filter' => 'pending', 'dashboardType' => $dashboardType]) }}"
             class="flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-yns_yellow">
             <span class="fas fa-star mb-4 h-14 w-14"></span>
-            {{-- {{ $pendingReviews }} Pending Review{{ $pendingReviews > 1 ? 's' : '' }} --}}
+            {{ $pendingReviews }} Pending Review{{ $pendingReviews > 1 ? 's' : '' }}
           </a>
           <a href="{{ route('admin.dashboard.todo-list', ['dashboardType' => $dashboardType]) }}"
             class="flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-yns_yellow">
@@ -45,11 +45,11 @@
               class="fas fa-file-alt mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-yns_yellow"></span>
             New Document
           </a>
-          <a href="{{ route('admin.dashboard.create-new-event', ['dashboardType' => $dashboardType]) }}"
+          <a href="{{ route('admin.dashboard.jobs.create', ['dashboardType' => $dashboardType]) }}"
             class="group flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-yns_yellow">
             <span
-              class="fas fa-calendar-alt mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-yns_yellow"></span>
-            New Event
+              class="fa-solid fa-pen-ruler mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-yns_yellow"></span>
+            New Job
           </a>
           <button id="new-note-button"
             class="group flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-yns_yellow">
@@ -70,11 +70,11 @@
               class="fas fa-file-alt mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-yns_yellow"></span>
             Documents
           </a>
-          <a href="{{ route('admin.dashboard.show-events', ['dashboardType' => $dashboardType]) }}"
+          <a href="{{ route('admin.dashboard.jobs', ['dashboardType' => $dashboardType]) }}"
             class="group flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-yns_yellow">
             <span
-              class="fas fa-calendar-alt mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-yns_yellow"></span>
-            Events
+              class="fa-solid fa-pen-ruler mb-4 h-14 w-14 rounded-lg bg-white px-1 py-1 text-black transition duration-150 ease-in-out group-hover:text-yns_yellow"></span>
+            Jobs
           </a>
           <a href="{{ route('admin.dashboard.show-notes', ['dashboardType' => $dashboardType]) }}"
             class="group flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-yns_yellow">

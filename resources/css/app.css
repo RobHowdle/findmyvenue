@@ -1499,6 +1499,10 @@ iframe {
     transform: rotate(180deg);
 }
 
+.dz-remove {
+    color: black;
+}
+
 /* @media only screen and (max-width: 1920px) {} */
 
 /* @media only screen and (max-width: 1680px) {} */

@@ -1,11 +1,11 @@
-<form method="POST" action="{{ route('photographer.update', ['dashboardType' => $dashboardType, 'user' => $user->id]) }}"
+<form method="POST" action="{{ route('portfolio.save', ['dashboardType' => $dashboardType, 'user' => $user->id]) }}"
   id="portfolioImagesForm">
   @csrf
   @method('PUT')
 
   <div class="group mb-6">
     <x-input-label-dark for="portfolio_link">Portfolio URL</x-input-label-dark>
-    <x-text-input id="portfolio_link" name="portfolio_link" :value="old('portfolio_link', $photographerData['portfolio_link'])" />
+    <x-text-input id="portfolio_link" name="portfolio_link" :value="old('portfolio_link', $dashboardData['portfolio_link'])" />
     @error('portfolio_link')
       <p class="yns_red mt-1 text-sm">{{ $message }}</p>
     @enderror
@@ -23,6 +23,13 @@
   jQuery("#portfolioImagesForm").on("submit", function(event) {
     event.preventDefault();
 
+    // Synchronize hidden input with Dropzone state
+    const portfolioImages = document.getElementById("portfolio_image_path").value;
+    if (!portfolioImages || portfolioImages === "[]") {
+      showFailureNotification("Please upload at least one portfolio image.");
+      return;
+    }
+
     var formData = new FormData(this);
 
     jQuery.ajax({
@@ -35,15 +42,14 @@
       contentType: false,
       processData: false,
       success: function(response) {
-
         showSuccessNotification(response.message);
         setTimeout(() => {
           window.location.href = response.redirect_url;
         }, 2000);
       },
       error: function(xhr) {
-        var errors = xhr.responseJSON.errors;
-        var errorMessages = Object.values(errors).flat().join("\n");
+        const errors = xhr.responseJSON.errors || {};
+        const errorMessages = Object.values(errors).flat().join("\n");
         showFailureNotification(errorMessages);
       }
     });

@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
+
 
 class Job extends Model
 {
@@ -22,8 +24,14 @@ class Job extends Model
         'user_id'
     ];
 
+    protected $dates = [
+        'job_start_date',
+        'job_end_date',
+    ];
+
     public function services()
     {
-        return $this->morphToMany(OtherService::class, 'serviceable', 'job_service', 'job_id', 'serviceable_id');
+        return $this->morphToMany(OtherService::class, 'serviceable', 'job_service', 'job_id', 'serviceable_id')
+            ->wherePivot('serviceable_type', '=', 'App\Models\OtherService');
     }
 }

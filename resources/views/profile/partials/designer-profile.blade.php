@@ -43,14 +43,14 @@
         class="group relative w-full px-8 py-2 text-left text-white transition duration-150 ease-in-out">
         <span class="absolute inset-0 transition-opacity duration-300 ease-in-out"
           :class="{ 'opacity-100': selected === 5, 'opacity-0': selected !== 5 }"></span>
-        <span class="relative z-10">Genres</span>
+        <span class="relative z-10">Genres & Band Types</span>
       </button>
       <button @click="selected = 6; selectedTab = 6"
         :class="{ 'bg-gradient-button': selected === 6, 'bg-yns_dark_gray': selected !== 6 }"
         class="group relative w-full px-8 py-2 text-left text-white transition duration-150 ease-in-out">
         <span class="absolute inset-0 transition-opacity duration-300 ease-in-out"
           :class="{ 'opacity-100': selected === 6, 'opacity-0': selected !== 6 }"></span>
-        <span class="relative z-10">Environments & Times</span>
+        <span class="relative z-10">Styles, Print & Working Times</span>
       </button>
     </div>
   </div>

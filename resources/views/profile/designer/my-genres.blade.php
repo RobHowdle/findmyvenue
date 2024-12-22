@@ -7,12 +7,8 @@
 <x-input-label>Select your genres</x-input-label>
 <div class="grid sm:grid-cols-2 sm:gap-3 lg:grid-cols-3 lg:gap-4">
   @php
-    $photographerGenres = is_string($photographer->genre)
-        ? json_decode($photographer->genre, true)
-        : $photographer->genre;
-    $bandGenres = is_string($photographer->band_type)
-        ? json_decode($photographer->band_type, true)
-        : $photographer->band_type;
+    $designerGenres = is_string($designer->genre) ? json_decode($designer->genre, true) : $designer->genre;
+    $bandGenres = is_string($designer->band_type) ? json_decode($designer->band_type, true) : $designer->band_type;
   @endphp
 
   <!-- "All Genres" checkbox -->
@@ -112,8 +108,8 @@
 <script defer>
   const genres = @json($genres);
   const dashboardType = "{{ $dashboardType }}";
-  let photographerGenres = @json($photographerData['photographerGenres']);
-  let photographerBandTypes = @json($photographerData['bandTypes']);
+  let designerGenres = @json($designerUserData['designerGenres']);
+  let designerBandTypes = @json($designerUserData['bandTypes']);
 
   document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("all-genres-checkbox")?.addEventListener("change", (e) => {
@@ -127,15 +123,15 @@
     });
 
     setTimeout(() => {
-      preCheckCheckboxes(photographerGenres);
-      preTickBandTypeCheckboxes(photographerBandTypes)
+      preCheckCheckboxes(designerGenres);
+      preTickBandTypeCheckboxes(designerBandTypes)
     }, 500);
     updateGenreStatus();
   });
 
   function updateGenreStatus() {
-    // Extract genres dynamically from photographerGenres
-    const genres = Object.keys(photographerGenres);
+    // Extract genres dynamically from designerGenres
+    const genres = Object.keys(designerGenres);
 
     // Iterate over each genre
     genres.forEach(genre => {
@@ -157,12 +153,12 @@
     });
   }
 
-  function preCheckCheckboxes(photographerGenres) {
-    if (!photographerGenres || typeof photographerGenres !== "object") {
+  function preCheckCheckboxes(designerGenres) {
+    if (!designerGenres || typeof designerGenres !== "object") {
       return;
     }
 
-    Object.entries(photographerGenres).forEach(([genreName, genreData], index) => {
+    Object.entries(designerGenres).forEach(([genreName, genreData], index) => {
       // Check "All" checkbox for the genre
       const allCheckboxId = `all-${genreName.toLowerCase().replace(/\W/g, '_')}-${index}`;
       const allCheckbox = document.querySelector(`#${allCheckboxId}`);

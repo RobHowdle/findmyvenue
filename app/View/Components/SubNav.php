@@ -160,6 +160,7 @@ class SubNav extends Component
             $this->overallRatingPromoter = $this->renderRatingIcons($this->promoterId);
         }
     }
+
     private function loadBandData($user)
     {
         $bands = $user->otherService("Artist")->get();
@@ -171,6 +172,7 @@ class SubNav extends Component
             $this->totalProfitsBandYtd = $this->calculateTotalProfitsBandYtd($band->id);
         }
     }
+
     private function loadDesignerData($user)
     {
         $designers = $user->otherService('Designer')->get();
@@ -239,7 +241,6 @@ class SubNav extends Component
             }
         }
 
-        // Return 0 if no promoter company or no profits found
         return 0;
     }
 
@@ -252,7 +253,6 @@ class SubNav extends Component
                 $startOfYear = Carbon::now()->startOfYear();
                 $endOfYear = Carbon::now()->endOfYear();
 
-                // Query the finances table for the current year's profits
                 $eventsCountYTD = DB::table('event_promoter')
                     ->join('events', 'event_promoter.event_id', '=', 'events.id')
                     ->where('promoter_id', $promoterCompany->id)
@@ -263,7 +263,6 @@ class SubNav extends Component
             }
         }
 
-        // Return 0 if no promoter company or no profits found
         return 0;
     }
 
@@ -277,7 +276,6 @@ class SubNav extends Component
                 $startOfYear = Carbon::now()->startOfYear();
                 $endOfYear = Carbon::now()->endOfYear();
 
-                // Query the finances table for the current year's jobs
                 $jobsCountYTD = DB::table('job_service')
                     ->join('jobs', 'job_service.job_id', '=', 'jobs.id')
                     ->where('serviceable_id', $photographerCompany->id)
@@ -289,7 +287,6 @@ class SubNav extends Component
             }
         }
 
-        // Return 0 if no promoter company or no profits found
         return 0;
     }
 
@@ -355,7 +352,6 @@ class SubNav extends Component
                 $startOfYear = Carbon::now()->startOfYear();
                 $endOfYear = Carbon::now()->endOfYear();
 
-                // Query the finances table for the current year's profits
                 $totalProfitsYTD = Finance::where('serviceable_id', $venueService->id)
                     ->where('serviceable_type', 'App\Models\Venue')
                     ->whereBetween('date_to', [$startOfYear, $endOfYear])
@@ -365,7 +361,6 @@ class SubNav extends Component
             }
         }
 
-        // Return 0 if no promoter company or no profits found
         return 0;
     }
 
@@ -378,7 +373,6 @@ class SubNav extends Component
                 $startOfYear = Carbon::now()->startOfYear();
                 $endOfYear = Carbon::now()->endOfYear();
 
-                // Query the finances table for the current year's profits
                 $eventsCountYTD = DB::table('event_venue')
                     ->join('events', 'event_venue.event_id', '=', 'events.id')
                     ->where('venue_id', $venueService->id)
@@ -389,7 +383,6 @@ class SubNav extends Component
             }
         }
 
-        // Return 0 if no promoter company or no profits found
         return 0;
     }
 
@@ -437,7 +430,6 @@ class SubNav extends Component
             }
         }
 
-        // Return 0 if no promoter company or no profits found
         return 0;
     }
 
@@ -450,7 +442,6 @@ class SubNav extends Component
                 $startOfYear = Carbon::now()->startOfYear();
                 $endOfYear = Carbon::now()->endOfYear();
 
-                // Query the finances table for the current year's jobs
                 $jobsCountDesignerYTD = DB::table('job_service')
                     ->join('jobs', 'job_service.job_id', '=', 'jobs.id')
                     ->where('serviceable_id', $designerCompany->id)
@@ -462,7 +453,6 @@ class SubNav extends Component
             }
         }
 
-        // Return 0 if no promoter company or no profits found
         return 0;
     }
 

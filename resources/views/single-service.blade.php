@@ -155,6 +155,12 @@
                     <span class="fas fa-cog mr-2"></span>Services
                   </a>
                 </li>
+                </li>
+                <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
+                  <a href="#" data-tab="portfolio" class="tabLinks text-base text-white hover:text-yns_yellow">
+                    <span class="fas fa-folder mr-2"></span>Portfolio
+                  </a>
+                </li>
                 <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
                   <a href="#" data-tab="reviews" class="tabLinks text-base text-white hover:text-yns_yellow">
                     <span class="fas fa-star mr-2"></span>Reviews
@@ -497,6 +503,23 @@
                 @endif
               </div>
 
+              <div id="portfolio" class="overflow-auto md:flex md:flex-wrap md:gap-8">
+                @if ($singleDesignerData['portfolioImages'])
+                  @foreach ($singleDesignerData['portfolioImages'] as $image)
+                    <div class="portfolio-image mb-6 min-w-[calc(50%-1rem)] md:mb-0 md:flex-1">
+                      <img src="{{ asset($image) }}" alt="Portfolio Image" class="h-auto w-full">
+                    </div>
+                  @endforeach
+                  @if ($singleDesignerData['portfolioLink'])
+                    <p class="mt-2">You can view our full portfolio here - <a
+                        class="underline hover:text-yns_yellow" href="{{ $singleDesignerData['portfolioLink'] }}"
+                        target="_blank">{{ $singleDesignerData['portfolioLink'] }}</a></p>
+                  @endif
+                @else
+                  <p>We haven't got our portfolio set up yet, check back later!</p>
+                @endif
+              </div>
+
               <div id="reviews">
                 <p class="text-center">Want to know what we're like? Check out our reviews!</p>
                 <div class="ratings-block mt-4 flex flex-col items-center gap-4">
@@ -620,6 +643,23 @@
                   @endif
                 @else
                   <p>We haven't got our services set up yet! Come back soon!</p>
+                @endif
+              </div>
+
+              <div id="portfolio" class="overflow-auto md:flex md:flex-wrap md:gap-8">
+                @if ($singleDesignerData['portfolioImages'])
+                  @foreach ($singleDesignerData['portfolioImages'] as $image)
+                    <div class="portfolio-image mb-6 min-w-[calc(50%-1rem)] md:mb-0 md:flex-1">
+                      <img src="{{ asset($image) }}" alt="Portfolio Image" class="h-auto w-full">
+                    </div>
+                  @endforeach
+                  @if ($singleVideographerData['portfolioLink'])
+                    <p class="mt-2">You can view our full portfolio here - <a
+                        class="underline hover:text-yns_yellow" href="{{ $singleVideographerData['portfolioLink'] }}"
+                        target="_blank">{{ $singleVideographerData['portfolioLink'] }}</a></p>
+                  @endif
+                @else
+                  <p>We haven't got our portfolio set up yet, check back later!</p>
                 @endif
               </div>
 

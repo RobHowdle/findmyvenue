@@ -3,8 +3,9 @@
 <div class="google-address-picker">
   <x-input-label-dark for="location_{{ $dataId }}">{{ $label }}:</x-input-label-dark>
 
-  <x-text-input id="location_{{ $dataId }}" class="mt-1 block w-full" name="location"
-    placeholder="{{ htmlspecialchars($placeholder) }}"
+  <input type="text" id="location_{{ $dataId }}"
+    class="mt-1 block w-full rounded-md border-yns_red shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-yns_red dark:bg-gray-900 dark:text-gray-300 dark:focus:border-indigo-600 dark:focus:ring-indigo-600"
+    name="location" placeholder="{{ htmlspecialchars($placeholder) }}"
     value="{{ htmlspecialchars(is_array($value) ? $value['location'] ?? '' : $value) }}" data-id="{{ $dataId }}" />
 
   <input type="hidden" id="latitude_{{ $dataId }}" name="latitude" value="{{ $latitude }}"

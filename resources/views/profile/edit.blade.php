@@ -48,13 +48,15 @@
           ]) --}}
           @endif
 
-          <button @click="selected = 10; selectedTab = 10" data-tab="calendar"
-            :class="{ 'bg-gradient-button': selected === 10, 'bg-yns_dark_gray': selected !== 10 }"
-            class="group relative w-full px-8 py-2 text-left text-white transition duration-150 ease-in-out">
-            <span class="absolute inset-0 transition-opacity duration-300 ease-in-out"
-              :class="{ 'opacity-100': selected === 10, 'opacity-0': selected !== 10 }"></span>
-            <span class="relative z-10">Calendar</span>
-          </button>
+          @if ($dashboardType !== 'designer')
+            <button @click="selected = 10; selectedTab = 10" data-tab="calendar"
+              :class="{ 'bg-gradient-button': selected === 10, 'bg-yns_dark_gray': selected !== 10 }"
+              class="group relative w-full px-8 py-2 text-left text-white transition duration-150 ease-in-out">
+              <span class="absolute inset-0 transition-opacity duration-300 ease-in-out"
+                :class="{ 'opacity-100': selected === 10, 'opacity-0': selected !== 10 }"></span>
+              <span class="relative z-10">Calendar</span>
+            </button>
+          @endif
 
           @if ($dashboardType !== 'standard')
             <button @click="selected = 11; selectedTab =11"
@@ -122,36 +124,39 @@
           ]) --}}
         @endif
 
-        <div x-show="selectedTab === 10" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
-          <div class="w-full">
-            <div class="flex items-center justify-center">
-              <div class="group">
-                @if (Auth::user()->google_access_token)
-                  <form action="{{ route('google.unlink') }}" method="POST">
+        @if ($dashboardType !== 'designer')
+          <div x-show="selectedTab === 10" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
+            <div class="w-full">
+              <div class="flex items-center justify-center">
+                <div class="group">
+                  @if (Auth::user()->google_access_token)
+                    <form action="{{ route('google.unlink') }}" method="POST">
+                      @csrf
+                      <x-button type="submit" label="Unlink Google Calendar"></x-button>
+                    </form>
+                  @else
+                    <a href="{{ route('google.redirect') }}" class="btn btn-primary">Link Google Calendar</a>
+                  @endif
+                </div>
+                <div class="group">
+                  <form action="{{ route('google.sync') }}" method="POST">
                     @csrf
-                    <x-button type="submit" label="Unlink Google Calendar"></x-button>
+                    <button type="submit" class="btn btn-success">Manual Google Sync</button>
                   </form>
-                @else
-                  <a href="{{ route('google.redirect') }}" class="btn btn-primary">Link Google Calendar</a>
-                @endif
-              </div>
-              <div class="group">
-                <form action="{{ route('google.sync') }}" method="POST">
-                  @csrf
-                  <button type="submit" class="btn btn-success">Manual Google Sync</button>
-                </form>
-              </div>
-              {{-- <div class="group">
+                </div>
+                {{-- <div class="group">
                 <button id="sync-all-events-apple"
                   class="rounded bg-green-500 px-4 py-2 font-semibold text-white hover:bg-green-600"
                   title="Sync All Events to Apple Calendar">
                   Sync All Events to Apple Calendar
                 </button>
               </div> --}}
+              </div>
+              <div id="calendar" data-user-id="{{ Auth::check() ? Auth::user()->id : '' }}"
+                data-dashboard-type="{{ $dashboardType }}"></div>
             </div>
-            <div id="calendar" data-user-id="{{ Auth::check() ? Auth::user()->id : '' }}"></div>
           </div>
-        </div>
+        @endif
         <div x-show="selectedTab === 11" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
           <div class="w-full">
             <div class="group">
@@ -180,40 +185,40 @@
   }
 </style>
 <script>
-  // document.getElementById('sync-all-events-apple').addEventListener('click', function() {
-  //   var calendarEl = document.getElementById("calendar");
-  //   var userId = calendarEl.getAttribute("data-user-id");
-  //   const url = `/profile/events/${userId}/apple/sync`; // Define your route for syncing
+  document.getElementById('sync-all-events-apple').addEventListener('click', function() {
+    var calendarEl = document.getElementById("calendar");
+    var userId = calendarEl.getAttribute("data-user-id");
+    const url = `/profile/events/${userId}/apple/sync`; // Define your route for syncing
 
-  //   // Show loading state if needed
-  //   this.textContent = 'Syncing...';
+    // Show loading state if needed
+    this.textContent = 'Syncing...';
 
-  //   // Make an AJAX request to trigger the download
-  //   fetch(url)
-  //     .then(response => {
-  //       if (response.ok) {
-  //         return response.blob(); // Return blob data for the .ics file
-  //       }
-  //       throw new Error('Network response was not ok.');
-  //     })
-  //     .then(blob => {
-  //       // Create a link element to download the file
-  //       const url = window.URL.createObjectURL(blob);
-  //       const a = document.createElement('a');
-  //       a.href = url;
-  //       a.download = 'events.ics'; // Set a name for the file
-  //       document.body.appendChild(a);
-  //       a.click();
-  //       a.remove();
-  //       window.URL.revokeObjectURL(url);
+    // Make an AJAX request to trigger the download
+    fetch(url)
+      .then(response => {
+        if (response.ok) {
+          return response.blob(); // Return blob data for the .ics file
+        }
+        throw new Error('Network response was not ok.');
+      })
+      .then(blob => {
+        // Create a link element to download the file
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'events.ics'; // Set a name for the file
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
 
-  //       // Reset button text
-  //       this.textContent = 'Sync All Events to Apple Calendar';
-  //     })
-  //     .catch(error => {
-  //       console.error('Error:', error);
-  //       alert('Failed to sync events. Please try again.');
-  //       this.textContent = 'Sync All Events to Apple Calendar';
-  //     });
-  // });
+        // Reset button text
+        this.textContent = 'Sync All Events to Apple Calendar';
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to sync events. Please try again.');
+        this.textContent = 'Sync All Events to Apple Calendar';
+      });
+  });
 </script>

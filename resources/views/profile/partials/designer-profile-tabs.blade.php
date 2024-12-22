@@ -24,11 +24,14 @@
     ])
   </div>
 </div>
+@php
+  $dashboardData = $designerUserData ?? ($photographerUserData ?? ($videographerUserData ?? []));
+@endphp
 <div x-show="selectedTab === 4" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
   <div class="w-full">
     <p class="text-xl font-bold">Portfolio</p>
     @include('profile.designer.portfolio', [
-        'portfolioImages' => $designerUserData['portfolioImages'],
+        'waterMarkedPortfolioImages' => $dashboardData['waterMarkedPortfolioImages'],
     ])
   </div>
 </div>
@@ -43,9 +46,9 @@
         'email' => $email,
         'location' => $location,
         'genres' => $designerUserData['genres'],
-        'photographerGenres' => $designerUserData['photographerGenres'],
+        'designerGenres' => $designerUserData['designerGenres'],
         'userId' => $userId,
-        'photographer' => $designerUserData['photographer'],
+        'designer' => $designerUserData['designer'],
         'isAllGenres' => $designerUserData['isAllGenres'],
         'bandTypes' => $designerUserData['bandTypes'],
     ])
@@ -53,14 +56,12 @@
 </div>
 <div x-show="selectedTab === 6" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
   <div class="w-full">
-    <p class="text-xl font-bold">Environments & Working Times</p>
-    @include('profile.designer.environments-and-times', [
+    <p class="text-xl font-bold">Design Styles, Print Mediums & Working Times</p>
+    @include('profile.designer.styles-and-times', [
         'dashboardType' => $dashboardType,
         'userRole' => $userRole,
         'userId' => $userId,
-        'photographer' => $designerUserData['photographer'],
-        'environmentTypes' => $designerUserData['environmentTypes'],
-        'groups' => $designerUserData['groups'],
+        'designer' => $designerUserData['designer'],
         'workingTimes' => $designerUserData['workingTimes'],
     ])
   </div>

@@ -45,7 +45,6 @@
                   <select id="job-type" name="job_type"
                     class="mt-1 block w-full rounded-md border-yns_red shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-indigo-600 dark:focus:ring-indigo-600">
                     <option value="" disabled selected>Select a Job Type</option>
-                    <option value="">Select a Job Type</option>
                   </select>
                 </div>
 
