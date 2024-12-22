@@ -43,41 +43,41 @@
   </div>
 </x-app-layout>
 <script>
-  $(document).ready(function() {
+  jQuery(document).ready(function() {
     let currentPage = 1;
     let dashboardType = "{{ $dashboardType }}";
 
     loadTasks(currentPage);
 
-    $('#load-more-btn').on('click', function() {
+    jQuery('#load-more-btn').on('click', function() {
       currentPage++;
       loadTasks(currentPage);
     });
 
-    $(document).on('click', '.complete-task-btn', function() {
-      const taskId = $(this).data('task-id');
-      const taskElement = $(this).closest('.todo-item');
+    jQuery(document).on('click', '.complete-task-btn', function() {
+      const taskId = jQuery(this).data('task-id');
+      const taskElement = jQuery(this).closest('.todo-item');
       completeTask(taskId);
 
-      $('#tasks').empty();
+      jQuery('#tasks').empty();
       currentPage = 1;
     });
 
-    $(document).on('click', '.delete-task-btn', function() {
-      const taskId = $(this).data('task-id');
-      const taskElement = $(this).closest('.todo-item');
+    jQuery(document).on('click', '.delete-task-btn', function() {
+      const taskId = jQuery(this).data('task-id');
+      const taskElement = jQuery(this).closest('.todo-item');
       deleteTask(taskId);
 
-      $('#tasks').empty();
+      jQuery('#tasks').empty();
       currentPage = 1;
     });
 
-    $(document).on('click', '.uncomplete-task-btn', function() {
-      const taskId = $(this).data('task-id');
-      const taskElement = $(this).closest('.todo-item');
+    jQuery(document).on('click', '.uncomplete-task-btn', function() {
+      const taskId = jQuery(this).data('task-id');
+      const taskElement = jQuery(this).closest('.todo-item');
       uncompleteTask(taskId);
 
-      $('#tasks').empty();
+      jQuery('#tasks').empty();
       currentPage = 1;
     });
 
@@ -91,13 +91,13 @@
           page: page
         },
         success: function(response) {
-          $('#tasks').append(response.view);
-          $('#completed-task-btn').show();
-          $('#uncomplete-task-btn').hide();
-          $('#load-more-btn').show();
+          jQuery('#tasks').append(response.view);
+          jQuery('#completed-task-btn').show();
+          jQuery('#uncomplete-task-btn').hide();
+          jQuery('#load-more-btn').show();
 
           if (!response.hasMore) {
-            $('#load-more-btn').hide();
+            jQuery('#load-more-btn').hide();
           }
         },
         error: function(xhr) {
@@ -107,9 +107,9 @@
     }
 
     // Handle new task submission
-    $('#newTodoItem').on('submit', function(e) {
+    jQuery('#newTodoItem').on('submit', function(e) {
       e.preventDefault();
-      let task = $('#taskInput').val();
+      let task = jQuery('#taskInput').val();
 
       $.ajax({
         url: '{{ route('admin.dashboard.new-todo-item', ['dashboardType' => '__dashboardType__']) }}'
@@ -121,8 +121,8 @@
           task: task
         },
         success: function(response) {
-          $('#taskInput').val('');
-          $('#tasks').empty();
+          jQuery('#taskInput').val('');
+          jQuery('#tasks').empty();
           currentPage = 1;
           loadTasks(currentPage);
           showSuccessNotification(response.message);
@@ -156,17 +156,17 @@
     }
 
     // Show Completed Tasks
-    $('#completed-task-btn').on('click', function() {
+    jQuery('#completed-task-btn').on('click', function() {
       $.ajax({
         url: '{{ route('admin.dashboard.completed-todo-items', ['dashboardType' => '__dashboardType__']) }}'
           .replace('__dashboardType__', dashboardType),
         type: 'GET',
         success: function(response) {
-          $('#tasks').empty();
-          $('#tasks').append(response.view);
-          $('#load-more-btn').hide(); // Optionally hide Load More button
-          $('#uncomplete-task-btn').show(); // Show uncompleted button
-          $('#completed-task-btn').hide(); // Show uncompleted button
+          jQuery('#tasks').empty();
+          jQuery('#tasks').append(response.view);
+          jQuery('#load-more-btn').hide(); // Optionally hide Load More button
+          jQuery('#uncomplete-task-btn').show(); // Show uncompleted button
+          jQuery('#completed-task-btn').hide(); // Show uncompleted button
         },
         error: function(xhr) {
           console.log('Error: ', xhr.responseText); // Handle error response
@@ -225,9 +225,9 @@
           .replace('__dashboardType__', dashboardType),
         type: 'GET',
         success: function(response) {
-          $('#tasks').append(response.view);
-          $('#complete-task-btn').hide(); // Hide completed button
-          $('#uncomplete-task-btn').show(); // Show uncompleted button
+          jQuery('#tasks').append(response.view);
+          jQuery('#complete-task-btn').hide(); // Hide completed button
+          jQuery('#uncomplete-task-btn').show(); // Show uncompleted button
         },
         error: function(xhr) {
           console.log('Error: ', xhr.responseText);

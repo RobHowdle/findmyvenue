@@ -136,10 +136,10 @@
     }
   }
 
-  $(document).ready(function() {
+  jQuery(document).ready(function() {
     // Listen for the 'input' event on the address input field
-    $('#w3w').on('input', function() {
-      var address = $(this).val();
+    jQuery('#w3w').on('input', function() {
+      var address = jQuery(this).val();
       console.log(address);
 
       if (address.length >= 7) { // Send request only if at least 3 characters are entered
@@ -160,20 +160,20 @@
                     '</li>';
                 });
                 suggestionsHtml += '</ul>';
-                $('#suggestions').html(suggestionsHtml);
+                jQuery('#suggestions').html(suggestionsHtml);
               } else {
-                $('#suggestions').html('<strong>No suggestions found</strong>');
+                jQuery('#suggestions').html('<strong>No suggestions found</strong>');
               }
             },
             error: function(xhr, status, error) {
               // Handle any errors
-              $('#suggestions').html(
+              jQuery('#suggestions').html(
                 '<strong>Error occurred while processing your request.</strong>');
             }
           });
         }, 2000);
       } else {
-        $('#suggestions').empty(); // Clear suggestions if input is less than 3 characters
+        jQuery('#suggestions').empty(); // Clear suggestions if input is less than 3 characters
       }
     });
   });

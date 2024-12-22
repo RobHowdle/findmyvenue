@@ -211,13 +211,13 @@
 </x-app-layout>
 
 <script>
-  $(document).ready(function() {
+  jQuery(document).ready(function() {
     const genres = @json($genres);
-    const allBandsCheckbox = $('#all-bands');
-    const bandCheckboxes = $('.band-checkbox').not('#all-bands');
+    const allBandsCheckbox = jQuery('#all-bands');
+    const bandCheckboxes = jQuery('.band-checkbox').not('#all-bands');
 
     allBandsCheckbox.change(function() {
-      const isChecked = $(this).prop('checked');
+      const isChecked = jQuery(this).prop('checked');
 
       bandCheckboxes.prop('checked', isChecked);
     });
@@ -229,15 +229,15 @@
     });
 
     function populateGenres(genres) {
-      const genresContainer = $('#genres-container');
+      const genresContainer = jQuery('#genres-container');
       genresContainer.empty(); // Clear existing genres
 
       genres.forEach((genre, genreIndex) => {
         // Create the main genre accordion item
-        const accordionItem = $('<div class="accordion-item"></div>');
+        const accordionItem = jQuery('<div class="accordion-item"></div>');
 
         // Create the header for the genre with a checkbox for the entire genre
-        const header = $(`
+        const header = jQuery(`
             <h2 class="accordion-header">
                 <div class="flex items-center gap-2">
                     <x-input-checkbox id="all-genre-${genreIndex}" name="genres[]" value="All ${genre.name}" class="genre-checkbox" data-all-genre-id="${genreIndex}" />
@@ -247,11 +247,11 @@
         `);
 
         // Create the body for subgenres
-        const body = $('<div class="accordion-body" style="display: none;"></div>');
+        const body = jQuery('<div class="accordion-body" style="display: none;"></div>');
 
         // Populate subgenres
         genre.subgenres.forEach((subgenre, subIndex) => {
-          const subgenreCheckbox = $(`
+          const subgenreCheckbox = jQuery(`
                 <div class="checkbox-wrapper">
                     <x-input-checkbox id="subgenre-${genreIndex}-${subIndex}" name="genres[]" value="${subgenre}" class="subgenre-checkbox" data-parent-genre="${genreIndex}" />
                     <x-input-label-dark class="inline" for="subgenre-${genreIndex}-${subIndex}">${subgenre}</x-input-label-dark>
@@ -271,66 +271,68 @@
 
     function attachGenreEventListeners() {
       // Accordion toggle functionality for genres
-      $(document).on('click', '.accordion-header', function() {
-        $(this).next('.accordion-body').slideToggle();
+      jQuery(document).on('click', '.accordion-header', function() {
+        jQuery(this).next('.accordion-body').slideToggle();
       });
 
       // Event listener for the "All Genres" checkbox
-      $(document).on('change', '.all-genres-checkbox', function() {
-        const isChecked = $(this).prop('checked');
+      jQuery(document).on('change', '.all-genres-checkbox', function() {
+        const isChecked = jQuery(this).prop('checked');
 
         // Check/uncheck all individual genre and subgenre checkboxes based on "All Genres"
-        $('.genre-checkbox').prop('checked', isChecked);
-        $('.subgenre-checkbox').prop('checked', isChecked);
+        jQuery('.genre-checkbox').prop('checked', isChecked);
+        jQuery('.subgenre-checkbox').prop('checked', isChecked);
       });
 
       // Event listener for individual genre checkboxes
-      $(document).on('change', '.genre-checkbox', function() {
-        const genreId = $(this).attr('id').split('-')[2]; // Extract the genre index
-        const isChecked = $(this).prop('checked');
+      jQuery(document).on('change', '.genre-checkbox', function() {
+        const genreId = jQuery(this).attr('id').split('-')[2]; // Extract the genre index
+        const isChecked = jQuery(this).prop('checked');
 
         // Check/uncheck all subgenres of this genre based on the "All Genre" checkbox
-        $(`.subgenre-checkbox[data-parent-genre="${genreId}"]`).prop('checked', isChecked);
+        jQuery(`.subgenre-checkbox[data-parent-genre="${genreId}"]`).prop('checked', isChecked);
 
         // Check if any subgenre is unchecked
-        const allSubgenresChecked = $(`.subgenre-checkbox[data-parent-genre="${genreId}"]:checked`)
+        const allSubgenresChecked = jQuery(`.subgenre-checkbox[data-parent-genre="${genreId}"]:checked`)
           .length ===
-          $(`.subgenre-checkbox[data-parent-genre="${genreId}"]`).length;
+          jQuery(`.subgenre-checkbox[data-parent-genre="${genreId}"]`).length;
 
         // Update the "All Genre" checkbox based on subgenre states
-        $(this).prop('checked', allSubgenresChecked);
+        jQuery(this).prop('checked', allSubgenresChecked);
       });
 
       // Event listener for subgenre checkboxes
-      $(document).on('change', '.subgenre-checkbox', function() {
-        const genreId = $(this).data('parent-genre');
+      jQuery(document).on('change', '.subgenre-checkbox', function() {
+        const genreId = jQuery(this).data('parent-genre');
 
         // Check if all subgenres of the parent genre are checked
-        const allSubgenresChecked = $(`.subgenre-checkbox[data-parent-genre="${genreId}"]:checked`).length ===
-          $(`.subgenre-checkbox[data-parent-genre="${genreId}"]`).length;
+        const allSubgenresChecked = jQuery(`.subgenre-checkbox[data-parent-genre="${genreId}"]:checked`)
+          .length ===
+          jQuery(`.subgenre-checkbox[data-parent-genre="${genreId}"]`).length;
 
         // Update the "All Genre" checkbox based on subgenre states
-        $(`#all-genre-${genreId}`).prop('checked', allSubgenresChecked);
+        jQuery(`#all-genre-${genreId}`).prop('checked', allSubgenresChecked);
       });
 
       // Event listener for accordion toggle to ensure states are checked correctly
-      $(document).on('click', '.accordion-header', function() {
-        const genreId = $(this).find('.genre-checkbox').attr('id').split('-')[2];
-        const allSubgenresChecked = $(`.subgenre-checkbox[data-parent-genre="${genreId}"]:checked`).length ===
-          $(`.subgenre-checkbox[data-parent-genre="${genreId}"]`).length;
+      jQuery(document).on('click', '.accordion-header', function() {
+        const genreId = jQuery(this).find('.genre-checkbox').attr('id').split('-')[2];
+        const allSubgenresChecked = jQuery(`.subgenre-checkbox[data-parent-genre="${genreId}"]:checked`)
+          .length ===
+          jQuery(`.subgenre-checkbox[data-parent-genre="${genreId}"]`).length;
 
         // Only check the "All Genre" checkbox if all subgenres are checked when the accordion is opened
-        if ($(this).next('.accordion-body').is(':visible') && allSubgenresChecked) {
-          $(`#all-genre-${genreId}`).prop('checked', true);
+        if (jQuery(this).next('.accordion-body').is(':visible') && allSubgenresChecked) {
+          jQuery(`#all-genre-${genreId}`).prop('checked', true);
         } else {
-          $(`#all-genre-${genreId}`).prop('checked', false);
+          jQuery(`#all-genre-${genreId}`).prop('checked', false);
         }
       });
     }
 
     // Promoter search functionality
-    $('#promoter-search').on('keyup', function() {
-      let query = $(this).val();
+    jQuery('#promoter-search').on('keyup', function() {
+      let query = jQuery(this).val();
       const dashboardType = "{{ $dashboardType }}";
 
 
@@ -342,32 +344,32 @@
           query: query
         },
         success: function(data) {
-          $('#promoter-results').html('');
-          $('#result-count').text('');
+          jQuery('#promoter-results').html('');
+          jQuery('#result-count').text('');
 
           if (data.count > 0) {
             data.results.forEach(function(promoter) {
-              $('#promoter-results').append(
+              jQuery('#promoter-results').append(
                 '<li class="flex px-2 flex-row items-center justify-between"><p>' +
                 promoter.name +
                 '</p><button class="bg-white text-black rounded-lg px-4 py-2 font-heading transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow" data-id="' +
                 promoter.id +
                 '">Link</button></li>');
             });
-            $('#create-promoter-form').fadeOut(500);
-            $('#result-count').text(data.count + ' results found');
+            jQuery('#create-promoter-form').fadeOut(500);
+            jQuery('#result-count').text(data.count + ' results found');
           } else {
-            $('#promoter-results').html('<li>No promoter found</li>');
-            $('#create-promoter-form').fadeIn(500);
-            $('#result-count').text('0 results');
+            jQuery('#promoter-results').html('<li>No promoter found</li>');
+            jQuery('#create-promoter-form').fadeIn(500);
+            jQuery('#result-count').text('0 results');
           }
         }
       });
     });
 
     // Event delegation for dynamically created buttons
-    $('#promoter-results').on('click', 'button', function() {
-      const promoterId = $(this).data('id'); // Retrieve the id from data-id attribute
+    jQuery('#promoter-results').on('click', 'button', function() {
+      const promoterId = jQuery(this).data('id'); // Retrieve the id from data-id attribute
       linkUserToPromoter(promoterId); // Call your function
     });
 

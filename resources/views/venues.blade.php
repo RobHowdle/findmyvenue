@@ -44,7 +44,7 @@
 <script>
   // Search Bar
   function initialize() {
-    $('form').on('keyup keypress', function(e) {
+    jQuery('form').on('keyup keypress', function(e) {
       var keyCode = e.keyCode || e.which;
       if (keyCode === 13) {
         return false;
@@ -130,42 +130,42 @@
   }
 
   // Attach event listener for filter checkboxes
-  $('.filter-checkbox').change(function() {
+  jQuery('.filter-checkbox').change(function() {
     applyFilters();
   });
 
   // Attach event listener for search input
-  $('#address-input').on('input', function() {
+  jQuery('#address-input').on('input', function() {
     applyFilters();
   });
 
   // Event handler for "All Types" checkbox
-  $("#all-bands").change(function() {
-    var isChecked = $(this).prop("checked");
-    $(".filter-checkbox").prop("checked", isChecked);
+  jQuery("#all-bands").change(function() {
+    var isChecked = jQuery(this).prop("checked");
+    jQuery(".filter-checkbox").prop("checked", isChecked);
   });
 
   // Event handler for "All Genres" checkbox
-  $("#all-genres").change(function() {
-    var isChecked = $(this).prop("checked");
-    $(".genre-checkbox").prop("checked", isChecked);
+  jQuery("#all-genres").change(function() {
+    var isChecked = jQuery(this).prop("checked");
+    jQuery(".genre-checkbox").prop("checked", isChecked);
 
     // If "All Genres" checkbox is checked, select all subgenres of each genre
     if (isChecked) {
-      $(".accordion-item .subgenre-checkbox").prop("checked", true); // Uncheck subgenres
+      jQuery(".accordion-item .subgenre-checkbox").prop("checked", true); // Uncheck subgenres
     }
     applyFilters();
   })
 
   // Attach event listener for genre checkboxes
-  $('.genre-checkbox').change(function() {
-    var isChecked = $(this).prop('checked');
-    var genreId = $(this).attr('id');
+  jQuery('.genre-checkbox').change(function() {
+    var isChecked = jQuery(this).prop('checked');
+    var genreId = jQuery(this).attr('id');
 
     var genreIdParts = genreId.split('-');
     var genreIndex = genreIdParts[2];
 
-    var subgenreCheckboxes = $('input[type="checkbox"][id*="genre-' + genreIndex + '-subgenre"]');
+    var subgenreCheckboxes = jQuery('input[type="checkbox"][id*="genre-' + genreIndex + '-subgenre"]');
 
     subgenreCheckboxes.prop('checked', isChecked);
 
@@ -173,9 +173,9 @@
   });
 
   // Attach event listener for subgenre checkboxes
-  $('.subgenre-checkbox').change(function() {
+  jQuery('.subgenre-checkbox').change(function() {
     // If a subgenre checkbox is selected, deselect the "All Genres" checkbox
-    $('#all-genres').prop('checked', false);
+    jQuery('#all-genres').prop('checked', false);
     applyFilters();
   });
 
@@ -183,9 +183,9 @@
     // Get selected filter values
     var bandTypeValue = [];
     var allTypesSelected = false;
-    var searchQuery = $('#address-input').val();
-    $('.filter-checkbox:checked').each(function() {
-      var filterValue = $(this).val();
+    var searchQuery = jQuery('#address-input').val();
+    jQuery('.filter-checkbox:checked').each(function() {
+      var filterValue = jQuery(this).val();
 
       // Check if "All Types" is selected
       if (filterValue === 'all') {
@@ -206,8 +206,8 @@
 
     // If "All Types" is selected, populate the array with all individual values
     if (allTypesSelected) {
-      $('.filter-checkbox').each(function() {
-        var filterValue = $(this).val();
+      jQuery('.filter-checkbox').each(function() {
+        var filterValue = jQuery(this).val();
         if (filterValue !== 'all') {
           bandTypeValue.push(filterValue);
         }
@@ -215,13 +215,13 @@
     }
 
     var selectedGenres = [];
-    $('.genre-checkbox:checked').each(function() {
-      selectedGenres.push($(this).val());
+    jQuery('.genre-checkbox:checked').each(function() {
+      selectedGenres.push(jQuery(this).val());
     });
 
     var selectedSubgenres = [];
-    $('.subgenre-checkbox:checked').each(function() {
-      selectedSubgenres.push($(this).val());
+    jQuery('.subgenre-checkbox:checked').each(function() {
+      selectedSubgenres.push(jQuery(this).val());
     });
 
     var mergedGenres = selectedGenres.concat(selectedSubgenres)
@@ -301,7 +301,7 @@
     }).join('');
 
     // Replace the existing HTML content with the new HTML
-    $('#venues tbody').html(rowsHtml);
+    jQuery('#venues tbody').html(rowsHtml);
   }
 
   // Function to generate HTML for the rating
@@ -361,7 +361,7 @@
                 <td colspan="5" class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4 uppercase text-center">No venues found</td>
             </tr>
         `;
-      $('#venues tbody').html(noVenuesRow);
+      jQuery('#venues tbody').html(noVenuesRow);
     }
   }
 

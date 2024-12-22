@@ -154,13 +154,13 @@
     datetimeInput.value = dateValue;
   });
 
-  $(document).ready(function() {
-    $('#registration-form').on('submit', function(event) {
+  jQuery(document).ready(function() {
+    jQuery('#registration-form').on('submit', function(event) {
       event.preventDefault(); // Prevent the default form submission
 
-      const formData = $(this).serialize(); // Serialize the form data
+      const formData = jQuery(this).serialize(); // Serialize the form data
       $.ajax({
-        url: $(this).attr('action'), // Use the form's action attribute
+        url: jQuery(this).attr('action'), // Use the form's action attribute
         type: 'POST',
         dataType: 'json', // Ensure that the response is expected as JSON
         headers: {

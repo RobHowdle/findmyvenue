@@ -29,7 +29,7 @@
 @push('scripts')
   <script>
     var myVenuesContent = @json(old('myVenues', $myVenues));
-    $(document).ready(function() {
+    jQuery(document).ready(function() {
       initialiseSummernote("#myVenues", myVenuesContent);
     });
   </script>

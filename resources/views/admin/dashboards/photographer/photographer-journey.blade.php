@@ -57,7 +57,7 @@
 <script>
   const dashboardType = "{{ $dashboardType }}";
 
-  $(document).ready(function() {
+  jQuery(document).ready(function() {
     function fetchPhotographers(query = '') {
       $.ajax({
         url: `/${dashboardType}/photographer-search`,
@@ -67,11 +67,11 @@
         },
         success: function(data) {
           if (data.html.trim() === '') {
-            $('#photographyTable tbody').empty();
-            $('#noPhotographersMessage').removeClass('hidden');
+            jQuery('#photographyTable tbody').empty();
+            jQuery('#noPhotographersMessage').removeClass('hidden');
           } else {
-            $('#photographyTable tbody').html(data.html);
-            $('#noPhotographersMessage').addClass('hidden');
+            jQuery('#photographyTable tbody').html(data.html);
+            jQuery('#noPhotographersMessage').addClass('hidden');
           }
         }
       });
@@ -81,15 +81,15 @@
     fetchPhotographers();
 
     // Search functionality
-    $('#photographerSearch').on('keyup', function() {
-      let query = $(this).val();
+    jQuery('#photographerSearch').on('keyup', function() {
+      let query = jQuery(this).val();
       fetchPhotographers(query);
     });
 
     // Join band functionality
-    $(document).on('click', '.join-photographer-btn', function(e) {
+    jQuery(document).on('click', '.join-photographer-btn', function(e) {
       e.preventDefault();
-      let photographerId = $(this).data('photographer-id');
+      let photographerId = jQuery(this).data('photographer-id');
       console.log(photographerId);
 
       $.ajax({

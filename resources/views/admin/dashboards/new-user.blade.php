@@ -35,11 +35,11 @@
 </x-app-layout>
 
 <script>
-  $(document).ready(function() {
+  jQuery(document).ready(function() {
     let debounceTimer;
 
-    $('#user-search').on('input', function() {
-      const query = $(this).val();
+    jQuery('#user-search').on('input', function() {
+      const query = jQuery(this).val();
       const dashboardType = "{{ $dashboardType }}";
 
       if (debounceTimer) {
@@ -48,17 +48,17 @@
 
       debounceTimer = setTimeout(function() {
         if (!query) {
-          $('#userTable tbody').empty();
+          jQuery('#userTable tbody').empty();
           return;
         }
 
         $.ajaxSetup({
           headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
           }
         });
 
-        $('#userTable tbody').html('<tr><td colspan="3" class="text-center">Loading...</td></tr>');
+        jQuery('#userTable tbody').html('<tr><td colspan="3" class="text-center">Loading...</td></tr>');
 
         $.ajax({
           url: "{{ route('admin.dashboard.search-users', ['dashboardType' => $dashboardType]) }}",
@@ -68,10 +68,10 @@
           },
           success: function(data) {
             console.log(data);
-            $('#userTable tbody').empty();
+            jQuery('#userTable tbody').empty();
             if (Array.isArray(data.result) && data.result.length > 0) {
               data.result.forEach(function(user) {
-                $('#userTable tbody').append(`
+                jQuery('#userTable tbody').append(`
                   <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
                     <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">${user.name}</td>
                     <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">${user.email}</td>
@@ -82,21 +82,21 @@
                 `);
               });
             } else {
-              $('#userTable tbody').append(
+              jQuery('#userTable tbody').append(
                 '<tr><td colspan="3" class="text-center">No users found.</td></tr>');
             }
           },
           error: function(xhr) {
             console.error(xhr.responseJSON.message || 'Error retrieving users.');
-            $('#userTable tbody').html(
+            jQuery('#userTable tbody').html(
               '<tr><td colspan="3" class="text-center">Error retrieving users.</td></tr>');
           }
         });
       }, 300);
     });
 
-    $('#userTable').on('click', '.addUserBtn', function() {
-      const userId = $(this).data('user-id');
+    jQuery('#userTable').on('click', '.addUserBtn', function() {
+      const userId = jQuery(this).data('user-id');
       const dashboardType = "{{ $dashboardType }}";
       const currentServiceId = "{{ $currentServiceId }}";
 

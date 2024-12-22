@@ -104,9 +104,9 @@
 <script>
   const dashboardType = "{{ $dashboardType }}";
 
-  $(document).ready(function() {
+  jQuery(document).ready(function() {
     // Client Search
-    $('#client-search').select2({
+    jQuery('#client-search').select2({
       placeholder: 'Type to search...',
       ajax: {
         url: `{{ route('admin.dashboard.jobs.client-search', ['dashboardType' => $dashboardType]) }}`,
@@ -132,13 +132,13 @@
     });
 
     // Handle selection
-    $('#client-search').on('select2:select', function(e) {
+    jQuery('#client-search').on('select2:select', function(e) {
       const data = e.params.data;
       console.log(data.text);
       console.log('Selected client ID:', data.id);
       console.log('Service Type:', data.serviceType);
-      $('#client_service').val(data.serviceType);
-      $('#client_name').val(data.text);
+      jQuery('#client_service').val(data.serviceType);
+      jQuery('#client_name').val(data.text);
 
     });
 
@@ -169,7 +169,7 @@
     };
 
     function loadJobTypes(dashboard) {
-      const jobTypeSelect = $('#job-type');
+      const jobTypeSelect = jQuery('#job-type');
       // jobTypeSelect.empty(); // Clear existing options before adding new ones
 
       if (jobTypes[dashboard]) {

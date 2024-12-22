@@ -25,7 +25,7 @@
 </form>
 <script>
   var capacityContent = @json(old('capacity', $capacity));
-  $(document).ready(function() {
-    $('#capacity').val(capacityContent);
+  jQuery(document).ready(function() {
+    jQuery('#capacity').val(capacityContent);
   });
 </script>

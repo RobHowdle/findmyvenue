@@ -26,7 +26,7 @@
 </form>
 <script>
   var additionalInfoContent = @json(old('additional_info', $additionalInfo));
-  $(document).ready(function() {
+  jQuery(document).ready(function() {
     initialiseSummernote("#additional_info", additionalInfoContent);
   });
 </script>

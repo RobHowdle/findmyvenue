@@ -142,8 +142,8 @@
     }, 300);
   }
 
-  $(document).ready(function() {
-    $('#delete-event-btn').click(function(e) {
+  jQuery(document).ready(function() {
+    jQuery('#delete-event-btn').click(function(e) {
       e.preventDefault();
       const dashboardType = "{{ $dashboardType }}";
       const eventId = "{{ $event->id }}";

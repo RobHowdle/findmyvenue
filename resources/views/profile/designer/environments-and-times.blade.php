@@ -2,12 +2,12 @@
 <x-working-times :workingTimes="$workingTimes" :dashboardType="$dashboardType" :user="$user" />
 
 <script>
-  $(document).ready(function() {
+  jQuery(document).ready(function() {
     // Event listener for when checkboxes are clicked
-    $('input[name="environment_type[]"]').on('change', function() {
+    jQuery('input[name="environment_type[]"]').on('change', function() {
       // Get all selected values from the checkboxes
-      let selectedEnvironmentTypes = $('input[name="environment_type[]"]:checked').map(function() {
-        return $(this).val();
+      let selectedEnvironmentTypes = jQuery('input[name="environment_type[]"]:checked').map(function() {
+        return jQuery(this).val();
       }).get();
 
       // Send the selected values via AJAX

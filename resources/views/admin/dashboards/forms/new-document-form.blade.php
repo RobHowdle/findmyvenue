@@ -62,7 +62,7 @@
       url: jQuery(this).attr('action'),
       type: 'POST',
       headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
       },
       data: formData,
       contentType: false,

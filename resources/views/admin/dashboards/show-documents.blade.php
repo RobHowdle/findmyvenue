@@ -116,9 +116,9 @@
     }
   }
 
-  $(document).on('click', '.delete-btn', function() {
-    var documentId = $(this).data('id');
-    var dashboardType = $(this).data('dashboard-type');
+  jQuery(document).on('click', '.delete-btn', function() {
+    var documentId = jQuery(this).data('id');
+    var dashboardType = jQuery(this).data('dashboard-type');
 
     showConfirmationNotification({
       text: 'Are you sure you want to delete this document?'
@@ -133,7 +133,7 @@
           success: function(response) {
             if (response.success) {
               showSuccessNotification(response.message);
-              $(`#document-row-${documentId}`).remove();
+              jQuery(`#document-row-${documentId}`).remove();
             } else {
               swal("Error!", response.error, "error");
             }
