@@ -3,8 +3,8 @@ import "../../node_modules/summernote/dist/summernote-lite.css";
 import Swal from "../../node_modules/sweetalert2";
 
 import Alpine from "alpinejs";
-window.$ = $;
-window.jQuery = $;
+// window.$ = $;
+// window.jQuery = $;
 
 window.Alpine = Alpine;
 Alpine.start();
