@@ -18,7 +18,8 @@
         "vite": "^5.1.7"
     },
     "dependencies": {
-        "summernote": "^0.8.20",
-        "sweetalert2": "^11.14.1"
+        "jquery": "^3.7.1",
+        "summernote": "^0.9.1",
+        "sweetalert2": "^11.6.13"
     }
 }
