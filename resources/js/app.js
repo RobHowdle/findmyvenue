@@ -1,8 +1,6 @@
 import jQuery from "jquery";
 import $ from "jquery";
 
-console.log("jQuery version:", $.fn.jquery);
-
 // import "../../node_modules/summernote/dist/summernote-lite.js";
 // import "../../node_modules/summernote/dist/summernote-lite.css";
 import * as Swal from "../../node_modules/sweetalert2";
@@ -258,11 +256,11 @@ jQuery(document).ready(function () {
 // });
 
 // // Reviewer IP
-// $(document).ready(function () {
+// jQuery(document).ready(function () {
 //     $.getJSON("https://api.ipify.org?format=json", function (data) {
 //         var userIP = data.ip;
 //         // Verify the element exists before setting the value
-//         var reviewerIpField = $("#reviewer_ip");
+//         var reviewerIpField = jQuery("#reviewer_ip");
 //         if (reviewerIpField.length) {
 //             reviewerIpField.val(userIP);
 //         }
@@ -274,7 +272,7 @@ jQuery(document).ready(function () {
 
 // // Function to initialize Summernote
 // window.initialiseSummernote = function (selector, initialContent) {
-//     $(selector).summernote({
+//     jQuery(selector).summernote({
 //         height: 300,
 //         toolbar: [
 //             ["style", ["style"]],
@@ -290,10 +288,10 @@ jQuery(document).ready(function () {
 //         ],
 //         callbacks: {
 //             onInit: function () {
-//                 $(this).summernote("code", initialContent); // Set the initial content
+//                 jQuery(this).summernote("code", initialContent); // Set the initial content
 //             },
 //             onKeyup: function () {
-//                 var editor = $(this);
+//                 var editor = jQuery(this);
 //                 var content = editor.summernote("code");
 
 //                 // Analyze and get the highlighted content
