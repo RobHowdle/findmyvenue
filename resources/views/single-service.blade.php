@@ -31,11 +31,11 @@
             <div class="rating-wrapper flex flex-row justify-center gap-1 md:justify-start xl:gap-2">
               <p class="h-full place-content-center font-sans md:place-content-end">Overall Rating
                 @if ($singleService->services == 'Artist')
-                  ({{ $singleArtistData['reviewCount'] }})
+                  ({{ $singleArtistData['reviewCount'] ?? 0 }})
                 @elseif($singleService->services == 'Photography')
-                  ({{ $singlePhotographerData['reviewCount'] }})
+                  ({{ $singlePhotographerData['reviewCount'] ?? 0 }})
                 @elseif($singleService->services == 'Videographer')
-                  ({{ $singleVideographerData['reviewCount'] }})
+                  ({{ $singleVideographerData['reviewCount'] ?? 0 }})
                 @elseif($singleService->services == 'Designer')
                 @endif
               </p>
