@@ -113,8 +113,13 @@ class VenueController extends Controller
             $overallReviews[$venue->id] = $this->renderRatingIcons($overallScore);
         }
 
-        $venuePromoterCount = count($venue['promoters']);
-        return view('venues', compact('venues', 'genres', 'overallReviews', 'venuePromoterCount'));
+        $venuePromoterCount = isset($venue['promoters']) ? count($venue['promoters']) : 0;
+        return view('venues', [
+            'venues' => $venues,
+            'genres' => $genres,
+            'overallReviews' => $overallReviews,
+            'venuePromoterCount' => $venuePromoterCount
+        ]);
     }
 
     /**
@@ -266,7 +271,7 @@ class VenueController extends Controller
                     foreach ($platformsToCheck as $platform) {
                         if (stripos($url, $platform) !== false) {
                             $matchedPlatform = $platform;
-                            break; // Stop checking once a platform is found
+                            break;
                         }
                     }
 
@@ -287,18 +292,21 @@ class VenueController extends Controller
         $data = json_decode($genreList, true);
         $genres = $data['genres'];
 
-        $overallReviews = []; // Array to store overall reviews for each venue
+        $overallReviews = [];
 
         foreach ($paginatedResults as $venue) {
             $overallScore = VenueReview::calculateOverallScore($venue->id);
             $overallReviews[$venue->id] = $this->renderRatingIcons($overallScore);
         }
 
+        $venuePromoterCount = isset($venue['promoters']) ? count($venue['promoters']) : 0;
+
         return view('venues', [
             'venues' => $paginatedResults,
             'genres' => $genres,
             'searchQuery' => $searchQuery,
-            'overallReviews' => $overallReviews
+            'overallReviews' => $overallReviews,
+            'venuePromoterCount' => $venuePromoterCount,
         ]);
     }
 
