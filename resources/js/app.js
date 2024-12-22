@@ -1,6 +1,6 @@
 import $ from "jquery";
-import "summernote/dist/summernote-lite.js"; // Non-Bootstrap version
-import "summernote/dist/summernote-lite.css"; // Include the CSS for this version
+import "../../node_modules/summernote/dist/summernote-lite.js";
+import "../../node_modules/summernote/dist/summernote-lite.css";
 import Swal from "sweetalert2";
 
 import Alpine from "alpinejs";
