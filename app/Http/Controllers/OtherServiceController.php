@@ -294,6 +294,7 @@ class OtherServiceController extends Controller
         $serviceId = $service->id;
 
         $members = $service->linkedUsers()->get();
+        $streamUrls = $service->stream_urls;
 
         $overallScore = OtherServicesReview::calculateOverallScore($serviceId);
         $overallReviews[$serviceId] = $this->renderRatingIcons($overallScore);
@@ -314,6 +315,7 @@ class OtherServiceController extends Controller
             'bandAverageGigQualityRating' => $bandAverageGigQualityRating,
             'renderRatingIcons' => [$this, 'renderRatingIcons'],
             'reviewCount' => $reviewCount,
+            'streamUrls' => $streamUrls,
         ];
     }
 
