@@ -87,7 +87,7 @@ class VenueController extends Controller
 
             foreach ($urls as $url) {
                 $matchedPlatform = 'Unknown';
-                $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+                $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube', 'bluesky'];
                 foreach ($platformsToCheck as $platform) {
                     if (stripos($url, $platform) !== false) {
                         $matchedPlatform = $platform;
@@ -140,7 +140,7 @@ class VenueController extends Controller
                 $matchedPlatform = 'Unknown';
 
                 // Check if the URL contains platform names
-                $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+                $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube', 'bluesky'];
                 foreach ($platformsToCheck as $platform) {
                     if (stripos($url, $platform) !== false) {
                         $matchedPlatform = $platform;
@@ -262,7 +262,7 @@ class VenueController extends Controller
                     $matchedPlatform = 'Unknown';
 
                     // Check if the URL contains platform names
-                    $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+                    $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube', 'bluesky'];
                     foreach ($platformsToCheck as $platform) {
                         if (stripos($url, $platform) !== false) {
                             $matchedPlatform = $platform;
@@ -358,7 +358,7 @@ class VenueController extends Controller
                 $matchedPlatform = 'Unknown';
 
                 // Check if the URL contains platform names
-                $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+                $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube', 'bluesky'];
                 foreach ($platformsToCheck as $platform) {
                     if (stripos($url, $platform) !== false) {
                         $matchedPlatform = $platform;
