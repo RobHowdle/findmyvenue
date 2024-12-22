@@ -8,15 +8,10 @@ export default defineConfig({
             refresh: true,
         }),
     ],
-    resolve: {
-        alias: {
-            $: "jquery",
-            jquery: "jquery",
-        },
-    },
     build: {
         rollupOptions: {
-            external: ["summernote/dist/summernote-lite.js"],
+            // Exclude summernote if you're using the CDN
+            external: ["jquery", "summernote"],
         },
     },
 });
