@@ -1,8 +1,8 @@
 import "../../node_modules/summernote/dist/summernote-lite.js";
 import "../../node_modules/summernote/dist/summernote-lite.css";
-import Swal from "sweetalert2";
+import Swal from "../../node_modules/sweetalert2";
 
-import Alpine from "alpinejs";
+import Alpine from "../../alpinejs";
 window.$ = $;
 window.jQuery = $;
 
