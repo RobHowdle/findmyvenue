@@ -14,7 +14,10 @@ jQuery(document).ready(function () {
 
     // Function to hide the loader and overlay
     function hideLoader() {
-        jQuery("#preloader").delay(100).removeClass("animation").addClass("over");
+        jQuery("#preloader")
+            .delay(100)
+            .removeClass("animation")
+            .addClass("over");
         jQuery(".pre-overlay").css({
             height: "0%",
         });
