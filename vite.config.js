@@ -9,6 +9,7 @@ export default defineConfig({
         }),
     ],
     resolve: {
+        modules: ["node_modules"],
         alias: {
             $: "jquery",
             jquery: "jquery",
