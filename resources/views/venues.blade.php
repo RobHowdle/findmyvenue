@@ -211,7 +211,7 @@
         success: function(data) {
           // Extract venues array and pass it to the function
           if (data.venues && Array.isArray(data.venues)) {
-            updatePromotersTable(data.venues);
+            updateTable(data.venues);
           } else {
             console.error("The 'venues' field is not an array or is missing:", data.venues);
           }
@@ -343,7 +343,6 @@
         $('#venues tbody').html(noPromotersRow);
       }
     }
-
 
     function setLocationCoordinates(key, lat, lng) {
       const latitudeField = document.getElementById(key + "-" + "latitude");
