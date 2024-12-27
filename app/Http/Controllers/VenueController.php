@@ -6,6 +6,7 @@ use App\Models\Venue;
 use App\Models\Promoter;
 use App\Models\VenueReview;
 use Illuminate\Http\Request;
+use App\Helpers\SocialLinksHelper;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -133,35 +134,8 @@ class VenueController extends Controller
 
         $suggestions = app('suggestions', ['venue' => $venue]);
 
-
-        // Split the field containing multiple URLs into an array
-        if ($venue->contact_link) {
-            $urls = explode(',', $venue->contact_link);
-            $platforms = [];
-
-            // Check each URL against the platforms
-            foreach ($urls as $url) {
-                // Initialize the platform as unknown
-                $matchedPlatform = 'Unknown';
-
-                // Check if the URL contains platform names
-                $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube', 'bluesky'];
-                foreach ($platformsToCheck as $platform) {
-                    if (stripos($url, $platform) !== false) {
-                        $matchedPlatform = $platform;
-                        break;
-                    }
-                }
-
-                // Store the platform information for each URL
-                $platforms[] = [
-                    'url' => $url,
-                    'platform' => $matchedPlatform
-                ];
-            }
-            // Add the processed data to the venue
-            $venue->platforms = $platforms;
-        }
+        $platforms = SocialLinksHelper::processSocialLinks($venue->contact_link);
+        $venue->platforms = $platforms;
 
         $recentReviews = VenueReview::getRecentReviewsForVenue($id);
         $venue->recentReviews = $recentReviews->isNotEmpty() ? $recentReviews : null;
@@ -330,7 +304,7 @@ class VenueController extends Controller
                 $bandType = array_map('trim', $bandType);
                 $query->where(function ($query) use ($bandType) {
                     foreach ($bandType as $type) {
-                        $query->orWhereRaw('JSON_CONTAINS(band_type, ?)', [json_encode([$type])]);
+                        $query->orWhereRaw('JSON_CONTAINS(band_type, ?)', [json_encode($type)]);
                     }
                 });
             }
@@ -340,33 +314,27 @@ class VenueController extends Controller
         if ($request->has('genres')) {
             $genres = $request->input('genres');
             if (!empty($genres)) {
-                $genres = array_map('trim', $genres); // Ensure no extra spaces
+                $genres = array_map('trim', $genres);
                 $query->where(function ($query) use ($genres) {
                     foreach ($genres as $genre) {
-                        // Ensure the genre is properly formatted
-                        $query->orWhereRaw('JSON_CONTAINS(genre, ?)', [json_encode([$genre])]);
+                        $query->orWhereRaw('JSON_CONTAINS(genre, ?)', [json_encode($genre)]);
                     }
                 });
             }
         }
 
         // Get the venues with pagination
-        $venues = $query->with('promoters') // Include promoters relationship
-            ->paginate(10);
+        $venues = $query->with('promoters')->paginate(10);
 
         // Process each venue
         $transformedData = $venues->getCollection()->map(function ($venue) {
-            // Split the field containing multiple URLs into an array
             $urls = explode(',', $venue->contact_link);
             $platforms = [];
 
-            // Check each URL against the platforms
             foreach ($urls as $url) {
-                // Initialize the platform as unknown
                 $matchedPlatform = 'Unknown';
-
-                // Check if the URL contains platform names
                 $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube', 'bluesky'];
+
                 foreach ($platformsToCheck as $platform) {
                     if (stripos($url, $platform) !== false) {
                         $matchedPlatform = $platform;
@@ -374,14 +342,12 @@ class VenueController extends Controller
                     }
                 }
 
-                // Store the platform information for each URL
                 $platforms[] = [
                     'url' => $url,
                     'platform' => $matchedPlatform
                 ];
             }
 
-            // Use the static method to calculate the overall score
             $overallScore = \App\Models\VenueReview::calculateOverallScore($venue->id);
 
             return [
@@ -391,10 +357,10 @@ class VenueController extends Controller
                 'contact_number' => $venue->contact_number,
                 'contact_email' => $venue->contact_email,
                 'platforms' => $platforms,
-                'promoters' => $venue->promoters, // Include promoters
+                'promoters' => $venue->promoters,
                 'average_rating' => $overallScore,
             ];
-        });
+        })->toArray();
 
         // Return the transformed data with pagination info
         return response()->json([
@@ -407,6 +373,7 @@ class VenueController extends Controller
             ]
         ]);
     }
+
 
     public function submitVenueReview(Request $request, Venue $id)
     {

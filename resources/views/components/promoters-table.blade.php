@@ -4,7 +4,7 @@
   <h1 class="py-4 text-center font-heading text-3xl text-white md:py-6 md:text-4xl xl:text-5xl 4xl:text-6xl">Promoters
   </h1>
   <div class="relative shadow-md sm:rounded-lg">
-    <div class="ssearch-wrapper flex justify-center border border-white bg-black">
+    <div class="search-wrapper flex justify-center border border-white bg-black">
       <form class="filter-search flex items-center px-2 py-2 md:p-3"
         action="{{ route('promoters.filterCheckboxesSearch') }}" method="GET">
         <div class="filters relative flex items-center">

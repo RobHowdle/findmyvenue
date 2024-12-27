@@ -1,5 +1,5 @@
 @if ($item->contact_number && $item->contact_number != '00000000000')
-  <a class="mr-2 hover:text-yns_yellow" href="tel:{{ $item->contact_number }}">
+  <a class="mr-2 hover:text-yns_yellow" href="tel:{{ str_replace(' ', '', $item->contact_number) }}">
     <span class="fas fa-phone"></span>
   </a>
 @endif
