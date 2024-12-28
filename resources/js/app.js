@@ -1,94 +1,58 @@
-import jQuery from "jquery";
-import $ from "jquery";
-
-// import "../../node_modules/summernote/dist/summernote-lite.js";
-// import "../../node_modules/summernote/dist/summernote-lite.css";
-import * as Swal from "../../node_modules/sweetalert2";
-
 import Alpine from "alpinejs";
-window.$ = jQuery;
+import * as Swal from "../../node_modules/sweetalert2";
+import $ from "jquery";
+window.$ = window.jQuery = $;
 
 window.Alpine = Alpine;
 Alpine.start();
 
-jQuery(document).ready(function () {
-    var startTime = performance.now(); // Record the start time when the document is ready
+window.Swal = Swal;
 
-    // Function to hide the loader and overlay
-    function hideLoader() {
-        jQuery("#preloader")
-            .delay(100)
-            .removeClass("animation")
-            .addClass("over");
-        jQuery(".pre-overlay").css({
-            height: "0%",
-        });
-    }
+// // Format currency helper
+// window.formatCurrency = function (value) {
+//     return new Intl.NumberFormat("en-GB", {
+//         style: "currency",
+//         currency: "GBP",
+//     }).format(value);
+// };
 
-    // Function to calculate loading time and decide whether to show the loader
-    function checkLoadingTime() {
-        var endTime = performance.now(); // Record the end time after the document is fully loaded
-        var loadingTime = endTime - startTime; // Calculate the loading time in milliseconds
-        // Check if the loading time exceeds a threshold (e.g., 1000 milliseconds)
-        if (loadingTime > 1000) {
-            // Show the loader if loading time exceeds the threshold
-            setTimeout(hideLoader, 4000);
-        } else {
-            hideLoader();
-        }
-    }
+// // Format Dates
+// window.formatDateToDMY = function (dateString) {
+//     const date = new Date(dateString);
+//     const day = String(date.getDate()).padStart(2, "0"); // Pad with zero if needed
+//     const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+//     const year = date.getFullYear();
 
-    // Call the function to check loading time when the document is fully loaded
-    jQuery(window).on("load", function () {
-        checkLoadingTime();
-    });
-});
-
-// Format currency helper
-window.formatCurrency = function (value) {
-    return new Intl.NumberFormat("en-GB", {
-        style: "currency",
-        currency: "GBP",
-    }).format(value);
-};
-
-// Format Dates
-window.formatDateToDMY = function (dateString) {
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, "0"); // Pad with zero if needed
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
-    const year = date.getFullYear();
-
-    return `${day}-${month}-${year}`; // Return in DMY format
-};
+//     return `${day}-${month}-${year}`; // Return in DMY format
+// };
 
 // Accordions
-jQuery(document).ready(function () {
+$(document).ready(function () {
     // Accordion functionality
-    jQuery("[data-accordion-target]").click(function () {
-        const isExpanded = jQuery(this).attr("aria-expanded") === "true";
-        const accordionBody = jQuery(this).attr("data-accordion-target");
+    $("[data-accordion-target]").click(function () {
+        const isExpanded = $(this).attr("aria-expanded") === "true";
+        const accordionBody = $(this).attr("data-accordion-target");
 
-        jQuery(this).find("svg.icon").toggleClass("rotate-180");
+        $(this).find("svg.icon").toggleClass("rotate-180");
 
         if (isExpanded) {
-            jQuery(this).attr("aria-expanded", "false");
-            jQuery(accordionBody).slideUp().addClass("hidden");
+            $(this).attr("aria-expanded", "false");
+            $(accordionBody).slideUp().addClass("hidden");
         } else {
-            jQuery(accordionBody).slideDown().removeClass("hidden");
-            jQuery(this).attr("aria-expanded", "true");
+            $(accordionBody).slideDown().removeClass("hidden");
+            $(this).attr("aria-expanded", "true");
         }
     });
 
     // Hide accordion content by default
-    jQuery(".accordion-content").hide();
+    $(".accordion-content").hide();
 
-    jQuery(".accordion-item .accordion-title").click(function () {
+    $(".accordion-item .accordion-title").click(function () {
         // Toggle active class to show/hide accordion content
-        jQuery(this).parent().toggleClass("active");
-        jQuery(this).parent().find(".accordion-content").slideToggle();
-        jQuery(".accordion-item")
-            .not(jQuery(this).parent())
+        $(this).parent().toggleClass("active");
+        $(this).parent().find(".accordion-content").slideToggle();
+        $(".accordion-item")
+            .not($(this).parent())
             .removeClass("active")
             .find(".accordion-content")
             .slideUp();
@@ -253,270 +217,270 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-// Reviewer IP
-jQuery(document).ready(function () {
-    $.getJSON("https://api.ipify.org?format=json", function (data) {
-        var userIP = data.ip;
-        // Verify the element exists before setting the value
-        var reviewerIpField = jQuery("#reviewer_ip");
-        if (reviewerIpField.length) {
-            reviewerIpField.val(userIP);
-        }
-    }).fail(function (jqxhr, textStatus, error) {
-        var err = textStatus + ", " + error;
-        console.error("Request Failed: " + err);
-    });
-});
-
-// Function to initialize Summernote
-window.initialiseSummernote = function (selector, initialContent) {
-    jQuery(selector).summernote({
-        height: 300,
-        toolbar: [
-            ["style", ["style"]],
-            ["font", ["bold", "italic", "underline", "clear"]],
-            ["fontname", ["fontname"]],
-            ["fontsize", ["fontsize"]],
-            ["fontSizeUnits", ["px", "pt"]],
-            ["color", ["color"]],
-            ["para", ["ul", "ol", "paragraph"]],
-            ["table", ["table"]],
-            ["insert", ["link", "picture", "video"]],
-            ["view", ["fullscreen", "help"]],
-        ],
-        callbacks: {
-            onInit: function () {
-                jQuery(this).summernote("code", initialContent); // Set the initial content
-            },
-            onKeyup: function () {
-                var editor = jQuery(this);
-                var content = editor.summernote("code");
-
-                // Analyze and get the highlighted content
-                // var highlightedContent = analyzeText(content);
-
-                // Update only if the content has changed
-                // if (highlightedContent !== content) {
-                //     // Get the current selection before updating the content
-                //     var selection = window.getSelection();
-                //     var range = selection.getRangeAt(0);
-
-                //     // Update the content directly
-                //     editor.summernote("code", highlightedContent);
-
-                //     // Restore the selection
-                //     setTimeout(function () {
-                //         // Get the editable area
-                //         var $editable = editor.summernote("editable")[0];
-
-                //         // Set the cursor position back to where it was
-                //         selection.removeAllRanges(); // Clear existing selections
-                //         selection.addRange(range); // Set the new range
-
-                //         // Refocus on the editor
-                //         $editable.focus(); // Focus the editable area
-                //     }, 0); // Use a small delay to ensure the content is rendered before moving the cursor
-                // }
-            },
-        },
-    });
-};
-
-// Function to analyze text for venue names
-// function analyzeText(inputText) {
-//     const venues = [
-//         {
-//             name: "The Forum",
-//             link: "https://www.google.com/theforummusiccenter",
-//         },
-//         { name: "The Turks Head", link: "https://www.google.com/theturkshead" },
-//     ];
-
-//     let highlightedContent = inputText; // Start with the original input text
-
-//     venues.forEach((venue) => {
-//         const regex = new RegExp(`\\b(${venue.name})\\b`, "gi");
-//         highlightedContent = highlightedContent.replace(
-//             regex,
-//             `<span class="highlight" data-link="${venue.link}">$1</span>`
-//         );
+// // Reviewer IP
+// jQuery(document).ready(function () {
+//     $.getJSON("https://api.ipify.org?format=json", function (data) {
+//         var userIP = data.ip;
+//         // Verify the element exists before setting the value
+//         var reviewerIpField = jQuery("#reviewer_ip");
+//         if (reviewerIpField.length) {
+//             reviewerIpField.val(userIP);
+//         }
+//     }).fail(function (jqxhr, textStatus, error) {
+//         var err = textStatus + ", " + error;
+//         console.error("Request Failed: " + err);
 //     });
-//     return highlightedContent; // Return the modified content
-// }
+// });
 
-// Sweet Alert 2 Notifications
-window.showSuccessNotification = function (message) {
-    Swal.fire({
-        showConfirmButton: false,
-        toast: true,
-        position: "top-end",
-        timer: 3000,
-        timerProgressBar: true,
-        customClass: {
-            popup: "bg-yns_dark_gray !important rounded-lg font-heading",
-            title: "text-black",
-            html: "text-black",
-        },
-        icon: "success",
-        title: "Success!",
-        text: message,
-    });
-};
+// // Function to initialize Summernote
+// window.initialiseSummernote = function (selector, initialContent) {
+//     jQuery(selector).summernote({
+//         height: 300,
+//         toolbar: [
+//             ["style", ["style"]],
+//             ["font", ["bold", "italic", "underline", "clear"]],
+//             ["fontname", ["fontname"]],
+//             ["fontsize", ["fontsize"]],
+//             ["fontSizeUnits", ["px", "pt"]],
+//             ["color", ["color"]],
+//             ["para", ["ul", "ol", "paragraph"]],
+//             ["table", ["table"]],
+//             ["insert", ["link", "picture", "video"]],
+//             ["view", ["fullscreen", "help"]],
+//         ],
+//         callbacks: {
+//             onInit: function () {
+//                 jQuery(this).summernote("code", initialContent); // Set the initial content
+//             },
+//             onKeyup: function () {
+//                 var editor = jQuery(this);
+//                 var content = editor.summernote("code");
 
-window.showFailureNotification = function (message) {
-    Swal.fire({
-        showConfirmButton: false,
-        toast: true,
-        position: "top-end",
-        timer: 3000,
-        timerProgressBar: true,
-        customClass: {
-            popup: "bg-yns_dark_gray !important rounded-lg font-heading",
-            title: "text-black",
-            html: "text-black",
-        },
-        icon: "error",
-        title: "Oops!",
-        text: message,
-    });
-};
+//                 // Analyze and get the highlighted content
+//                 // var highlightedContent = analyzeText(content);
 
-window.showWarningNotification = function (message) {
-    Swal.fire({
-        showConfirmButton: true,
-        toast: false,
-        customClass: {
-            popup: "bg-yns_dark_gray !important rounded-lg font-heading",
-            title: "text-yns_red",
-            html: "text-white",
-        },
-        icon: "warning",
-        title: "Warning!",
-        text: message,
-    });
-};
+//                 // Update only if the content has changed
+//                 // if (highlightedContent !== content) {
+//                 //     // Get the current selection before updating the content
+//                 //     var selection = window.getSelection();
+//                 //     var range = selection.getRangeAt(0);
 
-window.showConfirmationNotification = function (options) {
-    return Swal.fire({
-        showConfirmButton: true,
-        confirmButtonText: "I understand",
-        showCancelButton: true,
-        toast: false,
-        customClass: {
-            popup: "bg-yns_dark_gray !important rounded-lg font-heading",
-            title: "text-white",
-            text: "text-white !important",
-        },
-        icon: "warning",
-        title: "Are you sure?",
-        text: options.text,
-    });
-};
+//                 //     // Update the content directly
+//                 //     editor.summernote("code", highlightedContent);
 
-// Event Block
-window.showEventBlock = function (info) {
-    const extendedProps = info.event._def.extendedProps;
+//                 //     // Restore the selection
+//                 //     setTimeout(function () {
+//                 //         // Get the editable area
+//                 //         var $editable = editor.summernote("editable")[0];
 
-    const startTime = extendedProps.event_start_time || "N/A";
-    const description = extendedProps.description || "N/A";
-    const bands =
-        extendedProps.bands && extendedProps.bands.length > 0
-            ? extendedProps.bands.join(", ")
-            : "N/A";
-    const location = extendedProps.location || "N/A";
-    const ticketUrl = extendedProps.ticket_url || "N/A";
-    const onTheDoorPrice = extendedProps.on_the_door_ticket_price || "N/A";
+//                 //         // Set the cursor position back to where it was
+//                 //         selection.removeAllRanges(); // Clear existing selections
+//                 //         selection.addRange(range); // Set the new range
 
-    return Swal.fire({
-        showConfirmButton: true,
-        confirmButtonText: "Got it!",
-        toast: false,
-        icon: "info",
-        title: info.event.title,
-        html: `
-            <strong>Description:</strong> ${description}<br>
-            <strong>Start Time:</strong> ${startTime}<br>
-            <strong>Bands:</strong> ${bands}<br>
-            <strong>Location:</strong> ${location}<br>
-            <strong>Ticket URL:</strong> <a href="${ticketUrl}" target="_blank">${
-            ticketUrl ? "View Tickets" : "N/A"
-        }</a><br>
-            <strong>On The Door Price:</strong> £${onTheDoorPrice}<br>
-        `,
-        customClass: {
-            popup: "bg-yns_dark_gray !important rounded-lg font-heading",
-            title: "text-white",
-            hmtl: "text-white !important",
-        },
-    });
-};
+//                 //         // Refocus on the editor
+//                 //         $editable.focus(); // Focus the editable area
+//                 //     }, 0); // Use a small delay to ensure the content is rendered before moving the cursor
+//                 // }
+//             },
+//         },
+//     });
+// };
 
-// Full Calendar
-document.addEventListener("DOMContentLoaded", function () {
-    var calendarEl = document.getElementById("calendar");
+// // Function to analyze text for venue names
+// // function analyzeText(inputText) {
+// //     const venues = [
+// //         {
+// //             name: "The Forum",
+// //             link: "https://www.google.com/theforummusiccenter",
+// //         },
+// //         { name: "The Turks Head", link: "https://www.google.com/theturkshead" },
+// //     ];
 
-    if (!calendarEl) {
-        return; // Exit if the calendar element doesn't exist
-    }
+// //     let highlightedContent = inputText; // Start with the original input text
 
-    var userId = calendarEl.getAttribute("data-user-id");
-    var dashboardType = calendarEl.getAttribute("data-dashboard-type");
-    var calendar;
+// //     venues.forEach((venue) => {
+// //         const regex = new RegExp(`\\b(${venue.name})\\b`, "gi");
+// //         highlightedContent = highlightedContent.replace(
+// //             regex,
+// //             `<span class="highlight" data-link="${venue.link}">$1</span>`
+// //         );
+// //     });
+// //     return highlightedContent; // Return the modified content
+// // }
 
-    const calendarTabButton = document.querySelector(
-        'button[data-tab="calendar"]'
-    );
+// // Sweet Alert 2 Notifications
+// window.showSuccessNotification = function (message) {
+//     Swal.fire({
+//         showConfirmButton: false,
+//         toast: true,
+//         position: "top-end",
+//         timer: 3000,
+//         timerProgressBar: true,
+//         customClass: {
+//             popup: "bg-yns_dark_gray !important rounded-lg font-heading",
+//             title: "text-black",
+//             html: "text-black",
+//         },
+//         icon: "success",
+//         title: "Success!",
+//         text: message,
+//     });
+// };
 
-    calendarTabButton.addEventListener("click", function () {
-        if (!calendar) {
-            // Only initialize if not already done
-            calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: "dayGridMonth",
-                events: function (fetchInfo, successCallback, failureCallback) {
-                    fetch(
-                        `/profile/${dashboardType}/events/${userId}?view=calendar&start=${fetchInfo.startStr}&end=${fetchInfo.endStr}`
-                    )
-                        .then((response) => response.json())
-                        .then((data) => {
-                            if (data.success) {
-                                const eventsArray = data.events.map(
-                                    (event) => ({
-                                        title: event.title,
-                                        start: event.start,
-                                        end: event.end,
-                                        description: event.description,
-                                        event_start_time:
-                                            event.event_start_time,
-                                        bands: event.bands || [],
-                                        location: event.location || "N/A",
-                                        ticket_url: event.ticket_url || "N/A",
-                                        on_the_door_ticket_price:
-                                            event.on_the_door_ticket_price ||
-                                            "N/A",
-                                    })
-                                );
-                                successCallback(eventsArray);
-                            } else {
-                                console.error(
-                                    "Error fetching events:",
-                                    data.message
-                                );
-                                failureCallback();
-                            }
-                        })
-                        .catch((error) => {
-                            console.error("Error fetching events:", error);
-                            failureCallback();
-                        });
-                },
-                eventClick: function (info) {
-                    showEventBlock(info);
-                },
-            });
+// window.showFailureNotification = function (message) {
+//     Swal.fire({
+//         showConfirmButton: false,
+//         toast: true,
+//         position: "top-end",
+//         timer: 3000,
+//         timerProgressBar: true,
+//         customClass: {
+//             popup: "bg-yns_dark_gray !important rounded-lg font-heading",
+//             title: "text-black",
+//             html: "text-black",
+//         },
+//         icon: "error",
+//         title: "Oops!",
+//         text: message,
+//     });
+// };
 
-            calendar.render();
-        } else {
-            calendar.updateSize();
-        }
-    });
-});
+// window.showWarningNotification = function (message) {
+//     Swal.fire({
+//         showConfirmButton: true,
+//         toast: false,
+//         customClass: {
+//             popup: "bg-yns_dark_gray !important rounded-lg font-heading",
+//             title: "text-yns_red",
+//             html: "text-white",
+//         },
+//         icon: "warning",
+//         title: "Warning!",
+//         text: message,
+//     });
+// };
+
+// window.showConfirmationNotification = function (options) {
+//     return Swal.fire({
+//         showConfirmButton: true,
+//         confirmButtonText: "I understand",
+//         showCancelButton: true,
+//         toast: false,
+//         customClass: {
+//             popup: "bg-yns_dark_gray !important rounded-lg font-heading",
+//             title: "text-white",
+//             text: "text-white !important",
+//         },
+//         icon: "warning",
+//         title: "Are you sure?",
+//         text: options.text,
+//     });
+// };
+
+// // Event Block
+// window.showEventBlock = function (info) {
+//     const extendedProps = info.event._def.extendedProps;
+
+//     const startTime = extendedProps.event_start_time || "N/A";
+//     const description = extendedProps.description || "N/A";
+//     const bands =
+//         extendedProps.bands && extendedProps.bands.length > 0
+//             ? extendedProps.bands.join(", ")
+//             : "N/A";
+//     const location = extendedProps.location || "N/A";
+//     const ticketUrl = extendedProps.ticket_url || "N/A";
+//     const onTheDoorPrice = extendedProps.on_the_door_ticket_price || "N/A";
+
+//     return Swal.fire({
+//         showConfirmButton: true,
+//         confirmButtonText: "Got it!",
+//         toast: false,
+//         icon: "info",
+//         title: info.event.title,
+//         html: `
+//             <strong>Description:</strong> ${description}<br>
+//             <strong>Start Time:</strong> ${startTime}<br>
+//             <strong>Bands:</strong> ${bands}<br>
+//             <strong>Location:</strong> ${location}<br>
+//             <strong>Ticket URL:</strong> <a href="${ticketUrl}" target="_blank">${
+//             ticketUrl ? "View Tickets" : "N/A"
+//         }</a><br>
+//             <strong>On The Door Price:</strong> £${onTheDoorPrice}<br>
+//         `,
+//         customClass: {
+//             popup: "bg-yns_dark_gray !important rounded-lg font-heading",
+//             title: "text-white",
+//             hmtl: "text-white !important",
+//         },
+//     });
+// };
+
+// // Full Calendar
+// document.addEventListener("DOMContentLoaded", function () {
+//     var calendarEl = document.getElementById("calendar");
+
+//     if (!calendarEl) {
+//         return; // Exit if the calendar element doesn't exist
+//     }
+
+//     var userId = calendarEl.getAttribute("data-user-id");
+//     var dashboardType = calendarEl.getAttribute("data-dashboard-type");
+//     var calendar;
+
+//     const calendarTabButton = document.querySelector(
+//         'button[data-tab="calendar"]'
+//     );
+
+//     calendarTabButton.addEventListener("click", function () {
+//         if (!calendar) {
+//             // Only initialize if not already done
+//             calendar = new FullCalendar.Calendar(calendarEl, {
+//                 initialView: "dayGridMonth",
+//                 events: function (fetchInfo, successCallback, failureCallback) {
+//                     fetch(
+//                         `/profile/${dashboardType}/events/${userId}?view=calendar&start=${fetchInfo.startStr}&end=${fetchInfo.endStr}`
+//                     )
+//                         .then((response) => response.json())
+//                         .then((data) => {
+//                             if (data.success) {
+//                                 const eventsArray = data.events.map(
+//                                     (event) => ({
+//                                         title: event.title,
+//                                         start: event.start,
+//                                         end: event.end,
+//                                         description: event.description,
+//                                         event_start_time:
+//                                             event.event_start_time,
+//                                         bands: event.bands || [],
+//                                         location: event.location || "N/A",
+//                                         ticket_url: event.ticket_url || "N/A",
+//                                         on_the_door_ticket_price:
+//                                             event.on_the_door_ticket_price ||
+//                                             "N/A",
+//                                     })
+//                                 );
+//                                 successCallback(eventsArray);
+//                             } else {
+//                                 console.error(
+//                                     "Error fetching events:",
+//                                     data.message
+//                                 );
+//                                 failureCallback();
+//                             }
+//                         })
+//                         .catch((error) => {
+//                             console.error("Error fetching events:", error);
+//                             failureCallback();
+//                         });
+//                 },
+//                 eventClick: function (info) {
+//                     showEventBlock(info);
+//                 },
+//             });
+
+//             calendar.render();
+//         } else {
+//             calendar.updateSize();
+//         }
+//     });
+// });

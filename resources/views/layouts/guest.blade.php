@@ -19,11 +19,11 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
   <meta name="apple-mobile-web-app-title" content="YNS" />
   <link rel="manifest" href="/icons/site.webmanifest" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 
   <script src="https://kit.fontawesome.com/dd6bff54df.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
 
   <!-- Scripts -->
   @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -32,15 +32,38 @@
 <body class="guest relative font-sans antialiased" x-data="{ sidebarOpen: false }">
   <div class="absolute inset-0 bg-cover bg-fixed bg-center bg-no-repeat"
     style="background-image: url('{{ asset('storage/images/system/hero-bg.jpg') }}'); z-index: -1;"></div>
-  <div id="preloader" class="animation">
-    <div class="decor">
-      <div class="bar"></div>
+  <div x-data="{
+      startTime: performance.now(),
+      loadingTime: 0,
+      hideLoader() {
+          this.$nextTick(() => {
+              document.querySelector('#preloader').classList.remove('animation');
+              document.querySelector('#preloader').classList.add('over');
+              document.querySelector('.pre-overlay.o-1').style.height = '0%';
+              document.querySelector('.pre-overlay.o-2').style.height = '0%';
+          });
+      },
+      checkLoadingTime() {
+          this.loadingTime = performance.now() - this.startTime;
+          if (this.loadingTime > 1000) {
+              setTimeout(this.hideLoader, 4000); // Delay hiding the loader
+          } else {
+              this.hideLoader(); // Hide immediately if loading is fast
+          }
+      }
+  }" x-init="checkLoadingTime">
+    <!-- Preloader structure -->
+    <div id="preloader" class="animation">
+      <div class="decor">
+        <div class="bar"></div>
+      </div>
+      <p>Loading...</p>
     </div>
-    <p>Loading...</p>
-  </div>
 
-  <div class="pre-overlay o-1"></div>
-  <div class="pre-overlay o-2"></div>
+    <!-- Overlay elements -->
+    <div class="pre-overlay o-1" style="height: 100%;"></div>
+    <div class="pre-overlay o-2" style="height: 100%;"></div>
+  </div>
   @if (Route::has('login'))
     <nav class="fixed z-10 w-full bg-yns_dark_blue">
       <div class="mx-auto flex max-w-screen-2xl flex-wrap items-center justify-between px-2 py-4 md:px-4 md:py-8">
@@ -48,32 +71,32 @@
           <img src="{{ asset('images/system/yns_logo.png') }}" class="h-16"
             alt="{{ config('app.name', 'Laravel') }} Logo" />
           <span
-            class="hidden self-center whitespace-nowrap text-lg font-semibold dark:text-white sm:block xl:text-2xl">{{ config('app.name') }}</span>
+            class="hidden self-center whitespace-nowrap text-lg font-semibold sm:block xl:text-2xl dark:text-white">{{ config('app.name') }}</span>
         </a>
         <div class="group flex items-center gap-2">
           <div class="hidden w-full md:w-auto lg:block" id="navbar-default">
-            <ul class="flex flex-col items-center p-4 font-medium rtl:space-x-reverse md:flex-row md:space-x-8">
+            <ul class="flex flex-col items-center p-4 font-medium md:flex-row md:space-x-8 rtl:space-x-reverse">
               <li>
                 <a href="{{ url('/venues') }}"
-                  class="{{ request()->is('venues*') ? 'dark:text-yns_yellow' : '' }} font-heading text-lg font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow lg:text-xl xl:text-2xl">Venues</a>
+                  class="{{ request()->is('venues*') ? 'dark:text-yns_yellow' : '' }} font-heading text-lg font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 lg:text-xl xl:text-2xl dark:text-white dark:hover:text-yns_yellow">Venues</a>
               </li>
               <li>
                 <a href="{{ url('/promoters') }}"
-                  class="{{ request()->is('promoters*') ? 'dark:text-yns_yellow' : '' }} xl: font-heading text-lg font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow lg:text-xl xl:text-2xl">Promoters</a>
+                  class="{{ request()->is('promoters*') ? 'dark:text-yns_yellow' : '' }} xl: font-heading text-lg font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 lg:text-xl xl:text-2xl dark:text-white dark:hover:text-yns_yellow">Promoters</a>
               </li>
               <li>
                 <a href="{{ url('/other') }}"
-                  class="{{ request()->is('other*') ? 'dark:text-yns_yellow' : '' }} xl: font-heading text-lg font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow lg:text-xl xl:text-2xl">Other</a>
+                  class="{{ request()->is('other*') ? 'dark:text-yns_yellow' : '' }} xl: font-heading text-lg font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 lg:text-xl xl:text-2xl dark:text-white dark:hover:text-yns_yellow">Other</a>
               </li>
               @auth
                 <li>
                   <a href="{{ url('/dashboard') }}"
-                    class="xl: font-heading text-lg font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow lg:text-xl xl:text-2xl">Dashboard</a>
+                    class="xl: font-heading text-lg font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 lg:text-xl xl:text-2xl dark:text-white dark:hover:text-yns_yellow">Dashboard</a>
                 </li>
               @else
                 <li>
                   <a href="{{ url('/login') }}"
-                    class="xl: font-heading text-lg font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 dark:text-white dark:hover:text-yns_yellow lg:text-xl xl:text-2xl">Login</a>
+                    class="xl: font-heading text-lg font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 lg:text-xl xl:text-2xl dark:text-white dark:hover:text-yns_yellow">Login</a>
                 </li>
               @endauth
             </ul>
@@ -141,11 +164,11 @@
       <div
         class="mx-auto block max-w-screen-2xl flex-wrap items-center justify-between gap-4 px-2 py-4 md:flex md:gap-6 md:px-4">
         <a href="{{ url('/') }}"
-          class="flex w-full items-center justify-center space-x-3 transition duration-150 ease-in-out hover:text-yns_yellow rtl:space-x-reverse xl:w-60 xl:justify-start">
+          class="flex w-full items-center justify-center space-x-3 transition duration-150 ease-in-out hover:text-yns_yellow xl:w-60 xl:justify-start rtl:space-x-reverse">
           <img src="{{ asset('images/system/yns_logo.png') }}" class="h-16"
             alt="{{ config('app.name', 'Laravel') }} Logo" />
           <span
-            class="hidden self-center whitespace-nowrap text-lg font-semibold dark:text-white sm:block xl:text-2xl">{{ config('app.name') }}</span>
+            class="hidden self-center whitespace-nowrap text-lg font-semibold sm:block xl:text-2xl dark:text-white">{{ config('app.name') }}</span>
         </a>
         <ul
           class="flex w-full flex-col justify-center gap-8 py-4 text-center font-heading sm:flex-row md:py-0 xl:w-60">
@@ -190,6 +213,19 @@
     </div>
 
   </footer>
+  <script>
+    function initialize() {
+      // Your initialization code here
+      console.log('Google Maps API initialized');
+    }
+
+    // Ensure the function is available globally
+    window.initialize = initialize;
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places&callback=initialize"
+    async defer></script>
 </body>
 
 </html>

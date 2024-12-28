@@ -5,8 +5,7 @@
     {{ $serviceName }}</h1>
   <div class="relative shadow-md sm:rounded-lg">
     <div class="search-wrapper flex justify-center border border-white dark:bg-black">
-      <form class="filter-search flex items-center sm:p-1 md:p-3" action="{{ route('other.filterCheckboxesSearch') }}"
-        method="GET">
+      <div class="filter-search flex items-center sm:p-1 md:p-3">
         <div class="filters relative flex items-center">
           <div id="accordion-collapse" class="w-full" data-accordion="collapse">
             <h2 id="accordion-collapse-heading-1">
@@ -116,7 +115,7 @@
           <input class="search flex w-full justify-center bg-opac_black font-sans text-xl text-white" type="search"
             id="address-input" name="search_query" placeholder="Search..." value="{{ $searchQuery ?? '' }}" />
         </div>
-      </form>
+      </div>
     </div>
     <div class="relative z-0 overflow-x-auto">
       <table class="w-full border border-white text-left font-sans rtl:text-right" id="otherServices">

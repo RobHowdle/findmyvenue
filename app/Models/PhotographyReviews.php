@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\OtherServiceList;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -61,7 +62,7 @@ class PhotographyReviews extends Model
 
     public static function calculateOverallScore($otherServiceId)
     {
-        $reviews = BandReviews::where('other_services_id', $otherServiceId)->where('review_approved', 1)->get();
+        $reviews = self::where('other_services_id', $otherServiceId)->where('review_approved', 1)->get();
 
         // Calculate the total and count of each rating
         $totalCommunication = 0;
@@ -94,7 +95,7 @@ class PhotographyReviews extends Model
 
     public static function calculateAverageScore($otherServiceId, $field)
     {
-        $reviews = BandReviews::where('other_services_id', $otherServiceId)
+        $reviews = self::where('other_services_id', $otherServiceId)
             ->where('review_approved', 1)
             ->get();
 

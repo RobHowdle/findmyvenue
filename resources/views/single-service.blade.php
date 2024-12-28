@@ -23,11 +23,15 @@
             <h1 class="text-sans text-center text-xl md:text-left xl:text-2xl 2xl:text-4xl">{{ $singleService->name }}
             </h1>
             @if ($singleService->location)
-              <p class="font-sans text-2xl">{{ $singleService->location }}</p>
-              <div class="text-center md:text-left">
-                <x-contact-and-social-links :item="$singleService" />
+              <div class="group flex flex-row items-center justify-center gap-1 md:justify-start xl:gap-2">
+                <i class="fa-solid fa-location-dot mr-2"></i>
+                <a class="text-md text-center font-sans underline transition duration-150 ease-in-out hover:text-yns_yellow md:text-left lg:text-lg xl:text-xl 2xl:text-2xl"
+                  href="javascript:void(0)" target="_blank" id="open-map-link">{{ $singleService->location }}</a>
               </div>
             @endif
+            <div class="text-center md:text-left">
+              <x-contact-and-social-links :item="$singleService" />
+            </div>
             <div class="rating-wrapper flex flex-row justify-center gap-1 md:justify-start xl:gap-2">
               <p class="h-full place-content-center font-sans md:place-content-end">Overall Rating
                 @if ($singleService->services == 'Artist')
@@ -48,7 +52,6 @@
                 class="w-full rounded bg-gradient-to-t from-yns_dark_orange to-yns_yellow px-6 py-2 text-sm text-black transition duration-150 ease-in-out hover:bg-yns_yellow md:w-auto"
                 data-modal-toggle="review-modal" type="button">Leave a review</button>
             </div>
-
           </div>
         </div>
 
@@ -100,6 +103,11 @@
                   </a>
                 </li>
                 <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
+                  <a href="#" data-tab="portfolio" class="tabLinks text-base text-white hover:text-yns_yellow">
+                    <span class="fas fa-folder mr-2"></span>Portfolio
+                  </a>
+                </li>
+                <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
                   <a href="#" data-tab="reviews" class="tabLinks text-base text-white hover:text-yns_yellow">
                     <span class="fas fa-star mr-2"></span>Reviews
                   </a>
@@ -125,6 +133,11 @@
                 <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
                   <a href="#" data-tab="services" class="tabLinks text-base text-white hover:text-yns_yellow">
                     <span class="fas fa-cog mr-2"></span>Services
+                  </a>
+                </li>
+                <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
+                  <a href="#" data-tab="portfolio" class="tabLinks text-base text-white hover:text-yns_yellow">
+                    <span class="fas fa-folder mr-2"></span>Portfolio
                   </a>
                 </li>
                 <li class="tab w-full px-4 py-2 sm:px-6 sm:py-3 md:w-auto">
@@ -185,7 +198,7 @@
                 @endif
               </div>
               <div id="members" class="max-h-80 flex h-full flex-col gap-4 overflow-auto text-center md:text-left">
-                @if ($singleArtistData['members'])
+                @if (empty($singleArtistData['members']))
                   <div class="service min-w-[calc(50%-1rem)] flex-1">
                     @foreach ($singleArtistData['members'] as $member)
                       <p>{{ $member->first_name . ' ' . $member->last_name }}</p>
@@ -325,11 +338,46 @@
             </div>
           @elseif ($singleService->services == 'Photography')
             <div class="venue-tab-content mt-4 overflow-auto font-sans text-lg text-white">
-              <div id="about" class="text-center md:text-left">
+              <div id="overview" class="text-center md:text-left">
                 @if (empty($singlePhotographerData['description']))
                   <p>We're still working on this! Come back later to read about us!</p>
                 @else
+                  <p class="text-xl font-bold">About Us</p>
                   <p>{{ $singlePhotographerData['description'] }}</p>
+                @endif
+
+                @if (empty($singlePhotographerData['environmentTypes']))
+                  <p>We're still working on this! Come back later to read the types of environments we like to work in!
+                  </p>
+                @else
+                  @if ($singlePhotographerData['types'])
+                    <p class="mt-4 text-xl font-bold">Environments & Types</p>
+                    <p>We've listed below the types of environments and settings we like to work in. If
+                      you have any questions please feel free to <a
+                        class="underline transition duration-150 ease-in-out hover:text-yns_yellow"
+                        href="mailto:{{ $singleService->contact_email }}">contact
+                        us</a></p>
+                    <div class="mt-4 grid grid-cols-2 gap-4">
+                      <div class="group">
+                        <p class="mt-2 underline">Types</p>
+                        <ul>
+                          @foreach ($singlePhotographerData['types'] as $type)
+                            <li>{{ $type }}</li>
+                          @endforeach
+                        </ul>
+                      </div>
+                    </div>
+                  @endif
+                  @if ($singlePhotographerData['settings'])
+                    <div class="group">
+                      <p class="mt-2 underline">Settings</p>
+                      <ul>
+                        @foreach ($singlePhotographerData['settings'] as $setting)
+                          <li>{{ $setting }}</li>
+                        @endforeach
+                      </ul>
+                    </div>
+                  @endif
                 @endif
               </div>
 
@@ -346,6 +394,13 @@
                               <li>{{ $bullet }}</li>
                             @endforeach
                           </ul>
+
+                          <p class="mt-4">We've listed below the types of environments and settings we like to work
+                            in. If you have any questions please feel free to <a
+                              class="underline transition duration-150 ease-in-out hover:text-yns_yellow"
+                              href="mailto:{{ $singleService->contact_email }}">contact
+                              us</a>
+                          </p>
                         @endif
 
                         <p class="mt-4 text-lg font-bold">From {{ formatCurrency($p->price) }}</p>
@@ -353,7 +408,7 @@
                     @endforeach
                   @endforeach
                   <p class="mt-4">All services are subject to location and travel costs. Please <a
-                      class="underline hover:text-yns_yellow"
+                      class="underline transition duration-150 ease-in-out hover:text-yns_yellow"
                       href="mailto:{{ $singleService->contact_email }}">contact
                       us</a> with any
                     queries.</p>
@@ -363,6 +418,23 @@
                   @endif
                 @else
                   <p>We haven't got our services set up yet! Come back soon!</p>
+                @endif
+              </div>
+
+              <div id="portfolio" class="overflow-auto md:flex md:flex-wrap md:gap-8">
+                @if ($singlePhotographerData['portfolioImages'])
+                  @foreach ($singlePhotographerData['portfolioImages'] as $image)
+                    <div class="portfolio-image mb-6 min-w-[calc(50%-1rem)] md:mb-0 md:flex-1">
+                      <img src="{{ asset($image) }}" alt="Portfolio Image" class="h-auto w-full">
+                    </div>
+                  @endforeach
+                  @if ($singlePhotographerData['portfolioLink'])
+                    <p class="mt-2">You can view our full portfolio here - <a
+                        class="underline hover:text-yns_yellow" href="{{ $singleDesignerData['portfolioLink'] }}"
+                        target="_blank">{{ $singlePhotographerData['portfolioLink'] }}</a></p>
+                  @endif
+                @else
+                  <p>We haven't got our portfolio set up yet, check back later!</p>
                 @endif
               </div>
 
@@ -425,32 +497,32 @@
                     @if ($platform['platform'] == 'facebook')
                       <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
-                        <span class="fab fa-facebook mr-4 h-10"></span> {{ $platform['url'] }}
+                        <span class="fab fa-facebook mr-4 h-10"></span> {{ ucfirst($platform['platform']) }}
                       </a>
                     @elseif($platform['platform'] == 'twitter')
                       <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
-                        <span class="fab fa-twitter mr-4 h-10"></span> {{ $platform['url'] }}
+                        <span class="fab fa-twitter mr-4 h-10"></span> {{ ucfirst($platform['platform']) }}
                       </a>
                     @elseif($platform['platform'] == 'instagram')
                       <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
-                        <span class="fab fa-instagram mr-4 h-10"></span> {{ $platform['url'] }}
+                        <span class="fab fa-instagram mr-4 h-10"></span> {{ ucfirst($platform['platform']) }}
                       </a>
                     @elseif($platform['platform'] == 'snapchat')
                       <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
-                        <span class="fab fa-snapchat-ghost mr-4 h-10"></span> {{ $platform['url'] }}
+                        <span class="fab fa-snapchat-ghost mr-4 h-10"></span> {{ ucfirst($platform['platform']) }}
                       </a>
                     @elseif($platform['platform'] == 'tiktok')
                       <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
-                        <span class="fab fa-tiktok mr-4 h-10"></span> {{ $platform['url'] }}
+                        <span class="fab fa-tiktok mr-4 h-10"></span> {{ ucfirst($platform['platform']) }}
                       </a>
                     @elseif($platform['platform'] == 'youtube')
                       <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
-                        <span class="fab fa-youtube mr-4 h-10"></span> {{ $platform['url'] }}
+                        <span class="fab fa-youtube mr-4 h-10"></span> {{ ucfirst($platform['platform']) }}
                       </a>
                     @endif
                   @endforeach
@@ -568,32 +640,32 @@
                     @if ($platform['platform'] == 'facebook')
                       <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
-                        <span class="fab fa-facebook mr-4 h-10"></span> {{ $platform['url'] }}
+                        <span class="fab fa-facebook mr-4 h-10"></span> {{ ucfirst($platform['platform']) }}
                       </a>
                     @elseif($platform['platform'] == 'twitter')
                       <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
-                        <span class="fab fa-twitter mr-4 h-10"></span> {{ $platform['url'] }}
+                        <span class="fab fa-twitter mr-4 h-10"></span> {{ ucfirst($platform['platform']) }}
                       </a>
                     @elseif($platform['platform'] == 'instagram')
                       <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
-                        <span class="fab fa-instagram mr-4 h-10"></span> {{ $platform['url'] }}
+                        <span class="fab fa-instagram mr-4 h-10"></span> {{ ucfirst($platform['platform']) }}
                       </a>
                     @elseif($platform['platform'] == 'snapchat')
                       <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
-                        <span class="fab fa-snapchat-ghost mr-4 h-10"></span> {{ $platform['url'] }}
+                        <span class="fab fa-snapchat-ghost mr-4 h-10"></span> {{ ucfirst($platform['platform']) }}
                       </a>
                     @elseif($platform['platform'] == 'tiktok')
                       <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
-                        <span class="fab fa-tiktok mr-4 h-10"></span> {{ $platform['url'] }}
+                        <span class="fab fa-tiktok mr-4 h-10"></span> {{ ucfirst($platform['platform']) }}
                       </a>
                     @elseif($platform['platform'] == 'youtube')
                       <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
-                        <span class="fab fa-youtube mr-4 h-10"></span> {{ $platform['url'] }}
+                        <span class="fab fa-youtube mr-4 h-10"></span> {{ ucfirst($platform['platform']) }}
                       </a>
                     @endif
                   @endforeach
@@ -602,18 +674,52 @@
                 @endif
               </div>
             </div>
-          @elseif ($singleService->servies == 'Videographer')
+          @elseif ($singleService->services == 'Videography')
             <div class="venue-tab-content mt-4 overflow-auto font-sans text-lg text-white">
-              <div id="about" class="text-center md:text-left">
+              <div id="overview" class="text-center md:text-left">
                 @if (empty($singleVideographerData['description']))
                   <p>We're still working on this! Come back later to read about us!</p>
                 @else
                   <p>{{ $singleVideographerData['description'] }}</p>
                 @endif
+
+                @if (empty($singlePhotographerData['environmentTypes']))
+                  <p>We're still working on this! Come back later to read the types of environments we like to work in!
+                  </p>
+                @else
+                  @if ($singleVideographerData['types'])
+                    <p class="mt-4 text-xl font-bold">Environments & Types</p>
+                    <p>We've listed below the types of environments and settings we like to work in. If
+                      you have any questions please feel free to <a
+                        class="underline transition duration-150 ease-in-out hover:text-yns_yellow"
+                        href="mailto:{{ $singleService->contact_email }}">contact
+                        us</a></p>
+                    <div class="mt-4 grid grid-cols-2 gap-4">
+                      <div class="group">
+                        <p class="mt-2 underline">Types</p>
+                        <ul>
+                          @foreach ($singleVideographerData['types'] as $type)
+                            <li>{{ $type }}</li>
+                          @endforeach
+                        </ul>
+                      </div>
+                    </div>
+                  @endif
+                  @if ($singleVideographerData['settings'])
+                    <div class="group">
+                      <p class="mt-2 underline">Settings</p>
+                      <ul>
+                        @foreach ($singleVideographerData['settings'] as $setting)
+                          <li>{{ $setting }}</li>
+                        @endforeach
+                      </ul>
+                    </div>
+                  @endif
+                @endif
               </div>
 
               <div id="services" class="overflow-auto md:flex md:flex-wrap md:gap-8">
-                @if ($singleVideographerData['packages'])
+                @if (isset($singleVideographerData['packages']) && $singleVideographerData['packages'])
                   @foreach ($singleVideographerData['packages'] as $package)
                     @foreach ($package as $p)
                       <div class="service mb-6 min-w-[calc(50%-1rem)] md:mb-0 md:flex-1">
@@ -646,7 +752,7 @@
               </div>
 
               <div id="portfolio" class="overflow-auto md:flex md:flex-wrap md:gap-8">
-                @if ($singleDesignerData['portfolioImages'])
+                @if (isset($singleVideographerData['portfolioImages']) && $singleVideographerData['portfolioImages'])
                   @foreach ($singleDesignerData['portfolioImages'] as $image)
                     <div class="portfolio-image mb-6 min-w-[calc(50%-1rem)] md:mb-0 md:flex-1">
                       <img src="{{ asset($image) }}" alt="Portfolio Image" class="h-auto w-full">
@@ -667,35 +773,43 @@
                 <div class="ratings-block mt-4 flex flex-col items-center gap-4">
                   <p class="grid grid-cols-2">Communication:
                     <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $singleVideographerData['renderRatingIcons'](
-                          $singleVideographerData['videographyAverageCommunicationRating'],
-                      ) !!}
+                      @if (isset($singleVideographerData['renderRatingIcons']) && is_callable($singleVideographerData['renderRatingIcons']))
+                        {!! $singleVideographerData['renderRatingIcons'](
+                            $singleVideographerData['videographyAverageCommunicationRating'],
+                        ) !!}
+                      @endif
                     </span>
                   </p>
                   <p class="grid grid-cols-2">Flexibility:
                     <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $singleVideographerData['renderRatingIcons']($singleVideographerData['videographyAverageFlexibilityRating']) !!}
-
+                      @if (isset($singleVideographerData['renderRatingIcons']) && is_callable($singleVideographerData['renderRatingIcons']))
+                        {!! $singleVideographerData['renderRatingIcons']($singleVideographerData['videographyAverageFlexibilityRating']) !!}
+                      @endif
                     </span>
                   </p>
                   <p class="grid grid-cols-2">Professionalism:
                     <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $singleVideographerData['renderRatingIcons'](
-                          $singleVideographerData['videographyAverageProfessionalismRating'],
-                      ) !!}
-
+                      @if (isset($singleVideographerData['renderRatingIcons']) && is_callable($singleVideographerData['renderRatingIcons']))
+                        {!! $singleVideographerData['renderRatingIcons'](
+                            $singleVideographerData['videographyAverageProfessionalismRating'],
+                        ) !!}
+                      @endif
                     </span>
                   </p>
                   <p class="grid grid-cols-2">Video Quality:
                     <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $singleVideographerData['renderRatingIcons'](
-                          $singleVideographerData['videographyAverageVideoQualityRating'],
-                      ) !!}
+                      @if (isset($singleVideographerData['renderRatingIcons']) && is_callable($singleVideographerData['renderRatingIcons']))
+                        {!! $singleVideographerData['renderRatingIcons'](
+                            $singleVideographerData['videographyAverageVideoQualityRating'],
+                        ) !!}
+                      @endif
                     </span>
                   </p>
                   <p class="grid grid-cols-2">Price:
                     <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $singleVideographerData['renderRatingIcons']($singleVideographerData['videographyAveragePriceRating']) !!}
+                      @if (isset($singleVideographerData['renderRatingIcons']) && is_callable($singleVideographerData['renderRatingIcons']))
+                        {!! $singleVideographerData['renderRatingIcons']($singleVideographerData['videographyAveragePriceRating']) !!}
+                      @endif
                     </span>
                   </p>
                 </div>
@@ -717,32 +831,32 @@
                     @if ($platform['platform'] == 'facebook')
                       <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
-                        <span class="fab fa-facebook mr-4 h-10"></span> {{ $platform['url'] }}
+                        <span class="fab fa-facebook mr-4 h-10"></span> {{ ucfirst($platform['platform']) }}
                       </a>
                     @elseif($platform['platform'] == 'twitter')
                       <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
-                        <span class="fab fa-twitter mr-4 h-10"></span> {{ $platform['url'] }}
+                        <span class="fab fa-twitter mr-4 h-10"></span> {{ ucfirst($platform['platform']) }}
                       </a>
                     @elseif($platform['platform'] == 'instagram')
                       <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
-                        <span class="fab fa-instagram mr-4 h-10"></span> {{ $platform['url'] }}
+                        <span class="fab fa-instagram mr-4 h-10"></span> {{ ucfirst($platform['platform']) }}
                       </a>
                     @elseif($platform['platform'] == 'snapchat')
                       <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
-                        <span class="fab fa-snapchat-ghost mr-4 h-10"></span> {{ $platform['url'] }}
+                        <span class="fab fa-snapchat-ghost mr-4 h-10"></span> {{ ucfirst($platform['platform']) }}
                       </a>
                     @elseif($platform['platform'] == 'tiktok')
                       <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
-                        <span class="fab fa-tiktok mr-4 h-10"></span> {{ $platform['url'] }}
+                        <span class="fab fa-tiktok mr-4 h-10"></span> {{ ucfirst($platform['platform']) }}
                       </a>
                     @elseif($platform['platform'] == 'youtube')
                       <a class="mb-4 mr-2 flex items-center hover:text-yns_yellow" href="{{ $platform['url'] }}"
                         target="_blank">
-                        <span class="fab fa-youtube mr-4 h-10"></span> {{ $platform['url'] }}
+                        <span class="fab fa-youtube mr-4 h-10"></span> {{ ucfirst($platform['platform']) }}
                       </a>
                     @endif
                   @endforeach
@@ -777,4 +891,31 @@
     const callback = (EmbedController) => {};
     IFrameAPI.createController(element, options, callback);
   };
+
+  document.addEventListener("DOMContentLoaded", function() {
+    const openMapLink = document.getElementById("open-map-link");
+    const promoterLatitude = "{{ $singleService->latitude }}";
+    const promoterLongitude = "{{ $singleService->longitude }}";
+
+    // Function to detect if the user is on a mobile device
+    function isMobileDevice() {
+      return /Mobi|Android/i.test(navigator.userAgent);
+    }
+
+    // Function to open the map
+    function openMap() {
+      // First, check if it's a mobile device
+      if (isMobileDevice()) {
+        // For mobile, try geo URI
+        const geoURI = `geo:${promoterLatitude},${promoterLongitude}`;
+        window.location.href = geoURI;
+      } else {
+        // If not mobile, fall back to Google Maps
+        window.open(`https://www.google.com/maps?q=${promoterLatitude},${promoterLongitude}`, '_blank');
+      }
+    }
+
+    // Attach click event listeners
+    openMapLink.addEventListener("click", openMap);
+  });
 </script>

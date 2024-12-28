@@ -35,7 +35,6 @@
                     d="M51.1965,92.3346a2.7456,2.7456,0,0,1-2.6021-3.61L59.5651,55.812a2.743,2.743,0,0,1,5.2042,1.7356L53.7985,90.46A2.7429,2.7429,0,0,1,51.1965,92.3346Z" />
                   <path fill="#FFFFFF"
                     d="M84.1086,92.3346a2.7456,2.7456,0,0,1-2.6021-3.61L92.4772,55.812a2.743,2.743,0,0,1,5.2042,1.7356L86.7107,90.46A2.743,2.743,0,0,1,84.1086,92.3346Z" />
-
                 </svg>
 
                 <a class="text-md text-center font-sans underline transition duration-150 ease-in-out hover:text-yns_yellow md:text-left lg:text-lg xl:text-xl 2xl:text-2xl"
