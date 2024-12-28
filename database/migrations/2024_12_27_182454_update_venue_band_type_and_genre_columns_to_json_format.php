@@ -14,6 +14,9 @@ return new class extends Migration
     {
         DB::table('venues')->whereRaw('JSON_VALID(band_type) = 0')->update([
             'band_type' => DB::raw('CONCAT(\'"\', band_type, \'"\')'),
+        ]);
+
+        DB::table('venues')->whereRaw('JSON_VALID(band_type) = 0')->update([
             'genre' => DB::raw('CONCAT(\'"\', genre, \'"\')'),
         ]);
 
