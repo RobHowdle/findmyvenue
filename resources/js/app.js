@@ -174,48 +174,48 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-// // Ratings
-// document.addEventListener("DOMContentLoaded", function () {
-//     const emptyIcon = "{{ asset('storage/images/system/ratings/empty.png') }}";
-//     const fullIcon = "{{ asset('storage/images/system/ratings/full.png') }}";
-//     const hotIcon = "{{ asset('storage/images/system/ratings/hot.png') }}";
+// Ratings
+document.addEventListener("DOMContentLoaded", function () {
+    const emptyIcon = "{{ asset('storage/images/system/ratings/empty.png') }}";
+    const fullIcon = "{{ asset('storage/images/system/ratings/full.png') }}";
+    const hotIcon = "{{ asset('storage/images/system/ratings/hot.png') }}";
 
-//     const checkboxes = document.querySelectorAll(
-//         '.rating input[type="checkbox"]'
-//     );
+    const checkboxes = document.querySelectorAll(
+        '.rating input[type="checkbox"]'
+    );
 
-//     checkboxes.forEach((checkbox) => {
-//         checkbox.addEventListener("change", function () {
-//             const value = parseInt(this.value);
-//             const group = this.name;
+    checkboxes.forEach((checkbox) => {
+        checkbox.addEventListener("change", function () {
+            const value = parseInt(this.value);
+            const group = this.name;
 
-//             const checkboxesInGroup = document.querySelectorAll(
-//                 `input[name="${group}"]`
-//             );
+            const checkboxesInGroup = document.querySelectorAll(
+                `input[name="${group}"]`
+            );
 
-//             // Check if 5/5 is selected
-//             if (value === 5) {
-//                 checkboxesInGroup.forEach((cb) => {
-//                     if (parseInt(cb.value) === 5) {
-//                         cb.checked = true;
-//                     }
-//                     cb.nextElementSibling.style.backgroundImage = `url('${hotIcon}')`;
-//                 });
-//             } else {
-//                 // Update the checkboxes based on selected value
-//                 checkboxesInGroup.forEach((cb) => {
-//                     if (parseInt(cb.value) <= value) {
-//                         cb.checked = true;
-//                         cb.nextElementSibling.style.backgroundImage = `url('${fullIcon}')`;
-//                     } else {
-//                         cb.checked = false;
-//                         cb.nextElementSibling.style.backgroundImage = `url('${emptyIcon}')`;
-//                     }
-//                 });
-//             }
-//         });
-//     });
-// });
+            // Check if 5/5 is selected
+            if (value === 5) {
+                checkboxesInGroup.forEach((cb) => {
+                    if (parseInt(cb.value) === 5) {
+                        cb.checked = true;
+                    }
+                    cb.nextElementSibling.style.backgroundImage = `url('${hotIcon}')`;
+                });
+            } else {
+                // Update the checkboxes based on selected value
+                checkboxesInGroup.forEach((cb) => {
+                    if (parseInt(cb.value) <= value) {
+                        cb.checked = true;
+                        cb.nextElementSibling.style.backgroundImage = `url('${fullIcon}')`;
+                    } else {
+                        cb.checked = false;
+                        cb.nextElementSibling.style.backgroundImage = `url('${emptyIcon}')`;
+                    }
+                });
+            }
+        });
+    });
+});
 
 // // Reviewer IP
 // jQuery(document).ready(function () {

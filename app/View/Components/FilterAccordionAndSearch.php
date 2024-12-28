@@ -10,13 +10,13 @@ class FilterAccordionAndSearch extends Component
 {
     public $genres;
     public $venuePromoterCount;
+    public $promoterVenueCount;
     /**
      * Create a new component instance.
      */
-    public function __construct($genres, $venuePromoterCount)
+    public function __construct($genres)
     {
         $this->genres = $genres;
-        $this->venuePromoterCount = $venuePromoterCount;
     }
 
     /**

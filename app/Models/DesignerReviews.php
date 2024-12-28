@@ -64,7 +64,7 @@ class DesignerReviews extends Model
 
     public static function calculateOverallScore($otherServiceId)
     {
-        $reviews = BandReviews::where('other_services_id', $otherServiceId)->where('review_approved', 1)->get();
+        $reviews = self::where('other_services_id', $otherServiceId)->where('review_approved', 1)->get();
 
         // Calculate the total and count of each rating
         $totalCommunication = 0;
@@ -97,7 +97,7 @@ class DesignerReviews extends Model
 
     public static function calculateAverageScore($otherServiceId, $field)
     {
-        $reviews = BandReviews::where('other_services_id', $otherServiceId)
+        $reviews = self::where('other_services_id', $otherServiceId)
             ->where('review_approved', 1)
             ->get();
 

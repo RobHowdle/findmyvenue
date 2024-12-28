@@ -32,9 +32,6 @@
     @endforelse
   </x-other-service-table>
 </x-guest-layout>
-<script
-  src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places&callback=initialize"
-  async defer></script>
 <script>
   // Search Bar
   function initialize() {
@@ -129,109 +126,88 @@
   });
 
   // Attach event listener for search input
-  jQuery('#address-input').on('input', function() {
-    applyFilters();
+  let debounceTimeout;
+  $('#address-input').on('input', function() {
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(() => {
+      applyFilters();
+    }, 300); // Adjust debounce delay as needed
   });
 
   // Event handler for "All Types" checkbox
-  jQuery("#all-bands").change(function() {
-    var isChecked = jQuery(this).prop("checked");
-    jQuery(".filter-checkbox").prop("checked", isChecked);
+  $("#all-bands").change(function() {
+    var isChecked = $(this).prop("checked");
+    $(".filter-checkbox").prop("checked", isChecked);
+    applyFilters();
   });
 
-  // Event handler for "All Genres" checkbox
-  jQuery("#all-genres").change(function() {
-    var isChecked = jQuery(this).prop("checked");
-    jQuery(".genre-checkbox").prop("checked", isChecked);
+  $("#all-genres").change(function() {
+    var isChecked = $(this).prop("checked");
+    $(".genre-checkbox, .subgenre-checkbox").prop("checked", isChecked);
+    applyFilters();
+  });
 
-    // If "All Genres" checkbox is checked, select all subgenres of each genre
-    if (isChecked) {
-      jQuery(".accordion-item .subgenre-checkbox").prop("checked", true); // Uncheck subgenres
+  $('.genre-checkbox').change(function() {
+    var genreId = $(this).data('genre-id');
+    var isChecked = $(this).prop('checked');
+    $(`.subgenre-checkbox[data-genre-id="${genreId}"]`).prop('checked', isChecked);
+
+    // Uncheck "All Genres" if a single genre is deselected
+    if (!isChecked) {
+      $('#all-genres').prop('checked', false);
     }
     applyFilters();
-  })
-
-  // Attach event listener for genre checkboxes
-  jQuery('.genre-checkbox').change(function() {
-    var isChecked = jQuery(this).prop('checked');
-    var genreId = jQuery(this).attr('id');
-
-    var genreIdParts = genreId.split('-');
-    var genreIndex = genreIdParts[2];
-
-    var subgenreCheckboxes = jQuery('input[type="checkbox"][id*="genre-' + genreIndex + '-subgenre"]');
-
-    subgenreCheckboxes.prop('checked', isChecked);
-
-    applyFilters();
   });
 
-  // Attach event listener for subgenre checkboxes
-  jQuery('.subgenre-checkbox').change(function() {
-    // If a subgenre checkbox is selected, deselect the "All Genres" checkbox
-    jQuery('#all-genres').prop('checked', false);
+  $('.subgenre-checkbox').change(function() {
+    // Uncheck "All Genres" if any subgenre is deselected
+    $('#all-genres').prop('checked', false);
     applyFilters();
   });
 
   function applyFilters() {
-    // Get selected filter values
     var bandTypeValue = [];
-    var allTypesSelected = false;
-    var searchQuery = jQuery('#address-input').val();
-    jQuery('.filter-checkbox:checked').each(function() {
-      var filterValue = jQuery(this).val();
-
-      // Check if "All Types" is selected
-      if (filterValue === 'all') {
-        // If "All Types" is selected, populate the array with all individual values
-        allTypesSelected = true;
-        return false;
-      }
-
-      // If "All Types" is not selected and it was selected before, clear the array
-      if (allTypesSelected) {
-        bandTypeValue = [];
-        allTypesSelected = false; // Reset the flag
-      }
-
-      // Push the filter value into the array
-      bandTypeValue.push(filterValue);
-    });
-
-    // If "All Types" is selected, populate the array with all individual values
-    if (allTypesSelected) {
-      jQuery('.filter-checkbox').each(function() {
-        var filterValue = jQuery(this).val();
-        if (filterValue !== 'all') {
-          bandTypeValue.push(filterValue);
-        }
-      });
-    }
-
     var selectedGenres = [];
-    jQuery('.genre-checkbox:checked').each(function() {
-      selectedGenres.push(jQuery(this).val());
-    });
-
     var selectedSubgenres = [];
-    jQuery('.subgenre-checkbox:checked').each(function() {
-      selectedSubgenres.push(jQuery(this).val());
+    var searchQuery = $('#address-input').val();
+
+    // Collect selected band types
+    $('.filter-checkbox:checked').each(function() {
+      bandTypeValue.push($(this).val());
     });
 
-    var mergedGenres = selectedGenres.concat(selectedSubgenres)
+    // Collect selected genres
+    $('.genre-checkbox:checked').each(function() {
+      selectedGenres.push($(this).val());
+    });
+
+    // Collect selected subgenres
+    $('.subgenre-checkbox:checked').each(function() {
+      selectedSubgenres.push($(this).val());
+    });
+
+    // Combine genres and subgenres
+    var mergedGenres = [...selectedGenres, ...selectedSubgenres];
+    var serviceType = '{{ $serviceName }}';
 
     // Send AJAX request to fetch filtered data
     $.ajax({
-      url: '/other/filter',
-      method: 'GET',
+      url: `/other/${serviceType}/filter`,
+      method: 'POST',
       data: {
+        _token: $('meta[name="csrf-token"]').attr('content'),
         search_query: searchQuery,
         band_type: bandTypeValue,
         genres: mergedGenres,
+        serviceType: serviceType,
       },
       success: function(data) {
-        // Update table with filtered data
-        updateTable(data);
+        // Extract venues array and pass it to the function
+        if (data.otherServices && Array.isArray(data.otherServices)) {
+          updateTable(data);
+        } else {
+          console.error("The 'otherServices' field is not an array or is missing:", data.otherServices);
+        }
       },
       error: function(err) {
         console.error('Error applying filters:', err);
@@ -239,53 +215,60 @@
     });
   }
 
-  function updateVenuesTable(filteredOtherServices) {
+  function updateResultsTable(filteredOtherServices) {
     if (!Array.isArray(filteredOtherServices)) {
       console.error("filteredOtherServices is not an array:", filteredOtherServices);
       return;
     }
 
     // Generate HTML for the filtered venues
+    var otherRoute = "{{ route('singleService', [':serviceName', ':serviceId']) }}";
+
     var rowsHtml = filteredOtherServices.map(function(otherService) {
-      var otherRoute = "{{ route('other', ':otherId') }}";
+      var finalRoute = otherRoute
+        .replace(':serviceName', otherService.service_type)
+        .replace(':serviceId', otherService.id);
       var ratingHtml = getRatingHtml(otherService.average_rating);
 
       return `
-            <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
-                <th scope="row" class="font-sans text-white px-2 py-2 md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
-                    <a href="${otherRoute.replace(':otherId', otherService.id)}" class="venue-link hover:text-yns_yellow">${otherService.name}</a>
-                </th>
-                <td class="rating-wrapper hidden whitespace-nowrap px-2 py-2 sm:text-base md:px-6 md:py-3 lg:flex lg:px-8 lg:py-4">
-                    ${ratingHtml}
-                </td>
-                <td class="whitespace-nowrap font-sans text-white px-2 py-2 md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
-                    ${otherService.postal_town}
-                </td>
-                <td class="hidden whitespace-nowrap align-middle text-white px-2 py-2 md:block md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
-                    ${otherService.contact_number ? '<a href="tel:' + otherService.contact_number + '" class="hover:text-yns_yellow"><span class="fas fa-phone"></span></a>' : ''}
-                    ${otherService.contact_email ? '<a href="mailto:' + otherService.contact_email + '" class="hover:text-yns_yellow"><span class="fas fa-envelope"></span></a>' : ''}
-                    ${otherService.platforms ? otherService.platforms.map(function(platform) {
-                        switch (platform.platform) {
-                            case 'facebook':
-                                return '<a class="hover:text-yns_yellow" href="' + platform.url + '" target=_blank><span class="fab fa-facebook"></span></a>';
-                            case 'twitter':
-                                return '<a class="hover:text-yns_yellow" href="' + platform.url + '" target=_blank><span class="fab fa-twitter"></span></a>';
-                            case 'instagram':
-                                return '<a class="hover:text-yns_yellow" href="' + platform.url + '" target=_blank><span class="fab fa-instagram"></span></a>';
-                            case 'snapchat':
-                                return '<a class="hover:text-yns_yellow" href="' + platform.url + '" target=_blank><span class="fab fa-snapchat-ghost"></span></a>';
-                            case 'tiktok':
-                                return '<a class="hover:text-yns_yellow" href="' + platform.url + '" target=_blank><span class="fab fa-tiktok"></span></a>';
-                            case 'youtube':
-                                return '<a class="hover:text-yns_yellow" href="' + platform.url + '" target=_blank><span class="fab fa-youtube"></span></a>';
-                            default:
-                                return '';
-                        }
-                    }).join('') : ''}
-                </td>
-            </tr>
-        `;
+        <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+            <th scope="row" class="font-sans text-white px-2 py-2 md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
+                <a href="${finalRoute}" class="venue-link hover:text-yns_yellow">${otherService.name}</a>
+            </th>
+            <td class="rating-wrapper hidden whitespace-nowrap px-2 py-2 sm:text-base md:px-6 md:py-3 lg:flex lg:px-8 lg:py-4">
+                ${ratingHtml}
+            </td>
+            <td class="whitespace-nowrap font-sans text-white px-2 py-2 md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
+                ${otherService.postal_town}
+            </td>
+            <td class="hidden whitespace-nowrap align-middle text-white px-2 py-2 md:block md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
+                ${otherService.contact_number ? '<a href="tel:' + otherService.contact_number + '" class="hover:text-yns_yellow mr-2"><span class="fas fa-phone"></span></a>' : ''}
+                ${otherService.contact_email ? '<a href="mailto:' + otherService.contact_email + '" class="hover:text-yns_yellow mr-2"><span class="fas fa-envelope"></span></a>' : ''}
+                ${otherService.platforms ? otherService.platforms.map(function(platform) {
+                    switch (platform.platform) {
+                        case 'facebook':
+                            return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-facebook"></span></a>';
+                        case 'twitter':
+                            return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-twitter"></span></a>';
+                        case 'instagram':
+                            return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-instagram"></span></a>';
+                        case 'snapchat':
+                            return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-snapchat-ghost"></span></a>';
+                        case 'tiktok':
+                            return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-tiktok"></span></a>';
+                        case 'youtube':
+                            return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-youtube"></span></a>';
+                        case 'bluesky':
+                            return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fa-brands fa-bluesky"></span></a>';
+                        default:
+                            return '';
+                    }
+                }).join('') : ''}
+            </td>
+        </tr>
+    `;
     }).join('');
+
 
     // Replace the existing HTML content with the new HTML
     jQuery('#otherServices tbody').html(rowsHtml);
@@ -334,15 +317,23 @@
 
   // Update the updateTable function to pass the filtered venues to updateVenuesTable
   function updateTable(data) {
+    console.log("Data:", data); // Check the entire data object
+
+    // If the data doesn't have otherServices, we'll log an error and exit
+    if (!data || !data.otherServices) {
+      console.error("Other services data is missing or undefined.");
+      return; // Exit the function if the data is not structured as expected
+    }
+
     var otherServices = data.otherServices;
     var pagination = data.pagination;
 
+    console.log("Other Services:", otherServices);
+
     // Check if data is not null or empty array
-    if (data.otherServices && data.otherServices.length > 0) {
-      // Append new rows based on filtered data
-      updateVenuesTable(data.otherServices);
+    if (otherServices && otherServices.length > 0) {
+      updateResultsTable(otherServices);
     } else {
-      // Display message if no venues found
       var noOtherServicesRow = `
             <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
                 <td colspan="5" class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4 uppercase text-center">No Services Found</td>

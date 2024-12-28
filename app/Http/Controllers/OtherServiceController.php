@@ -7,6 +7,7 @@ use App\Models\OtherService;
 use Illuminate\Http\Request;
 use App\Models\DesignerReviews;
 use App\Models\OtherServiceList;
+use App\Helpers\SocialLinksHelper;
 use App\Models\PhotographyReviews;
 use App\Models\VideographyReviews;
 use Illuminate\Support\Facades\DB;
@@ -75,11 +76,36 @@ class OtherServiceController extends Controller
         $serviceCounts = [];
         foreach ($otherServices as $service) {
             $serviceCounts[$service->other_service_id] = $service->total;
+
+            // Split the field containing multiple URLs into an array
+            $urls = explode(',', $service->contact_link);
+            $platforms = [];
+
+            foreach ($urls as $url) {
+                $matchedPlatform = 'Unknown';
+                $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube', 'bluesky'];
+                foreach ($platformsToCheck as $platform) {
+                    if (stripos($url, $platform) !== false) {
+                        $matchedPlatform = $platform;
+                        break;
+                    }
+                }
+
+                // Store the platform information for each URL
+                $platforms[] = [
+                    'url' => $url,
+                    'platform' => $matchedPlatform
+                ];
+            }
+
+            // Add the processed data to the venue
+            $service->platforms = $platforms;
         }
 
-
-
-        return view('other', compact('otherServices', 'serviceCounts'));
+        return view('other', [
+            'otherServices' => $otherServices,
+            'serviceCounts' => $serviceCounts,
+        ]);
     }
 
     public function showGroup(Request $request, $serviceName)
@@ -90,7 +116,6 @@ class OtherServiceController extends Controller
         $singleServices = OtherService::with('otherServiceList')
             ->whereIn('other_service_id', $otherServiceIds)
             ->when($searchQuery, function ($query, $searchQuery) {
-                // Apply search query condition only if search_query is present
                 return $query->whereHas('otherServiceList', function ($query) use ($searchQuery) {
                     $query->where('postal_town', 'like', "%$searchQuery%");
                 });
@@ -189,9 +214,11 @@ class OtherServiceController extends Controller
         ]);
     }
 
-    public function filterCheckboxesSearch(Request $request)
+    public function filterCheckboxesSearch(Request $request, $serviceType)
     {
         $query = OtherService::query();
+
+        $query->where('services', $serviceType);
 
         // Search Results
         $searchQuery = $request->input('search_query');
@@ -209,7 +236,7 @@ class OtherServiceController extends Controller
                 $bandType = array_map('trim', $bandType);
                 $query->where(function ($query) use ($bandType) {
                     foreach ($bandType as $type) {
-                        $query->orWhereRaw('JSON_CONTAINS(band_type, ?)', [json_encode([$type])]);
+                        $query->orWhereRaw('JSON_CONTAINS(band_type, ?)', [json_encode($type)]);
                     }
                 });
             }
@@ -219,11 +246,10 @@ class OtherServiceController extends Controller
         if ($request->has('genres')) {
             $genres = $request->input('genres');
             if (!empty($genres)) {
-                $genres = array_map('trim', $genres); // Ensure no extra spaces
+                $genres = array_map('trim', $genres);
                 $query->where(function ($query) use ($genres) {
                     foreach ($genres as $genre) {
-                        // Ensure the genre is properly formatted
-                        $query->orWhereRaw('JSON_CONTAINS(genre, ?)', [json_encode([$genre])]);
+                        $query->orWhereRaw('JSON_CONTAINS(genre, ?)', [json_encode($genre)]);
                     }
                 });
             }
@@ -242,8 +268,6 @@ class OtherServiceController extends Controller
             foreach ($urls as $url) {
                 // Initialize the platform as unknown
                 $matchedPlatform = 'Unknown';
-
-                // Check if the URL contains platform names
                 $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube', 'bluesky'];
                 foreach ($platformsToCheck as $platform) {
                     if (stripos($url, $platform) !== false) {
@@ -270,6 +294,7 @@ class OtherServiceController extends Controller
                 'contact_email' => $other->contact_email,
                 'platforms' => $platforms,
                 'average_rating' => $overallScore,
+                'service_type' => $other->services,
             ];
         });
 
@@ -295,6 +320,8 @@ class OtherServiceController extends Controller
 
         $members = $service->linkedUsers()->get() ?? [];
         $streamUrls = $service->stream_urls;
+        $platforms = SocialLinksHelper::processSocialLinks($service->contact_link);
+        $service->platforms = $platforms;
 
         $overallScore = OtherServicesReview::calculateOverallScore($serviceId);
         $overallReviews[$serviceId] = $this->renderRatingIcons($overallScore);
@@ -325,7 +352,15 @@ class OtherServiceController extends Controller
         $serviceId = $service->id;
 
         $description = $service ? $service->description : '';
-        $packages = json_decode($service->packages);
+        $packages = $service ? json_decode($service->packages) : [];
+        $portfolioImages = $service->portfolio_images;
+        $portfolioLink = $service->portfolio_link;
+        $platforms = SocialLinksHelper::processSocialLinks($service->contact_link);
+        $service->platforms = $platforms;
+        $environmentTypes = $service ? json_decode($service->environment_type, true) : [];
+        $types = $environmentTypes ? $environmentTypes['types'] : [];
+        $settings = $environmentTypes ? $environmentTypes['settings'] : [];
+        $workingTimes = $service ? json_decode($service->working_times, true) : [];
 
         $overallScore = OtherServicesReview::calculateOverallScore($serviceId);
         $overallReviews[$serviceId] = $this->renderRatingIcons($overallScore);
@@ -340,6 +375,12 @@ class OtherServiceController extends Controller
         return [
             'description' => $description,
             'packages' => $packages,
+            'portfolioImages' => $portfolioImages,
+            'portfolioLink' => $portfolioLink,
+            'environmentTypes' => $environmentTypes,
+            'types' => $types,
+            'settings' => $settings,
+            'workingTimes' => $workingTimes,
             'overallScore' => $overallScore,
             'overallReviews' => $overallReviews,
             'photographerAverageCommunicationRating' => $photographerAverageCommunicationRating,
@@ -358,9 +399,15 @@ class OtherServiceController extends Controller
         $serviceId = $service->id;
 
         $description = $service ? $service->description : '';
-        $packages = json_decode($service->packages);
+        $packages = $service ? json_decode($service->packages) : [];
         $portfolioImages = $service->portfolio_images;
         $portfolioLink = $service->portfolio_link;
+        $platforms = SocialLinksHelper::processSocialLinks($service->contact_link);
+        $service->platforms = $platforms;
+        $environmentTypes = $service ? json_decode($service->environment_type, true) : [];
+        $types = $environmentTypes ? $environmentTypes['types'] : [];
+        $settings = $environmentTypes ? $environmentTypes['settings'] : [];
+        $workingTimes = $service ? json_decode($service->working_times, true) : [];
 
         $overallScore = OtherServicesReview::calculateOverallScore($serviceId);
         $overallReviews[$serviceId] = $this->renderRatingIcons($overallScore);
@@ -375,6 +422,12 @@ class OtherServiceController extends Controller
         return [
             'description' => $description,
             'packages' => $packages,
+            'portfolioImages' => $portfolioImages,
+            'portfolioLink' => $portfolioLink,
+            'environmentTypes' => $environmentTypes,
+            'types' => $types,
+            'settings' => $settings,
+            'workingTimes' => $workingTimes,
             'overallScore' => $overallScore,
             'overallReviews' => $overallReviews,
             'videographyAverageCommunicationRating' => $videographyAverageCommunicationRating,
@@ -384,10 +437,9 @@ class OtherServiceController extends Controller
             'videographyAveragePriceRating' => $videographyAveragePriceRating,
             'renderRatingIcons' => [$this, 'renderRatingIcons'],
             'reviewCount' => $reviewCount,
-            'portfolioImages' => $portfolioImages,
-            'portfolioLink' => $portfolioLink,
         ];
     }
+
     private function getDesignerData(OtherService $singleService)
     {
         $service = $singleService;
@@ -397,6 +449,8 @@ class OtherServiceController extends Controller
         $packages = json_decode($service->packages);
         $portfolioImages = $service->portfolio_images;
         $portfolioLink = $service->portfolio_link;
+        $platforms = SocialLinksHelper::processSocialLinks($service->contact_link);
+        $service->platforms = $platforms;
 
         $overallScore = OtherServicesReview::calculateOverallScore($serviceId);
         $overallReviews[$serviceId] = $this->renderRatingIcons($overallScore);

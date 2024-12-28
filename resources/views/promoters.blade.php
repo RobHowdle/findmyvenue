@@ -25,7 +25,7 @@
         </td>
         @if ($promoterVenueCount != 0)
           <td
-            class="{{ $venues ? 'md:block' : 'hidden' }} whitespace-nowrap px-2 py-2 font-sans text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
+            class="{{ $promoters ? 'md:block' : 'hidden' }} whitespace-nowrap px-2 py-2 font-sans text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
             @foreach ($promoters->venues as $venue)
               <a class="hover:text-yns_yellow" href="{{ url('venues', $venue->id) }}">{{ $venue['name'] }}</a>
             @endforeach
@@ -130,7 +130,7 @@
     }
 
     // Attach event listener for filter checkboxes
-    jQuery('.filter-checkbox').change(function() {
+    $('.filter-checkbox').change(function() {
       applyFilters();
     });
 
@@ -202,7 +202,7 @@
       // Send AJAX request to fetch filtered data
       $.ajax({
         url: '/promoters/filter',
-        method: 'GET',
+        method: 'POST',
         data: {
           _token: $('meta[name="csrf-token"]').attr('content'),
           search_query: searchQuery,
@@ -211,7 +211,11 @@
         },
         success: function(data) {
           // Update table with filtered data
-          updateTable(data);
+          if (data.promoters && Array.isArray(data.promoters)) {
+            updateTable(data);
+          } else {
+            console.error("The 'promoters' field is not an array or is missing:", data.promoters);
+          }
         },
         error: function(err) {
           console.error('Error applying filters:', err);
@@ -221,7 +225,7 @@
     }
 
     // Define the updatepromotersTable function outside of the updateTable function
-    function updatePromotersTable(filteredPromoters) {
+    function updateResultsTable(filteredPromoters) {
       if (!Array.isArray(filteredPromoters)) {
         console.error("filteredPromoters is not an array:", filteredPromoters);
         return;
@@ -244,22 +248,24 @@
                     ${promoter.postal_town}
                 </td>
                 <td class="hidden whitespace-nowrap align-middle text-white px-2 py-2 md:block md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
-                    ${promoter.contact_number ? '<a href="tel:' + promoter.contact_number + '" class="hover:text-yns_yellow"><span class="fas fa-phone"></span></a>' : ''}
-                    ${promoter.contact_email ? '<a href="mailto:' + promoter.contact_email + '" class="hover:text-yns_yellow"><span class="fas fa-envelope"></span></a>' : ''}
+                    ${promoter.contact_number ? '<a href="tel:' + promoter.contact_number + '" class="hover:text-yns_yellow mr-2"><span class="fas fa-phone"></span></a>' : ''}
+                    ${promoter.contact_email ? '<a href="mailto:' + promoter.contact_email + '" class="hover:text-yns_yellow mr-2"><span class="fas fa-envelope"></span></a>' : ''}
                     ${promoter.platforms ? promoter.platforms.map(function(platform) {
                         switch (platform.platform) {
                             case 'facebook':
-                                return '<a class="hover:text-yns_yellow" href="' + platform.url + '" target=_blank><span class="fab fa-facebook"></span></a>';
+                                return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-facebook"></span></a>';
                             case 'twitter':
-                                return '<a class="hover:text-yns_yellow" href="' + platform.url + '" target=_blank><span class="fab fa-twitter"></span></a>';
+                                return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-twitter"></span></a>';
                             case 'instagram':
-                                return '<a class="hover:text-yns_yellow" href="' + platform.url + '" target=_blank><span class="fab fa-instagram"></span></a>';
+                                return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-instagram"></span></a>';
                             case 'snapchat':
-                                return '<a class="hover:text-yns_yellow" href="' + platform.url + '" target=_blank><span class="fab fa-snapchat-ghost"></span></a>';
+                                return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-snapchat-ghost"></span></a>';
                             case 'tiktok':
-                                return '<a class="hover:text-yns_yellow" href="' + platform.url + '" target=_blank><span class="fab fa-tiktok"></span></a>';
+                                return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-tiktok"></span></a>';
                             case 'youtube':
-                                return '<a class="hover:text-yns_yellow" href="' + platform.url + '" target=_blank><span class="fab fa-youtube"></span></a>';
+                                return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-youtube"></span></a>';
+                            case 'bluesky':
+                                return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fa-brands fa-bluesky"></span></a>';
                             default:
                                 return '';
                         }
@@ -326,7 +332,7 @@
       // Check if data is not null or empty array
       if (data.promoters && data.promoters.length > 0) {
         // Append new rows based on filtered data
-        updatePromotersTable(data.promoters);
+        updateResultsTable(data.promoters);
       } else {
         // Display message if no promoters found
         var noPromotersRow = `

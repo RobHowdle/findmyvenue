@@ -54,14 +54,14 @@ Route::get('/venues/{id}', [VenueController::class, 'show'])->name('venue');
 Route::get('/promoter-suggestion', [VenueController::class, 'suggestPromoters'])->name('suggestPromoters');
 
 Route::get('/promoters', [PromoterController::class, 'index'])->name('promoters');
-Route::get('/promoters/filter', [PromoterController::class, 'filterCheckboxesSearch'])->name('promoters.filterCheckboxesSearch');
+Route::post('/promoters/filter', [PromoterController::class, 'filterCheckboxesSearch'])->name('promoters.filterCheckboxesSearch');
 Route::get('/promoters/{id}', [PromoterController::class, 'show'])->name('promoter');
 Route::post('/promoters/{id}/submitReview', [PromoterController::class, 'submitPromoterReview'])->name('submit-promoter-review');
 
 Route::get('/other', [OtherServiceController::class, 'index'])->name('other');
+Route::post('/other/{serviceType}/filter', [OtherServiceController::class, 'filterCheckboxesSearch'])->name('other.filterCheckboxesSearch');
 Route::get('/other/{serviceName}', [OtherServiceController::class, 'showGroup'])->name('singleServiceGroup');
 Route::get('/other/{serviceName}/{serviceId}', [OtherServiceController::class, 'show'])->name('singleService');
-Route::get('/other/filter', [OtherServiceController::class, 'filterCheckboxesSearch'])->name('other.filterCheckboxesSearch');
 
 Route::get('/gig-guide', [GigGuideController::class, 'showGigGuide'])->name('gig-guide');
 Route::get('/gigs/filter', [GigGuideController::class, 'filterGigs'])->name('gigs.filter');

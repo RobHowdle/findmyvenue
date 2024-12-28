@@ -142,7 +142,6 @@
       }, 300); // Adjust debounce delay as needed
     });
 
-
     // Event handler for "All Types" checkbox
     $("#all-bands").change(function() {
       var isChecked = $(this).prop("checked");
@@ -211,7 +210,7 @@
         success: function(data) {
           // Extract venues array and pass it to the function
           if (data.venues && Array.isArray(data.venues)) {
-            updateTable(data.venues);
+            updateTable(data);
           } else {
             console.error("The 'venues' field is not an array or is missing:", data.venues);
           }
@@ -223,9 +222,8 @@
 
     }
 
-
     // Define the updatevenuesTable function outside of the updateTable function
-    function updatePromotersTable(filteredPromoters) {
+    function updateResultsTable(filteredPromoters) {
       if (!Array.isArray(filteredPromoters)) {
         console.error("filteredPromoters is not an array:", filteredPromoters);
         return;
@@ -248,8 +246,8 @@
                     ${venue.postal_town}
                 </td>
                 <td class="hidden whitespace-nowrap px-2 py-2 align-middle text-white md:block md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
-                    ${venue.contact_number ? '<a href="tel:' + venue.contact_number + '" class="hover:text-yns_yellow"><span class="fas fa-phone"></span></a>' : ''}
-                    ${venue.contact_email ? '<a href="mailto:' + venue.contact_email + '" class="hover:text-yns_yellow"><span class="fas fa-envelope"></span></a>' : ''}
+                    ${venue.contact_number ? '<a href="tel:' + venue.contact_number + '" class="hover:text-yns_yellow mr-2"><span class="fas fa-phone"></span></a>' : ''}
+                    ${venue.contact_email ? '<a href="mailto:' + venue.contact_email + '" class="hover:text-yns_yellow mr-2><span class="fas fa-envelope"></span></a>' : ''}
                     ${venue.platforms ? venue.platforms.map(function(platform) {
                         switch (platform.platform) {
                             case 'facebook':
@@ -332,7 +330,7 @@
       // Check if data is not null or empty array
       if (data.venues && data.venues.length > 0) {
         // Append new rows based on filtered data
-        updatePromotersTable(data.venues);
+        updateResultsTable(data.venues);
       } else {
         // Display message if no venues found
         var noPromotersRow = `

@@ -374,7 +374,6 @@ class VenueController extends Controller
         ]);
     }
 
-
     public function submitVenueReview(Request $request, Venue $id)
     {
         try {
