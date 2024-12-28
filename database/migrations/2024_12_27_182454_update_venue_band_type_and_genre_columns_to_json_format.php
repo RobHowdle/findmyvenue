@@ -13,16 +13,16 @@ return new class extends Migration
     public function up(): void
     {
         DB::table('venues')->whereRaw('JSON_VALID(band_type) = 0')->update([
-            'band_type' => DB::raw('NULL'),
-            'genre' => DB::raw('NULL'),
+            'band_type' => DB::raw('CONCAT(\'"\', band_type, \'"\')'),
+            'genre' => DB::raw('CONCAT(\'"\', genre, \'"\')'),
         ]);
 
         Schema::table('venues', function (Blueprint $table) {
-            $table->json('band_type')->nullable(false)->change();
+            $table->json('band_type')->nullable(true)->change();
         });
 
         Schema::table('venues', function (Blueprint $table) {
-            $table->json('genre')->nullable(false)->change();
+            $table->json('genre')->nullable(true)->change();
         });
     }
 
