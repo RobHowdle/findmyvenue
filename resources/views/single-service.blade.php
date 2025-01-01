@@ -579,7 +579,7 @@
               </div>
 
               <div id="portfolio" class="overflow-auto md:flex md:flex-wrap md:gap-8">
-                @if ($singleDesignerData['portfolioImages'])
+                @if ($singleDesignerData['portfolioImages'] !== '[]')
                   @foreach ($singleDesignerData['portfolioImages'] as $image)
                     <div class="portfolio-image mb-6 min-w-[calc(50%-1rem)] md:mb-0 md:flex-1">
                       <img src="{{ asset($image) }}" alt="Portfolio Image" class="h-auto w-full">
