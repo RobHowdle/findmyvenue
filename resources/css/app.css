@@ -1307,6 +1307,7 @@ video {
 
 .service-block img {
     max-width: 250px;
+    max-height: 250px;
     height: 100%;
     /* aspect-ratio: 1/1; */
     object-fit: cover;
@@ -1512,10 +1513,12 @@ iframe {
 @media only screen and (max-width: 1199px) {
     ._250img {
         max-width: 200px;
+        max-height: 200px;
     }
 
     .service-block img {
         max-width: 200px;
+        max-height: 200px;
     }
 }
 
@@ -1526,6 +1529,7 @@ iframe {
 
     .service-block img {
         max-width: 250px;
+        max-height: 250px;
     }
 }
 
@@ -1558,6 +1562,7 @@ iframe {
 
     .service-block img {
         max-width: 150px;
+        max-height: 150px;
     }
 }
 
