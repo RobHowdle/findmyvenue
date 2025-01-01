@@ -51,11 +51,11 @@
       </div>
     </div>
 </x-app-layout>
-
 <script>
-  jQuery(document).ready(function() {
+  $(document).ready(function() {
     var serviceableId = "{{ $service->id }}";
     var serviceableType = "{{ $serviceType }}";
+    const dashboardType = "{{ $dashboardType }}";
 
     // Initialize the date picker
     flatpickr("#date-picker", {
@@ -67,27 +67,30 @@
       dateFormat: "Y-m-d",
     });
 
+    // Listen for filter changes
+    $('#finance-filter').change(function() {
+      console.log('Selected filter:', $(this).val()); // This should log the selected value
+      const selectedFilter = $(this).val();
+      adjustDatePicker(selectedFilter); // Ensure this function is working too
+    });
+
     // Initialize chart variables
     let incomeChart, outgoingChart, profitChart;
+
+    console.log(incomeChart, outgoingChart, profitChart);
 
     // Initialize totals
     let totalIncome = [];
     let totalOutgoing = [];
     let totalProfit = [];
 
-    // Listen for filter changes
-    jQuery('#finance-filter').change(function() {
-      let filter = jQuery(this).val();
-      adjustDatePicker(filter);
-    });
-
     // Fetch data when filters change
-    jQuery('#finance-filter, #date-picker').change(function() {
+    jQuery('#date-picker').change(function() {
       let filter = jQuery('#finance-filter').val();
       let date = jQuery('#date-picker').val();
 
       $.ajax({
-        url: '/api/dashboard/promoter/finances',
+        url: `/dashboard/${dashboardType}/finances`,
         method: 'GET',
         data: {
           filter: filter,
@@ -105,19 +108,26 @@
           totalProfit = response.totalProfit;
 
           // Display totals
-          jQuery('#totalIncoming').text('Total Income: ' + formatCurrency(sumArray(totalIncome)));
-          jQuery('#totalOutgoing').text('Total Outgoing: ' + formatCurrency(sumArray(totalOutgoing)));
-          jQuery('#totalProfit').text('Total Profit: ' + formatCurrency(sumArray(totalProfit)));
+          jQuery('#totalIncoming').text('Total Income: ' + formatCurrency(totalIncome));
+          jQuery('#totalOutgoing').text('Total Outgoing: ' + formatCurrency(totalOutgoing));
+          jQuery('#totalProfit').text('Total Profit: ' + formatCurrency(totalProfit));
 
           // Generate links for individual finance records
           let financeLinks = '';
           response.financeRecords.forEach(record => {
             financeLinks +=
-              `<li class="ml-4 my-2"><a href="${record.link}" target="_blank" class="hover:text-yns_yellow font-heading transition duration-150 ease-in-out">${record.name}</a></li>`;
+              `<li class="ml-4 my-2"><a href="${record.link}" target="_blank" class="cursor-pointer hover:text-yns_yellow font-heading transition duration-150 ease-in-out">${record.name}</a></li>`;
           });
 
           // Display finance links in a specific element
           jQuery('#financeRecords').html(financeLinks);
+        },
+        error: function(xhr, status, error) {
+          console.error("AJAX Error: " + status + ": " + error); // Logs the error details
+
+          // Optionally, display a user-friendly error message
+          showFailureNotification("Oops!",
+            "Something went wrong while fetching the data. Please try again later.", "error");
         }
       });
     });
@@ -150,159 +160,181 @@
     }
 
     function updateCharts(data) {
-      if (incomeChart instanceof Chart) {
-        incomeChart.destroy();
-      }
-      if (outgoingChart instanceof Chart) {
-        outgoingChart.destroy();
-      }
-      if (profitChart instanceof Chart) {
-        profitChart.destroy();
-      }
+      try {
+        // Destroy previous charts if they exist
+        if (incomeChart instanceof Chart) {
+          incomeChart.destroy();
+        }
+        if (outgoingChart instanceof Chart) {
+          outgoingChart.destroy();
+        }
+        if (profitChart instanceof Chart) {
+          profitChart.destroy();
+        }
 
-      // Create new charts
-      let ctxIncome = document.getElementById('incomeChart').getContext('2d');
-      incomeChart = new Chart(ctxIncome, {
-        type: 'bar',
-        data: {
-          labels: data.dates,
-          datasets: [{
-            label: 'Income',
-            color: 'rgba(255,255,255,0.5)',
-            data: data.totalIncome,
-            backgroundColor: 'rgba(75, 192, 192, 0.6)',
-            borderColor: 'rgba(75, 192, 192, 1)',
-          }]
-        },
-        options: {
-          plugins: {
-            legend: {
-              labels: {
-                color: 'white',
+
+
+        // Create labels for the charts from `financeRecords`
+        let dates = data.financeRecords.map(record => record
+          .date_from); // Replace 'date' with the actual property in financeRecords
+
+        // Ensure there are labels for the chart (fallback to empty array if missing)
+        if (!dates || dates.length === 0) {
+          dates = ['No data']; // Fallback label
+        }
+
+        let incomeData = data.financeRecords.map(record => record.totalIncome);
+        let outgoingData = data.financeRecords.map(record => record.totalOutgoing);
+        let profitData = data.financeRecords.map(record => record.totalProfit);
+
+
+        // Create new charts with error handling
+        let ctxIncome = document.getElementById('incomeChart').getContext('2d');
+        incomeChart = new Chart(ctxIncome, {
+          type: 'bar',
+          data: {
+            labels: dates,
+            datasets: [{
+              label: 'Income',
+              color: 'rgba(255,255,255,0.5)',
+              data: incomeData,
+              backgroundColor: 'rgba(75, 192, 192, 0.6)',
+              borderColor: 'rgba(75, 192, 192, 1)',
+              borderWidth: 1,
+            }]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              x: {
+                ticks: {
+                  color: 'white'
+                },
+                border: {
+                  color: 'rgba(255,255,255,0.5)',
+                },
+                grid: {
+                  color: 'rgba(255,255,255,0.5)',
+                },
+              },
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  color: 'white'
+                },
+                border: {
+                  color: 'rgba(255,255,255,0.5)',
+                },
+                grid: {
+                  color: 'rgba(255,255,255,0.5)',
+                },
               }
             }
-          },
-          scales: {
-            x: {
-              ticks: {
-                color: 'white'
-              },
-              border: {
-                color: 'rgba(255,255,255,0.5)',
-              },
-              grid: {
-                color: 'rgba(255,255,255,0.5)',
-              },
-            },
-            y: {
-              ticks: {
-                color: 'white'
-              },
-              border: {
-                color: 'rgba(255,255,255,0.5)',
-              },
-              grid: {
-                color: 'rgba(255,255,255,0.5)',
-
-              },
-            }
           }
-        }
-      });
+        });
 
-      let ctxOutgoing = document.getElementById('outgoingChart').getContext('2d');
-      outgoingChart = new Chart(ctxOutgoing, {
-        type: 'bar',
-        data: {
-          labels: data.dates,
-          datasets: [{
-            label: 'Outgoing',
-            data: data.totalOutgoing,
-            backgroundColor: 'rgba(255, 99, 132, 0.6)'
-          }]
-        },
-        options: {
-          plugins: {
-            legend: {
-              labels: {
-                color: 'white',
+        let ctxOutgoing = document.getElementById('outgoingChart').getContext('2d');
+        outgoingChart = new Chart(ctxOutgoing, {
+          type: 'bar',
+          data: {
+            labels: dates,
+            datasets: [{
+              label: 'Outgoing',
+              data: outgoingData,
+              backgroundColor: 'rgba(255, 99, 132, 0.6)'
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                labels: {
+                  color: 'white',
+                }
+              }
+            },
+            scales: {
+              x: {
+                ticks: {
+                  color: 'white'
+                },
+                border: {
+                  color: 'rgba(255,255,255,0.5)',
+                },
+                grid: {
+                  color: 'rgba(255,255,255,0.5)',
+                },
+              },
+              y: {
+                ticks: {
+                  color: 'white'
+                },
+                border: {
+                  color: 'rgba(255,255,255,0.5)',
+                },
+                grid: {
+                  color: 'rgba(255,255,255,0.5)',
+
+                },
               }
             }
-          },
-          scales: {
-            x: {
-              ticks: {
-                color: 'white'
-              },
-              border: {
-                color: 'rgba(255,255,255,0.5)',
-              },
-              grid: {
-                color: 'rgba(255,255,255,0.5)',
-              },
-            },
-            y: {
-              ticks: {
-                color: 'white'
-              },
-              border: {
-                color: 'rgba(255,255,255,0.5)',
-              },
-              grid: {
-                color: 'rgba(255,255,255,0.5)',
-
-              },
-            }
           }
-        }
-      });
+        });
 
-      let ctxProfit = document.getElementById('profitChart').getContext('2d');
-      profitChart = new Chart(ctxProfit, {
-        type: 'bar',
-        data: {
-          labels: data.dates,
-          datasets: [{
-            label: 'Profit',
-            data: data.totalProfit,
-            backgroundColor: 'rgba(153, 102, 255, 0.6)'
-          }]
-        },
-        options: {
-          plugins: {
-            legend: {
-              labels: {
-                color: 'white',
+        let ctxProfit = document.getElementById('profitChart').getContext('2d');
+        profitChart = new Chart(ctxProfit, {
+          type: 'bar',
+          data: {
+            labels: dates,
+            datasets: [{
+              label: 'Profit',
+              data: profitData,
+              backgroundColor: 'rgba(153, 102, 255, 0.6)'
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                labels: {
+                  color: 'white',
+                }
+              }
+            },
+            scales: {
+              x: {
+                ticks: {
+                  color: 'white'
+                },
+                border: {
+                  color: 'rgba(255,255,255,0.5)',
+                },
+                grid: {
+                  color: 'rgba(255,255,255,0.5)',
+                },
+              },
+              y: {
+                ticks: {
+                  color: 'white'
+                },
+                border: {
+                  color: 'rgba(255,255,255,0.5)',
+                },
+                grid: {
+                  color: 'rgba(255,255,255,0.5)',
+
+                },
               }
             }
-          },
-          scales: {
-            x: {
-              ticks: {
-                color: 'white'
-              },
-              border: {
-                color: 'rgba(255,255,255,0.5)',
-              },
-              grid: {
-                color: 'rgba(255,255,255,0.5)',
-              },
-            },
-            y: {
-              ticks: {
-                color: 'white'
-              },
-              border: {
-                color: 'rgba(255,255,255,0.5)',
-              },
-              grid: {
-                color: 'rgba(255,255,255,0.5)',
-
-              },
-            }
           }
-        }
-      });
+        });
+
+        console.log('Charts updated successfully');
+      } catch (error) {
+        console.error('Error occurred while updating charts:', error);
+        showFailureNotification("Chart Update Failed",
+          "An error occurred while updating the charts. Please try again later.", "error");
+      }
     }
 
     jQuery('#exportButton').on('click', function() {
@@ -349,9 +381,5 @@
         }
       });
     });
-
-    function sumArray(array) {
-      return array.reduce((acc, curr) => acc + parseFloat(curr || 0), 0);
-    }
   });
 </script>

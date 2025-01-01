@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Finance;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\StoreUpdateFinanceRequest;
 
 class FinanceController extends Controller
@@ -46,13 +48,41 @@ class FinanceController extends Controller
             ->where('serviceable_type', $serviceType)
             ->get();
 
+        $totalIncome = $finances->sum('total_incoming'); // Replace 'incoming' with the correct column
+        $totalOutgoing = $finances->sum('total_outgoing'); // Replace 'outgoing' with the correct column
+        $totalProfit = $totalIncome - $totalOutgoing;
+
+        if (request()->ajax()) {
+            return response()->json([
+                'totalIncome' => $totalIncome,
+                'totalOutgoing' => $totalOutgoing,
+                'totalProfit' => $totalProfit,
+                'modules' => $modules,
+                'financeRecords' => $finances->map(function ($finance, $dashboardType) {
+                    return [
+                        'name' => $finance->name, // Replace with actual column
+                        'date_from' => $finance->date_from,
+                        'date_to' => $finance->date_to,
+                        'totalIncome' => $finance->total_incoming,
+                        'totalOutgoing' => $finance->total_outgoing,
+                        'totalProfit' => $finance->total_profit,
+                        'link' => route('admin.dashboard.show-finance', [$dashboardType, $finance->id]), // Replace with correct route if needed
+                    ];
+                }),
+            ]);
+        }
+
+        // If not an AJAX request, return the normal view
         return view('admin.dashboards.show-finances', [
             'userId' => $this->getUserId(),
             'dashboardType' => $dashboardType,
-            'modules' => $modules,
             'finances' => $finances,
             'service' => $service,
             'serviceType' => $serviceType,
+            'totalIncome' => $totalIncome,
+            'totalOutgoing' => $totalOutgoing,
+            'totalProfit' => $totalProfit,
+            'modules' => $modules,
         ]);
     }
 
@@ -203,6 +233,130 @@ class FinanceController extends Controller
             'dashboardType' => $dashboardType,
             'modules' => $modules,
             'finance' => $finance,
+        ]);
+    }
+
+    public function exportFinances(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'date' => 'required|string',
+            'filter' => 'required|string',
+            'totalIncome' => 'required|string',
+            'totalOutgoing' => 'required|string',
+            'totalProfit' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Retrieve the data from the request
+        $dateRange = $request->input('date');
+        $filterValue = $request->input('filter');
+        $totalIncome = $request->input('totalIncome');
+        $totalOutgoing = $request->input('totalOutgoing');
+        $totalProfit = $request->input('totalProfit');
+
+        // Convert inputs to arrays if necessary
+        $totalIncome = is_array($totalIncome) ? $totalIncome : [$totalIncome];
+        $totalOutgoing = is_array($totalOutgoing) ? $totalOutgoing : [$totalOutgoing];
+        $totalProfit = is_array($totalProfit) ? $totalProfit : [$totalProfit];
+
+        // Prepare the data for the PDF
+        $data = [];
+
+        if ($filterValue === 'day') {
+            // Handle single day case
+            $data[] = [
+                'date' => $dateRange,
+                'totalIncome' => $totalIncome[0],
+                'totalOutgoing' => $totalOutgoing[0],
+                'totalProfit' => $totalProfit[0],
+            ];
+        } elseif ($filterValue === 'week') {
+            // Handle week case
+            $dates = explode(' to ', $dateRange);
+
+            if (count($dates) !== 2) {
+                return response()->json(['errors' => ['Invalid date range format']], 422);
+            }
+
+            list($startDate, $endDate) = $dates;
+
+            // Validate the dates
+            if (!strtotime($startDate) || !strtotime($endDate)) {
+                return response()->json(['errors' => ['Invalid date format']], 422);
+            }
+
+            $currentDate = strtotime($startDate);
+            $endDateTimestamp = strtotime($endDate);
+
+            while ($currentDate <= $endDateTimestamp) {
+                $formattedDate = date('Y-m-d', $currentDate);
+                $data[] = [
+                    'date' => $formattedDate,
+                    'totalIncome' => $totalIncome[0],
+                    'totalOutgoing' => $totalOutgoing[0],
+                    'totalProfit' => $totalProfit[0],
+                ];
+                $currentDate = strtotime('+1 day', $currentDate);
+            }
+        } elseif ($filterValue === 'month') {
+            // Handle month case
+            $month = $dateRange; // This should be in 'YYYY-MM' format
+            $year = substr($month, 0, 4);
+            $monthNumber = substr($month, 5, 2);
+
+            // Get the total days in the month
+            $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $monthNumber, $year);
+
+            for ($day = 1; $day <= $daysInMonth; $day++) {
+                $formattedDate = sprintf('%04d-%02d-%02d', $year, $monthNumber, $day);
+                $data[] = [
+                    'date' => $formattedDate,
+                    'totalIncome' => $totalIncome[0],
+                    'totalOutgoing' => $totalOutgoing[0],
+                    'totalProfit' => $totalProfit[0],
+                ];
+            }
+        } elseif ($filterValue === 'year') {
+            // Handle year case
+            $year = $dateRange; // This should be a year in 'YYYY' format
+
+            // Validate the year
+            if (!preg_match('/^\d{4}$/', $year)) {
+                return response()->json(['errors' => ['Invalid year format']], 422);
+            }
+
+            // Loop through each month of the year
+            for ($month = 1; $month <= 12; $month++) {
+                $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+                $totalIncomeForMonth = $totalIncome[0]; // Adjust if you want to calculate per month
+                $totalOutgoingForMonth = $totalOutgoing[0]; // Adjust if you want to calculate per month
+                $totalProfitForMonth = $totalProfit[0]; // Adjust if you want to calculate per month
+
+                for ($day = 1; $day <= $daysInMonth; $day++) {
+                    $formattedDate = sprintf('%04d-%02d-%02d', $year, $month, $day);
+                    $data[] = [
+                        'date' => $formattedDate,
+                        'totalIncome' => $totalIncomeForMonth,
+                        'totalOutgoing' => $totalOutgoingForMonth,
+                        'totalProfit' => $totalProfitForMonth,
+                    ];
+                }
+            }
+        }
+
+        // Generate the PDF
+        $pdf = Pdf::loadView('pdf.finances', compact('data'));
+        $pdfContent = $pdf->output();
+
+        // Return the PDF to the browser
+        return response()->stream(function () use ($pdfContent) {
+            echo $pdfContent;
+        }, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="finances_graph_data.pdf"',
         ]);
     }
 }

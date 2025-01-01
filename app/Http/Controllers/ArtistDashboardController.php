@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\OtherServicesReview;
 use Illuminate\Support\Facades\Auth;
 
-class BandDashboardController extends Controller
+class ArtistDashboardController extends Controller
 {
     protected function getUserId()
     {
@@ -43,7 +43,7 @@ class BandDashboardController extends Controller
         $service = $band->otherService(ucfirst($role))->first();
         // $dashboardType = lcfirst($service->services);
 
-        return view('admin.dashboards.band-dash', [
+        return view('admin.dashboards.artist-dash', [
             'userId' => $this->getUserId(),
             'dashboardType' => $dashboardType,
             'modules' => $modules,

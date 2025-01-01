@@ -32,17 +32,17 @@ class BandJourneyController extends Controller
         $query = $request->get('query');
 
         if ($query) {
-            $bands = OtherService::where('other_service_id', 4)
+            $artists = OtherService::where('other_service_id', 4)
                 ->where('name', 'like', '%' . $query . '%')
                 ->get();
         } else {
-            $bands = OtherService::where('other_service_id', 4)
+            $artists = OtherService::where('other_service_id', 4)
                 ->limit(8)
                 ->get();
         }
 
         $html = '';
-        foreach ($bands as $band) {
+        foreach ($artists as $artist) {
             $html .= view('admin.dashboards.partials.band-row', compact('artist'))->render();
         }
 
@@ -61,7 +61,7 @@ class BandJourneyController extends Controller
         if (!$band) {
             return response()->json([
                 'success' => false,
-                'message' => 'The band does not exist.'
+                'message' => 'The artist does not exist.'
             ], 404);
         }
 
@@ -69,7 +69,7 @@ class BandJourneyController extends Controller
         if ($user->otherService('artist')->where('serviceable_id', $bandId)->exists()) {
             return response()->json([
                 'success' => false,
-                'message' => 'You are already a member of this band.'
+                'message' => 'You are already a member of this artist.'
             ], 400);
         }
 
@@ -102,6 +102,6 @@ class BandJourneyController extends Controller
         $user = auth()->user();
         $user->otherService()->attach($band->id);
 
-        return redirect()->route('dashboard')->with('success', 'Successfully created and joined the new band!');
+        return redirect()->route('dashboard')->with('success', 'Successfully created and joined the new artist!');
     }
 }
