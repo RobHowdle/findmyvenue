@@ -1,6 +1,6 @@
 <div id="review-modal" tabindex="-1" class="fixed inset-0 z-[9999] hidden place-items-center px-4">
-  <div class="relative mx-auto w-full max-w-4xl border border-white bg-white dark:bg-black">
-    <div class="review-popup relative rounded-lg bg-white dark:bg-black">
+  <div class="relative mx-auto w-full max-w-4xl border border-white bg-black">
+    <div class="review-popup relative rounded-lg bg-black">
       <div class="flex items-center justify-between rounded-t border-b p-4 md:p-5">
         <h3 class="text-xl font-semibold">
           Leave a review
