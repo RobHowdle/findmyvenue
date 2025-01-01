@@ -14,7 +14,7 @@
         </div>
 
         <div class="mb-4">
-          <div class="col-span-2" id="create-promoter-form" style="display: none;">
+          <div class="col-span-2" id="create-designer-form" style="display: none;">
             <p class="col-span-2 mb-3 font-bold">It looks like you're not already in the system - Let's get you added!
             </p>
             <form action="{{ route('designer.create', ['dashboardType' => $dashboardType]) }}"

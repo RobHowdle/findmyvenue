@@ -86,22 +86,62 @@ class BandJourneyController extends Controller
 
     public function createBand(Request $request)
     {
+        $dashboardType = 'Artist';
+        $platform = determinePlatform($request->contact_link);
+        $contactLinksJson = json_encode([$platform => $request->contact_link]);
         // Validate and create a new band
         $request->validate([
-            'band_name' => 'required|string|max:255',
-            // Add other validation rules as needed
+            'name' => 'required|string|max:255',
+            'location' => 'required|string|max:255',
+            'postal_town' => 'required',
+            'latitude' => 'required',
+            'longitude' => 'required',
+            'description' => 'required|string|max:255',
+            'contact_name' => 'required',
+            'contact_number' => 'required',
+            'contact_email' => 'required',
+            'contact_link' => 'required',
         ]);
+
+        // Log request data for debugging
+        \Log::info('Creating band with request data:', $request->all());
 
         // Create new band in the OtherService model
-        $band = OtherService::create([
-            'name' => $request->band_name,
-            'other_service_id' => 4,
-        ]);
+        try {
+            // Create new band in the OtherService model
+            $band = OtherService::create([
+                'name' => $request->name,
+                'location' => $request->location,
+                'other_service_id' => 4,
+                'postal_town' => $request->postal_town,
+                'latitude' => $request->latitude,
+                'longitude' => $request->longitude,
+                'description' => $request->description,
+                'contact_name' => $request->contact_name,
+                'contact_number' => $request->contact_number,
+                'contact_email' => $request->contact_email,
+                'contact_link' => $contactLinksJson,
+                'services' => 'Artist'
+            ]);
 
-        // Associate the user with the new band
-        $user = auth()->user();
-        $user->otherService()->attach($band->id);
+            if (!$band) {
+                logger()->error('Band creation failed');
+                return back()->withErrors(['error' => 'Failed to create the band']);
+            }
 
-        return redirect()->route('dashboard')->with('success', 'Successfully created and joined the new artist!');
+            // Associate the user with the new band
+            $user = auth()->user();
+            if (!$user) {
+                logger()->error('No authenticated user found');
+                return back()->withErrors(['error' => 'No authenticated user']);
+            }
+
+            $user->otherService()->attach($band->id);
+
+            return redirect()->route('dashboard', $dashboardType)->with('success', 'Successfully created and joined the new artist!');
+        } catch (\Exception $e) {
+            logger()->error('Error in createBand:', ['error' => $e->getMessage()]);
+            return back()->withErrors(['error' => 'Something went wrong.']);
+        }
     }
 }

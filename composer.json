@@ -40,7 +40,8 @@
         },
         "files": [
             "app/Helpers/helpers.php",
-            "app/Helpers/SocialLinksHelper.php"
+            "app/Helpers/SocialLinksHelper.php",
+            "app/Helpers/PlatformHelper.php"
         ]
     },
     "autoload-dev": {
@@ -49,7 +50,8 @@
         },
         "files": [
             "app/Helpers/helpers.php",
-            "app/Helpers/SocialLinksHelper.php"
+            "app/Helpers/SocialLinksHelper.php",
+            "app/Helpers/PlatformHelper.php"
         ]
     },
     "scripts": {
