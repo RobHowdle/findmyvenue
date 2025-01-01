@@ -13,7 +13,8 @@
         <tr>
           <th scope="col" class="px-2 py-2 text-base md:px-6 md:py-3 md:text-xl lg:px-8 lg:py-4 lg:text-2xl">Venue
           </th>
-          <th scope="col" class="px-2 py-2 text-base md:px-6 md:py-3 md:text-xl lg:px-8 lg:py-4 lg:text-2xl">Rating
+          <th scope="col"
+            class="hidden px-2 py-2 text-base md:px-6 md:py-3 md:text-xl lg:flex lg:px-8 lg:py-4 lg:text-2xl">Rating
           </th>
           <th scope="col" class="px-2 py-2 text-base md:px-6 md:py-3 md:text-xl lg:px-8 lg:py-4 lg:text-2xl">
             Location
