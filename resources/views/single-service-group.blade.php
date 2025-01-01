@@ -6,10 +6,11 @@
 
   <x-other-service-table :singleServices="$singleServices" :genres="$genres" :serviceName="$serviceName">
     @forelse ($singleServices as $service)
-      <tr class="border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
-        <th scope="row" class="px-2 py-2 font-sans text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
+      <tr class="border-gray-700 odd:bg-black even:bg-gray-900">
+        <th scope="row"
+          class="whitespace-nowrap px-2 py-2 font-sans text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
           <a href="{{ route('singleService', ['serviceName' => $service->services, 'serviceId' => $service->id]) }}"
-            class="hover:text-yns_yellow">{{ $service->name }}</a>
+            class="transition duration-150 ease-in-out hover:text-yns_yellow">{{ $service->name }}</a>
         </th>
         <td
           class="rating-wrapper px:2 py:2 hidden whitespace-nowrap sm:text-base md:px-6 md:py-3 lg:flex lg:px-8 lg:py-4">
@@ -26,8 +27,10 @@
         </td>
       </tr>
     @empty
-      <tr class="border-b border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
-        <td colspan="4" class="text-center text-2xl text-white dark:bg-gray-900">No service found</td>
+      <tr class="border-b border-white bg-gray-900">
+        <td colspan="4"
+          class="px-2 py-2 text-center text-2xl text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">No
+          services found</td>
       </tr>
     @endforelse
   </x-other-service-table>
@@ -231,35 +234,35 @@
       var ratingHtml = getRatingHtml(otherService.average_rating);
 
       return `
-        <tr class=" border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
-            <th scope="row" class="font-sans text-white px-2 py-2 md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
-                <a href="${finalRoute}" class="venue-link hover:text-yns_yellow">${otherService.name}</a>
+            <tr class="border-gray-700 odd:bg-black even:bg-gray-900">
+                <th scope="row" class="whitespace-nowrap px-2 py-2 font-sans text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
+                <a href="${finalRoute}" class="venue-link transition duration-150 ease-in-out hover:text-yns_yellow">${otherService.name}</a>
             </th>
-            <td class="rating-wrapper hidden whitespace-nowrap px-2 py-2 sm:text-base md:px-6 md:py-3 lg:flex lg:px-8 lg:py-4">
+            <td class="rating-wrapper px:2 py:2 hidden whitespace-nowrap sm:text-base md:px-6 md:py-3 lg:flex lg:px-8 lg:py-4">
                 ${ratingHtml}
             </td>
-            <td class="whitespace-nowrap font-sans text-white px-2 py-2 md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
+            <td class="whitespace-nowrap px-2 py-2 font-sans text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
                 ${otherService.postal_town}
             </td>
-            <td class="hidden whitespace-nowrap align-middle text-white px-2 py-2 md:block md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
-                ${otherService.contact_number ? '<a href="tel:' + otherService.contact_number + '" class="hover:text-yns_yellow mr-2"><span class="fas fa-phone"></span></a>' : ''}
-                ${otherService.contact_email ? '<a href="mailto:' + otherService.contact_email + '" class="hover:text-yns_yellow mr-2"><span class="fas fa-envelope"></span></a>' : ''}
+            <td class="hidden whitespace-nowrap px-2 py-2 align-middle text-white md:block md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
+                ${otherService.contact_number ? '<a href="tel:' + otherService.contact_number + '" class="hover:text-yns_yellow mr-2 transition duration-150 ease-in-out"><span class="fas fa-phone"></span></a>' : ''}
+                ${otherService.contact_email ? '<a href="mailto:' + otherService.contact_email + '" class="hover:text-yns_yellow mr-2 transition duration-150 ease-in-out"><span class="fas fa-envelope"></span></a>' : ''}
                 ${otherService.platforms ? otherService.platforms.map(function(platform) {
                     switch (platform.platform) {
                         case 'facebook':
-                            return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-facebook"></span></a>';
+                            return '<a class="hover:text-yns_yellow mr-2 transition duration-150 ease-in-out" href="' + platform.url + '" target="_blank"><span class="fab fa-facebook"></span></a>';
                         case 'twitter':
-                            return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-twitter"></span></a>';
+                            return '<a class="hover:text-yns_yellow mr-2 transition duration-150 ease-in-out" href="' + platform.url + '" target="_blank"><span class="fab fa-twitter"></span></a>';
                         case 'instagram':
-                            return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-instagram"></span></a>';
+                            return '<a class="hover:text-yns_yellow mr-2 transition duration-150 ease-in-out" href="' + platform.url + '" target="_blank"><span class="fab fa-instagram"></span></a>';
                         case 'snapchat':
-                            return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-snapchat-ghost"></span></a>';
+                            return '<a class="hover:text-yns_yellow mr-2 transition duration-150 ease-in-out" href="' + platform.url + '" target="_blank"><span class="fab fa-snapchat-ghost"></span></a>';
                         case 'tiktok':
-                            return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-tiktok"></span></a>';
+                            return '<a class="hover:text-yns_yellow mr-2 transition duration-150 ease-in-out" href="' + platform.url + '" target="_blank"><span class="fab fa-tiktok"></span></a>';
                         case 'youtube':
-                            return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-youtube"></span></a>';
+                            return '<a class="hover:text-yns_yellow mr-2 transition duration-150 ease-in-out" href="' + platform.url + '" target="_blank"><span class="fab fa-youtube"></span></a>';
                         case 'bluesky':
-                            return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fa-brands fa-bluesky"></span></a>';
+                            return '<a class="hover:text-yns_yellow mr-2 transition duration-150 ease-in-out" href="' + platform.url + '" target="_blank"><span class="fa-brands fa-bluesky"></span></a>';
                         default:
                             return '';
                     }

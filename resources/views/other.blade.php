@@ -15,7 +15,8 @@
             <a class="service-overlay"
               href="{{ route('singleServiceGroup', ['serviceName' => $other->otherServiceList->service_name]) }}">
               <img src={{ $other->otherServiceList->image_url }}>
-              <p class="bg-black px-0 py-2 text-white md:px-4 xl:px-6">
+              <p
+                class="bg-black px-0 py-2 text-white transition duration-150 ease-in-out hover:text-yns_yellow md:px-4 xl:px-6">
                 {{ $other->otherServiceList->service_name }} (
                 {{ $serviceCounts[$other->other_service_id] ?? 0 }})</p>
             </a>

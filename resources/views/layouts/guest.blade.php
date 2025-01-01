@@ -71,32 +71,32 @@
           <img src="{{ asset('images/system/yns_logo.png') }}" class="h-16"
             alt="{{ config('app.name', 'Laravel') }} Logo" />
           <span
-            class="hidden self-center whitespace-nowrap text-lg font-semibold sm:block xl:text-2xl dark:text-white">{{ config('app.name') }}</span>
+            class="hidden self-center whitespace-nowrap text-lg font-semibold text-white sm:block xl:text-2xl">{{ config('app.name') }}</span>
         </a>
         <div class="group flex items-center gap-2">
           <div class="hidden w-full md:w-auto lg:block" id="navbar-default">
             <ul class="flex flex-col items-center p-4 font-medium md:flex-row md:space-x-8 rtl:space-x-reverse">
               <li>
                 <a href="{{ url('/venues') }}"
-                  class="{{ request()->is('venues*') ? 'dark:text-yns_yellow' : '' }} font-heading text-lg font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 lg:text-xl xl:text-2xl dark:text-white dark:hover:text-yns_yellow">Venues</a>
+                  class="{{ request()->is('venues*') ? 'text-yns_yellow' : '' }} font-heading text-lg font-semibold text-white transition duration-150 ease-in-out hover:text-yns_yellow focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 lg:text-xl xl:text-2xl">Venues</a>
               </li>
               <li>
                 <a href="{{ url('/promoters') }}"
-                  class="{{ request()->is('promoters*') ? 'dark:text-yns_yellow' : '' }} xl: font-heading text-lg font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 lg:text-xl xl:text-2xl dark:text-white dark:hover:text-yns_yellow">Promoters</a>
+                  class="{{ request()->is('promoters*') ? 'text-yns_yellow' : '' }} xl: font-heading text-lg font-semibold text-white transition duration-150 ease-in-out hover:text-yns_yellow focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 lg:text-xl xl:text-2xl">Promoters</a>
               </li>
               <li>
                 <a href="{{ url('/other') }}"
-                  class="{{ request()->is('other*') ? 'dark:text-yns_yellow' : '' }} xl: font-heading text-lg font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 lg:text-xl xl:text-2xl dark:text-white dark:hover:text-yns_yellow">Other</a>
+                  class="{{ request()->is('other*') ? 'text-yns_yellow' : '' }} xl: font-heading text-lg font-semibold text-white transition duration-150 ease-in-out hover:text-yns_yellow focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 lg:text-xl xl:text-2xl">Other</a>
               </li>
               @auth
                 <li>
                   <a href="{{ url('/dashboard') }}"
-                    class="xl: font-heading text-lg font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 lg:text-xl xl:text-2xl dark:text-white dark:hover:text-yns_yellow">Dashboard</a>
+                    class="xl: font-heading text-lg font-semibold text-white transition duration-150 ease-in-out hover:text-yns_yellow focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 lg:text-xl xl:text-2xl">Dashboard</a>
                 </li>
               @else
                 <li>
                   <a href="{{ url('/login') }}"
-                    class="xl: font-heading text-lg font-semibold text-white hover:text-gray-900 focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 lg:text-xl xl:text-2xl dark:text-white dark:hover:text-yns_yellow">Login</a>
+                    class="xl: font-heading text-lg font-semibold text-white transition duration-150 ease-in-out hover:text-yns_yellow focus:rounded-sm focus:outline focus:outline-2 focus:outline-red-500 lg:text-xl xl:text-2xl">Login</a>
                 </li>
               @endauth
             </ul>

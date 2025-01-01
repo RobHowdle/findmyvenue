@@ -5,11 +5,11 @@
 
   <x-promoters-table :promoters="$promoters" :genres="$genres" :promoterVenueCount="$promoterVenueCount">
     @forelse ($promoters as $promoter)
-      <tr class="border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+      <tr class="border-gray-700 odd:bg-black even:bg-gray-900">
         <th scope="row"
           class="whitespace-nowrap px-2 py-2 font-sans text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
           <a href="{{ route('promoter', $promoter->id) }}"
-            class="promoter-link hover:text-yns_yellow">{{ $promoter->name }}</a>
+            class="promoter-link transition duration-150 ease-in-out hover:text-yns_yellow">{{ $promoter->name }}</a>
         </th>
         <td
           class="rating-wrapper px:2 py:2 hidden whitespace-nowrap sm:text-base md:px-6 md:py-3 lg:flex lg:px-8 lg:py-4">
@@ -33,8 +33,10 @@
         @endif
       </tr>
     @empty
-      <tr class="border-b border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
-        <td colspan="4" class="text-center text-2xl text-white dark:bg-gray-900">No promoters found</td>
+      <tr class="border-b border-white bg-gray-900">
+        <td colspan="4"
+          class="px-2 py-2 text-center text-2xl text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">No
+          promoters found</td>
       </tr>
     @endforelse
   </x-promoters-table>
@@ -237,35 +239,35 @@
         var promoterVenueCount = {{ $promoterVenueCount }};
         const className = promoterVenueCount > 0 ? 'md:block' : 'hidden';
         return `
-            <tr class=" border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
-                <th scope="row" class="whitespace-nowrap font-sans text-white px-2 py-2 md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
-                    <a href="${promoterRoute.replace(':promoterId', promoter.id)}" class="promoter-link hover:text-yns_yellow">${promoter.name}</a>
+            <tr class="border-gray-700 odd:bg-black even:bg-gray-900">
+                <th scope="row" class="whitespace-nowrap px-2 py-2 font-sans text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
+                    <a href="${promoterRoute.replace(':promoterId', promoter.id)}" class="promoter-link transition duration-150 ease-in-out hover:text-yns_yellow">${promoter.name}</a>
                 </th>
-                <td class="rating-wrapper hidden whitespace-nowrap px-2 py-2 sm:text-base md:px-6 md:py-3 lg:flex lg:px-8 lg:py-4">
+                <td class="rating-wrapper px:2 py:2 hidden whitespace-nowrap sm:text-base md:px-6 md:py-3 lg:flex lg:px-8 lg:py-4">
                     ${ratingHtml}
                 </td>
-                <td class="whitespace-nowrap font-sans text-white px-2 py-2 md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
+                <td class="whitespace-nowrap px-2 py-2 font-sans text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
                     ${promoter.postal_town}
                 </td>
-                <td class="hidden whitespace-nowrap align-middle text-white px-2 py-2 md:block md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
-                    ${promoter.contact_number ? '<a href="tel:' + promoter.contact_number + '" class="hover:text-yns_yellow mr-2"><span class="fas fa-phone"></span></a>' : ''}
-                    ${promoter.contact_email ? '<a href="mailto:' + promoter.contact_email + '" class="hover:text-yns_yellow mr-2"><span class="fas fa-envelope"></span></a>' : ''}
+                <td class="hidden whitespace-nowrap px-2 py-2 align-middle text-white md:block md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
+                    ${promoter.contact_number ? '<a href="tel:' + promoter.contact_number + '" class="hover:text-yns_yellow mr-2 transition duration-150 ease-in-out"><span class="fas fa-phone"></span></a>' : ''}
+                    ${promoter.contact_email ? '<a href="mailto:' + promoter.contact_email + '" class="hover:text-yns_yellow mr-2 transition duration-150 ease-in-out"><span class="fas fa-envelope"></span></a>' : ''}
                     ${promoter.platforms ? promoter.platforms.map(function(platform) {
                         switch (platform.platform) {
                             case 'facebook':
-                                return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-facebook"></span></a>';
+                                return '<a class="hover:text-yns_yellow mr-2 transition duration-150 ease-in-out" href="' + platform.url + '" target="_blank"><span class="fab fa-facebook"></span></a>';
                             case 'twitter':
-                                return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-twitter"></span></a>';
+                                return '<a class="hover:text-yns_yellow mr-2 transition duration-150 ease-in-out" href="' + platform.url + '" target="_blank"><span class="fab fa-twitter"></span></a>';
                             case 'instagram':
-                                return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-instagram"></span></a>';
+                                return '<a class="hover:text-yns_yellow mr-2 transition duration-150 ease-in-out" href="' + platform.url + '" target="_blank"><span class="fab fa-instagram"></span></a>';
                             case 'snapchat':
-                                return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-snapchat-ghost"></span></a>';
+                                return '<a class="hover:text-yns_yellow mr-2 transition duration-150 ease-in-out" href="' + platform.url + '" target="_blank"><span class="fab fa-snapchat-ghost"></span></a>';
                             case 'tiktok':
-                                return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-tiktok"></span></a>';
+                                return '<a class="hover:text-yns_yellow mr-2 transition duration-150 ease-in-out" href="' + platform.url + '" target="_blank"><span class="fab fa-tiktok"></span></a>';
                             case 'youtube':
-                                return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-youtube"></span></a>';
+                                return '<a class="hover:text-yns_yellow mr-2 transition duration-150 ease-in-out" href="' + platform.url + '" target="_blank"><span class="fab fa-youtube"></span></a>';
                             case 'bluesky':
-                                return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fa-brands fa-bluesky"></span></a>';
+                                return '<a class="hover:text-yns_yellow mr-2 transition duration-150 ease-in-out" href="' + platform.url + '" target="_blank"><span class="fa-brands fa-bluesky"></span></a>';
                             default:
                                 return '';
                         }
@@ -336,8 +338,8 @@
       } else {
         // Display message if no promoters found
         var noPromotersRow = `
-            <tr class=" border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
-                <td colspan="5" class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4 uppercase text-center">No promoters found</td>
+            <tr class="border-b border-white bg-gray-900">
+                <td colspan="4" class="text-center text-2xl text-white px-2 py-2 md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">No promoters found</td>
             </tr>
         `;
         jQuery('#promoters tbody').html(noPromotersRow);
