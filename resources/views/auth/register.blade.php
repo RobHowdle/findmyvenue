@@ -34,7 +34,7 @@
         <div class="mt-4">
           <x-input-label for="email" :value="__('Email')" />
           <x-text-input id="email" class="mt-1 block w-full" type="email" name="email" :value="old('email')"
-            required autocomplete="email" />
+            required autocomplete="email" oninput="this.value = this.value.toLowerCase();" />
           <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
