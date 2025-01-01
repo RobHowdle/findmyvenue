@@ -47,6 +47,11 @@
               </div>
 
               <div class="group">
+                <x-input-label-dark for="contact_name">Contact Name</x-input-label-dark>
+                <x-text-input id="contact_name" name="contact_name" />
+              </div>
+
+              <div class="group">
                 <x-input-label-dark for="contact_number">Contact Number</x-input-label-dark>
                 <x-text-input id="contact_number" name="contact_number" />
               </div>
@@ -59,35 +64,10 @@
                 <x-text-input id="contact_link" name="contact_link" />
               </div>
 
-              <div class="group relative z-0 mb-5 w-full" x-data="{ isMainContact: 'true' }">
-                <x-input-label-dark>Are you the main contact for the artist?</x-input-label-dark>
-
-                <!-- Radio buttons for Yes/No -->
-                <div class="my-4 flex items-center gap-4">
-                  <div class="flex items-center gap-2">
-                    <x-input-radio id="main-contact-yes" name="is_main_contact" value="true"
-                      x-model="isMainContact"></x-input-radio>
-                    <x-input-label-dark for="main-contact-yes" class="mb-0">Yes</x-input-label-dark>
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <x-input-radio id="main-contact-no" name="is_main_contact" value="false"
-                      x-model="isMainContact"></x-input-radio>
-                    <x-input-label-dark for="main-contact-no" class="mb-0">No</x-input-label-dark>
-                  </div>
-                </div>
-
-                <!-- Fields for main contact information -->
-                <div x-show="isMainContact === 'false'" x-cloak class="mt-4">
-                  <div class="mb-4">
-                    <x-input-label-dark for="contact_name">Contact Name</x-input-label-dark>
-                    <x-text-input id="contact_name" name="contact_name" />
-                  </div>
-                </div>
-
-                <div class="group">
-                  <button type="submit"
-                    class="mt-8 flex w-full justify-center rounded-lg border border-yns_cyan bg-yns_cyan px-4 py-2 font-heading text-xl text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">Save</button>
-                </div>
+              <div class="group">
+                <button type="submit"
+                  class="mt-8 flex w-full justify-center rounded-lg border border-yns_cyan bg-yns_cyan px-4 py-2 font-heading text-xl text-black transition duration-150 ease-in-out hover:border-yns_yellow hover:text-yns_yellow">Save</button>
+              </div>
             </form>
           </div>
         </div>
