@@ -1,5 +1,5 @@
 <x-guest-layout>
-  <div class="flex h-screen flex-grow items-center justify-center p-2 px-2 backdrop-brightness-50">
+  <div class="flex h-[calc(100vh+128px)] flex-grow items-center justify-center p-2 px-2 backdrop-brightness-50">
     <div class="max-w-6xl rounded-lg bg-opac_8_black p-6 text-center lg:p-8 xl:p-10 2xl:p-12">
       <h1 class="text-3xl font-bold text-white md:text-4xl xl:text-5xl 2xl:text-6xl">
         Credits

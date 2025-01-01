@@ -5,29 +5,41 @@
         Contact
       </h1>
       <p class="mt-4 text-white">You can reach us in many different ways, find our contact links below.</p>
-      <div class="mt-4 grid grid-cols-5 gap-4">
+      <div class="gap:2 mt-4 grid grid-cols-5 lg:gap-4">
         <div class="group">
-          <a class="text-white transition duration-150 ease-in-out hover:text-yns_yellow"
+          <a class="flex items-center justify-center text-white transition duration-150 ease-in-out hover:text-yns_yellow lg:hidden"
+            href="https://www.facebook.com/yournextshowuk" target="_blank"><span class="fab fa-facebook mr-2"></span></a>
+          <a class="hidden items-center justify-center text-white transition duration-150 ease-in-out hover:text-yns_yellow lg:flex"
             href="https://www.facebook.com/yournextshowuk" target="_blank"><span
               class="fab fa-facebook mr-2"></span>Facebook</a>
         </div>
-        <div class="group">
-          <a class="text-white transition duration-150 ease-in-out hover:text-yns_yellow"
+        <div class="tex group">
+          <a class="flex items-center justify-center text-white transition duration-150 ease-in-out hover:text-yns_yellow lg:hidden"
+            href="https://bsky.app/profile/yournextshow.bsky.social" target="_blank"><span
+              class="fa-brands fa-bluesky mr-2"></span></a>
+          <a class="hidden items-center justify-center text-white transition duration-150 ease-in-out hover:text-yns_yellow lg:flex"
             href="https://bsky.app/profile/yournextshow.bsky.social" target="_blank"><span
               class="fa-brands fa-bluesky mr-2"></span>Bluesky</a>
         </div>
         <div class="group">
-          <a class="text-white transition duration-150 ease-in-out hover:text-yns_yellow"
+          <a class="flex items-center justify-center text-white transition duration-150 ease-in-out hover:text-yns_yellow lg:hidden"
+            href="https://www.instagram.com/yournextshow/" target="_blank"><span
+              class="fab fa-instagram mr-2"></span></a>
+          <a class="hidden items-center justify-center text-white transition duration-150 ease-in-out hover:text-yns_yellow lg:flex"
             href="https://www.instagram.com/yournextshow/" target="_blank"><span
               class="fab fa-instagram mr-2"></span>Instagram</a>
         </div>
         <div class="group">
-          <a class="text-white transition duration-150 ease-in-out hover:text-yns_yellow"
+          <a class="flex items-center justify-center text-white transition duration-150 ease-in-out hover:text-yns_yellow lg:hidden"
+            href="https://discord.com/invite/rjaRxsn9Bx" target="_blank"><span class="fab fa-discord mr-2"></span></a>
+          <a class="hidden items-center justify-center text-white transition duration-150 ease-in-out hover:text-yns_yellow lg:flex"
             href="https://discord.com/invite/rjaRxsn9Bx" target="_blank"><span
               class="fab fa-discord mr-2"></span>Discord</a>
         </div>
         <div class="group">
-          <a class="text-white transition duration-150 ease-in-out hover:text-yns_yellow"
+          <a class="flex items-center justify-center text-white transition duration-150 ease-in-out hover:text-yns_yellow lg:hidden"
+            href="mailto:rob@yournextshow.co.uk" target="_blank"><span class="fas fa-envelope mr-2"></span></a>
+          <a class="hidden items-center justify-center text-white transition duration-150 ease-in-out hover:text-yns_yellow lg:flex"
             href="mailto:rob@yournextshow.co.uk" target="_blank"><span class="fas fa-envelope mr-2"></span>Email</a>
         </div>
       </div>
