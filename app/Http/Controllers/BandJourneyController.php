@@ -32,17 +32,17 @@ class BandJourneyController extends Controller
         $query = $request->get('query');
 
         if ($query) {
-            $bands = OtherService::where('other_service_id', 4)
+            $artists = OtherService::where('other_service_id', 4)
                 ->where('name', 'like', '%' . $query . '%')
                 ->get();
         } else {
-            $bands = OtherService::where('other_service_id', 4)
+            $artists = OtherService::where('other_service_id', 4)
                 ->limit(8)
                 ->get();
         }
 
         $html = '';
-        foreach ($bands as $band) {
+        foreach ($artists as $artist) {
             $html .= view('admin.dashboards.partials.band-row', compact('artist'))->render();
         }
 
