@@ -170,12 +170,12 @@
         success: function(response) {
           console.log(response); // Log the entire response for debugging
           if (response.success) {
-            window.showSuccessNotification(response.message); // Ensure message is defined
+            showSuccessNotification(response.message); // Ensure message is defined
             setTimeout(() => {
               window.location.href = response.redirect;
             }, 3000);
           } else {
-            window.showSuccessNotification('Registration successful!'); // Fallback message
+            showSuccessNotification('Registration successful!'); // Fallback message
             setTimeout(() => {
               window.location.href = response.redirect;
             }, 3000);
@@ -189,91 +189,91 @@
             if (errors.password && errors.password.includes(
                 'This password has been compromised in a data breach. Please choose a different password.'
               )) {
-              window.showWarningNotification(errors.password[0]);
+              showWarningNotification(errors.password[0]);
             } else if (xhr.status === 422) {
               // Handle validation errors
               for (const error in errors) {
                 if (errors.hasOwnProperty(error)) {
-                  window.showFailureNotification(errors[error][0]); // Show the first error message
+                  showFailureNotification(errors[error][0]); // Show the first error message
                 }
               }
             } else {
-              window.showFailureNotification('Registration failed. Please try again.');
+              showFailureNotification('Registration failed. Please try again.');
             }
           } else {
-            window.showFailureNotification('An unknown error occurred.');
+            showFailureNotification('An unknown error occurred.');
           }
         }
       });
     });
 
-    window.showSuccessNotification = function(message) {
-      Swal.fire({
-        showConfirmButton: false,
-        toast: true,
-        position: "top-end",
-        timer: 3000,
-        timerProgressBar: true,
-        customClass: {
-          popup: "bg-yns_dark_gray !important rounded-lg font-heading",
-          title: "text-black",
-          html: "text-black",
-        },
-        icon: "success",
-        title: "Success!",
-        text: message,
-      });
-    };
+    // window.showSuccessNotification = function(message) {
+    //   Swal.fire({
+    //     showConfirmButton: false,
+    //     toast: true,
+    //     position: "top-end",
+    //     timer: 3000,
+    //     timerProgressBar: true,
+    //     customClass: {
+    //       popup: "bg-yns_dark_gray !important rounded-lg font-heading",
+    //       title: "text-black",
+    //       html: "text-black",
+    //     },
+    //     icon: "success",
+    //     title: "Success!",
+    //     text: message,
+    //   });
+    // };
 
-    window.showFailureNotification = function(message) {
-      Swal.fire({
-        showConfirmButton: false,
-        toast: true,
-        position: "top-end",
-        timer: 3000,
-        timerProgressBar: true,
-        customClass: {
-          popup: "bg-yns_dark_gray !important rounded-lg font-heading",
-          title: "text-black",
-          html: "text-black",
-        },
-        icon: "error",
-        title: "Oops!",
-        text: message,
-      });
-    };
+    // window.showFailureNotification = function(message) {
+    //   Swal.fire({
+    //     showConfirmButton: false,
+    //     toast: true,
+    //     position: "top-end",
+    //     timer: 3000,
+    //     timerProgressBar: true,
+    //     customClass: {
+    //       popup: "bg-yns_dark_gray !important rounded-lg font-heading",
+    //       title: "text-black",
+    //       html: "text-black",
+    //     },
+    //     icon: "error",
+    //     title: "Oops!",
+    //     text: message,
+    //   });
+    // };
 
-    window.showWarningNotification = function(message) {
-      Swal.fire({
-        showConfirmButton: true,
-        toast: false,
-        customClass: {
-          popup: "bg-yns_dark_gray !important rounded-lg font-heading",
-          title: "text-yns_red",
-          html: "text-white",
-        },
-        icon: "warning",
-        title: "Warning!",
-        text: message,
-      });
-    };
+    // window.showWarningNotification = function(message) {
+    //   Swal.fire({
+    //     showConfirmButton: true,
+    //     toast: false,
+    //     customClass: {
+    //       popup: "bg-yns_dark_gray !important rounded-lg font-heading",
+    //       title: "text-yns_red",
+    //       html: "text-white",
+    //     },
+    //     icon: "warning",
+    //     title: "Warning!",
+    //     text: message,
+    //   });
+    // };
 
-    window.showConfirmationNotification = function(options) {
-      return Swal.fire({
-        showConfirmButton: true,
-        confirmButtonText: "I understand",
-        showCancelButton: true,
-        toast: false,
-        customClass: {
-          popup: "bg-yns_dark_gray !important rounded-lg font-heading",
-          title: "text-white",
-          text: "text-white !important",
-        },
-        icon: "warning",
-        title: "Are you sure?",
-        text: options.text,
-      });
-    };
+    // window.showConfirmationNotification = function(options) {
+    //   return Swal.fire({
+    //     showConfirmButton: true,
+    //     confirmButtonText: "I understand",
+    //     showCancelButton: true,
+    //     toast: false,
+    //     customClass: {
+    //       popup: "bg-yns_dark_gray !important rounded-lg font-heading",
+    //       title: "text-white",
+    //       text: "text-white !important",
+    //     },
+    //     icon: "warning",
+    //     title: "Are you sure?",
+    //     text: options.text,
+    //   });
+    // };
 
     // Other JavaScript code for password strength and requirements can stay the same
     document.addEventListener('DOMContentLoaded', function() {

@@ -38,7 +38,6 @@ class PromoterDashboardController extends Controller
         $modules = collect(session('modules', []));
 
         $user = Auth::user()->load(['roles', 'promoters']);
-        $service = 'Promoter';
         $pendingReviews = PromoterReview::with('promoter')->where('review_approved', '0')->whereNull('deleted_at')->count();
         $promoter = Auth::user()->load('promoters');
         $todoItemsCount = $promoter->promoters()->with(['todos' => function ($query) {

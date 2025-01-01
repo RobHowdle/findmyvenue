@@ -1,5 +1,5 @@
 import Alpine from "alpinejs";
-import * as Swal from "../../node_modules/sweetalert2";
+import Swal from "../../node_modules/sweetalert2";
 import $ from "jquery";
 window.$ = window.jQuery = $;
 
@@ -217,270 +217,271 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-// // Reviewer IP
-// jQuery(document).ready(function () {
-//     $.getJSON("https://api.ipify.org?format=json", function (data) {
-//         var userIP = data.ip;
-//         // Verify the element exists before setting the value
-//         var reviewerIpField = jQuery("#reviewer_ip");
-//         if (reviewerIpField.length) {
-//             reviewerIpField.val(userIP);
-//         }
-//     }).fail(function (jqxhr, textStatus, error) {
-//         var err = textStatus + ", " + error;
-//         console.error("Request Failed: " + err);
-//     });
-// });
+// Reviewer IP
+jQuery(document).ready(function () {
+    $.getJSON("https://api.ipify.org?format=json", function (data) {
+        var userIP = data.ip;
+        // Verify the element exists before setting the value
+        var reviewerIpField = jQuery("#reviewer_ip");
+        if (reviewerIpField.length) {
+            reviewerIpField.val(userIP);
+        }
+    }).fail(function (jqxhr, textStatus, error) {
+        var err = textStatus + ", " + error;
+        console.error("Request Failed: " + err);
+    });
+});
 
-// // Function to initialize Summernote
-// window.initialiseSummernote = function (selector, initialContent) {
-//     jQuery(selector).summernote({
-//         height: 300,
-//         toolbar: [
-//             ["style", ["style"]],
-//             ["font", ["bold", "italic", "underline", "clear"]],
-//             ["fontname", ["fontname"]],
-//             ["fontsize", ["fontsize"]],
-//             ["fontSizeUnits", ["px", "pt"]],
-//             ["color", ["color"]],
-//             ["para", ["ul", "ol", "paragraph"]],
-//             ["table", ["table"]],
-//             ["insert", ["link", "picture", "video"]],
-//             ["view", ["fullscreen", "help"]],
-//         ],
-//         callbacks: {
-//             onInit: function () {
-//                 jQuery(this).summernote("code", initialContent); // Set the initial content
-//             },
-//             onKeyup: function () {
-//                 var editor = jQuery(this);
-//                 var content = editor.summernote("code");
+// Function to initialize Summernote
+window.initialiseSummernote = function (selector, initialContent) {
+    jQuery(selector).summernote({
+        height: 300,
+        toolbar: [
+            ["style", ["style"]],
+            ["font", ["bold", "italic", "underline", "clear"]],
+            ["fontname", ["fontname"]],
+            ["fontsize", ["fontsize"]],
+            ["fontSizeUnits", ["px", "pt"]],
+            ["color", ["color"]],
+            ["para", ["ul", "ol", "paragraph"]],
+            ["table", ["table"]],
+            ["insert", ["link", "picture", "video"]],
+            ["view", ["fullscreen", "help"]],
+        ],
+        callbacks: {
+            onInit: function () {
+                jQuery(this).summernote("code", initialContent); // Set the initial content
+            },
+            onKeyup: function () {
+                var editor = jQuery(this);
+                var content = editor.summernote("code");
 
-//                 // Analyze and get the highlighted content
-//                 // var highlightedContent = analyzeText(content);
+                // Analyze and get the highlighted content
+                // var highlightedContent = analyzeText(content);
 
-//                 // Update only if the content has changed
-//                 // if (highlightedContent !== content) {
-//                 //     // Get the current selection before updating the content
-//                 //     var selection = window.getSelection();
-//                 //     var range = selection.getRangeAt(0);
+                // Update only if the content has changed
+                // if (highlightedContent !== content) {
+                //     // Get the current selection before updating the content
+                //     var selection = window.getSelection();
+                //     var range = selection.getRangeAt(0);
 
-//                 //     // Update the content directly
-//                 //     editor.summernote("code", highlightedContent);
+                //     // Update the content directly
+                //     editor.summernote("code", highlightedContent);
 
-//                 //     // Restore the selection
-//                 //     setTimeout(function () {
-//                 //         // Get the editable area
-//                 //         var $editable = editor.summernote("editable")[0];
+                //     // Restore the selection
+                //     setTimeout(function () {
+                //         // Get the editable area
+                //         var $editable = editor.summernote("editable")[0];
 
-//                 //         // Set the cursor position back to where it was
-//                 //         selection.removeAllRanges(); // Clear existing selections
-//                 //         selection.addRange(range); // Set the new range
+                //         // Set the cursor position back to where it was
+                //         selection.removeAllRanges(); // Clear existing selections
+                //         selection.addRange(range); // Set the new range
 
-//                 //         // Refocus on the editor
-//                 //         $editable.focus(); // Focus the editable area
-//                 //     }, 0); // Use a small delay to ensure the content is rendered before moving the cursor
-//                 // }
-//             },
+                //         // Refocus on the editor
+                //         $editable.focus(); // Focus the editable area
+                //     }, 0); // Use a small delay to ensure the content is rendered before moving the cursor
+                // }
+            },
+        },
+    });
+};
+
+// Function to analyze text for venue names
+
+// function analyzeText(inputText) {
+//     const venues = [
+//         {
+//             name: "The Forum",
+//             link: "https://www.google.com/theforummusiccenter",
 //         },
+//         { name: "The Turks Head", link: "https://www.google.com/theturkshead" },
+//     ];
+
+//     let highlightedContent = inputText; // Start with the original input text
+
+//     venues.forEach((venue) => {
+//         const regex = new RegExp(`\\b(${venue.name})\\b`, "gi");
+//         highlightedContent = highlightedContent.replace(
+//             regex,
+//             `<span class="highlight" data-link="${venue.link}">$1</span>`
+//         );
 //     });
-// };
+//     return highlightedContent; // Return the modified content
+// }
 
-// // Function to analyze text for venue names
-// // function analyzeText(inputText) {
-// //     const venues = [
-// //         {
-// //             name: "The Forum",
-// //             link: "https://www.google.com/theforummusiccenter",
-// //         },
-// //         { name: "The Turks Head", link: "https://www.google.com/theturkshead" },
-// //     ];
+// Sweet Alert 2 Notifications
+window.showSuccessNotification = function (message) {
+    Swal.fire({
+        showConfirmButton: false,
+        toast: true,
+        position: "top-end",
+        timer: 3000,
+        timerProgressBar: true,
+        customClass: {
+            popup: "bg-yns_dark_gray !important rounded-lg font-heading",
+            title: "text-black",
+            html: "text-black",
+        },
+        icon: "success",
+        title: "Success!",
+        text: message,
+    });
+};
 
-// //     let highlightedContent = inputText; // Start with the original input text
+window.showFailureNotification = function (message) {
+    Swal.fire({
+        showConfirmButton: false,
+        toast: true,
+        position: "top-end",
+        timer: 3000,
+        timerProgressBar: true,
+        customClass: {
+            popup: "bg-yns_dark_gray !important rounded-lg font-heading",
+            title: "text-black",
+            html: "text-black",
+        },
+        icon: "error",
+        title: "Oops!",
+        text: message,
+    });
+};
 
-// //     venues.forEach((venue) => {
-// //         const regex = new RegExp(`\\b(${venue.name})\\b`, "gi");
-// //         highlightedContent = highlightedContent.replace(
-// //             regex,
-// //             `<span class="highlight" data-link="${venue.link}">$1</span>`
-// //         );
-// //     });
-// //     return highlightedContent; // Return the modified content
-// // }
+window.showWarningNotification = function (message) {
+    Swal.fire({
+        showConfirmButton: true,
+        toast: false,
+        customClass: {
+            popup: "bg-yns_dark_gray !important rounded-lg font-heading",
+            title: "text-yns_red",
+            html: "text-white",
+        },
+        icon: "warning",
+        title: "Warning!",
+        text: message,
+    });
+};
 
-// // Sweet Alert 2 Notifications
-// window.showSuccessNotification = function (message) {
-//     Swal.fire({
-//         showConfirmButton: false,
-//         toast: true,
-//         position: "top-end",
-//         timer: 3000,
-//         timerProgressBar: true,
-//         customClass: {
-//             popup: "bg-yns_dark_gray !important rounded-lg font-heading",
-//             title: "text-black",
-//             html: "text-black",
-//         },
-//         icon: "success",
-//         title: "Success!",
-//         text: message,
-//     });
-// };
+window.showConfirmationNotification = function (options) {
+    return Swal.fire({
+        showConfirmButton: true,
+        confirmButtonText: "I understand",
+        showCancelButton: true,
+        toast: false,
+        customClass: {
+            popup: "bg-yns_dark_gray !important rounded-lg font-heading",
+            title: "text-white",
+            text: "text-white !important",
+        },
+        icon: "warning",
+        title: "Are you sure?",
+        text: options.text,
+    });
+};
 
-// window.showFailureNotification = function (message) {
-//     Swal.fire({
-//         showConfirmButton: false,
-//         toast: true,
-//         position: "top-end",
-//         timer: 3000,
-//         timerProgressBar: true,
-//         customClass: {
-//             popup: "bg-yns_dark_gray !important rounded-lg font-heading",
-//             title: "text-black",
-//             html: "text-black",
-//         },
-//         icon: "error",
-//         title: "Oops!",
-//         text: message,
-//     });
-// };
+// Event Block
+window.showEventBlock = function (info) {
+    const extendedProps = info.event._def.extendedProps;
 
-// window.showWarningNotification = function (message) {
-//     Swal.fire({
-//         showConfirmButton: true,
-//         toast: false,
-//         customClass: {
-//             popup: "bg-yns_dark_gray !important rounded-lg font-heading",
-//             title: "text-yns_red",
-//             html: "text-white",
-//         },
-//         icon: "warning",
-//         title: "Warning!",
-//         text: message,
-//     });
-// };
+    const startTime = extendedProps.event_start_time || "N/A";
+    const description = extendedProps.description || "N/A";
+    const bands =
+        extendedProps.bands && extendedProps.bands.length > 0
+            ? extendedProps.bands.join(", ")
+            : "N/A";
+    const location = extendedProps.location || "N/A";
+    const ticketUrl = extendedProps.ticket_url || "N/A";
+    const onTheDoorPrice = extendedProps.on_the_door_ticket_price || "N/A";
 
-// window.showConfirmationNotification = function (options) {
-//     return Swal.fire({
-//         showConfirmButton: true,
-//         confirmButtonText: "I understand",
-//         showCancelButton: true,
-//         toast: false,
-//         customClass: {
-//             popup: "bg-yns_dark_gray !important rounded-lg font-heading",
-//             title: "text-white",
-//             text: "text-white !important",
-//         },
-//         icon: "warning",
-//         title: "Are you sure?",
-//         text: options.text,
-//     });
-// };
+    return Swal.fire({
+        showConfirmButton: true,
+        confirmButtonText: "Got it!",
+        toast: false,
+        icon: "info",
+        title: info.event.title,
+        html: `
+            <strong>Description:</strong> ${description}<br>
+            <strong>Start Time:</strong> ${startTime}<br>
+            <strong>Bands:</strong> ${bands}<br>
+            <strong>Location:</strong> ${location}<br>
+            <strong>Ticket URL:</strong> <a href="${ticketUrl}" target="_blank">${
+            ticketUrl ? "View Tickets" : "N/A"
+        }</a><br>
+            <strong>On The Door Price:</strong> £${onTheDoorPrice}<br>
+        `,
+        customClass: {
+            popup: "bg-yns_dark_gray !important rounded-lg font-heading",
+            title: "text-white",
+            hmtl: "text-white !important",
+        },
+    });
+};
 
-// // Event Block
-// window.showEventBlock = function (info) {
-//     const extendedProps = info.event._def.extendedProps;
+// Full Calendar
+document.addEventListener("DOMContentLoaded", function () {
+    var calendarEl = document.getElementById("calendar");
 
-//     const startTime = extendedProps.event_start_time || "N/A";
-//     const description = extendedProps.description || "N/A";
-//     const bands =
-//         extendedProps.bands && extendedProps.bands.length > 0
-//             ? extendedProps.bands.join(", ")
-//             : "N/A";
-//     const location = extendedProps.location || "N/A";
-//     const ticketUrl = extendedProps.ticket_url || "N/A";
-//     const onTheDoorPrice = extendedProps.on_the_door_ticket_price || "N/A";
+    if (!calendarEl) {
+        return; // Exit if the calendar element doesn't exist
+    }
 
-//     return Swal.fire({
-//         showConfirmButton: true,
-//         confirmButtonText: "Got it!",
-//         toast: false,
-//         icon: "info",
-//         title: info.event.title,
-//         html: `
-//             <strong>Description:</strong> ${description}<br>
-//             <strong>Start Time:</strong> ${startTime}<br>
-//             <strong>Bands:</strong> ${bands}<br>
-//             <strong>Location:</strong> ${location}<br>
-//             <strong>Ticket URL:</strong> <a href="${ticketUrl}" target="_blank">${
-//             ticketUrl ? "View Tickets" : "N/A"
-//         }</a><br>
-//             <strong>On The Door Price:</strong> £${onTheDoorPrice}<br>
-//         `,
-//         customClass: {
-//             popup: "bg-yns_dark_gray !important rounded-lg font-heading",
-//             title: "text-white",
-//             hmtl: "text-white !important",
-//         },
-//     });
-// };
+    var userId = calendarEl.getAttribute("data-user-id");
+    var dashboardType = calendarEl.getAttribute("data-dashboard-type");
+    var calendar;
 
-// // Full Calendar
-// document.addEventListener("DOMContentLoaded", function () {
-//     var calendarEl = document.getElementById("calendar");
+    const calendarTabButton = document.querySelector(
+        'button[data-tab="calendar"]'
+    );
 
-//     if (!calendarEl) {
-//         return; // Exit if the calendar element doesn't exist
-//     }
+    calendarTabButton.addEventListener("click", function () {
+        if (!calendar) {
+            // Only initialize if not already done
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: "dayGridMonth",
+                events: function (fetchInfo, successCallback, failureCallback) {
+                    fetch(
+                        `/profile/${dashboardType}/events/${userId}?view=calendar&start=${fetchInfo.startStr}&end=${fetchInfo.endStr}`
+                    )
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.success) {
+                                const eventsArray = data.events.map(
+                                    (event) => ({
+                                        title: event.title,
+                                        start: event.start,
+                                        end: event.end,
+                                        description: event.description,
+                                        event_start_time:
+                                            event.event_start_time,
+                                        bands: event.bands || [],
+                                        location: event.location || "N/A",
+                                        ticket_url: event.ticket_url || "N/A",
+                                        on_the_door_ticket_price:
+                                            event.on_the_door_ticket_price ||
+                                            "N/A",
+                                    })
+                                );
+                                successCallback(eventsArray);
+                            } else {
+                                console.error(
+                                    "Error fetching events:",
+                                    data.message
+                                );
+                                failureCallback();
+                            }
+                        })
+                        .catch((error) => {
+                            console.error("Error fetching events:", error);
+                            failureCallback();
+                        });
+                },
+                eventClick: function (info) {
+                    showEventBlock(info);
+                },
+            });
 
-//     var userId = calendarEl.getAttribute("data-user-id");
-//     var dashboardType = calendarEl.getAttribute("data-dashboard-type");
-//     var calendar;
-
-//     const calendarTabButton = document.querySelector(
-//         'button[data-tab="calendar"]'
-//     );
-
-//     calendarTabButton.addEventListener("click", function () {
-//         if (!calendar) {
-//             // Only initialize if not already done
-//             calendar = new FullCalendar.Calendar(calendarEl, {
-//                 initialView: "dayGridMonth",
-//                 events: function (fetchInfo, successCallback, failureCallback) {
-//                     fetch(
-//                         `/profile/${dashboardType}/events/${userId}?view=calendar&start=${fetchInfo.startStr}&end=${fetchInfo.endStr}`
-//                     )
-//                         .then((response) => response.json())
-//                         .then((data) => {
-//                             if (data.success) {
-//                                 const eventsArray = data.events.map(
-//                                     (event) => ({
-//                                         title: event.title,
-//                                         start: event.start,
-//                                         end: event.end,
-//                                         description: event.description,
-//                                         event_start_time:
-//                                             event.event_start_time,
-//                                         bands: event.bands || [],
-//                                         location: event.location || "N/A",
-//                                         ticket_url: event.ticket_url || "N/A",
-//                                         on_the_door_ticket_price:
-//                                             event.on_the_door_ticket_price ||
-//                                             "N/A",
-//                                     })
-//                                 );
-//                                 successCallback(eventsArray);
-//                             } else {
-//                                 console.error(
-//                                     "Error fetching events:",
-//                                     data.message
-//                                 );
-//                                 failureCallback();
-//                             }
-//                         })
-//                         .catch((error) => {
-//                             console.error("Error fetching events:", error);
-//                             failureCallback();
-//                         });
-//                 },
-//                 eventClick: function (info) {
-//                     showEventBlock(info);
-//                 },
-//             });
-
-//             calendar.render();
-//         } else {
-//             calendar.updateSize();
-//         }
-//     });
-// });
+            calendar.render();
+        } else {
+            calendar.updateSize();
+        }
+    });
+});

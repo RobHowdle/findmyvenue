@@ -49,6 +49,12 @@ class SubNav extends Component
     public $totalProfitsPhotographerYtd;
     public $overallPhotographerRating;
 
+    // Videographer
+    public $videographerId;
+    public $jobsCountVideographerYtd;
+    public $overallRatingVideographer;
+    public $totalProfitsVideographerYtd;
+
     // Standard
     public $standardUserId;
     public $eventsCountStandardYtd;
@@ -115,7 +121,7 @@ class SubNav extends Component
         }
 
         $this->role = $user->getRoleNames()->first();
-        $this->userType = $this->role ?? 'guest'; // Set a default user type if none
+        $this->userType = $this->role ?? 'guest';
 
         switch ($this->userType) {
             case 'promoter':
@@ -152,8 +158,9 @@ class SubNav extends Component
 
     private function loadPromoterData($user)
     {
-        $promoter = $user->promoters()->first();
-        if ($promoter) {
+        $promoters = $user->promoters()->get();
+        if ($promoters->isNotEmpty()) {
+            $promoter = $promoters->first();
             $this->promoterId = $promoter->id;
             $this->eventsCountPromoterYtd = $this->calculateEventsCountPromoterYtd($promoter);
             $this->totalProfitsPromoterYtd = $this->calculateTotalProfitsPromoterYtd($promoter);
@@ -187,14 +194,23 @@ class SubNav extends Component
         return null;
     }
 
-    private function loadVideographerData(int $bandId)
+    private function loadVideographerData($user)
     {
-        //
+        $videographers = $user->otherService('Videographer')->get();
+        if ($videographers->isNotEmpty()) {
+            $videographer = $videographers->first();
+            $this->videographerId = $videographer->id;
+            $this->jobsCountVideographerYtd = $this->calculateJobsVideographerYtd($videographer);
+            $this->totalProfitsVideographerYtd = $this->calculateTotalProfitsVideographerYtd($videographer);
+            $this->overallRatingVideographer = $this->renderRatingIcons($this->videographerId);
+        }
     }
+
     private function loadVenueData($user)
     {
-        $venue = $user->venues()->first();
-        if ($venue) {
+        $venues = $user->venues()->get();
+        if ($venues) {
+            $venue = $venues->first();
             $this->venueId = $venue->id;
             $this->eventsCountVenueYtd = $this->calculateEventsCountPromoterYtd($venue);
             $this->totalProfitsVenueYtd = $this->calculateTotalProfitsPromoterYtd($venue);
@@ -215,8 +231,9 @@ class SubNav extends Component
 
     private function loadStandardUserData($user)
     {
-        $standardUser = $user->standardUser()->first();
-        if ($standardUser) {
+        $standardUsers = $user->standardUser()->get();
+        if ($standardUsers) {
+            $standardUser = $standardUsers->first();
             $this->eventsCountStandardYtd = $this->calculateStandardUserEventsCountYtd($standardUser);
         }
     }
@@ -457,6 +474,57 @@ class SubNav extends Component
     }
 
     public function calculateOverallRatingDesigner($designer)
+    {
+        //
+    }
+
+    // Videographer Calculations
+    public function calculateTotalProfitsVideographerYtd($videographer)
+    {
+        if ($videographer) {
+            $videographerCompany = $videographer->first();
+
+            if ($videographerCompany) {
+                $startOfYear = Carbon::now()->startOfYear();
+                $endOfYear = Carbon::now()->endOfYear();
+
+                // Query the finances table for the current year's profits
+                $totalProfitsYTD = Finance::where('serviceable_id', $videographerCompany->id)
+                    ->where('serviceable_type', 'App\Models\OtherService')
+                    ->whereBetween('date_to', [$startOfYear, $endOfYear])
+                    ->sum('total_profit');
+
+                return $totalProfitsYTD;
+            }
+        }
+
+        return 0;
+    }
+
+    public function calculateJobsVideographerYtd($videographer)
+    {
+        if ($videographer) {
+            $videographerCompany = $videographer->first();
+
+            if ($videographerCompany) {
+                $startOfYear = Carbon::now()->startOfYear();
+                $endOfYear = Carbon::now()->endOfYear();
+
+                $jobsCountDesignerYTD = DB::table('job_service')
+                    ->join('jobs', 'job_service.job_id', '=', 'jobs.id')
+                    ->where('serviceable_id', $videographerCompany->id)
+                    ->where('serviceable_type', 'App\Models\OtherService')
+                    ->whereBetween('jobs.job_start_date', [$startOfYear, $endOfYear])
+                    ->count();
+
+                return $jobsCountDesignerYTD;
+            }
+        }
+
+        return 0;
+    }
+
+    public function calculateOverallRatingVideographer($videographer)
     {
         //
     }

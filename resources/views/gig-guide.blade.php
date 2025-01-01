@@ -63,6 +63,13 @@
                 @include('partials.gigs_table_row', ['event' => $event, 'distance' => 'All'])
               @endforeach
             @endif
+            @if ($gigsCloseToMe == 0 && $otherGigs == 0)
+              <tr class="odd:bg-black even:bg-gray-900 dark:border-gray-700">
+                <td colspan="4"
+                  class="whitespace-nowrap text-center font-sans text-white sm:px-2 sm:py-3 md:px-6 md:py-2 lg:px-8 lg:py-4">
+                  No gigs found</td>
+              </tr>
+            @endif
           </tbody>
         </table>
       </div>
@@ -193,8 +200,6 @@
           return;
         }
 
-        console.log(data);
-
         const tableBody = document.getElementById("gigsTableBody");
         tableBody.innerHTML = "";
 
@@ -225,16 +230,17 @@
 
 
   function createRow(event, distanceLabel) {
+    console.log(event);
     const formattedDateTime = formatDate(event.event_date, event.event_start_time);
     const eventUrl = `/events/${event.id}`;
-    const venueUrl = `/venues/${event.name.replace(/\s+/g, '-').toLowerCase()}`;
+    const venueUrl = `/venues/${event.venue_id}`;
     return `
         <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
            <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 md:px-6 md:py-2 lg:px-8 lg:py-4">
-                <a href="${eventUrl}" class="text-blue-400 hover:text-blue-600 underline">${event.event_name}</a>
+                <a href="${eventUrl}" class="underline hover:text-yns_yellow transition duration-150 ease-in-out">${event.event_name}</a>
             </td>
             <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 md:px-6 md:py-2 lg:px-8 lg:py-4">
-                <a href="${venueUrl}" class="text-blue-400 hover:text-blue-600 underline">${event.name}</a>
+                <a href="${venueUrl}" class="underline hover:text-yns_yellow transition duration-150 ease-in-out">${event.name}</a>
             </td>            
             <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 md:px-6 md:py-2 lg:px-8 lg:py-4">${distanceLabel}</td>
             <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 md:px-6 md:py-2 lg:px-8 lg:py-4">${formattedDateTime}</td>

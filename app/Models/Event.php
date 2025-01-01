@@ -29,6 +29,7 @@ class Event extends Model
         'attendance',
         'ticket_sales',
         'ratings',
+        'public'
     ];
 
     protected $casts = [

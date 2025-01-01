@@ -64,7 +64,7 @@ class OtherService extends Model
     /**
      * Retrieve all videogrphers (other services with `other_service_id` as 2).
      */
-    public static function videogrphers()
+    public static function videographers()
     {
         return self::where('other_service_id', 2);
     }

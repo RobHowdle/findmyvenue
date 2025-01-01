@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Venue;
+use App\Models\VenueReview;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -18,10 +20,31 @@ class VenueDashboardController extends Controller
     {
         $modules = collect(session('modules', []));
 
+        $pendingReviews = VenueReview::with('venue')->where('review_approved', '0')->whereNull('deleted_at')->count();
+        $venue = Auth::user()->load('venues');
+        $todoItemsCount = $venue->venues()->with(['todos' => function ($query) {
+            $query->where('completed', 0)->whereNull('deleted_at');
+        }])->get()->pluck('todos')->flatten()->count();
+
+        $startOfWeek = Carbon::now()->startOfWeek();
+        $endOfWeek = Carbon::now()->endOfWeek();
+        $eventsCount = $venue->venues()
+            ->with(['events' => function ($query) use ($startOfWeek, $endOfWeek) {
+                $query->whereBetween('event_date', [$startOfWeek, $endOfWeek]);
+            }])
+            ->get()
+            ->pluck('events')
+            ->flatten()
+            ->count();
+
+
         return view('admin.dashboards.venue-dash', [
             'userId' => $this->getUserId(),
             'dashboardType' => $dashboardType,
             'modules' => $modules,
+            'pendingReviews' => $pendingReviews,
+            'todoItemsCount' => $todoItemsCount,
+            'eventsCount' => $eventsCount,
         ]);
     }
 

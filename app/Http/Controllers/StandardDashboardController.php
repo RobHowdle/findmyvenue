@@ -37,8 +37,6 @@ class StandardDashboardController extends Controller
             'userId' => $this->getUserId(),
             'dashboardType' => $dashboardType,
             'modules' => $modules,
-            // 'pendingReviews' => $pendingReviews,
-            // 'todoItemsCount' => $todoItemsCount,
             // 'eventsCount' => $eventsCount,
         ]);
     }

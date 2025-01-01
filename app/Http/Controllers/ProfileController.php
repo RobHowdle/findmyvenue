@@ -1298,7 +1298,6 @@ class ProfileController extends Controller
     /**
      * Uploading Portfolio Sample Images
      */
-
     public function uploadPortfolioImages($dashboardType, Request $request)
     {
         // Validate the uploaded file

@@ -123,7 +123,7 @@
               @php
                 $bandTypes = json_decode($venue->band_type ?? '[]');
               @endphp
-              @if (!$bandTypes)
+              @if ($bandTypes == [])
                 <p class="text-center md:text-left">We don't have any specific band types listed, please <a
                     class="underline hover:text-yns_yellow" href="mailto:{{ $venue->contact_email }}">contact us.</a>
                   if you would like to enquire about
@@ -160,12 +160,11 @@
                     class="underline hover:text-yns_yellow" href="mailto:{{ $venue->email }}">contact us.</a></p>
               @endif
 
-              @if ($venue->genre)
+              @php
+                $genres = json_decode($venue->genre ?? '[]');
+              @endphp
+              @if ($venue->genre != '[]')
                 <p class="mt-4">The genres that we usually have at {{ $venue->name }} are:</p>
-
-                @php
-                  $genres = json_decode($venue->genre ?? '[]');
-                @endphp
 
                 <ul class="genre-list columns-1 gap-2 md:columns-3 md:gap-4">
                   @foreach ($genres as $genre)
@@ -177,38 +176,40 @@
                     class="underline hover:text-yns_yellow" href="mailto:{{ $venue->contact_email }}">contact us.</a>
                 </p>
               @else
-                <p>We don't have a preference on genres of music at {{ $venue->name }}. If you would like to enquire
+                <p class="mt-4">We don't have a preference on genres of music at {{ $venue->name }}. If you would
+                  like to enquire
                   about a show, please <a class="underline hover:text-yns_yellow"
                     href="mailto:{{ $venue->contact_email }}">contact us.</a></p>
               @endif
             </div>
 
             <div id="reviews">
-              <p class="text-center">Want to know what we're like? Check out our reviews!</p>
-              <div class="ratings-block mt-4 flex flex-col items-center gap-4">
-                <p class="grid grid-cols-1 text-center md:grid-cols-2 md:text-left">Communication:
-                  <span class="rating-wrapper flex flex-row gap-3">
-                    {!! $renderRatingIcons($averageCommunicationRating) !!}
-                  </span>
-                </p>
-                <p class="grid grid-cols-1 text-center md:grid-cols-2 md:text-left">Rate Of Pay:
-                  <span class="rating-wrapper flex flex-row gap-3">
-                    {!! $renderRatingIcons($averageRopRating) !!}
-                  </span>
-                </p>
-                <p class="grid grid-cols-1 text-center md:grid-cols-2 md:text-left">Promotion:
-                  <span class="rating-wrapper flex flex-row gap-3">
-                    {!! $renderRatingIcons($averagePromotionRating) !!}
-                  </span>
-                </p>
-                <p class="grid grid-cols-1 text-center md:grid-cols-2 md:text-left">Gig Quality:
-                  <span class="rating-wrapper flex flex-row gap-3">
-                    {!! $renderRatingIcons($averageQualityRating) !!}
-                  </span>
-                </p>
-              </div>
-
               @if ($venue->recentReviews)
+
+                <p class="text-center">Want to know what we're like? Check out our reviews!</p>
+                <div class="ratings-block mt-4 flex flex-col items-center gap-4">
+                  <p class="grid grid-cols-1 text-center md:grid-cols-2 md:text-left">Communication:
+                    <span class="rating-wrapper flex flex-row gap-3">
+                      {!! $renderRatingIcons($averageCommunicationRating) !!}
+                    </span>
+                  </p>
+                  <p class="grid grid-cols-1 text-center md:grid-cols-2 md:text-left">Rate Of Pay:
+                    <span class="rating-wrapper flex flex-row gap-3">
+                      {!! $renderRatingIcons($averageRopRating) !!}
+                    </span>
+                  </p>
+                  <p class="grid grid-cols-1 text-center md:grid-cols-2 md:text-left">Promotion:
+                    <span class="rating-wrapper flex flex-row gap-3">
+                      {!! $renderRatingIcons($averagePromotionRating) !!}
+                    </span>
+                  </p>
+                  <p class="grid grid-cols-1 text-center md:grid-cols-2 md:text-left">Gig Quality:
+                    <span class="rating-wrapper flex flex-row gap-3">
+                      {!! $renderRatingIcons($averageQualityRating) !!}
+                    </span>
+                  </p>
+                </div>
+
                 <div class="reviews-block mt-8 flex flex-col gap-4">
                   @foreach ($venue->recentReviews as $review)
                     <div class="review text-center font-sans">
@@ -216,6 +217,9 @@
                     </div>
                   @endforeach
                 </div>
+              @else
+                <p class="mt-4 text-center">No reviews avaliable for {{ $venue->name }} yet. Be the first to leave a
+                  review!</p>
               @endif
             </div>
 

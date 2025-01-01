@@ -258,34 +258,34 @@
               </div>
 
               <div id="reviews">
-                <p class="text-center">Want to know what we're like? Check out our reviews!</p>
-                <div class="ratings-block mt-4 flex flex-col items-center gap-4">
-                  <p class="grid grid-cols-2">Communication:
-                    <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $singleArtistData['renderRatingIcons']($singleArtistData['bandAverageCommunicationRating']) !!}
-                    </span>
-                  </p>
-                  <p class="grid grid-cols-2">Music:
-                    <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $singleArtistData['renderRatingIcons']($singleArtistData['bandAverageMusicRating']) !!}
-
-                    </span>
-                  </p>
-                  <p class="grid grid-cols-2">Promotion:
-                    <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $singleArtistData['renderRatingIcons']($singleArtistData['bandAveragePromotionRating']) !!}
-
-                    </span>
-                  </p>
-                  <p class="grid grid-cols-2">Gig Quality:
-                    <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $singleArtistData['renderRatingIcons']($singleArtistData['bandAverageGigQualityRating']) !!}
-
-                    </span>
-                  </p>
-                </div>
-
                 @if ($singleService->recentReviews)
+                  <p class="text-center">Want to know what we're like? Check out our reviews!</p>
+                  <div class="ratings-block mt-4 flex flex-col items-center gap-4">
+                    <p class="grid grid-cols-2">Communication:
+                      <span class="rating-wrapper flex flex-row gap-3">
+                        {!! $singleArtistData['renderRatingIcons']($singleArtistData['bandAverageCommunicationRating']) !!}
+                      </span>
+                    </p>
+                    <p class="grid grid-cols-2">Music:
+                      <span class="rating-wrapper flex flex-row gap-3">
+                        {!! $singleArtistData['renderRatingIcons']($singleArtistData['bandAverageMusicRating']) !!}
+
+                      </span>
+                    </p>
+                    <p class="grid grid-cols-2">Promotion:
+                      <span class="rating-wrapper flex flex-row gap-3">
+                        {!! $singleArtistData['renderRatingIcons']($singleArtistData['bandAveragePromotionRating']) !!}
+
+                      </span>
+                    </p>
+                    <p class="grid grid-cols-2">Gig Quality:
+                      <span class="rating-wrapper flex flex-row gap-3">
+                        {!! $singleArtistData['renderRatingIcons']($singleArtistData['bandAverageGigQualityRating']) !!}
+
+                      </span>
+                    </p>
+                  </div>
+
                   <div class="reviews-block mt-8 flex flex-col gap-4">
                     @foreach ($singleService->recentReviews as $review)
                       <div class="review text-center font-sans">
@@ -293,6 +293,8 @@
                       </div>
                     @endforeach
                   </div>
+                @else
+                  <p>No reviews yet! Check back later!</p>
                 @endif
               </div>
 
@@ -439,48 +441,48 @@
               </div>
 
               <div id="reviews">
-                <p class="text-center">Want to know what we're like? Check out our reviews!</p>
-                <div class="ratings-block mt-4 flex flex-col items-center gap-4">
-                  <p class="grid grid-cols-2">Communication:
-                    <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $singlePhotographerData['renderRatingIcons'](
-                          $singlePhotographerData['photographerAverageCommunicationRating'],
-                      ) !!}
-                    </span>
-                  </p>
-                  <p class="grid grid-cols-2">Flexibility:
-                    <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $singlePhotographerData['renderRatingIcons'](
-                          $singlePhotographerData['photographerAverageFlexibilityRating'],
-                      ) !!}
-
-                    </span>
-                  </p>
-                  <p class="grid grid-cols-2">Professionalism:
-                    <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $singlePhotographerData['renderRatingIcons'](
-                          $singlePhotographerData['photographerAverageProfessionalismRating'],
-                      ) !!}
-
-                    </span>
-                  </p>
-                  <p class="grid grid-cols-2">Photo Quality:
-                    <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $singlePhotographerData['renderRatingIcons'](
-                          $singlePhotographerData['photographerAveragePhotoQualityRating'],
-                      ) !!}
-                    </span>
-                  </p>
-                  <p class="grid grid-cols-2">Price:
-                    <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $singlePhotographerData['renderRatingIcons'](
-                          $singlePhotographerData['photographerAveragePhotoQualityRating'],
-                      ) !!}
-                    </span>
-                  </p>
-                </div>
-
                 @if ($singleService->recentReviews)
+                  <p class="text-center">Want to know what we're like? Check out our reviews!</p>
+                  <div class="ratings-block mt-4 flex flex-col items-center gap-4">
+                    <p class="grid grid-cols-2">Communication:
+                      <span class="rating-wrapper flex flex-row gap-3">
+                        {!! $singlePhotographerData['renderRatingIcons'](
+                            $singlePhotographerData['photographerAverageCommunicationRating'],
+                        ) !!}
+                      </span>
+                    </p>
+                    <p class="grid grid-cols-2">Flexibility:
+                      <span class="rating-wrapper flex flex-row gap-3">
+                        {!! $singlePhotographerData['renderRatingIcons'](
+                            $singlePhotographerData['photographerAverageFlexibilityRating'],
+                        ) !!}
+
+                      </span>
+                    </p>
+                    <p class="grid grid-cols-2">Professionalism:
+                      <span class="rating-wrapper flex flex-row gap-3">
+                        {!! $singlePhotographerData['renderRatingIcons'](
+                            $singlePhotographerData['photographerAverageProfessionalismRating'],
+                        ) !!}
+
+                      </span>
+                    </p>
+                    <p class="grid grid-cols-2">Photo Quality:
+                      <span class="rating-wrapper flex flex-row gap-3">
+                        {!! $singlePhotographerData['renderRatingIcons'](
+                            $singlePhotographerData['photographerAveragePhotoQualityRating'],
+                        ) !!}
+                      </span>
+                    </p>
+                    <p class="grid grid-cols-2">Price:
+                      <span class="rating-wrapper flex flex-row gap-3">
+                        {!! $singlePhotographerData['renderRatingIcons'](
+                            $singlePhotographerData['photographerAveragePhotoQualityRating'],
+                        ) !!}
+                      </span>
+                    </p>
+                  </div>
+
                   <div class="reviews-block mt-8 flex flex-col gap-4">
                     @foreach ($singleService->recentReviews as $review)
                       <div class="review text-center font-sans">
@@ -488,6 +490,8 @@
                       </div>
                     @endforeach
                   </div>
+                @else
+                  <p>No reviews yet! Check back later!</p>
                 @endif
               </div>
 
@@ -592,38 +596,39 @@
               </div>
 
               <div id="reviews">
-                <p class="text-center">Want to know what we're like? Check out our reviews!</p>
-                <div class="ratings-block mt-4 flex flex-col items-center gap-4">
-                  <p class="grid grid-cols-2">Communication:
-                    <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $singleDesignerData['renderRatingIcons']($singleDesignerData['designerAverageCommunicationRating']) !!}
-                    </span>
-                  </p>
-                  <p class="grid grid-cols-2">Flexibility:
-                    <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $singleDesignerData['renderRatingIcons']($singleDesignerData['designerAverageFlexibilityRating']) !!}
-
-                    </span>
-                  </p>
-                  <p class="grid grid-cols-2">Professionalism:
-                    <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $singleDesignerData['renderRatingIcons']($singleDesignerData['designerAverageProfessionalismRating']) !!}
-
-                    </span>
-                  </p>
-                  <p class="grid grid-cols-2">Design Quality:
-                    <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $singleDesignerData['renderRatingIcons']($singleDesignerData['designerAverageDesignQualityRating']) !!}
-                    </span>
-                  </p>
-                  <p class="grid grid-cols-2">Price:
-                    <span class="rating-wrapper flex flex-row gap-3">
-                      {!! $singleDesignerData['renderRatingIcons']($singleDesignerData['designerAveragePriceRating']) !!}
-                    </span>
-                  </p>
-                </div>
-
                 @if ($singleService->recentReviews)
+
+                  <p class="text-center">Want to know what we're like? Check out our reviews!</p>
+                  <div class="ratings-block mt-4 flex flex-col items-center gap-4">
+                    <p class="grid grid-cols-2">Communication:
+                      <span class="rating-wrapper flex flex-row gap-3">
+                        {!! $singleDesignerData['renderRatingIcons']($singleDesignerData['designerAverageCommunicationRating']) !!}
+                      </span>
+                    </p>
+                    <p class="grid grid-cols-2">Flexibility:
+                      <span class="rating-wrapper flex flex-row gap-3">
+                        {!! $singleDesignerData['renderRatingIcons']($singleDesignerData['designerAverageFlexibilityRating']) !!}
+
+                      </span>
+                    </p>
+                    <p class="grid grid-cols-2">Professionalism:
+                      <span class="rating-wrapper flex flex-row gap-3">
+                        {!! $singleDesignerData['renderRatingIcons']($singleDesignerData['designerAverageProfessionalismRating']) !!}
+
+                      </span>
+                    </p>
+                    <p class="grid grid-cols-2">Design Quality:
+                      <span class="rating-wrapper flex flex-row gap-3">
+                        {!! $singleDesignerData['renderRatingIcons']($singleDesignerData['designerAverageDesignQualityRating']) !!}
+                      </span>
+                    </p>
+                    <p class="grid grid-cols-2">Price:
+                      <span class="rating-wrapper flex flex-row gap-3">
+                        {!! $singleDesignerData['renderRatingIcons']($singleDesignerData['designerAveragePriceRating']) !!}
+                      </span>
+                    </p>
+                  </div>
+
                   <div class="reviews-block mt-8 flex flex-col gap-4">
                     @foreach ($singleService->recentReviews as $review)
                       <div class="review text-center font-sans">
@@ -631,6 +636,8 @@
                       </div>
                     @endforeach
                   </div>
+                @else
+                  <p>No reviews yet! Check back later!</p>
                 @endif
               </div>
 
@@ -769,52 +776,52 @@
               </div>
 
               <div id="reviews">
-                <p class="text-center">Want to know what we're like? Check out our reviews!</p>
-                <div class="ratings-block mt-4 flex flex-col items-center gap-4">
-                  <p class="grid grid-cols-2">Communication:
-                    <span class="rating-wrapper flex flex-row gap-3">
-                      @if (isset($singleVideographerData['renderRatingIcons']) && is_callable($singleVideographerData['renderRatingIcons']))
-                        {!! $singleVideographerData['renderRatingIcons'](
-                            $singleVideographerData['videographyAverageCommunicationRating'],
-                        ) !!}
-                      @endif
-                    </span>
-                  </p>
-                  <p class="grid grid-cols-2">Flexibility:
-                    <span class="rating-wrapper flex flex-row gap-3">
-                      @if (isset($singleVideographerData['renderRatingIcons']) && is_callable($singleVideographerData['renderRatingIcons']))
-                        {!! $singleVideographerData['renderRatingIcons']($singleVideographerData['videographyAverageFlexibilityRating']) !!}
-                      @endif
-                    </span>
-                  </p>
-                  <p class="grid grid-cols-2">Professionalism:
-                    <span class="rating-wrapper flex flex-row gap-3">
-                      @if (isset($singleVideographerData['renderRatingIcons']) && is_callable($singleVideographerData['renderRatingIcons']))
-                        {!! $singleVideographerData['renderRatingIcons'](
-                            $singleVideographerData['videographyAverageProfessionalismRating'],
-                        ) !!}
-                      @endif
-                    </span>
-                  </p>
-                  <p class="grid grid-cols-2">Video Quality:
-                    <span class="rating-wrapper flex flex-row gap-3">
-                      @if (isset($singleVideographerData['renderRatingIcons']) && is_callable($singleVideographerData['renderRatingIcons']))
-                        {!! $singleVideographerData['renderRatingIcons'](
-                            $singleVideographerData['videographyAverageVideoQualityRating'],
-                        ) !!}
-                      @endif
-                    </span>
-                  </p>
-                  <p class="grid grid-cols-2">Price:
-                    <span class="rating-wrapper flex flex-row gap-3">
-                      @if (isset($singleVideographerData['renderRatingIcons']) && is_callable($singleVideographerData['renderRatingIcons']))
-                        {!! $singleVideographerData['renderRatingIcons']($singleVideographerData['videographyAveragePriceRating']) !!}
-                      @endif
-                    </span>
-                  </p>
-                </div>
-
                 @if ($singleService->recentReviews)
+                  <p class="text-center">Want to know what we're like? Check out our reviews!</p>
+                  <div class="ratings-block mt-4 flex flex-col items-center gap-4">
+                    <p class="grid grid-cols-2">Communication:
+                      <span class="rating-wrapper flex flex-row gap-3">
+                        @if (isset($singleVideographerData['renderRatingIcons']) && is_callable($singleVideographerData['renderRatingIcons']))
+                          {!! $singleVideographerData['renderRatingIcons'](
+                              $singleVideographerData['videographyAverageCommunicationRating'],
+                          ) !!}
+                        @endif
+                      </span>
+                    </p>
+                    <p class="grid grid-cols-2">Flexibility:
+                      <span class="rating-wrapper flex flex-row gap-3">
+                        @if (isset($singleVideographerData['renderRatingIcons']) && is_callable($singleVideographerData['renderRatingIcons']))
+                          {!! $singleVideographerData['renderRatingIcons']($singleVideographerData['videographyAverageFlexibilityRating']) !!}
+                        @endif
+                      </span>
+                    </p>
+                    <p class="grid grid-cols-2">Professionalism:
+                      <span class="rating-wrapper flex flex-row gap-3">
+                        @if (isset($singleVideographerData['renderRatingIcons']) && is_callable($singleVideographerData['renderRatingIcons']))
+                          {!! $singleVideographerData['renderRatingIcons'](
+                              $singleVideographerData['videographyAverageProfessionalismRating'],
+                          ) !!}
+                        @endif
+                      </span>
+                    </p>
+                    <p class="grid grid-cols-2">Video Quality:
+                      <span class="rating-wrapper flex flex-row gap-3">
+                        @if (isset($singleVideographerData['renderRatingIcons']) && is_callable($singleVideographerData['renderRatingIcons']))
+                          {!! $singleVideographerData['renderRatingIcons'](
+                              $singleVideographerData['videographyAverageVideoQualityRating'],
+                          ) !!}
+                        @endif
+                      </span>
+                    </p>
+                    <p class="grid grid-cols-2">Price:
+                      <span class="rating-wrapper flex flex-row gap-3">
+                        @if (isset($singleVideographerData['renderRatingIcons']) && is_callable($singleVideographerData['renderRatingIcons']))
+                          {!! $singleVideographerData['renderRatingIcons']($singleVideographerData['videographyAveragePriceRating']) !!}
+                        @endif
+                      </span>
+                    </p>
+                  </div>
+
                   <div class="reviews-block mt-8 flex flex-col gap-4">
                     @foreach ($singleService->recentReviews as $review)
                       <div class="review text-center font-sans">
@@ -822,6 +829,8 @@
                       </div>
                     @endforeach
                   </div>
+                @else
+                  <p>No reviews yet! Check back later!</p>
                 @endif
               </div>
 

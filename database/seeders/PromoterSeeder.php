@@ -14,18 +14,32 @@ class PromoterSeeder extends Seeder
     public function run(): void
     {
         $csvFile = fopen(base_path("database/data/promoters.csv"), "r");
+
+        if ($csvFile === false) {
+            throw new \Exception("Could not open the CSV file.");
+        }
+
         $firstLine = true;
         while (($data = fgetcsv($csvFile, 2000, ",")) !== FALSE) {
             if (!$firstLine) {
-                // Check if contact_link contains valid JSON
                 $contactLink = $data[13];
+                $bandType = $data[9];  // Get the band_type field
+
+                // Validate if the contact link is valid JSON
                 if ($this->isValidJson($contactLink)) {
-                    // Decode JSON and re-encode it as a JSON string
-                    $contactLink = json_encode(json_decode($contactLink, true));
+                    $contactLink = json_encode(json_decode($contactLink, true)); // Re-encode to ensure correct format
                 } else {
-                    $contactLink = null; // Set to null if invalid JSON
+                    $contactLink = null;
                 }
 
+                // Ensure band_type is a valid JSON array if it's not already
+                if (!empty($bandType) && $bandType !== '[]') {
+                    $bandType = json_encode([$bandType]); // Wrap in an array if needed
+                } else {
+                    $bandType = '[]'; // Set to an empty array if it's empty
+                }
+
+                // Create a new venue
                 Promoter::create([
                     "name" => $data[0],
                     "location" => $data[1],
@@ -36,7 +50,7 @@ class PromoterSeeder extends Seeder
                     "description" => $data[6],
                     "my_venues" => $data[7],
                     "genre" => $data[8],
-                    "band_type" => $data[9],
+                    "band_type" => $bandType,
                     "contact_name" => $data[10],
                     "contact_number" => $data[11],
                     "contact_email" => $data[12],

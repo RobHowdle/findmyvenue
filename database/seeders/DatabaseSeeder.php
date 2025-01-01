@@ -33,7 +33,7 @@ class DatabaseSeeder extends Seeder
             // VenueTestSeeder::class, // For Testing Data
             VenuesSeeder::class,
             // VenueExtraInfoSeeder::class, // For Testing Data
-            // PromoterTestSeeder::class,
+            // PromoterTestSeeder::class, // Foir Testing Data
             PromoterSeeder::class,
             // PromoterVenueTestPivotSeeder::class, // For Testing Data
             // PromoterReviewTestSeeder::class, // For Testing Data

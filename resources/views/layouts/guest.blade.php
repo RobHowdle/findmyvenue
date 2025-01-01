@@ -173,15 +173,15 @@
         <ul
           class="flex w-full flex-col justify-center gap-8 py-4 text-center font-heading sm:flex-row md:py-0 xl:w-60">
           <li>
-            <a href="#"
+            <a href="/about"
               class="text-white transition duration-150 ease-in-out hover:text-yns_yellow hover:underline">About</a>
           </li>
           <li>
-            <a href="#"
+            <a href="/credits"
               class="text-white transition duration-150 ease-in-out hover:text-yns_yellow hover:underline">Credits</a>
           </li>
           <li>
-            <a href="#"
+            <a href="/contact"
               class="text-white transition duration-150 ease-in-out hover:text-yns_yellow hover:underline">Contact</a>
           </li>
         </ul>

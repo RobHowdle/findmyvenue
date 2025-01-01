@@ -69,14 +69,6 @@
   <script nomodule defer src="https://cdn.what3words.com/javascript-components@4.8.0/dist/what3words/what3words.js">
   </script>
 
-  {{-- <script>
-    // Set the callback function for what3words
-    window.w3w = {
-      callback: "initW3w"
-    };
-    console.log('started w3w');
-  </script> --}}
-
   @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
