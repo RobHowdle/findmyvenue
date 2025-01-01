@@ -57,9 +57,9 @@ class VenueJourneyController extends Controller
         $serviceableType = 'App\Models\Venue';
 
         $user = auth()->user();
-        $promoter = Venue::find($serviceableId);
+        $venue = Venue::find($serviceableId);
 
-        if (!$promoter) {
+        if (!$venue) {
             return response()->json(['error' => 'Venue not found'], 404);
         }
 

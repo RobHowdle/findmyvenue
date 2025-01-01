@@ -703,4 +703,59 @@ class EventController extends Controller
             'message' => 'Event not found.'
         ], 404);
     }
+
+    public function getPublicEvents()
+    {
+        //
+    }
+
+    public function getSinglePublicEvent($eventId)
+    {
+        $event = Event::with(['bands', 'promoters', 'venues', 'services'])->findOrFail($eventId);
+
+        $bandRolesArray = json_decode($event->band_ids, true);
+
+        $headliner = null;
+        $mainSupport = null;
+        $otherBands = [];
+        $opener = null;
+
+        $bandRoles = $event->bands()->get();
+
+        foreach ($bandRolesArray as $bandRole) {
+            $band = $bandRoles->firstWhere('id', $bandRole['band_id']);
+            if ($band) {
+                switch ($bandRole['role']) {
+                    case 'Headliner':
+                        $headliner = $band;
+                        break;
+                    case 'Main Support':
+                        $mainSupport = $band;
+                        break;
+                    case 'Artist':
+                        $otherBands[] = $band;
+                        break;
+                    case 'Opener':
+                        $opener = $band;
+                        break;
+                }
+            }
+        }
+
+        $eventStartTime = $event->event_start_time ? Carbon::parse($event->event_start_time)->format('g:i A') : null;
+        $eventEndTime = $event->event_end_time ? Carbon::parse($event->event_end_time)->format('g:i A') : null;
+
+        $isPastEvent = Carbon::now()->isAfter($event->event_date);
+
+        return view('single-event', [
+            'event' => $event,
+            'isPastEvent' => $isPastEvent,
+            'headliner' => $headliner,
+            'mainSupport' => $mainSupport,
+            'otherBands' => $otherBands,
+            'opener' => $opener,
+            'eventStartTime' => $eventStartTime,
+            'eventEndTime' => $eventEndTime,
+        ]);
+    }
 }

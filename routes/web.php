@@ -23,11 +23,10 @@ use App\Http\Controllers\APIRequestsController;
 use App\Http\Controllers\BandJourneyController;
 use App\Http\Controllers\OtherServiceController;
 use App\Http\Controllers\VenueJourneyController;
-use App\Http\Controllers\BandDashboardController;
-use App\Http\Controllers\VenueDashboardController;
 use App\Http\Controllers\DesignerJourneyController;
 use App\Http\Controllers\PromoterDashboardController;
 use App\Http\Controllers\PhotographerJourneyController;
+use App\Http\Controllers\VideographerJourneyController;
 
 
 /*
@@ -66,6 +65,9 @@ Route::get('/other/{serviceName}/{serviceId}', [OtherServiceController::class, '
 Route::get('/gig-guide', [GigGuideController::class, 'showGigGuide'])->name('gig-guide');
 Route::get('/gigs/filter', [GigGuideController::class, 'filterGigs'])->name('gigs.filter');
 Route::view('/privacy-policy', 'privacy-policy');
+Route::view('/about', 'about');
+Route::view('/credits', 'credits');
+Route::view('/contact', 'contact');
 
 Route::get('/events', [EventController::class, 'getPublicEvents'])->name('public-events');
 Route::get('/events/{eventId}', [EventController::class, 'getSinglePublicEvent'])->name('public-event');
@@ -87,7 +89,6 @@ Route::middleware(['auth', 'web', 'verified'])->group(function () {
                 return app("App\\Http\\Controllers\\$controllerName")->index($dashboardType);
             }
 
-            // Handle the case where the controller does not exist
             abort(404);
         })->name('dashboard');
     });
@@ -95,6 +96,7 @@ Route::middleware(['auth', 'web', 'verified'])->group(function () {
     Route::post('/dashboard/notes/store-note', [DashboardController::class, 'storeNewNote'])->name('dashboard.store-new-note');
 
     // First Time User Routes
+    // Artist Journey
     Route::prefix('/{dashboardType}')->middleware(['auth'])->group(function () {
         Route::get('/band-journey', [BandJourneyController::class, 'index'])->name('band.journey');
         Route::get('/band-search', [BandJourneyController::class, 'search'])->name('band.search');
@@ -108,6 +110,7 @@ Route::middleware(['auth', 'web', 'verified'])->group(function () {
         Route::post('/store', [PromoterDashboardController::class, 'storeNewPromoter'])->name('admin.dashboard.promoter.store');
     });
 
+    // Venue Journey
     Route::prefix('/{dashboardType}')->middleware(['auth'])->group(function () {
         Route::get('/venue-journey', [VenueJourneyController::class, 'index'])->name('venue.journey');
         Route::get('/venue-search', [VenueJourneyController::class, 'searchVenue'])->name('venue.search');
@@ -116,6 +119,7 @@ Route::middleware(['auth', 'web', 'verified'])->group(function () {
         Route::post('/venue/create', [VenueJourneyController::class, 'createVenue'])->name('venue.store');
     });
 
+    // Photographer Journey
     Route::prefix('/{dashboardType}')->middleware(['auth'])->group(function () {
         Route::get('/photographer-journey', [PhotographerJourneyController::class, 'index'])->name('photographer.journey');
         Route::get('/photographer-search', [PhotographerJourneyController::class, 'searchPhotographer'])->name('photographer.search');
@@ -124,11 +128,19 @@ Route::middleware(['auth', 'web', 'verified'])->group(function () {
         Route::post('/photographer/create', [PhotographerJourneyController::class, 'createPhotographer'])->name('photographer.store');
     });
 
+    // Designer Journey
     Route::prefix('/{dashboardType}')->middleware(['auth'])->group(function () {
         Route::get('/designer-journey', [DesignerJourneyController::class, 'index'])->name('designer.journey');
         Route::get('/designer-search', [DesignerJourneyController::class, 'search'])->name('designer.search');
         Route::post('/designer-journey/join/{id}', [DesignerJourneyController::class, 'joinDesigner'])->name('designer.join');
         Route::post('/designer-journey/create', [DesignerJourneyController::class, 'createDesigner'])->name('designer.create');
+    });
+
+    Route::prefix('/{dashboardType}')->middleware(['auth'])->group(function () {
+        Route::get('/videographer-journey', [VideographerJourneyController::class, 'index'])->name('videographer.journey');
+        Route::get('/videographer-search', [VideographerJourneyController::class, 'search'])->name('videographer.search');
+        Route::post('/videographer-journey/join/{id}', [VideographerJourneyController::class, 'joinVideographer'])->name('videographer.join');
+        Route::post('/videographer-journey/create', [VideographerJourneyController::class, 'createVideographer'])->name('videographer.create');
     });
 
     // Finances

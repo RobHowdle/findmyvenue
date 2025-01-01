@@ -65,7 +65,7 @@ class GigGuideController extends Controller
             ->whereNull('events.deleted_at')
             ->join('event_venue', 'events.id', '=', 'event_venue.event_id')
             ->join('venues', 'event_venue.venue_id', '=', 'venues.id')
-            ->select('events.*', 'venues.latitude', 'venues.longitude', 'venues.name')
+            ->select('events.*', 'venues.latitude', 'venues.longitude', 'venues.name', 'venues.id as venue_id')
             ->get();
 
         $userLocation = "{$latitude},{$longitude}";
@@ -114,9 +114,6 @@ class GigGuideController extends Controller
         $filteredGigs = $gigs->filter(function ($gig) use ($distance) {
             $distanceValue = floatval($gig->distance);
             $filterResult = $gig->distance === null || $distanceValue <= floatval($distance);
-            // Debugging output
-            // dd($gig->distance, $distance, $filterResult);
-            // dd($filterResult);
             return $filterResult;
         });
 

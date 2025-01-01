@@ -55,7 +55,7 @@ class PhotographerJourneyController extends Controller
         $photographerId = $request->input('photographer_id');
         $user = Auth::user();
 
-        // Check if the band exists
+        // Check if the photographer exists
         $photographer = OtherService::find($photographerId);
 
         if (!$photographer) {
@@ -74,12 +74,14 @@ class PhotographerJourneyController extends Controller
         }
 
         // Add the user to the band
-        $user->otherService('artist')->attach($photographerId);
+        $user->otherService('photography')->attach($photographerId);
+        $user->load('roles');
+        $userRole = $user->roles->first();
 
         return response()->json([
             'success' => true,
             'message' => 'Successfully joined the photography company!',
-            'redirect' => route('dashboard', ['dashboardType' => $dashboardType])
+            'redirect_url' => route('dashboard', ['dashboardType' => $userRole->name]),
         ], 200);
     }
 

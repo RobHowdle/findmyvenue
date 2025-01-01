@@ -100,10 +100,10 @@
           _token: '{{ csrf_token() }}'
         },
         success: function(response) {
-          if (response.success) {
-            showSuccessNotification(response.message);
-            window.location.href = response.redirect;
-          }
+          showSuccessNotification(response.message);
+          setTimeout(function() {
+            window.location.href = response.redirect_url;
+          }, 3000);
         },
         error: function(xhr) {
           let errorMessage = xhr.responseJSON.message || 'Something went wrong!';

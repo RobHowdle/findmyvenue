@@ -21,15 +21,68 @@ class OtherServiceSeeder extends Seeder
         $firstLine = true;
         while (($data = fgetcsv($csvFile, 2000, ",")) !== FALSE) {
             if (!$firstLine) {
-                $contactLink = $data[18];
+                $packages = $data[8] ?? null;
+                $environmentType = $data[9] ?? null;
+                $workingTimes = $data[10] ?? null;
+                $members = $data[11] ?? null;
+                $streamUrls = $data[12] ?? null;
+                $bandType = $data[13] ?? null;
+                $genre = $data[14] ?? null;
+                $contactLink = $data[18] ?? null;
+                $portfolioImages = $data[20] ?? null;
 
                 // Validate if the contact link is valid JSON
                 if ($this->isValidJson($contactLink)) {
-                    // Decode JSON and re-encode it as a JSON string to ensure it's in correct format
-                    $contactLink = json_encode(json_decode($contactLink, true));
+                    $contactLink = json_encode(json_decode($contactLink, true)); // Re-encode to ensure correct format
                 } else {
-                    $contactLink = null; // Set to null if it's invalid JSON
+                    $contactLink = null;
                 }
+
+                if (!empty($packages) && $packages !== '[]') {
+                    $packages = json_encode([$packages]); // Wrap in an array if needed
+                } else {
+                    $packages = '[]'; // Set to an empty array if it's empty
+                }
+
+                if (!empty($environmentType) && $environmentType !== '[]') {
+                    $environmentType = json_encode([$environmentType]); // Wrap in an array if needed
+                } else {
+                    $environmentType = '[]'; // Set to an empty array if it's empty
+                }
+                if (!empty($workingTimes) && $workingTimes !== '[]') {
+                    $workingTimes = json_encode([$workingTimes]); // Wrap in an array if needed
+                } else {
+                    $workingTimes = '[]'; // Set to an empty array if it's empty
+                }
+                if (!empty($members) && $members !== '[]') {
+                    $members = json_encode([$members]); // Wrap in an array if needed
+                } else {
+                    $members = '[]'; // Set to an empty array if it's empty
+                }
+                if (!empty($streamUrls) && $streamUrls !== '[]') {
+                    $streamUrls = json_encode([$streamUrls]); // Wrap in an array if needed
+                } else {
+                    $streamUrls = '[]'; // Set to an empty array if it's empty
+                }
+                if (!empty($genre) && $genre !== '[]') {
+                    $genre = json_encode([$genre]); // Wrap in an array if needed
+                } else {
+                    $genre = '[]'; // Set to an empty array if it's empty
+                }
+
+                // Ensure band_type is a valid JSON array if it's not already
+                if (!empty($bandType) && $bandType !== '[]') {
+                    $bandType = json_encode([$bandType]); // Wrap in an array if needed
+                } else {
+                    $bandType = '[]'; // Set to an empty array if it's empty
+                }
+                if (!empty($portfolioImages) && $portfolioImages !== '[]') {
+                    $portfolioImages = json_encode([$portfolioImages]); // Wrap in an array if needed
+                } else {
+                    $portfolioImages = '[]'; // Set to an empty array if it's empty
+                }
+
+                // Create a new venue
                 OtherService::create([
                     "name" => $data[0],
                     "logo_url" => $data[1],
@@ -39,24 +92,24 @@ class OtherServiceSeeder extends Seeder
                     "latitude" => $data[5],
                     "other_service_id" => $data[6],
                     "description" => $data[7],
-                    "packages" => $data[8],
-                    "environment_type" => $data[9],
-                    "working_times" => $data[10],
-                    "members" => $data[11],
-                    "stream_urls" => $data[12],
-                    "band_type" => $data[13],
-                    "genre" => $data[14],
+                    "packages" => $packages,
+                    "environment_type" => $environmentType,
+                    "working_times" => $workingTimes,
+                    "members" => $members,
+                    "stream_urls" => $streamUrls,
+                    "band_type" => $bandType,
+                    "genre" => $genre,
                     "contact_name" => $data[15],
                     "contact_number" => $data[16],
                     "contact_email" => $data[17],
                     "contact_link" => $contactLink,
                     "portfolio_link" => $data[19],
-                    "services" => $data[20],
+                    "portfolio_images" => $portfolioImages,
+                    "services" => $data[21],
                 ]);
             }
             $firstLine = false;
         }
-
         fclose($csvFile);
     }
 

@@ -36,11 +36,12 @@ class DashboardController extends Controller
         $roleName = $roles->first();
         $venues = Venue::all();
         $photographers = OtherService::photographers()->get();
+        $videographers = OtherService::videographers()->get();
         $designers = OtherService::designers()->get();
 
         // Get existing services
         $promoter = $user->promoters()->first();
-        $band = $user->otherService("Artist")->first();
+        $artist = $user->otherService("Artist")->first();
         $photographer = $user->otherService("Photographer")->first();
         $venue = $user->venues()->first();
         $designer = $user->otherService("Designer")->first();
@@ -67,7 +68,7 @@ class DashboardController extends Controller
                 return redirect("/dashboard/{$dashboardType}")->with(['dashboardType', $dashboardType, 'modules', $modules]);
                 break;
             case 'artist':
-                if (!$band) {
+                if (!$artist) {
                     return
                         redirect("/{$dashboardType}/band-journey")->with(['venues', $venues, 'genres', $genres, 'dashboardType', $dashboardType, 'modules', $modules]);
                 }
@@ -87,6 +88,9 @@ class DashboardController extends Controller
                 return redirect("/dashboard/{$dashboardType}")->with(['dashboardType', $dashboardType, 'modules', $modules]);
                 break;
             case 'videographer':
+                if (!$videographer) {
+                    return redirect("/{$dashboardType}/videographer-journey")->with(['videographers', $videographers, 'genres', $genres, 'dashboardType', $dashboardType, 'modules', $modules]);
+                }
                 return redirect("/dashboard/{$dashboardType}")->with(['dashboardType', $dashboardType, 'modules', $modules]);
                 break;
             case 'designer':

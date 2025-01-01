@@ -89,9 +89,9 @@
 
             <div id="bands-and-genres">
               @php
-                $bandTypes = json_decode($promoter->band_type);
+                $bandTypes = json_decode($promoter->band_type ?? '[]');
               @endphp
-              @if (!$bandTypes)
+              @if ($bandTypes == [])
                 <p class="mb-2">We don't have any specific band types that we prefer to work with, please <a
                     class="underline hover:text-yns_yellow" href="mailto:{{ $promoter->contact_email }}">contact us.</a>
                   if you would like to enquire about promoting your band.</p>
@@ -121,10 +121,10 @@
               @endif
               </p>
               @php
-                $genres = json_decode($promoter->genre);
+                $genres = json_decode($promoter->genre ?? '[]');
               @endphp
               <p class="mb-2">
-                @if ($genres)
+                @if ($promoter->genre != '[]')
                   We like to work mostly with artists in the
                   @foreach ($genres as $index => $genre)
                     {{ $genre }}@if ($index < count($genres) - 1)
@@ -139,31 +139,31 @@
             </div>
 
             <div id="reviews">
-              <p class="text-center">Want to know what we're like? Check out our reviews!</p>
-              <div class="ratings-block mt-4 flex flex-col items-center gap-4">
-                <p class="grid grid-cols-2">Communication:
-                  <span class="rating-wrapper flex flex-row gap-3">
-                    {!! $renderRatingIcons($averageCommunicationRating) !!}
-                  </span>
-                </p>
-                <p class="grid grid-cols-2">Rate Of Pay:
-                  <span class="rating-wrapper flex flex-row gap-3">
-                    {!! $renderRatingIcons($averageRopRating) !!}
-                  </span>
-                </p>
-                <p class="grid grid-cols-2">Promotion:
-                  <span class="rating-wrapper flex flex-row gap-3">
-                    {!! $renderRatingIcons($averagePromotionRating) !!}
-                  </span>
-                </p>
-                <p class="grid grid-cols-2">Gig Quality:
-                  <span class="rating-wrapper flex flex-row gap-3">
-                    {!! $renderRatingIcons($averageQualityRating) !!}
-                  </span>
-                </p>
-              </div>
-
               @if ($promoter->recentReviews)
+                <p class="text-center">Want to know what we're like? Check out our reviews!</p>
+                <div class="ratings-block mt-4 flex flex-col items-center gap-4">
+                  <p class="grid grid-cols-2">Communication:
+                    <span class="rating-wrapper flex flex-row gap-3">
+                      {!! $renderRatingIcons($averageCommunicationRating) !!}
+                    </span>
+                  </p>
+                  <p class="grid grid-cols-2">Rate Of Pay:
+                    <span class="rating-wrapper flex flex-row gap-3">
+                      {!! $renderRatingIcons($averageRopRating) !!}
+                    </span>
+                  </p>
+                  <p class="grid grid-cols-2">Promotion:
+                    <span class="rating-wrapper flex flex-row gap-3">
+                      {!! $renderRatingIcons($averagePromotionRating) !!}
+                    </span>
+                  </p>
+                  <p class="grid grid-cols-2">Gig Quality:
+                    <span class="rating-wrapper flex flex-row gap-3">
+                      {!! $renderRatingIcons($averageQualityRating) !!}
+                    </span>
+                  </p>
+                </div>
+
                 <div class="reviews-block mt-8 flex flex-col gap-4">
                   @foreach ($promoter->recentReviews as $review)
                     <div class="review text-center font-sans">
@@ -171,6 +171,9 @@
                     </div>
                   @endforeach
                 </div>
+              @else
+                <p class="mt-4 text-center">No reviews avaliable for {{ $promoter->name }} yet. Be the first to leave a
+                  review!</p>
               @endif
             </div>
           </div>
