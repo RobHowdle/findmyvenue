@@ -5,7 +5,7 @@
 
   <x-promoters-table :promoters="$promoters" :genres="$genres" :promoterVenueCount="$promoterVenueCount">
     @forelse ($promoters as $promoter)
-      <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+      <tr class="border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
         <th scope="row"
           class="whitespace-nowrap px-2 py-2 font-sans text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
           <a href="{{ route('promoter', $promoter->id) }}"
@@ -33,7 +33,7 @@
         @endif
       </tr>
     @empty
-      <tr class="border-b odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+      <tr class="border-b border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
         <td colspan="4" class="text-center text-2xl text-white dark:bg-gray-900">No promoters found</td>
       </tr>
     @endforelse
@@ -237,7 +237,7 @@
         var promoterVenueCount = {{ $promoterVenueCount }};
         const className = promoterVenueCount > 0 ? 'md:block' : 'hidden';
         return `
-            <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+            <tr class=" border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
                 <th scope="row" class="whitespace-nowrap font-sans text-white px-2 py-2 md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
                     <a href="${promoterRoute.replace(':promoterId', promoter.id)}" class="promoter-link hover:text-yns_yellow">${promoter.name}</a>
                 </th>
@@ -336,7 +336,7 @@
       } else {
         // Display message if no promoters found
         var noPromotersRow = `
-            <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+            <tr class=" border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
                 <td colspan="5" class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4 uppercase text-center">No promoters found</td>
             </tr>
         `;
