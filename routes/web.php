@@ -287,5 +287,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('google/unlink', [CalendarController::class, 'unlinkGoogle'])->name('google.unlink');
 });
 
-
 require __DIR__ . '/auth.php';

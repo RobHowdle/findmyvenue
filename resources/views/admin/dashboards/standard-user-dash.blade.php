@@ -12,13 +12,13 @@
         <div class="grid grid-cols-2 items-center">
           <a href="{{ route('admin.dashboard.show-events', ['dashboardType' => $dashboardType]) }}"
             class="flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-yns_yellow">
-            <span class="fas fa-calendar-alt mb-4 h-14 w-14"></span>
-            {{ $eventsCount }} Event{{ $eventsCount > 1 ? 's' : '' }}
+            <span class="fas fa-calendar-alt mb-4 h-14 w-14"></span>Event History Coming Soon!
+            {{-- {{ $eventsCount }} Event{{ $eventsCount > 1 ? 's' : '' }} --}}
           </a>
           <a href="#"
             class="flex flex-col items-center text-center transition duration-150 ease-in-out hover:text-yns_yellow">
             <span class="fa-solid fa-location-dot mb-4 h-14 w-14"></span>
-            5 Events In Your Area
+            Events in your area coming soon!
           </a>
         </div>
       </div>
