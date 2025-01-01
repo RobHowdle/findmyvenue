@@ -48,8 +48,6 @@
           '__dashboardType__', dashboardType),
         type: 'GET',
         success: function(response) {
-          console.log(response);
-
           const userList = jQuery('#user-list');
           userList.empty();
 
@@ -84,7 +82,6 @@
           }
         },
         error: function(xhr) {
-          console.error(xhr.responseJSON.message || 'Error fetching users.');
           showFailureNotification(xhr.responseJSON.message);
         }
       });
@@ -101,7 +98,6 @@
         '{{ route('admin.dashboard.delete-user', ['dashboardType' => '__dashboardType__', 'id' => '__userId__']) }}'
         .replace('__dashboardType__', dashboardType)
         .replace('__userId__', userId);
-      console.log(url);
 
       showConfirmationNotification({
         text: "You are removing this user from this promotions company"

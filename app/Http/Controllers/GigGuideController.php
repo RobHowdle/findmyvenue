@@ -83,15 +83,15 @@ class GigGuideController extends Controller
 
         $data = $response->json();
 
-        if (!isset($data['rows'][0]['elements'])) {
-            \Log::info('Error fetching distance data from Google Maps API');
-        }
+        // if (!isset($data['rows'][0]['elements'])) {
+        //     \Log::info('Error fetching distance data from Google Maps API');
+        // }
 
         if (isset($data['rows'][0]['elements'])) {
             $distances = $data['rows'][0]['elements'];
         } else {
             // Handle the case where the distance data is missing
-            \Log::error('No distance data found for the provided locations.', ['data' => $data]);
+            // \Log::error('No distance data found for the provided locations.', ['data' => $data]);
             // You can set a default value or handle the error in another way
             $distances = [];  // Or maybe an empty array or null, depending on your needs
         }

@@ -217,7 +217,6 @@
   }
 
   function showDeleteRoleModal(roleId, roleName) {
-    console.log('hit');
     const deleteModalTitle = document.getElementById('deleteModalTitle');
     const saveDeleteButton = document.getElementById('save-delete-role-btn');
 

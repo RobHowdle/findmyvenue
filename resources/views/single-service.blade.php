@@ -889,10 +889,8 @@
   window.onSpotifyIframeApiReady = (IFrameAPI) => {
     const element = document.getElementById('embed-iframe');
     if (!element) {
-      console.error('Embed iframe element not found.');
+      // console.error('Embed iframe element not found.');
       return;
-    } else {
-      console.log('found it');
     }
     const options = {
       uri: `{{ $spotifyUrl ?? 'https://open.spotify.com/track/4PTG3Z6ehGkBFwjybzWkR8?si=23c6845e25df4307' }}`

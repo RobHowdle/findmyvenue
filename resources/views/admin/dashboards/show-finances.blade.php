@@ -57,9 +57,6 @@
     var serviceableId = "{{ $service->id }}";
     var serviceableType = "{{ $serviceType }}";
 
-    console.log(serviceableId,
-      serviceableType);
-
     // Initialize the date picker
     flatpickr("#date-picker", {
       dateFormat: "Y-m-d",

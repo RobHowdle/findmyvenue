@@ -97,7 +97,7 @@
     });
 
     const selectedTags = @json(old('tags', $categories));
-    console.log('Selected tags:', selectedTags);
+    // console.log('Selected tags:', selectedTags);
 
     jQuery('#tags').val(selectedTags).trigger('change');
   });

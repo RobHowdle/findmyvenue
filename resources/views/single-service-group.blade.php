@@ -317,7 +317,7 @@
 
   // Update the updateTable function to pass the filtered venues to updateVenuesTable
   function updateTable(data) {
-    console.log("Data:", data); // Check the entire data object
+    // console.log("Data:", data); // Check the entire data object
 
     // If the data doesn't have otherServices, we'll log an error and exit
     if (!data || !data.otherServices) {
@@ -328,7 +328,7 @@
     var otherServices = data.otherServices;
     var pagination = data.pagination;
 
-    console.log("Other Services:", otherServices);
+    // console.log("Other Services:", otherServices);
 
     // Check if data is not null or empty array
     if (otherServices && otherServices.length > 0) {

@@ -605,7 +605,7 @@
   document.getElementById('eventForm').addEventListener('submit', function(event) {
     event.preventDefault();
 
-    console.log(document.getElementById('poster_url'));
+    // console.log(document.getElementById('poster_url'));
 
     const dashboardType = "{{ $dashboardType }}";
     const otd_ticket_price = document.getElementById('on_the_door_ticket_price').value;
@@ -620,16 +620,6 @@
     const fileInput = document.getElementById('poster_url');
     const file = fileInput.files[0]; // Get the uploaded file if one exists
 
-    // Only append if there is a new file uploaded
-    if (file) {
-      console.log('Selected file name:', file.name);
-      console.log('Selected file type:', file.type);
-      // No need to manually append poster_url, as it's already in formData
-    } else {
-      // If no new file, the existing URL will be sent automatically if the field is empty
-      console.log('No new file uploaded, sending existing URL if present.');
-    }
-
     if (fileInput.files.length === 0) {
       formData.delete('poster_url');
 
@@ -637,7 +627,7 @@
       formData.append('poster_url', existingPosterUrl); // Include existing poster URL
     }
 
-    console.log('Form Data:', [...formData]);
+    // console.log('Form Data:', [...formData]);
 
     $.ajax({
       url: "{{ route('admin.dashboard.update-event', ['dashboardType' => ':dashboardType', 'id' => ':id']) }}"
@@ -651,15 +641,15 @@
         'X-CSRF-TOKEN': '{{ csrf_token() }}' // Include the CSRF token
       },
       success: function(data) {
-        console.log('Data processed:', data); // Log the data
+        // console.log('Data processed:', data); // Log the data
         if (data.success) {
           showSuccessNotification(data.message); // Show success notification
           setTimeout(() => {
-            console.log('Redirecting to:', data.redirect_url); // Log redirect URL
+            // console.log('Redirecting to:', data.redirect_url); // Log redirect URL
             window.location.href = data.redirect_url; // Redirect after 2 seconds
           }, 2000);
         } else {
-          console.log('Errors:', data.errors); // Log any errors
+          // console.log('Errors:', data.errors); // Log any errors
           if (data.errors) {
             Object.keys(data.errors).forEach(key => {
               const error = data.errors[key];
@@ -672,7 +662,7 @@
         }
       },
       error: function(jqXHR, textStatus, errorThrown) {
-        console.error('AJAX error:', textStatus, errorThrown); // Log any AJAX errors
+        // console.error('AJAX error:', textStatus, errorThrown); // Log any AJAX errors
         showFailureNotification('An error occurred: ' + errorThrown); // Show error notification
       }
     });

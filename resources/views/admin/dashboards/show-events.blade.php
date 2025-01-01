@@ -121,7 +121,6 @@
     e.preventDefault(); // Prevent the default button action if it's a button
 
     upcomingPage++; // Increment the page number for the next load
-    console.log('Loading page:', upcomingPage);
 
     $.ajaxSetup({
       headers: {
@@ -182,7 +181,6 @@
   // Delete Event
   jQuery(document).on('click', '.delete-event', function() {
     const eventId = jQuery(this).data('id'); // Get event ID from data attribute
-    console.log(eventId);
     // Show confirmation notification
     showConfirmationNotification({
       text: 'Are you sure you want to delete this event?'
@@ -196,9 +194,8 @@
           },
           success: function(response) {
             showSuccessNotification(response.message); // Assuming response has a message property
-            console.log(eventId);
             jQuery(`.event-card[data-id="${eventId}"]`)
-          .remove(); // This line should work if the ID matches
+              .remove(); // This line should work if the ID matches
           },
           error: function(xhr) {
             showFailureNotification(xhr.responseJSON.message ||

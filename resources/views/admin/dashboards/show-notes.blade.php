@@ -105,7 +105,6 @@
 
     // Function to load notes dynamically
     function loadNotes(page) {
-      console.log('Loading notes for page:', page);
       $.ajax({
         url: '{{ route('admin.dashboard.note-items', ['dashboardType' => '__dashboardType__']) }}'.replace(
           '__dashboardType__', dashboardType),
@@ -124,9 +123,6 @@
             jQuery('#load-more-btn').hide();
           }
         },
-        error: function(xhr) {
-          console.log('Error: ', xhr.responseText);
-        }
       });
     }
 
@@ -161,9 +157,6 @@
           loadNotes(currentPage);
           showSuccessNotification(response.message);
         },
-        error: function(xhr) {
-          console.log('Error: ', xhr.responseText);
-        }
       });
     });
 
@@ -259,9 +252,6 @@
             jQuery('#load-more-btn').hide();
           }
         },
-        error: function(xhr) {
-          console.log('Error: ', xhr.responseText);
-        }
       });
     }
   });

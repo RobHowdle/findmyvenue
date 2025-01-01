@@ -28,5 +28,6 @@ if (!function_exists('formatCurrency')) {
         return '£' . number_format((float)$amount, 2, '.', ',');
     }
 } else {
-    Log::error('formatCurrency function is not defined');
+    // Log a notice instead of an error
+    Log::notice('The formatCurrency function was already defined.');
 }

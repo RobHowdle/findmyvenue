@@ -143,7 +143,7 @@
 
 <script>
   function initialize() {
-    console.log("Google Maps API initialized");
+    // console.log("Google Maps API initialized");
 
     const locationInputs = document.getElementsByClassName("map-input");
     const autocompletes = [];

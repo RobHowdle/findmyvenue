@@ -67,7 +67,6 @@
             query: query,
           },
           success: function(data) {
-            console.log(data);
             jQuery('#userTable tbody').empty();
             if (Array.isArray(data.result) && data.result.length > 0) {
               data.result.forEach(function(user) {
