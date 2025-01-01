@@ -6,7 +6,7 @@
 
   <x-other-service-table :singleServices="$singleServices" :genres="$genres" :serviceName="$serviceName">
     @forelse ($singleServices as $service)
-      <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+      <tr class="border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
         <th scope="row" class="px-2 py-2 font-sans text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
           <a href="{{ route('singleService', ['serviceName' => $service->services, 'serviceId' => $service->id]) }}"
             class="hover:text-yns_yellow">{{ $service->name }}</a>
@@ -26,7 +26,7 @@
         </td>
       </tr>
     @empty
-      <tr class="border-b odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+      <tr class="border-b border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
         <td colspan="4" class="text-center text-2xl text-white dark:bg-gray-900">No service found</td>
       </tr>
     @endforelse
@@ -231,7 +231,7 @@
       var ratingHtml = getRatingHtml(otherService.average_rating);
 
       return `
-        <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+        <tr class=" border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
             <th scope="row" class="font-sans text-white px-2 py-2 md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
                 <a href="${finalRoute}" class="venue-link hover:text-yns_yellow">${otherService.name}</a>
             </th>
@@ -335,7 +335,7 @@
       updateResultsTable(otherServices);
     } else {
       var noOtherServicesRow = `
-            <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+            <tr class=" border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
                 <td colspan="5" class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4 uppercase text-center">No Services Found</td>
             </tr>
         `;

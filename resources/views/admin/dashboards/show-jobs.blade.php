@@ -38,7 +38,7 @@
           <tbody>
             @if ($jobs)
               @forelse ($jobs as $job)
-                <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+                <tr class="border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
                   <th scope="row"
                     class="whitespace-nowrap px-2 py-2 font-sans text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
                     {{ $job->name }}
@@ -79,8 +79,7 @@
                   </td>
                 </tr>
               @empty
-                <tr
-                  class="border-b odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+                <tr class="border-b border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
                   <td colspan="6" class="text-center text-2xl text-white dark:bg-gray-900">No jobs found</td>
                 </tr>
               @endforelse

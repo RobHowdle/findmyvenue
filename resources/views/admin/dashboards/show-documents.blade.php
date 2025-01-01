@@ -25,7 +25,7 @@
             <tbody>
               @forelse ($documents as $document)
                 <tr id="document-row-{{ $document->id }}"
-                  class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+                  class="border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
                   <th scope="row" class="whitespace-nowrap px-6 py-4 font-sans text-lg text-white">
                     <a class="transition-all duration-150 ease-in-out hover:text-yns_yellow"
                       href="{{ route('admin.dashboard.document.show', ['dashboardType' => $dashboardType, 'id' => $document->id]) }}">{{ $document->title }}</a>
@@ -65,8 +65,7 @@
                   </td>
                 </tr>
               @empty
-                <tr
-                  class="border-b odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+                <tr class="border-b border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
                   <td colspan="5" class="text-center text-2xl text-white dark:bg-gray-900">No documents found</td>
                 </tr>
               @endforelse
