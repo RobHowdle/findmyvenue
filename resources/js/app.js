@@ -8,23 +8,23 @@ Alpine.start();
 
 window.Swal = Swal;
 
-// // Format currency helper
-// window.formatCurrency = function (value) {
-//     return new Intl.NumberFormat("en-GB", {
-//         style: "currency",
-//         currency: "GBP",
-//     }).format(value);
-// };
+// Format currency helper
+window.formatCurrency = function (value) {
+    return new Intl.NumberFormat("en-GB", {
+        style: "currency",
+        currency: "GBP",
+    }).format(value);
+};
 
-// // Format Dates
-// window.formatDateToDMY = function (dateString) {
-//     const date = new Date(dateString);
-//     const day = String(date.getDate()).padStart(2, "0"); // Pad with zero if needed
-//     const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
-//     const year = date.getFullYear();
+// Format Dates
+window.formatDateToDMY = function (dateString) {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, "0"); // Pad with zero if needed
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+    const year = date.getFullYear();
 
-//     return `${day}-${month}-${year}`; // Return in DMY format
-// };
+    return `${day}-${month}-${year}`; // Return in DMY format
+};
 
 // Accordions
 $(document).ready(function () {
