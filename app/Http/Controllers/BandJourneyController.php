@@ -87,8 +87,7 @@ class BandJourneyController extends Controller
     public function createBand(Request $request)
     {
         $dashboardType = 'Artist';
-        $platform = determinePlatform($request->contact_link);
-        $contactLinksJson = json_encode([$platform => $request->contact_link]);
+        $platformsJson = determinePlatform($request->input('contact_link'));
         // Validate and create a new band
         $request->validate([
             'name' => 'required|string|max:255',
@@ -102,9 +101,6 @@ class BandJourneyController extends Controller
             'contact_email' => 'required',
             'contact_link' => 'required',
         ]);
-
-        // Log request data for debugging
-        \Log::info('Creating band with request data:', $request->all());
 
         // Create new band in the OtherService model
         try {
@@ -120,7 +116,7 @@ class BandJourneyController extends Controller
                 'contact_name' => $request->contact_name,
                 'contact_number' => $request->contact_number,
                 'contact_email' => $request->contact_email,
-                'contact_link' => $contactLinksJson,
+                'contact_link' => $platformsJson,
                 'services' => 'Artist'
             ]);
 
