@@ -8,7 +8,7 @@
   <x-input-label-dark>Bands you've worked with</x-input-label-dark>
   <table class="mt-4 w-full border border-white text-left font-sans text-xl rtl:text-right">
     <thead class="border-b border-b-white text-xl text-white underline dark:bg-black">
-      <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+      <tr class="border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
         <th class="max-w-md whitespace-normal break-words px-6 py-4 font-sans text-white">Band Name</th>
         <th class="max-w-md whitespace-normal break-words px-6 py-4 font-sans text-white">Location</th>
         <th class="max-w-md whitespace-normal break-words px-6 py-4 font-sans text-white">Genre</th>
@@ -17,7 +17,7 @@
     </thead>
     <tbody>
       @foreach ($uniqueBands as $band)
-        <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+        <tr class="border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
           <td class="max-w-md whitespace-normal break-words px-6 py-4 font-sans text-white">{{ $band->name }}</td>
           <td class="max-w-md whitespace-normal break-words px-6 py-4 font-sans text-white">
             {{ $band->location ?? 'No Location' }}

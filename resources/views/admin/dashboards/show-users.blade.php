@@ -58,7 +58,7 @@
               if (Array.isArray(service.linked_users) && service.linked_users.length > 0) {
                 service.linked_users.forEach(user => {
                   userList.append(`
-                <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+                <tr class=" border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
                   <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">${user.first_name} ${user.last_name}</td>
                   <td class="whitespace-nowrap font-sans text-white sm:py-3 sm:text-base md:py-2 lg:py-4">${user.email}</td>
                   <td class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4">${user.pivot ? user.pivot.role : 'N/A'}</td>

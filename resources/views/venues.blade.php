@@ -5,10 +5,11 @@
 
   <x-venue-table :venues="$venues" :genres="$genres" :venuePromoterCount="$venuePromoterCount">
     @forelse ($venues as $venue)
-      <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+      <tr class="border-gray-700 odd:bg-black even:bg-gray-900">
         <th scope="row"
           class="whitespace-nowrap px-2 py-2 font-sans text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
-          <a href="{{ route('venue', $venue->id) }}" class="venue-link hover:text-yns_yellow">{{ $venue->name }}</a>
+          <a href="{{ route('venue', $venue->id) }}"
+            class="venue-link transition duration-150 ease-in-out hover:text-yns_yellow">{{ $venue->name }}</a>
         </th>
         <td
           class="rating-wrapper px:2 py:2 hidden whitespace-nowrap sm:text-base md:px-6 md:py-3 lg:flex lg:px-8 lg:py-4">
@@ -26,14 +27,17 @@
           <td
             class="{{ $venues ? 'md:block' : 'hidden' }} whitespace-nowrap px-2 py-2 font-sans text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
             @foreach ($venue->venues as $venue)
-              <a class="hover:text-yns_yellow" href="{{ url('venues', $venue->id) }}">{{ $venue['name'] }}</a>
+              <a class="transition duration-150 ease-in-out hover:text-yns_yellow"
+                href="{{ url('venues', $venue->id) }}">{{ $venue['name'] }}</a>
             @endforeach
           </td>
         @endif
       </tr>
     @empty
-      <tr class="border-b odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
-        <td colspan="4" class="text-center text-2xl text-white dark:bg-gray-900">No venues found</td>
+      <tr class="border-b border-white bg-gray-900">
+        <td colspan="4"
+          class="px-2 py-2 text-center text-2xl text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">No
+          venues found</td>
       </tr>
     @endforelse
   </x-venue-table>
@@ -235,35 +239,35 @@
         var venuePromoterCount = {{ $venuePromoterCount }};
         const className = venuePromoterCount > 0 ? 'md:block' : 'hidden';
         return `
-            <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
-                <th scope="row" class="whitespace-nowrap font-sans text-white px-2 py-2 md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
-                    <a href="${venueRoute.replace(':venueId', venue.id)}" class="venue-link hover:text-yns_yellow">${venue.name}</a>
+            <tr class="border-gray-700 odd:bg-black even:bg-gray-900">
+                <th scope="row" class="whitespace-nowrap px-2 py-2 font-sans text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
+                    <a href="${venueRoute.replace(':venueId', venue.id)}" class="venue-link transition duration-150 ease-in-out hover:text-yns_yellow">${venue.name}</a>
                 </th>
-                <td class="rating-wrapper hidden whitespace-nowrap px-2 py-2 sm:text-base md:px-6 md:py-3 lg:flex lg:px-8 lg:py-4">
+                <td class="rating-wrapper px:2 py:2 hidden whitespace-nowrap sm:text-base md:px-6 md:py-3 lg:flex lg:px-8 lg:py-4">
                     ${ratingHtml}
                 </td>
-                <td class="whitespace-nowrap font-sans text-white px-2 py-2 md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
+                <td class="whitespace-nowrap px-2 py-2 font-sans text-white md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
                     ${venue.postal_town}
                 </td>
                 <td class="hidden whitespace-nowrap px-2 py-2 align-middle text-white md:block md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">
-                    ${venue.contact_number ? '<a href="tel:' + venue.contact_number + '" class="hover:text-yns_yellow mr-2"><span class="fas fa-phone"></span></a>' : ''}
-                    ${venue.contact_email ? '<a href="mailto:' + venue.contact_email + '" class="hover:text-yns_yellow mr-2><span class="fas fa-envelope"></span></a>' : ''}
+                    ${venue.contact_number ? '<a href="tel:' + venue.contact_number + '" class="hover:text-yns_yellow mr-2 transition duration-150 ease-in-out"><span class="fas fa-phone"></span></a>' : ''}
+                    ${venue.contact_email ? '<a href="mailto:' + venue.contact_email + '" class="hover:text-yns_yellow mr-2 transition duration-150 ease-in-out"><span class="fas fa-envelope"></span></a>' : ''}
                     ${venue.platforms ? venue.platforms.map(function(platform) {
                         switch (platform.platform) {
                             case 'facebook':
-                                return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-facebook"></span></a>';
+                                return '<a class="hover:text-yns_yellow transition duration-150 ease-in-out mr-2" href="' + platform.url + '" target="_blank"><span class="fab fa-facebook"></span></a>';
                             case 'twitter':
-                                return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-twitter"></span></a>';
+                                return '<a class="hover:text-yns_yellow transition duration-150 ease-in-out mr-2" href="' + platform.url + '" target="_blank"><span class="fab fa-twitter"></span></a>';
                             case 'instagram':
-                                return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-instagram"></span></a>';
+                                return '<a class="hover:text-yns_yellow transition duration-150 ease-in-out mr-2" href="' + platform.url + '" target="_blank"><span class="fab fa-instagram"></span></a>';
                             case 'snapchat':
-                                return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-snapchat-ghost"></span></a>';
+                                return '<a class="hover:text-yns_yellow transition duration-150 ease-in-out mr-2" href="' + platform.url + '" target="_blank"><span class="fab fa-snapchat-ghost"></span></a>';
                             case 'tiktok':
-                                return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-tiktok"></span></a>';
+                                return '<a class="hover:text-yns_yellow transition duration-150 ease-in-out mr-2" href="' + platform.url + '" target="_blank"><span class="fab fa-tiktok"></span></a>';
                             case 'youtube':
-                                return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fab fa-youtube"></span></a>';
+                                return '<a class="hover:text-yns_yellow transition duration-150 ease-in-out mr-2" href="' + platform.url + '" target="_blank"><span class="fab fa-youtube"></span></a>';
                             case 'bluesky':
-                                return '<a class="hover:text-yns_yellow mr-2" href="' + platform.url + '" target=_blank><span class="fa-brands fa-bluesky"></span></a>';
+                                return '<a class="hover:text-yns_yellow transition duration-150 ease-in-out mr-2" href="' + platform.url + '" target="_blank"><span class="fa-brands fa-bluesky"></span></a>';
                             default:
                                 return '';
                         }
@@ -334,8 +338,8 @@
       } else {
         // Display message if no venues found
         var noPromotersRow = `
-            <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
-                <td colspan="5" class="whitespace-nowrap font-sans text-white sm:px-2 sm:py-3 sm:text-base md:px-6 md:py-2 md:text-lg lg:px-8 lg:py-4 uppercase text-center">No venues found</td>
+            <tr class="border-b border-white bg-gray-900">
+                <td colspan="4" class="text-center text-2xl text-white px-2 py-2 md:px-6 md:py-3 md:text-base lg:px-8 lg:py-4 lg:text-lg">No venues found</td>
             </tr>
         `;
         $('#venues tbody').html(noPromotersRow);

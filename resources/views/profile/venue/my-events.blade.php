@@ -7,7 +7,7 @@
   <x-input-label-dark>Your recent events</x-input-label-dark>
   <table class="mt-4 w-full border border-white text-left font-sans text-xl rtl:text-right">
     <thead class="border-b border-b-white text-xl text-white underline dark:bg-black">
-      <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+      <tr class="border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
         <th class="max-w-md whitespace-normal break-words px-6 py-4 font-sans text-white">Event Name</th>
         <th class="max-w-md whitespace-normal break-words px-6 py-4 font-sans text-white">Location</th>
         <th class="max-w-md whitespace-normal break-words px-6 py-4 font-sans text-white">Date</th>
@@ -16,7 +16,7 @@
     </thead>
     <tbody>
       @foreach ($myEvents as $event)
-        <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+        <tr class="border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
           <td class="max-w-md whitespace-normal break-words px-6 py-4 font-sans text-white">{{ $event->event_name }}
           </td>
           <td class="max-w-md whitespace-normal break-words px-6 py-4 font-sans text-white">

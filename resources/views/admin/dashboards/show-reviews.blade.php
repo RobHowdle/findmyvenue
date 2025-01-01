@@ -168,7 +168,7 @@
     if (reviews.length > 0) {
       reviews.forEach(review => {
         tbody.innerHTML += `
-                <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+                <tr class=" border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
                     <td class="max-w-md whitespace-normal break-words px-6 py-4 font-sans text-white">${review.review}</td>
                     <td class="whitespace-nowrap px-6 py-4">${review.author}</td>
                     <td class="max-w-md whitespace-normal flex flex-row gap-4 break-words px-6 py-4 font-sans text-white">
@@ -195,7 +195,7 @@
       });
     } else {
       tbody.innerHTML = `
-          <tr class="odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
+          <tr class=" border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
             <td colspan="3" class="whitespace-nowrap px-6 py-4 text-center">No Reviews</td>
           </tr>`;
     }
