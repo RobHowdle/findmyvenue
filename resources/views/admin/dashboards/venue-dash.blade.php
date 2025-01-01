@@ -18,7 +18,7 @@
           <a href="#"
             class="pointer-events-none flex cursor-not-allowed flex-col items-center text-center opacity-disabled transition duration-150 ease-in-out hover:text-yns_yellow">
             <span class="fas fa-guitar mb-4 h-14 w-14"></span>
-            6 Aviliable Bands
+            6 Available Bands
           </a>
           <a href="{{ route('admin.dashboard.get-reviews', ['filter' => 'pending', 'dashboardType' => $dashboardType]) }}"
             data-filter="pending"
