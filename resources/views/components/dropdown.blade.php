@@ -1,4 +1,4 @@
-@props(['align' => 'right', 'width' => '48', 'contentClasses' => 'py-1 bg-opac8Black'])
+@props(['align' => 'right', 'width' => '48', 'contentClasses' => 'py-1 bg-opac_8_black'])
 
 @php
   switch ($align) {
@@ -32,9 +32,9 @@
   <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95"
     x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-75"
     x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-    class="{{ $width }} {{ $alignmentClasses }} absolute z-50 mt-2 rounded-md bg-opac8Black text-white shadow-lg"
+    class="{{ $width }} {{ $alignmentClasses }} bg-opac_8_black absolute z-50 mt-2 rounded-md text-white shadow-lg"
     style="display: none;" @click="open = false">
-    <div class="{{ $contentClasses }} rounded-md bg-opac8Black ring-1 ring-black ring-opacity-5">
+    <div class="{{ $contentClasses }} bg-opac_8_black rounded-md ring-1 ring-black ring-opacity-5">
       {{ $content }}
     </div>
   </div>

@@ -3,32 +3,367 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
+use App\Models\Note;
 use App\Models\Todo;
+use App\Models\User;
+use App\Models\Event;
+use App\Models\Venue;
 use App\Models\Finance;
+use App\Models\Promoter;
+use Illuminate\Support\Str;
+use App\Models\OtherService;
 use Illuminate\Http\Request;
 use App\Models\PromoterReview;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 
 class PromoterDashboardController extends Controller
 {
-    public function index()
+    protected function getUserId()
     {
+        return Auth::id();
+    }
+
+    /**
+     * Return the Dashboard
+     */
+    public function index($dashboardType)
+    {
+        $modules = collect(session('modules', []));
+
+        $user = Auth::user()->load(['roles', 'promoters']);
         $pendingReviews = PromoterReview::with('promoter')->where('review_approved', '0')->whereNull('deleted_at')->count();
         $promoter = Auth::user()->load('promoters');
+        $todoItemsCount = $promoter->promoters()->with(['todos' => function ($query) {
+            $query->where('completed', 0)->whereNull('deleted_at');
+        }])->get()->pluck('todos')->flatten()->count();
+
+        $startOfWeek = Carbon::now()->startOfWeek();
+        $endOfWeek = Carbon::now()->endOfWeek();
+        $eventsCount = $promoter->promoters()
+            ->with(['events' => function ($query) use ($startOfWeek, $endOfWeek) {
+                $query->whereBetween('event_date', [$startOfWeek, $endOfWeek]);
+            }])
+            ->get()
+            ->pluck('events')
+            ->flatten()
+            ->count();
+
+        return view('admin.dashboards.promoter-dash', [
+            'userId' => $this->getUserId(),
+            'dashboardType' => $dashboardType,
+            'modules' => $modules,
+            'pendingReviews' => $pendingReviews,
+            'todoItemsCount' => $todoItemsCount,
+            'eventsCount' => $eventsCount,
+        ]);
+    }
+
+    /**
+     * New Promoter - Linking to existing company/ create new one
+     */
+    public function searchExistingPromoters(Request $request)
+    {
+        $query = $request->input('query');
+        $promoters = Promoter::where('name', 'LIKE', '%' . $query . '%')->get();
+
+        return response()->json([
+            'results' => $promoters,
+            'count' => $promoters->count()
+        ]);
+    }
+
+    public function linkToExistingPromoter(Request $request)
+    {
+        $serviceableId = $request->input('serviceable_id');
+        $serviceableType = 'App\Models\Promoter';
+
+        $user = auth()->user();
+        $promoter = Promoter::find($serviceableId);
 
         if (!$promoter) {
-            return redirect()->back()->withErrors('No promoter company linked to this user.');
+            return response()->json(['error' => 'Promoter not found'], 404);
         }
 
-        return view('admin.dashboards.promoter-dash', compact([
-            'pendingReviews',
-            'promoter'
+        $existingUsersCount = DB::table('service_user')
+            ->where('serviceable_id', $serviceableId)
+            ->where('serviceable_type', $serviceableType)
+            ->count();
+
+        DB::table('service_user')->insert([
+            'user_id' => $user->id,
+            'serviceable_id' => $serviceableId,
+            'serviceable_type' => $serviceableType,
+            'role' => ($existingUsersCount == 0) ? 'Owner' : 'Standard',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $user->load('roles');
+        $userRole = $user->roles->first();
+
+
+        if (!$userRole) {
+            return response()->json(['error' => 'User role not found'], 404);
+        }
+
+
+        return response()->json([
+            'redirect_url' => route('dashboard', ['dashboardType' => $userRole->name]),
+            'message' => 'Successfully linked! Hold tight whilst we redirect you'
+        ]);
+    }
+
+    public function showSinglePromoterEvent($id)
+    {
+        $promoter = Auth::user()->promoters()->first();
+        $event = Event::with(['bands', 'promoters', 'venues'])->findOrFail($id);
+
+        $bandRolesArray = json_decode($event->band_ids, true);
+
+        $headliner = null;
+        $mainSupport = null;
+        $otherBands = [];
+        $opener = null;
+
+        $bandRoles = $event->bands()->get();
+
+        foreach ($bandRolesArray as $bandRole) {
+            $band = $bandRoles->firstWhere('id', $bandRole['band_id']);
+            if ($band) {
+                switch ($bandRole['role']) {
+                    case 'Headliner':
+                        $headliner = $band;
+                        break;
+                    case 'Main Support':
+                        $mainSupport = $band;
+                        break;
+                    case 'Artist':
+                        $otherBands[] = $band;
+                        break;
+                    case 'Opener':
+                        $opener = $band;
+                        break;
+                }
+            }
+        }
+
+        $eventStartTime = $event->event_start_time ? Carbon::parse($event->event_start_time)->format('g:i A') : null;
+        $eventEndTime = $event->event_end_time ? Carbon::parse($event->event_end_time)->format('g:i A') : null;
+
+        return view('admin.dashboards.promoter.promoter-show-single-event', compact(
+            'promoter',
+            'event',
+            'headliner',
+            'mainSupport',
+            'otherBands',
+            'opener',
+            'eventStartTime',
+            'eventEndTime'
+        ));
+    }
+
+    public function editSinglePromoterEvent($id)
+    {
+        $promoter = Auth::user()->promoters()->first();
+
+        $event = Event::with(['promoters', 'venues', 'services'])->findOrFail($id);
+        $eventDate = Carbon::parse($event->event_date)->toDateString();
+        $eventTime = $event->event_start_time;
+        $combinedDateTime = Carbon::parse($eventDate . ' ' . $eventTime)->format('Y-m-d\TH:i');
+        $formattedEndTime = \Carbon\Carbon::parse($event->event_end_time)->format('H:i');
+        $formattedEventDate = \Carbon\Carbon::parse($event->event_date)->format('Y-m-d\TH:i');
+
+        $bandRoles = json_decode($event->band_ids, true);
+
+        $headlinerId = null;
+        $mainSupportId = null;
+        $openerId = null;
+        $bands = [];
+
+        // Iterate through the decoded roles and IDs
+        foreach ($bandRoles as $band) {
+            switch ($band['role']) {
+                case 'Headliner':
+                    $headlinerId = $band['band_id'];
+                    break;
+                case 'Main Support':
+                    $mainSupportId = $band['band_id'];
+                    break;
+                case 'Opener':
+                    $openerId = $band['band_id'];
+                    break;
+                case 'Artist':
+                    $bands[] = $band['band_id'];
+                    break;
+            }
+        }
+
+        $headliner = $headlinerId ? OtherService::find($headlinerId) : null;
+        $mainSupport = $mainSupportId ? OtherService::find($mainSupportId) : null;
+        $opener = $openerId ? OtherService::find($openerId) : null;
+
+        $bandObjects = [];
+        foreach ($bands as $bandId) {
+            $band = OtherService::find($bandId);
+            if ($band) {
+                $bandObjects[] = $band;
+            }
+        }
+
+        return view('admin.dashboards.promoter.promoter-edit-event', [
+            'event' => $event,
+            'combinedDateTime' => $combinedDateTime,
+            'promoter' => $promoter,
+            'formattedEndTime' => $formattedEndTime,
+            'formattedEventDate' => $formattedEventDate,
+            'headliner' => $headliner,
+            'mainSupport' => $mainSupport,
+            'bandObjects' => $bandObjects,
+            'opener' => $opener
+        ]);
+    }
+
+    public function updateSinglePromoterEvent(Request $request, $id)
+    {
+        $promoter = Auth::user()->promoters()->first();
+
+        $request->validate([
+            'event_name' => 'required|string',
+            'event_date' => 'required|date_format:d-m-Y',
+            'event_start_time' => 'required|date_format:H:i',
+            'event_end_time' => 'nullable|date_format:H:i',
+            'event_description' => 'nullable',
+            'facebook_event_url' => 'nullable|url',
+            'ticket_url' => 'nullable|url',
+            'otd_ticket_price' => 'required|numeric',
+            'venue_id' => 'required|integer|exists:venues,id',
+            'headliner' => 'required|string',
+            'headliner_id' => 'required|integer',
+            'mainSupport' => 'required|string',
+            'main_support_id' => 'required|integer',
+            'artist' => 'nullable|array',
+            'band.*' => 'nullable|string',
+            'band_id' => 'required|array',
+            'band_id.*' => 'required|integer',
+            'opener' => 'nullable|string',
+            'opener_id' => 'required|integer',
+            'poster_url' => 'required|image|mimes:jpeg,jpg,png,webp,svg|max:5120'
+        ]);
+
+        // Find the event to update
+        $event = Event::findOrFail($id);
+
+        // Only fill the fields that are present in the request
+        $event->fill($request->only([
+            'event_name',
+            'event_start_time',
+            'event_end_time',
+            'event_description',
+            'facebook_event_url',
+            'ticket_url',
+            'otd_ticket_price',
+            'venue_id',
+            'headliner',
+            'headliner_id',
+            'mainSupport',
+            'main_support_id',
+            'artist',
+            'band.*',
+            'band_id',
+            'band_id.*',
+            'opener',
+            'opener_id',
+            'poster_url'
         ]));
+
+        // Poster Upload
+        $posterUrl = null;
+
+        if ($request->hasFile('poster_url')) {
+            // Get the uploaded image file
+            $eventPosterFile = $request->file('poster_url');
+
+            // Generate a unique filename based on the event name and extension
+            $eventName = $request->input('event_name');
+            $posterExtension = $eventPosterFile->getClientOriginalExtension() ?: $eventPosterFile->guessExtension();
+            $posterFilename = Str::slug($eventName) . '_poster.' . $posterExtension; // Adding '_poster' to the filename
+
+            // Specify the destination directory
+            $destinationPath = public_path('images/event_posters/' . $promoter->id); // Create a folder for the promoter
+
+            // Check if the directory exists; if not, create it
+            if (!File::exists($destinationPath)) {
+                File::makeDirectory($destinationPath, 0755, true); // Create directory with permissions
+            }
+
+            // Check if there is an existing poster to replace
+            if ($event->poster_url) {
+                // Generate old filename with date suffix
+                $oldPosterFilename = pathinfo($event->poster_url, PATHINFO_FILENAME);
+                $oldPosterExtension = pathinfo($event->poster_url, PATHINFO_EXTENSION);
+                $dateSuffix = Carbon::now()->format('Y-m-d_H-i-s'); // Format: YYYY-MM-DD_HH-MM-SS
+                $archivedPosterFilename = "{$oldPosterFilename}_old_{$dateSuffix}.{$oldPosterExtension}";
+
+                // Move the old poster to the same directory with the new name
+                File::move(public_path($event->poster_url), public_path('images/event_posters/' . $promoter->id . '/' . $archivedPosterFilename));
+            }
+
+            // Move the uploaded image to the specified directory
+            $eventPosterFile->move($destinationPath, $posterFilename);
+
+            // Construct the URL to the stored image
+            $posterUrl = 'images/event_posters/' . $promoter->id . '/' . $posterFilename;
+        }
+
+        // Save the event only if there are changes
+        if ($event->isDirty()) { // Checks if any attributes have been changed
+            $event->save();
+        }
+
+        // Redirect back with a success message
+        return redirect()->route('admin.dashboard.promoter.single-event.edit', $event->id)
+            ->with('success', 'Event updated successfully!');
+    }
+
+    public function deleteSinglePromoterEvent($id)
+    {
+        $promoter = Auth::user()->promoters()->first();
+        $event = Event::findOrFail($id);
+
+        if ($event) {
+            $event->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Event deleted successfully'
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Event not found.'
+        ], 404);
+    }
+
+    public function eventSelectVenue(Request $request)
+    {
+        $query = $request->input('query');
+
+        if (!is_string($query) || strlen($query) < 3) {
+            return response()->json([], 400); // Optionally return an empty array if query is too short
+        }
+
+        // Use the query builder to search directly in the database
+        $venues = Venue::where('name', 'like', '%' . $query . '%')->get();
+
+        return response()->json($venues);
     }
 
     /**
@@ -36,10 +371,115 @@ class PromoterDashboardController extends Controller
      */
     public function promoterUsers()
     {
-        $promoter = Auth::user()->load('promoters');
-        $users = $promoter->users;
+        $promoter = Auth::user()->promoters()->first();
 
-        return view('admin.dashboards.promoter.promoter-users', compact('promoter', 'users'));
+        return view('admin.dashboards.promoter.promoter-users', compact('promoter'));
+    }
+
+    public function getPromoterusers()
+    {
+        $promoter = Auth::user()->promoters()->first();
+
+        if ($promoter) {
+            $users = $promoter->users;
+
+            return response()->json($users);
+        } else {
+            return response()->json(['message' => 'No promoters associated with that user'], 404);
+        }
+    }
+
+    public function newUser()
+    {
+        $promoter = Auth::user()->promoters()->first();
+
+        return view('admin.dashboards.promoter.promoter-new-user', compact('promoter'));
+    }
+
+    public function searchUsers(Request $request)
+    {
+        $query = $request->input('query');
+
+        // Adjust this query to fit your database schema
+        $users = User::where('first_name', 'LIKE', "%{$query}%")
+            // ->orWhere('email', 'LIKE', "%{$query}%")
+            ->get();
+
+        $promoterId = Auth::user()->promoters()->first()->id;
+
+        $userLinks = DB::table('service_user')
+            ->where('serviceable_id', $promoterId)
+            ->where('serviceable_type', 'App\Models\Promoter')
+            ->pluck('user_id')
+            ->toArray();
+
+        // Add linked status to each user
+        $result = $users->map(function ($user) use ($userLinks) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'linked' => in_array($user->id, $userLinks),
+            ];
+        });
+
+        return response()->json($result);
+    }
+
+    public function addUserToCompany(Request $request)
+    {
+        $userId = $request->input('user_id');
+        $role = $request->input('role');
+        $promoterId = $request->input('promoter_id');
+
+        $validatedData = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'role' => 'required|string',
+            'promoter_id' => 'required|exists:promoters,id',
+        ]);
+
+        // Assuming you have a method to link the user to the promoter
+        DB::table('service_user')->insert([
+            'user_id' => $userId,
+            'serviceable_id' => $promoterId,
+            'serviceable_type' => 'App\Models\Promoter',
+            'role' => $role,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Return a success response with an appropriate HTTP status code
+        return response()->json(['message' => 'User successfully added to the promotion company.'], 200);
+    }
+
+    public function deleteUserFromCompany(Request $request)
+    {
+        try {
+            // Validate the incoming request data
+            $validatedData = $request->validate([
+                'user_id' => 'required|exists:users,id',
+                'promoter_id' => 'required|exists:promoters,id',
+            ]);
+
+            if ((int) $validatedData['user_id'] === (int) Auth::user()->id) {
+                return response()->json(['message' => 'You can\'t delete yourself. Please contact an administrator.'], 403);
+            }
+
+            // Perform the update operation
+            DB::table('service_user')
+                ->where('user_id', $validatedData['user_id'])
+                ->where('serviceable_id', $validatedData['promoter_id'])
+                ->update(['deleted_at' => now()]);
+
+
+            return response()->json(['message' => 'User successfully removed from the promotion company.']);
+        } catch (ValidationException $e) {
+
+            return response()->json(['message' => 'Validation failed.', 'errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+
+            return response()->json(['message' => 'An error occurred while removing the user.', 'error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -504,7 +944,7 @@ class PromoterDashboardController extends Controller
         $promoter = Auth::user()->load('promoters');
 
         $finance = Finance::findOrFail($id)->load('user', 'serviceable');
-        return view('admin.dashboards.promoter.show-single-finance', compact('finance', 'promoter'));
+        return view('admin.dashboards.promoter.promoter-show-single-finance', compact('finance', 'promoter'));
     }
 
     public function editSingleFinance($id)
@@ -512,7 +952,7 @@ class PromoterDashboardController extends Controller
         $promoter = Auth::user()->load('promoters');
         $finance = Finance::findOrFail($id)->load('user', 'serviceable');
 
-        return view('admin.dashboards.promoter.edit-single-finance', compact('finance', 'promoter'));
+        return view('admin.dashboards.promoter..promoter-edit-single-finance', compact('finance', 'promoter'));
     }
 
     public function updateSingleFinance(Request $request, $id)
@@ -602,7 +1042,7 @@ class PromoterDashboardController extends Controller
             ->orderBy('created_at', 'DESC')
             ->paginate(6);
 
-        return view('admin.dashboards.promoter.todo-list', compact('promoter', 'todoItems'));
+        return view('admin.dashboards.promoter.promoter-todo-list', compact('promoter', 'todoItems'));
     }
 
     public function getPromoterTodos(Request $request)
@@ -624,6 +1064,7 @@ class PromoterDashboardController extends Controller
 
         $todoItems = Todo::whereIn('serviceable_id', $serviceableId)
             ->where('completed', false)
+            ->where('completed_at', null)
             ->orderBy('created_at', 'DESC')
             ->paginate(6);
 
@@ -699,5 +1140,391 @@ class PromoterDashboardController extends Controller
             'view' => view('components.todo-items', ['todoItems' => $completedTodos])->render(),
             'hasMore' => $completedTodos->hasMorePages(),
         ]);
+    }
+
+    public function uncompleteTodoItem($id)
+    {
+        // Find the todo item by ID
+        $todoItem = Todo::findOrFail($id);
+
+        // Mark the item as completed
+        $todoItem->completed = false;
+        $todoItem->completed_at = null;
+        $todoItem->save();
+
+        // Return a success response
+        return response()->json([
+            'message' => 'Todo item marked as uncompleted!',
+            'todoItem' => $todoItem,
+        ]);
+    }
+
+    /**
+     * Promoter Notes
+     */
+    public function showPromoterNotes(Request $request)
+    {
+        $promoter = Auth::user()->load(['promoters']);
+
+        // Get the promoter's company
+        $promoterCompany = $promoter->promoters;
+        $serviceableId = $promoterCompany->pluck('id');
+
+        $perPage = 6;
+        $page = $request->input('page', 1);
+
+        // Fetch the todo items
+        $notes = Note::whereIn('serviceable_id', $serviceableId)
+            ->where('completed', 0)
+            ->orderBy('created_at', 'DESC')
+            ->paginate(6);
+
+        return view('admin.dashboards.promoter.promoter-notes', compact('promoter', 'notes'));
+    }
+
+    public function getPromoterNotes(Request $request)
+    {
+        $promoter = Auth::user()->load(['promoters']);
+
+        $promoterCompany = $promoter->promoters;
+        $serviceableId = $promoterCompany->pluck('id');
+
+        if ($promoterCompany->isEmpty()) {
+            return response()->json([
+                'view' => view('components.note-items', ['notes' => collect()])->render(),
+                'hasMore' => false,
+            ]);
+        }
+
+        $perPage = 6;
+        $page = $request->input('page', 1);
+
+        $notes = Note::whereIn('serviceable_id', $serviceableId)
+            ->where('completed', false)
+            ->orderBy('created_at', 'DESC')
+            ->paginate(6);
+
+        return response()->json([
+            'view' => view('components.note-items', compact('notes'))->render(),
+            'hasMore' => $notes->hasMorePages(),
+        ]);
+    }
+
+    public function completeNoteItem($id)
+    {
+        // Find the todo item by ID
+        $note = Note::findOrFail($id);
+
+        // Mark the item as completed
+        $note->completed = true;
+        $note->completed_at = now();
+        $note->save();
+
+        // Return a success response
+        return response()->json([
+            'message' => 'Note marked as completed!',
+            'note' => $note,
+        ]);
+    }
+
+    public function deleteNoteItem($id)
+    {
+        // Find the todo item by ID
+        $note = Note::findOrFail($id);
+
+        // Delete the todo item
+        $note->delete();
+
+        // Return a success response
+        return response()->json([
+            'message' => 'Note deleted successfully!',
+        ]);
+    }
+
+    public function showCompletedNoteItems()
+    {
+        $promoter = Auth::user()->load(['promoters']);
+
+        $promoterCompany = $promoter->promoters;
+        $serviceableId = $promoterCompany->pluck('id');
+
+        $completedNotes = Note::whereIn('serviceable_id', $serviceableId)
+            ->where('completed', true)
+            ->orderBy('created_at', 'DESC')
+            ->paginate(6);
+
+        return response()->json([
+            'view' => view('components.note-items', ['notes' => $completedNotes])->render(),
+            'hasMore' => $completedNotes->hasMorePages(),
+        ]);
+    }
+
+    /**
+     * Creating New Promoter
+     */
+    public function storeNewPromoter(Request $request)
+    {
+        try {
+            // Validation
+            $validatedData = $request->validate([
+                'name' => 'required|string|max:255',
+                'address-input' => 'required',
+                'postal-town-input' => 'required',
+                'latitude' => 'required',
+                'longitude' => 'required',
+                'promoter_logo' => 'nullable|mimes:jpeg,jpg,png,webp,svg|max:2048',
+                'description' => 'required',
+                'my_venues' => 'nullable',
+                'genres' => 'required|array',
+                'band_type' => 'required|array',
+                'contact_name' => 'required_if:is_main_contact,false',
+                'contact_number' => 'numeric|digits:11',
+                'contact_email' => 'email|max:255',
+                'contact_link' => 'nullable',
+                'is_main_contact' => 'required|string'
+            ]);
+
+            $logoUrl = null; // Initialize logo URL
+
+            if ($request->hasFile('promoter_logo')) {
+                // Get the uploaded image file
+                $promoterLogoFile = $request->file('promoter_logo');
+
+                // Generate a unique filename based on the promoter's name and extension
+                $promoterName = $request->input('name');
+                $promoterLogoExtension = $promoterLogoFile->getClientOriginalExtension() ?: $promoterLogoFile->guessExtension();
+                $promoterLogoFilename = Str::slug($promoterName) . '.' . $promoterLogoExtension;
+
+                // Specify the destination directory within the public folder
+                $destinationPath = 'images/promoters_logos';
+
+                // Move the uploaded image to the specified directory
+                $promoterLogoFile->move(public_path($destinationPath), $promoterLogoFilename);
+
+                // Construct the URL to the stored image
+                $logoUrl = $destinationPath . '/' . $promoterLogoFilename;
+            }
+
+            // Create or update the promoter
+            if ($validatedData['is_main_contact'] == "true") {
+                $user = Auth::user();
+                $contactName = $user->name;
+            } else {
+                $contactName = $validatedData['contact_name'];
+            }
+
+            if (is_null($logoUrl)) {
+                $logoUrl = asset('storage/images/system/yns_logo.png');
+            }
+
+            $contactLinks = explode(',', $validatedData['contact_link']);
+            $contactLinks = array_map('trim', $contactLinks);
+            $platformLinks = [];
+
+            $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube', 'bluesky'];
+
+            foreach ($contactLinks as $link) {
+                $matchedPlatform = 'Unknown';
+
+                foreach ($platformsToCheck as $platform) {
+                    if (stripos($link, $platform) !== false) {
+                        $matchedPlatform = $platform;
+                        break;
+                    }
+                }
+
+                if ($matchedPlatform === 'Unknown') {
+                    $matchedPlatform = 'website';
+                }
+
+                $platformLinks[$matchedPlatform][] = trim($link);
+            }
+
+            // Save the promoter data to the database
+            $promoter = Promoter::create([
+                'name' => $validatedData['name'],
+                'location' => $validatedData['address-input'],
+                'postal_town' => $validatedData['postal-town-input'],
+                'longitude' => $validatedData['longitude'],
+                'latitude' => $validatedData['latitude'],
+                'logo_url' => $logoUrl,
+                'description' => $validatedData['description'],
+                'my_venues' => json_encode($validatedData['my_venues']),
+                'genre' => json_encode($validatedData['genres']),
+                'band_type' => json_encode($validatedData['band_type']),
+                'contact_name' => $contactName,
+                'contact_number' => $validatedData['contact_number'],
+                'contact_email' => $validatedData['contact_email'],
+                'contact_link' => json_encode($platformLinks),
+            ]);
+
+            // Log success
+            Log::info('Promoter created successfully', [
+                'promoter_id' => $promoter->id,
+                'name' => $validatedData['name'],
+                'contact_name' => $contactName
+            ]);
+
+            $serviceableId = $promoter->id;
+            $serviceableType = 'App\Models\Promoter';
+
+            DB::table('service_user')->insert([
+                'user_id' => $user->id,
+                'serviceable_id' => $serviceableId,
+                'serviceable_type' => $serviceableType,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            Log::info('Promoter Link created successfully');
+
+            // Redirect to the promoter dashboard with success message
+            return redirect()->route('promoter.dashboard', compact('promoter'))
+                ->with('success', 'Promoter created successfully.');
+        } catch (ValidationException $e) {
+            // Handle validation exceptions
+            Log::error('Validation failed for promoter creation', [
+                'errors' => $e->validator->errors(),
+                'request_data' => $request->all()
+            ]);
+
+            return back()->withErrors($e->validator)->withInput();
+        } catch (\Exception $e) {
+            // Handle other exceptions
+            Log::error('Failed to create promoter', [
+                'error' => $e->getMessage(),
+                'request_data' => $request->all()
+            ]);
+
+            return back()->with('error', 'Failed to create promoter. Please try again.')
+                ->withInput();
+        }
+    }
+
+    /**
+     * Promoter Reviews
+     */
+    public function getPromoterReviews($filter = 'all')
+    {
+        $promoter = Auth::user()->load(['promoters']);
+
+        switch ($filter) {
+            case 'pending':
+                $filter = 'pending';
+                break;
+            case 'all':
+                $filter = 'all';
+                break;
+
+                dd($filter);
+        }
+
+        return view('admin.dashboards.promoter.promoter-reviews', compact('promoter', 'filter'));
+    }
+
+    public function fetchReviews($filter = 'all')
+    {
+        // Fetch the reviews based on the filter
+        $reviews = ($filter === 'pending')
+            ? PromoterReview::where('review_approved', 0)->get()
+            : PromoterReview::all();
+
+        return response()->json(['reviews' => $reviews]);
+    }
+
+    public function showAllPromoterReviews()
+    {
+        $allReviews = PromoterReview::get();
+
+        return response()->json(['reviews' => $allReviews]);
+    }
+
+    public function showPendingPromoterReviews()
+    {
+        $pendingReviews = PromoterReview::where('review_approved', 0)->get();
+
+        return response()->json(['reviews' => $pendingReviews]);
+    }
+
+    public function approveDisplayPromoterReview($reviewId)
+    {
+        $review = PromoterReview::findOrFail($reviewId);
+
+        if ($review) {
+            $review->review_approved = true;
+            $review->display = true;
+            $review->save();
+
+            return response()->json(['success' => true, 'message' => 'Review displayed successfully']);
+        }
+        return response()->json(['success' => false, 'message' => 'Review not found']);
+    }
+
+    public function approvePromoterReview($reviewId)
+    {
+        $review = PromoterReview::findOrFail($reviewId);
+
+        if ($review) {
+            $review->review_approved = true;
+            $review->save();
+
+            return response()->json(['success' => true, 'message' => 'Review approved successfully']);
+        }
+        return response()->json(['success' => false, 'message' => 'Review not found']);
+    }
+
+    public function displayPromoterReview($reviewId)
+    {
+        $review = PromoterReview::findOrFail($reviewId);
+
+        if ($review) {
+            $review->display = true;
+            $review->save();
+
+            return response()->json(['success' => true, 'message' => 'Review displayed successfully']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Review not found']);
+    }
+
+    public function hidePromoterReview($reviewId)
+    {
+        $review = PromoterReview::findOrFail($reviewId);
+
+        if ($review) {
+            $review->display = false;
+            $review->save();
+
+            return response()->json(['success' => true, 'message' => 'Review hidden successfully']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Review not found']);
+    }
+
+    public function unapprovePromoterReview($reviewId)
+    {
+
+        $review = PromoterReview::findOrFail($reviewId);
+
+        if ($review) {
+            $review->review_approved = false;
+            $review->display = false;
+            $review->save();
+
+            return response()->json(['success' => true, 'message' => 'Review unnapproved successfully']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Review not found']);
+    }
+
+    public function deletePromoterReview($reviewId)
+    {
+        $review = PromoterReview::find($reviewId);
+        if ($review) {
+            $review->delete();
+            return response()->json(['success' => true, 'message' => 'Review deleted successfully']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Review not found']);
     }
 }

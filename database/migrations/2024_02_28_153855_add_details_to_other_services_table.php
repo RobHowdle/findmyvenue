@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('other_services', function (Blueprint $table) {
             $table->string('contact_number')->after('location');
             $table->string('contact_email')->after('contact_number');
-            $table->string('contact_link')->after('contact_email');
+            $table->json('contact_link')->after('contact_email');
             $table->string('services')->after('contact_link');
         });
     }

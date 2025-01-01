@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('venues', function (Blueprint $table) {
-            $table->string('contact_link')->nullable()->after('contact_email');
+            $table->json('contact_link')->nullable()->after('contact_email');
             $table->string('contact_number')->nullable()->change();
             $table->string('contact_email')->nullable()->change();
         });

@@ -14,6 +14,7 @@ export default {
             maxWidth: {
                 yns132: "132px",
                 yns250: "250px",
+                yns22: "22rem",
             },
             padding: {
                 yns25: "25rem",
@@ -24,22 +25,44 @@ export default {
                 heading: ["Roboto", "sans-serif"],
             },
             colors: {
-                opacBlack: "rgba(0,0,0,0.4)",
-                opac5Black: "rgba(0,0,0,0.5)",
-                opac8Black: "rgba(0,0,0,0.8)",
-                ynsLightGray: "rgba(217,217,217,0.5)",
-                ynsRed: "#EF3F38",
-                ynsPurple: "#9022BB",
-                ynsCyan: "#29C0D2",
-                ynsTeal: "#53E5D6",
-                ynsYellow: "#D59220",
-                ynsDarkOrange: "#F03F37",
-                ynsDarkGray: "#1D232A",
-                ynsDarkBlue: "#111827",
-                ynsMedGray: "#D1D5DB",
+                opac_black: "rgba(0,0,0,0.4)",
+                opac_5_black: "rgba(0,0,0,0.5)",
+                opac_8_black: "rgba(0,0,0,0.8)",
+                yns_light_gray: "rgba(217,217,217,0.5)",
+                yns_light_gray1: "#D9D9D9",
+                yns_red: "#EF3F38",
+                yns_purple: "#9022BB",
+                yns_cyan: "#29C0D2",
+                yns_teal: "#53E5D6",
+                yns_yellow: "#D59220",
+                yns_dark_orange: "#F03F37",
+                yns_dark_gray: "#1D232A",
+                yns_dark_blue: "#111827",
+                yns_med_gray: "#D1D5DB",
             },
             backgroundImage: {
                 "gradient-button": "linear-gradient(to top, #F03F37 , #D59220)",
+            },
+            gap: {
+                275: "2.75rem",
+            },
+            width: {
+                400: "25rem",
+            },
+            height: {
+                520: "32.5rem",
+            },
+            borderRadius: {
+                50: "50px",
+            },
+            opacity: {
+                disabled: "0.5",
+            },
+            cursor: {
+                "not-allowed": "not-allowed",
+            },
+            pointerEvents: {
+                none: "none",
             },
         },
         screens: {

@@ -29,19 +29,19 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AdminUserSeeder::class,
             PermissionsSeeder::class,
+            RoleSeeder::class,
             // VenueTestSeeder::class, // For Testing Data
             VenuesSeeder::class,
-            VenueExtraInfoSeeder::class, // For Testing Data
-            // PromoterTestSeeder::class,
+            // VenueExtraInfoSeeder::class, // For Testing Data
+            // PromoterTestSeeder::class, // Foir Testing Data
             PromoterSeeder::class,
-            PromoterVenueTestPivotSeeder::class,
-            PromoterReviewTestSeeder::class,
-            RoleSeeder::class,
+            // PromoterVenueTestPivotSeeder::class, // For Testing Data
+            // PromoterReviewTestSeeder::class, // For Testing Data
             OtherServicesListSeeder::class,
             OtherServiceSeeder::class,
-            FinanceTestDataSeeder::class,
-            UserServiceSeeder::class,
-            TodoTestDataSeeder::class,
+            // FinanceTestDataSeeder::class,
+            // UserServiceSeeder::class,
+            // TodoTestDataSeeder::class,
         ]);
     }
 }

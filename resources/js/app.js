@@ -1,14 +1,12 @@
-import $ from "jquery";
-// import "summernote/dist/summernote-lite.js"; // Non-Bootstrap version
-// import "summernote/dist/summernote-lite.css"; // Include the CSS for this version
-import Swal from "sweetalert2";
-
 import Alpine from "alpinejs";
-window.$ = $;
-window.jQuery = $;
+import Swal from "../../node_modules/sweetalert2";
+import $ from "jquery";
+window.$ = window.jQuery = $;
 
 window.Alpine = Alpine;
 Alpine.start();
+
+window.Swal = Swal;
 
 // Format currency helper
 window.formatCurrency = function (value) {
@@ -18,6 +16,17 @@ window.formatCurrency = function (value) {
     }).format(value);
 };
 
+// Format Dates
+window.formatDateToDMY = function (dateString) {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, "0"); // Pad with zero if needed
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+    const year = date.getFullYear();
+
+    return `${day}-${month}-${year}`; // Return in DMY format
+};
+
+// Accordions
 $(document).ready(function () {
     // Accordion functionality
     $("[data-accordion-target]").click(function () {
@@ -49,63 +58,69 @@ $(document).ready(function () {
             .slideUp();
 
         // Prevent checkbox from being checked/unchecked when clicking on label
-        var checkbox = $(this).siblings('input[type="checkbox"]');
+        var checkbox = jQuery(this).siblings('input[type="checkbox"]');
         checkbox.prop("checked", !checkbox.prop("checked"));
     });
 
     // Function to close all accordion items
     function closeAllAccordions() {
-        $(".accordion-item").removeClass("active");
-        $(".accordion-content").slideUp().addClass("hidden");
+        jQuery(".accordion-item").removeClass("active");
+        jQuery(".accordion-content").slideUp().addClass("hidden");
     }
 
-    // Click outside to close the accordion`
-    $(document).click(function (event) {
+    // Click outside to close the accordion
+    jQuery(document).click(function (event) {
         // Check if the click is outside the accordion
         if (
-            !$(event.target).closest(".accordion-item, [data-accordion-target]")
-                .length
+            !jQuery(event.target).closest(
+                ".accordion-item, [data-accordion-target]"
+            ).length
         ) {
             closeAllAccordions();
         }
     });
 
     // Prevent clicks inside the accordion from closing it
-    $(".accordion-item").click(function (event) {
+    jQuery(".accordion-item").click(function (event) {
         event.stopPropagation();
     });
 
-    // Hide all tab contents except the first one
-    $(".venue-tab-content > div:not(:first)").hide();
+    jQuery(document).ready(function () {
+        // Cache selectors for performance
+        var $tabs = jQuery(".tabLinks");
+        var $tabContents = jQuery(".venue-tab-content > div");
 
-    // Add active class to the default tab link
-    $(".tabLinks:first").addClass(
-        "active text-ynsYellow border-b-2 border-ynsYellow rounded-t-lg group"
-    );
+        // Hide all tab contents except the first one
+        $tabContents.not(":first").hide();
 
-    // Add click event to tab links
-    $(".tabLinks").click(function () {
-        // Get the tab ID from the data attribute
-        var tabId = $(this).data("tab");
+        // Add active class to the default tab link
+        $tabs
+            .first()
+            .addClass(
+                "active text-yns_yellow border-b-2 border-yns_yellow rounded-t-lg group"
+            );
 
-        // Hide all tab contents
-        $(".venue-tab-content > div").hide();
+        // Add click event to tab links
+        $tabs.click(function (e) {
+            e.preventDefault(); // Prevent the default anchor click behavior
 
-        // Show the selected tab content
-        $("#" + tabId).fadeIn();
+            // Get the tab ID from the data attribute
+            var tabId = jQuery(this).data("tab");
 
-        // Remove "active" class from all tab links
-        $(".tabLinks").removeClass(
-            "active text-ynsYellow border-b-2 border-ynsYellow rounded-t-lg group"
-        );
+            // Hide all tab contents and show the selected one
+            $tabContents.hide();
+            jQuery("#" + tabId).fadeIn();
 
-        // Add "active" class to the clicked tab link
-        $(this).addClass(
-            "active text-ynsYellow border-b-2 border-ynsYellow rounded-t-lg group"
-        );
+            // Remove "active" class from all tab links
+            $tabs.removeClass(
+                "active text-yns_yellow border-b-2 border-yns_yellow rounded-t-lg group"
+            );
 
-        // Prevent default link behavior
-        return false;
+            // Add "active" class to the clicked tab link
+            jQuery(this).addClass(
+                "active text-yns_yellow border-b-2 border-yns_yellow rounded-t-lg group"
+            );
+        });
     });
 });
 
@@ -114,24 +129,26 @@ document.addEventListener("DOMContentLoaded", function () {
     // Function to show the modal
     function showModal(modalId) {
         const modal = document.getElementById(modalId);
-        const backdrop = document.querySelector(".fixed");
 
-        if (modal && backdrop) {
+        if (modal) {
             modal.classList.remove("hidden");
-            backdrop.setAttribute("aria-hidden", "false");
+            modal.classList.add("flex"); // Add 'flex' for display
+            modal.setAttribute("aria-hidden", "false");
             modal.focus();
         }
     }
 
+    // Function to hide the modal
     function hideModal(modalId) {
         const modal = document.getElementById(modalId);
-        const backdrop = document.querySelector(".fixed");
 
-        if (modal && backdrop) {
+        if (modal) {
+            modal.classList.remove("flex"); // Remove 'flex'
             modal.classList.add("hidden");
-            backdrop.setAttribute("aria-hidden", "true");
+            modal.setAttribute("aria-hidden", "true");
         }
     }
+
     // Event listener for buttons to show the modal
     document.querySelectorAll("[data-modal-toggle]").forEach((button) => {
         button.addEventListener("click", function () {
@@ -150,12 +167,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Close modal when clicking outside of it
     document.addEventListener("click", function (event) {
-        if (event.target.classList.contains("fixed")) {
-            hideModal(event.target.id);
+        const modal = event.target.closest(".fixed"); // Check for modal clicks
+        if (modal && event.target === modal) {
+            hideModal(modal.id);
         }
     });
 });
 
+// Ratings
 document.addEventListener("DOMContentLoaded", function () {
     const emptyIcon = "{{ asset('storage/images/system/ratings/empty.png') }}";
     const fullIcon = "{{ asset('storage/images/system/ratings/full.png') }}";
@@ -199,11 +218,11 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // Reviewer IP
-$(document).ready(function () {
+jQuery(document).ready(function () {
     $.getJSON("https://api.ipify.org?format=json", function (data) {
         var userIP = data.ip;
         // Verify the element exists before setting the value
-        var reviewerIpField = $("#reviewer_ip");
+        var reviewerIpField = jQuery("#reviewer_ip");
         if (reviewerIpField.length) {
             reviewerIpField.val(userIP);
         }
@@ -213,23 +232,82 @@ $(document).ready(function () {
     });
 });
 
-// Summernote
-// $(document).ready(function () {
-//     $(".summernote").summernote({
-//         height: 300, // Set the height of the editor
-//         toolbar: [
-//             // Customize the toolbar
-//             ["style", ["style"]],
-//             ["font", ["bold", "italic", "underline", "clear"]],
-//             ["fontname", ["fontname"]],
-//             ["color", ["color"]],
-//             ["para", ["ul", "ol", "paragraph"]],
-//             ["table", ["table"]],
-//             ["insert", ["link", "picture", "video"]],
-//             ["view", ["fullscreen", "codeview", "help"]],
-//         ],
+// Function to initialize Summernote
+window.initialiseSummernote = function (selector, initialContent) {
+    jQuery(selector).summernote({
+        height: 300,
+        toolbar: [
+            ["style", ["style"]],
+            ["font", ["bold", "italic", "underline", "clear"]],
+            ["fontname", ["fontname"]],
+            ["fontsize", ["fontsize"]],
+            ["fontSizeUnits", ["px", "pt"]],
+            ["color", ["color"]],
+            ["para", ["ul", "ol", "paragraph"]],
+            ["table", ["table"]],
+            ["insert", ["link", "picture", "video"]],
+            ["view", ["fullscreen", "help"]],
+        ],
+        callbacks: {
+            onInit: function () {
+                jQuery(this).summernote("code", initialContent); // Set the initial content
+            },
+            onKeyup: function () {
+                var editor = jQuery(this);
+                var content = editor.summernote("code");
+
+                // Analyze and get the highlighted content
+                // var highlightedContent = analyzeText(content);
+
+                // Update only if the content has changed
+                // if (highlightedContent !== content) {
+                //     // Get the current selection before updating the content
+                //     var selection = window.getSelection();
+                //     var range = selection.getRangeAt(0);
+
+                //     // Update the content directly
+                //     editor.summernote("code", highlightedContent);
+
+                //     // Restore the selection
+                //     setTimeout(function () {
+                //         // Get the editable area
+                //         var $editable = editor.summernote("editable")[0];
+
+                //         // Set the cursor position back to where it was
+                //         selection.removeAllRanges(); // Clear existing selections
+                //         selection.addRange(range); // Set the new range
+
+                //         // Refocus on the editor
+                //         $editable.focus(); // Focus the editable area
+                //     }, 0); // Use a small delay to ensure the content is rendered before moving the cursor
+                // }
+            },
+        },
+    });
+};
+
+// Function to analyze text for venue names
+
+// function analyzeText(inputText) {
+//     const venues = [
+//         {
+//             name: "The Forum",
+//             link: "https://www.google.com/theforummusiccenter",
+//         },
+//         { name: "The Turks Head", link: "https://www.google.com/theturkshead" },
+//     ];
+
+//     let highlightedContent = inputText; // Start with the original input text
+
+//     venues.forEach((venue) => {
+//         const regex = new RegExp(`\\b(${venue.name})\\b`, "gi");
+//         highlightedContent = highlightedContent.replace(
+//             regex,
+//             `<span class="highlight" data-link="${venue.link}">$1</span>`
+//         );
 //     });
-// });
+//     return highlightedContent; // Return the modified content
+// }
 
 // Sweet Alert 2 Notifications
 window.showSuccessNotification = function (message) {
@@ -240,7 +318,7 @@ window.showSuccessNotification = function (message) {
         timer: 3000,
         timerProgressBar: true,
         customClass: {
-            popup: "bg-ynsDarkGray !important rounded-lg font-heading",
+            popup: "bg-yns_dark_gray !important rounded-lg font-heading",
             title: "text-black",
             html: "text-black",
         },
@@ -258,7 +336,7 @@ window.showFailureNotification = function (message) {
         timer: 3000,
         timerProgressBar: true,
         customClass: {
-            popup: "bg-ynsDarkGray !important rounded-lg font-heading",
+            popup: "bg-yns_dark_gray !important rounded-lg font-heading",
             title: "text-black",
             html: "text-black",
         },
@@ -267,3 +345,143 @@ window.showFailureNotification = function (message) {
         text: message,
     });
 };
+
+window.showWarningNotification = function (message) {
+    Swal.fire({
+        showConfirmButton: true,
+        toast: false,
+        customClass: {
+            popup: "bg-yns_dark_gray !important rounded-lg font-heading",
+            title: "text-yns_red",
+            html: "text-white",
+        },
+        icon: "warning",
+        title: "Warning!",
+        text: message,
+    });
+};
+
+window.showConfirmationNotification = function (options) {
+    return Swal.fire({
+        showConfirmButton: true,
+        confirmButtonText: "I understand",
+        showCancelButton: true,
+        toast: false,
+        customClass: {
+            popup: "bg-yns_dark_gray !important rounded-lg font-heading",
+            title: "text-white",
+            text: "text-white !important",
+        },
+        icon: "warning",
+        title: "Are you sure?",
+        text: options.text,
+    });
+};
+
+// Event Block
+window.showEventBlock = function (info) {
+    const extendedProps = info.event._def.extendedProps;
+
+    const startTime = extendedProps.event_start_time || "N/A";
+    const description = extendedProps.description || "N/A";
+    const bands =
+        extendedProps.bands && extendedProps.bands.length > 0
+            ? extendedProps.bands.join(", ")
+            : "N/A";
+    const location = extendedProps.location || "N/A";
+    const ticketUrl = extendedProps.ticket_url || "N/A";
+    const onTheDoorPrice = extendedProps.on_the_door_ticket_price || "N/A";
+
+    return Swal.fire({
+        showConfirmButton: true,
+        confirmButtonText: "Got it!",
+        toast: false,
+        icon: "info",
+        title: info.event.title,
+        html: `
+            <strong>Description:</strong> ${description}<br>
+            <strong>Start Time:</strong> ${startTime}<br>
+            <strong>Bands:</strong> ${bands}<br>
+            <strong>Location:</strong> ${location}<br>
+            <strong>Ticket URL:</strong> <a href="${ticketUrl}" target="_blank">${
+            ticketUrl ? "View Tickets" : "N/A"
+        }</a><br>
+            <strong>On The Door Price:</strong> £${onTheDoorPrice}<br>
+        `,
+        customClass: {
+            popup: "bg-yns_dark_gray !important rounded-lg font-heading",
+            title: "text-white",
+            hmtl: "text-white !important",
+        },
+    });
+};
+
+// Full Calendar
+document.addEventListener("DOMContentLoaded", function () {
+    var calendarEl = document.getElementById("calendar");
+
+    if (!calendarEl) {
+        return; // Exit if the calendar element doesn't exist
+    }
+
+    var userId = calendarEl.getAttribute("data-user-id");
+    var dashboardType = calendarEl.getAttribute("data-dashboard-type");
+    var calendar;
+
+    const calendarTabButton = document.querySelector(
+        'button[data-tab="calendar"]'
+    );
+
+    calendarTabButton.addEventListener("click", function () {
+        if (!calendar) {
+            // Only initialize if not already done
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: "dayGridMonth",
+                events: function (fetchInfo, successCallback, failureCallback) {
+                    fetch(
+                        `/profile/${dashboardType}/events/${userId}?view=calendar&start=${fetchInfo.startStr}&end=${fetchInfo.endStr}`
+                    )
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.success) {
+                                const eventsArray = data.events.map(
+                                    (event) => ({
+                                        title: event.title,
+                                        start: event.start,
+                                        end: event.end,
+                                        description: event.description,
+                                        event_start_time:
+                                            event.event_start_time,
+                                        bands: event.bands || [],
+                                        location: event.location || "N/A",
+                                        ticket_url: event.ticket_url || "N/A",
+                                        on_the_door_ticket_price:
+                                            event.on_the_door_ticket_price ||
+                                            "N/A",
+                                    })
+                                );
+                                successCallback(eventsArray);
+                            } else {
+                                console.error(
+                                    "Error fetching events:",
+                                    data.message
+                                );
+                                failureCallback();
+                            }
+                        })
+                        .catch((error) => {
+                            console.error("Error fetching events:", error);
+                            failureCallback();
+                        });
+                },
+                eventClick: function (info) {
+                    showEventBlock(info);
+                },
+            });
+
+            calendar.render();
+        } else {
+            calendar.updateSize();
+        }
+    });
+});

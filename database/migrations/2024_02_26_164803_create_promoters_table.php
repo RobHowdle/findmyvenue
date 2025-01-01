@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('location');
             $table->string('contact_number')->nullable();
             $table->string('contact_email')->nullable();
-            $table->string('contact_link')->nullable();
+            $table->json('contact_link')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

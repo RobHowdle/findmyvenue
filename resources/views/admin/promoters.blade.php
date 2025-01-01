@@ -311,7 +311,7 @@
 <script>
   function initialize() {
 
-    $('form').on('keyup keypress', function(e) {
+    jQuery('form').on('keyup keypress', function(e) {
       var keyCode = e.keyCode || e.which;
       if (keyCode === 13) {
         e.preventDefault();
@@ -419,38 +419,39 @@
     longitudeField.value = lng;
   }
 
-  $(document).ready(function() {
+  jQuery(document).ready(function() {
     // Hide accordion content by default
-    $('.accordion-content').hide();
+    jQuery('.accordion-content').hide();
 
-    $('.accordion-item .accordion-title').click(function() {
+    jQuery('.accordion-item .accordion-title').click(function() {
       // Toggle active class to show/hide accordion content
-      $(this).parent().toggleClass('active');
-      $(this).parent().find('.accordion-content').slideToggle();
-      $('.accordion-item').not($(this).parent()).removeClass('active').find('.accordion-content').slideUp();
+      jQuery(this).parent().toggleClass('active');
+      jQuery(this).parent().find('.accordion-content').slideToggle();
+      jQuery('.accordion-item').not(jQuery(this).parent()).removeClass('active').find('.accordion-content')
+        .slideUp();
 
       // Prevent checkbox from being checked/unchecked when clicking on label
-      var checkbox = $(this).siblings('input[type="checkbox"]');
+      var checkbox = jQuery(this).siblings('input[type="checkbox"]');
       checkbox.prop('checked', !checkbox.prop('checked'));
     });
 
     // Event handler for "All {location name}" checkbox
-    $('.venues-checkbox').change(function() {
-      var isChecked = $(this).prop('checked');
-      var accordionContent = $(this).closest('.accordion-item').find('.accordion-content');
+    jQuery('.venues-checkbox').change(function() {
+      var isChecked = jQuery(this).prop('checked');
+      var accordionContent = jQuery(this).closest('.accordion-item').find('.accordion-content');
       accordionContent.find('.venue-checkbox').prop('checked', isChecked);
     });
   });
 
-  $(document).ready(function() {
-    $('#locationSelect').change(function() {
-      var selectedLocations = $(this).val();
+  jQuery(document).ready(function() {
+    jQuery('#locationSelect').change(function() {
+      var selectedLocations = jQuery(this).val();
 
       // Make sure at least one location is selected
       if (selectedLocations && selectedLocations.length > 0) {
         $.ajax({
           headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
           },
           url: '/admin/promoters/get-location-venues', // Your endpoint to get venues based on location
           type: 'GET',
@@ -459,7 +460,7 @@
           },
           success: function(response) {
             // Assuming response is an array of venues
-            var venueSelect = $('#venueSelect');
+            var venueSelect = jQuery('#venueSelect');
             venueSelect.empty(); // Clear the existing options
 
             // Add a placeholder option
@@ -476,7 +477,7 @@
         });
       } else {
         // If no location is selected, clear the venues
-        $('#venueSelect').empty().append('<option value="">Please Select Venue</option>');
+        jQuery('#venueSelect').empty().append('<option value="">Please Select Venue</option>');
       }
     });
   });

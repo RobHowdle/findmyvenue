@@ -305,7 +305,7 @@
 <script>
   function initialize() {
 
-    $('form').on('keyup keypress', function(e) {
+    jQuery('form').on('keyup keypress', function(e) {
       var keyCode = e.keyCode || e.which;
       if (keyCode === 13) {
         e.preventDefault();
@@ -413,18 +413,19 @@
     longitudeField.value = lng;
   }
 
-  $(document).ready(function() {
+  jQuery(document).ready(function() {
     // Hide accordion content by default
-    $('.accordion-content').hide();
+    jQuery('.accordion-content').hide();
 
-    $('.accordion-item .accordion-title').click(function() {
+    jQuery('.accordion-item .accordion-title').click(function() {
       // Toggle active class to show/hide accordion content
-      $(this).parent().toggleClass('active');
-      $(this).parent().find('.accordion-content').slideToggle();
-      $('.accordion-item').not($(this).parent()).removeClass('active').find('.accordion-content').slideUp();
+      jQuery(this).parent().toggleClass('active');
+      jQuery(this).parent().find('.accordion-content').slideToggle();
+      jQuery('.accordion-item').not(jQuery(this).parent()).removeClass('active').find('.accordion-content')
+        .slideUp();
 
       // Prevent checkbox from being checked/unchecked when clicking on label
-      var checkbox = $(this).siblings('input[type="checkbox"]');
+      var checkbox = jQuery(this).siblings('input[type="checkbox"]');
       checkbox.prop('checked', !checkbox.prop('checked'));
     });
 

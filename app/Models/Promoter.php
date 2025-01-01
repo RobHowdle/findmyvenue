@@ -7,6 +7,7 @@ use App\Models\PromoterReview;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class Promoter extends Model
 {
@@ -22,13 +23,19 @@ class Promoter extends Model
         'longitude',
         'latitude',
         'logo_url',
-        'about_me',
+        'description',
         'my_venues',
         'genre',
-        'band_types',
+        'band_type',
+        'contact_name',
         'contact_number',
         'contact_email',
         'contact_link',
+    ];
+
+    protected $casts = [
+        'contact_links' => 'array',
+        'genre' => 'array',
     ];
 
     public function venues()
@@ -41,13 +48,25 @@ class Promoter extends Model
         return $this->hasMany(PromoterReview::class);
     }
 
-    public function users()
+    public function linkedUsers(): MorphToMany
     {
-        return $this->morphToMany(User::class, 'serviceable', 'service_user', 'serviceable_id', 'user_id')->whereNull('service_user.deleted_at');
+        return $this->morphToMany(User::class, 'serviceable', 'service_user', 'serviceable_id', 'user_id')
+            ->withPivot('created_at', 'updated_at', 'role')
+            ->whereNull('service_user.deleted_at');
     }
 
     public function todos()
     {
-        return $this->morphMany(Todo::class, 'serviceable', 'serviceable_id', 'serviceable_type');
+        return $this->morphMany(Todo::class, 'serviceable');
+    }
+
+    public function events()
+    {
+        return $this->belongsToMany(Event::class, 'event_promoter');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

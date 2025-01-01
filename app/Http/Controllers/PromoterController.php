@@ -5,11 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\Promoter;
 use Illuminate\Http\Request;
 use App\Models\PromoterReview;
+use App\Helpers\SocialLinksHelper;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class PromoterController extends Controller
 {
+    protected $dashboardType;
+
+    public function __construct(Request $request)
+    {
+        $this->dashboardType = $request->dashboardType;
+        view()->share('dashboardType', $this->dashboardType);
+    }
+
     /**
      * Helper function to render rating icons
      */
@@ -81,17 +90,13 @@ class PromoterController extends Controller
             $urls = explode(',', $promoter->contact_link);
             $platforms = [];
 
-            // // Check each URL against the platforms
             foreach ($urls as $url) {
-                // Initialize the platform as unknown
                 $matchedPlatform = 'Unknown';
-
-                // Check if the URL contains platform names
-                $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
+                $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube', 'bluesky'];
                 foreach ($platformsToCheck as $platform) {
                     if (stripos($url, $platform) !== false) {
                         $matchedPlatform = $platform;
-                        break; // Stop checking once a platform is found
+                        break;
                     }
                 }
 
@@ -112,7 +117,14 @@ class PromoterController extends Controller
             $overallScore = PromoterReview::calculateOverallScore($promoter->id);
             $overallReviews[$promoter->id] = $this->renderRatingIcons($overallScore);
         }
-        return view('promoters', compact('promoters', 'genres', 'overallReviews'));
+
+        $promoterVenueCount = isset($promoter['venues']) ? count($promoter['venues']) : 0;
+        return view('promoters', [
+            'promoters' => $promoters,
+            'genres' => $genres,
+            'overallReviews' => $overallReviews,
+            'promoterVenueCount' => $promoterVenueCount
+        ]);
     }
 
     /**
@@ -126,40 +138,14 @@ class PromoterController extends Controller
 
         $suggestions = app('suggestions', ['promoter' => $promoter]);
 
-        // Split the field containing multiple URLs into an array
-        if ($promoter->contact_link) {
-            $urls = explode(',', $promoter->contact_link);
-            $platforms = [];
-        }
-
-        // // Check each URL against the platforms
-        foreach ($urls as $url) {
-            // Initialize the platform as unknown
-            $matchedPlatform = 'Unknown';
-
-            // Check if the URL contains platform names
-            $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
-            foreach ($platformsToCheck as $platform) {
-                if (stripos($url, $platform) !== false) {
-                    $matchedPlatform = $platform;
-                    break; // Stop checking once a platform is found
-                }
-            }
-
-            // Store the platform information for each URL
-            $platforms[] = [
-                'url' => $url,
-                'platform' => $matchedPlatform
-            ];
-        }
+        $platforms = SocialLinksHelper::processSocialLinks($promoter->contact_link);
+        $promoter->platforms = $platforms;
 
         // Add the processed data to the venue
-        $promoter->platforms = $platforms;
         $recentReviews = PromoterReview::getRecentReviewsForPromoter($id);
         $promoter->recentReviews = $recentReviews->isNotEmpty() ? $recentReviews : null;
 
         $overallScore = PromoterReview::calculateOverallScore($id);
-        dd($overallScore);
         $overallReviews[$id] = $this->renderRatingIcons($overallScore);
 
         // Get Review Scores
@@ -186,7 +172,7 @@ class PromoterController extends Controller
             'venueWithHighestRating' => $suggestions['venue'],
             'photographerWithHighestRating' => $suggestions['photographer'],
             'videographerWithHighestRating' => $suggestions['videographer'],
-            'bandWithHighestRating' => $suggestions['band'],
+            'bandWithHighestRating' => $suggestions['artist'],
             'designerWithHighestRating' => $suggestions['designer'],
             'existingVenues' => $existingVenues,
             'renderRatingIcons' => [$this, 'renderRatingIcons']
@@ -248,11 +234,10 @@ class PromoterController extends Controller
         if ($request->has('band_type')) {
             $bandType = $request->input('band_type');
             if (!empty($bandType)) {
-                $bandType = array_map('trim', $bandType); // Ensure no extra spaces
+                $bandType = array_map('trim', $bandType);
                 $query->where(function ($query) use ($bandType) {
                     foreach ($bandType as $type) {
-                        // Ensure the type is properly formatted
-                        $query->orWhereRaw('JSON_CONTAINS(CAST(band_type AS JSON), ?)', [json_encode([$type])]);
+                        $query->orWhereRaw('JSON_CONTAINS(band_type, ?)', [json_encode($type)]);
                     }
                 });
             }
@@ -262,11 +247,10 @@ class PromoterController extends Controller
         if ($request->has('genres')) {
             $genres = $request->input('genres');
             if (!empty($genres)) {
-                $genres = array_map('trim', $genres); // Ensure no extra spaces
+                $genres = array_map('trim', $genres);
                 $query->where(function ($query) use ($genres) {
                     foreach ($genres as $genre) {
-                        // Ensure the genre is properly formatted
-                        $query->orWhereRaw('JSON_CONTAINS(CAST(genre AS JSON), ?)', [json_encode([$genre])]);
+                        $query->orWhereRaw('JSON_CONTAINS(genre, ?)', [json_encode($genre)]);
                     }
                 });
             }
@@ -280,13 +264,10 @@ class PromoterController extends Controller
             $urls = explode(',', $promoter->contact_link);
             $platforms = [];
 
-            // Check each URL against the platforms
             foreach ($urls as $url) {
-                // Initialize the platform as unknown
                 $matchedPlatform = 'Unknown';
+                $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube', 'bluesky'];
 
-                // Check if the URL contains platform names
-                $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube'];
                 foreach ($platformsToCheck as $platform) {
                     if (stripos($url, $platform) !== false) {
                         $matchedPlatform = $platform;
@@ -294,14 +275,12 @@ class PromoterController extends Controller
                     }
                 }
 
-                // Store the platform information for each URL
                 $platforms[] = [
                     'url' => $url,
                     'platform' => $matchedPlatform
                 ];
             }
 
-            // Use the static method to calculate the overall score
             $overallScore = \App\Models\PromoterReview::calculateOverallScore($promoter->id);
 
             return [
@@ -311,7 +290,7 @@ class PromoterController extends Controller
                 'contact_number' => $promoter->contact_number,
                 'contact_email' => $promoter->contact_email,
                 'platforms' => $platforms,
-                'promoters' => $promoter->venues, // Include venues
+                'promoters' => $promoter->venues,
                 'average_rating' => $overallScore,
             ];
         });
