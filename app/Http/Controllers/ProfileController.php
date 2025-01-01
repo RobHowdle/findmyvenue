@@ -1332,7 +1332,7 @@ class ProfileController extends Controller
                 return response()->json(['success' => true, 'path' => $watermarkedImagePath]);
             } catch (\Exception $e) {
                 // Catch any exceptions during file storage and log the error
-                \Log::error('File upload failed: ' . $e->getMessage());
+                // \Log::error('File upload failed: ' . $e->getMessage());
                 return response()->json(['success' => false, 'message' => 'File upload failed.'], 500);
             }
         }

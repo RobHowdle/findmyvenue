@@ -134,9 +134,6 @@
     // Handle selection
     jQuery('#client-search').on('select2:select', function(e) {
       const data = e.params.data;
-      console.log(data.text);
-      console.log('Selected client ID:', data.id);
-      console.log('Service Type:', data.serviceType);
       jQuery('#client_service').val(data.serviceType);
       jQuery('#client_name').val(data.text);
 
@@ -173,12 +170,9 @@
       // jobTypeSelect.empty(); // Clear existing options before adding new ones
 
       if (jobTypes[dashboard]) {
-        console.log("Found job types for:", dashboard);
         jobTypes[dashboard].forEach(function(job) {
           jobTypeSelect.append(new Option(job.name, job.id));
         });
-      } else {
-        console.error("No job types found for:", dashboard);
       }
     }
 

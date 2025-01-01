@@ -194,7 +194,6 @@
         return response.json();
       })
       .then(data => {
-        console.log('Data:', data);
         if (data.hasGoogleCalendar) {
           const calendarService = 'google';
           addEventToGoogleCalendar(calendarService);
@@ -217,7 +216,6 @@
     const eventDescription = @json($event->event_description ?? '');
     const preSaleURL = @json($event->ticket_url ?? '');
     const otdTicketPrice = {{ $event->on_the_door_ticket_price }};
-    console.log('Adding event to Google Calendar...');
 
     fetch('/dashboard/promoter/events/add-to-calendar', {
         method: 'POST',
@@ -247,7 +245,6 @@
         }
       })
       .catch(error => {
-        console.error('Error adding event to calendar:', error);
         showFailureNotification('An error occurred while adding the event.');
       });
   }

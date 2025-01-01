@@ -139,7 +139,7 @@
           this.removeFile(file);
         });
         this.on("removedfile", function(file) {
-          console.log("File removed: ", file.name);
+          // console.log("File removed: ", file.name);
         });
       },
     });

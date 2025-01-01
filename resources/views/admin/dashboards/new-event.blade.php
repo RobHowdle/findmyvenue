@@ -672,7 +672,7 @@
   // Handle form submission
   document.getElementById('eventForm').addEventListener('submit', function(event) {
     event.preventDefault(); // Prevent default form submission
-    console.log('Form submitted'); // Log form submission
+    // console.log('Form submitted'); // Log form submission
 
     const dashboardType = "{{ $dashboardType }}"; // Capture the dashboard type from the template
 
@@ -689,15 +689,15 @@
         'X-CSRF-TOKEN': '{{ csrf_token() }}' // Include the CSRF token
       },
       success: function(data) {
-        console.log('Data processed:', data); // Log the data
+        // console.log('Data processed:', data); // Log the data
         if (data.success) {
           showSuccessNotification(data.message); // Show success notification
           setTimeout(() => {
-            console.log('Redirecting to:', data.redirect_url); // Log redirect URL
+            // console.log('Redirecting to:', data.redirect_url); // Log redirect URL
             window.location.href = data.redirect_url; // Redirect after 2 seconds
           }, 2000);
         } else {
-          console.log('Errors:', data.errors); // Log any errors
+          // console.log('Errors:', data.errors); // Log any errors
           if (data.errors) {
             Object.keys(data.errors).forEach(key => {
               const error = data.errors[key];

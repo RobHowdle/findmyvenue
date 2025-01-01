@@ -86,7 +86,7 @@
     getUserLocation((lat, long) => {
       userLatitude = lat;
       userLongitude = long;
-      console.log("Location retrieved via browser: ", userLatitude, userLongitude);
+      // console.log("Location retrieved via browser: ", userLatitude, userLongitude);
     });
   }
 
@@ -94,7 +94,7 @@
     if (userLatitude && userLongitude) {
       callback(userLatitude, userLongitude);
     } else {
-      console.log("No stored location. Attempting to get geolocation from the browser...");
+      // console.log("No stored location. Attempting to get geolocation from the browser...");
       if (navigator.geolocation) {
         // Show loading feedback
         document.body.appendChild(loader);
@@ -109,7 +109,7 @@
           },
           function(error) {
             document.body.removeChild(loader); // Remove loader on error
-            console.log("Error handler hit");
+            // console.log("Error handler hit");
             handleGeolocationError(error);
             fallbackToManualLocation();
           }, {
@@ -155,7 +155,7 @@
         .then((response) => response.json())
         .then((data) => {
           if (data.latitude && data.longitude) {
-            console.log("Fallback manual location retrieved: ", data.latitude, data.longitude);
+            // console.log("Fallback manual location retrieved: ", data.latitude, data.longitude);
             fetchGigs(getSelectedDistance(), data.latitude, data.longitude, isShowOtherChecked());
           } else {
             showFailureNotification(
@@ -164,7 +164,7 @@
           }
         })
         .catch((error) => {
-          console.error("Error processing manual location:", error);
+          // console.error("Error processing manual location:", error);
           showFailureNotification("Something went wrong. Please try again later.");
         });
     }
@@ -196,7 +196,7 @@
       .then((response) => response.json())
       .then((data) => {
         if (data.error) {
-          console.error(data.error);
+          // console.error(data.error);
           return;
         }
 
@@ -230,7 +230,7 @@
 
 
   function createRow(event, distanceLabel) {
-    console.log(event);
+    // console.log(event);
     const formattedDateTime = formatDate(event.event_date, event.event_start_time);
     const eventUrl = `/events/${event.id}`;
     const venueUrl = `/venues/${event.venue_id}`;
