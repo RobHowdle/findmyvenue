@@ -52,11 +52,11 @@ class BandJourneyController extends Controller
 
     public function joinBand($dashboardType, Request $request)
     {
-        $bandId = $request->input('band_id');
+        $artistId = $request->input('serviceable_id');
         $user = Auth::user();
 
         // Check if the band exists
-        $band = OtherService::find($bandId);
+        $band = OtherService::find($artistId);
 
         if (!$band) {
             return response()->json([
@@ -66,7 +66,7 @@ class BandJourneyController extends Controller
         }
 
         // Check if the user is already part of the band
-        if ($user->otherService('artist')->where('serviceable_id', $bandId)->exists()) {
+        if ($user->otherService('artist')->where('serviceable_id', $artistId)->exists()) {
             return response()->json([
                 'success' => false,
                 'message' => 'You are already a member of this artist.'
@@ -74,7 +74,7 @@ class BandJourneyController extends Controller
         }
 
         // Add the user to the band
-        $user->otherService('artist')->attach($bandId);
+        $user->otherService('artist')->attach($artistId);
 
         return response()->json([
             'success' => true,

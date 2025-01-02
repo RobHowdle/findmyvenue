@@ -10,14 +10,14 @@
   @method('PUT')
   <div class="mt-4 grid sm:grid-cols-2 sm:gap-3 lg:grid-cols-3 lg:gap-4">
     @php
-      $bandGenres = is_string($band->genre) ? explode(',', $band->genre) : $band->genre;
+      $artistGenres = is_string($artist->genre) ? explode(',', $artist->genre) : $artist->genre;
     @endphp
 
     <!-- "All Genres" checkbox -->
     <div class="flex items-center">
       <input id="all-genres" name="all-genres" type="checkbox" value=""
         class="genre-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
-        {{ in_array('All', $bandGenres) ? 'checked' : '' }}>
+        {{ in_array('All', $artistGenres) ? 'checked' : '' }}>
       <label for="all-genres" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">All Genres</label>
     </div>
 
@@ -29,7 +29,7 @@
             <input type="checkbox"
               class="genre-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
               id="all-genre-{{ $index }}" name="genres[]" value="{{ $genre['name'] }}"
-              {{ in_array($genre['name'], $bandGenres) ? 'checked' : '' }}>
+              {{ in_array($genre['name'], $artistGenres) ? 'checked' : '' }}>
             <label for="all-genre-{{ $index }}"
               class="accordion-title ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
               All {{ $genre['name'] }}
@@ -41,7 +41,7 @@
                   <input type="checkbox"
                     class="subgenre-checkbox focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
                     id="genre-{{ $index }}-subgenre-{{ $subIndex }}" name="genres[]"
-                    value="{{ $subgenre }}" {{ in_array($subgenre, $bandGenres) ? 'checked' : '' }}>
+                    value="{{ $subgenre }}" {{ in_array($subgenre, $artistGenres) ? 'checked' : '' }}>
                   <label class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100"
                     for="subgenre-{{ $index }}-{{ $subIndex }}">{{ $subgenre }}</label>
                 </div>
@@ -62,7 +62,7 @@
   const dashboardType = "{{ $dashboardType }}";
   const userId = "{{ $user->id }}";
 
-  let selectedGenres = "{{ json_encode($bandGenres) }}";
+  let selectedGenres = "{{ json_encode($artistGenres) }}";
 
   jQuery('.genre-checkbox, .subgenre-checkbox').each(function() {
     jQuery(this).prop('checked', selectedGenres.includes(jQuery(this).val()));

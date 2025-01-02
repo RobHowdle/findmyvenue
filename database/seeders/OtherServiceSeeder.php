@@ -25,7 +25,7 @@ class OtherServiceSeeder extends Seeder
                 $environmentType = $data[9] ?? null;
                 $workingTimes = $data[10] ?? null;
                 $members = $data[11] ?? null;
-                $streamUrls = $data[12] ?? null;
+                // $streamUrls = $data[12] ?? null;
                 $bandType = $data[13] ?? null;
                 $genre = $data[14] ?? null;
                 $contactLink = $data[18] ?? null;
@@ -59,11 +59,11 @@ class OtherServiceSeeder extends Seeder
                 } else {
                     $members = '[]'; // Set to an empty array if it's empty
                 }
-                if (!empty($streamUrls) && $streamUrls !== '[]') {
-                    $streamUrls = json_encode([$streamUrls]); // Wrap in an array if needed
-                } else {
-                    $streamUrls = '[]'; // Set to an empty array if it's empty
-                }
+                // if (!empty($streamUrls) && $streamUrls !== '[]') {
+                //     $streamUrls = json_encode([$streamUrls]); // Wrap in an array if needed
+                // } else {
+                //     $streamUrls = '[]'; // Set to an empty array if it's empty
+                // }
                 if (!empty($genre) && $genre !== '[]') {
                     $genre = json_encode([$genre]); // Wrap in an array if needed
                 } else {
@@ -96,7 +96,7 @@ class OtherServiceSeeder extends Seeder
                     "environment_type" => $environmentType,
                     "working_times" => $workingTimes,
                     "members" => $members,
-                    "stream_urls" => $streamUrls,
+                    "stream_urls" => $data[12],
                     "band_type" => $bandType,
                     "genre" => $genre,
                     "contact_name" => $data[15],
