@@ -426,9 +426,19 @@ class ProfileController extends Controller
 
                 // Stream Links
                 if (isset($userData['stream_links'])) {
+                    // Decode the stored stream URLs from JSON to an array
                     $storedStreamLinks = json_decode($band->stream_urls, true);
-                    if ($storedStreamLinks !== $userData['stream_links']) {
-                        $band->update(['stream_urls' => json_encode($userData['stream_links'])]);
+
+                    // Ensure $userData['stream_links'] is an array
+                    if (is_array($userData['stream_links'])) {
+                        // If the stored stream links are different from the user input, update the database
+                        if ($storedStreamLinks !== $userData['stream_links']) {
+                            // Encode the user input as JSON and update
+                            $band->update(['stream_urls' => json_encode($userData['stream_links'])]);
+                        }
+                    } else {
+                        // If $userData['stream_links'] is not an array, handle the error
+                        dd('Error: $userData[\'stream_links\'] is not an array');
                     }
                 }
 
@@ -841,22 +851,28 @@ class ProfileController extends Controller
         $data = json_decode($genreList, true);
         $genres = $data['genres'];
         $bandGenres = is_array($band->genre) ? $band->genre : json_decode($band->genre, true);
-        $streamLinks = is_array($band->genre) ? $band->stream_urls : json_decode($band->stream_urls, true);
+        $streamLinks = json_decode($band->stream_urls, true);
+        // dd(gettype($streamLinks));
+        // $explodedStreamLinks = explode(',', $streamLinks);
+        // dd($streamLinks);
 
         $streamPlatforms = [];
         $streamPlatformsToCheck = ['spotify', 'apple-music', 'youtube-music', 'amazon-music', 'bandcamp', 'soundcloud'];
 
-        foreach ($streamPlatformsToCheck as $streamPlatform) {
-            $streamPlatforms[$streamPlatform] = '';
-        }
+        // if (is_array($streamLinks)) {
+        //     foreach ($streamLinks as $link) {
+        //         // Loop through each platform in $streamPlatformsToCheck and check if it exists in the link
+        //         foreach ($streamPlatformsToCheck as $platform) {
+        //             // Check if the platform key exists in the link
+        //             if (isset($link[$platform])) {
+        //                 // Add the platform and URL to the $streamPlatforms array
+        //                 $streamPlatforms[$platform] = $link[$platform];
+        //             }
+        //         }
+        //     }
+        // }
 
-        if ($streamLinks) {
-            foreach ($streamPlatformsToCheck as $streamPlatform) {
-                if (isset($streamLinks[$streamPlatform])) {
-                    $streamPlatforms[$streamPlatform] = $streamLinks[$streamPlatform];
-                };
-            };
-        }
+        // dd($streamLinks);
 
         $members = is_array($band->members) ? $band->members : json_decode($band->members, true);
 

@@ -53,21 +53,3 @@
     </div>
   @endif
 </form>
-<script>
-  function previewLogo(event) {
-    const file = event.target.files[0];
-    const preview = document.getElementById('logo-preview');
-
-    if (file) {
-      const reader = new FileReader();
-
-      reader.onload = function(e) {
-        preview.src = e.target.result; // Set the preview to the file data
-        preview.style.display = 'block'; // Show the preview image
-        console.log('Preview URL:', e.target.result); // Log the preview URL
-      };
-
-      reader.readAsDataURL(file); // Read the file as a data URL
-    }
-  }
-</script>

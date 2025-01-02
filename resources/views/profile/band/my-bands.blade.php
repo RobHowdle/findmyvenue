@@ -16,17 +16,17 @@
       </tr>
     </thead>
     <tbody>
-      @foreach ($uniqueBands as $band)
+      @foreach ($uniqueBands as $artist)
         <tr class="border-gray-700 odd:dark:bg-black even:dark:bg-gray-900">
-          <td class="max-w-md whitespace-normal break-words px-6 py-4 font-sans text-white">{{ $band->name }}</td>
+          <td class="max-w-md whitespace-normal break-words px-6 py-4 font-sans text-white">{{ $artist->name }}</td>
           <td class="max-w-md whitespace-normal break-words px-6 py-4 font-sans text-white">
-            {{ $band->location ?? 'No Location' }}
+            {{ $artist->location ?? 'No Location' }}
           </td>
           <td class="max-w-md whitespace-normal break-words px-6 py-4 font-sans text-white">
-            {{ $band->genre ?? 'No Genre Available' }}
+            {{ $artist->genre ?? 'No Genre Available' }}
           </td>
           <td class="max-w-md whitespace-normal break-words px-6 py-4 text-center font-sans text-white">
-            {{-- <a href="{{ route('admin.dashboard.show-band', ['dashboardType' => $dashboardType, 'id' => $band->id]) }}"
+            {{-- <a href="{{ route('admin.dashboard.show-band', ['dashboardType' => $dashboardType, 'id' => $artist->id]) }}"
               class="text-blue-500 hover:underline">View</a> --}}
           </td>
         </tr>
