@@ -13,17 +13,70 @@ class APIRequestsController extends Controller
 {
     public function searchBands(Request $request)
     {
-        $query = $request->input('name');
+        $query = $request->input('q');
+
+        // Clean the query (assuming cleanQuery is a helper function)
+        // $cleanedQuery = cleanQuery($query);
 
         if (empty($query)) {
             return response()->json(['error' => 'Query is required'], 400);
         }
 
+        // Fetch bands with the specified other_service_id
         $bands = OtherService::where('other_service_id', 4)
             ->where('name', 'LIKE', '%' . $query . '%')
             ->get(['id', 'name']);
 
+        // Prepare response
+        if ($bands->isEmpty()) {
+            $bands = [
+                'bands' => [],
+                'createNewBandOption' => [
+                    'name' => $query,
+                    'message' => "No results found. Click to create a new band: $query",
+                ],
+            ];
+        } else {
+            $bands = [
+                'bands' => $bands,
+                'createNewBandOption' => null,
+            ];
+        }
+
+        // Return the response as JSON
         return response()->json($bands);
+    }
+
+
+    public function createBand(Request $request)
+    {
+        $this->validate($request, [
+            'name' => 'required|string',
+        ]);
+
+        $query = $request->input('name');
+        $cleanedQuery = cleanQuery($query);
+
+        $newBand = OtherService::create([
+            'other_service_id' => 4,
+            'name' => $cleanedQuery,
+            'location' => 'Unknown',
+            'postal_town' => 'Unknown',
+            'longitude' => 0,
+            'latitude' => 0,
+            'description' => 'Nothing here yet!',
+            'contact_name' => 'Unknown',
+            'contact_number' => '00000000000',
+            'contact_email' => 'blank@yournextshow.co.uk',
+            'contact_link' => json_encode(['website' => 'https://yournextshow.co.uk']),
+            'services' => 'Artist',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'band' => $newBand,
+            'message' => 'Artist not found, created new artist'
+        ]);
     }
 
     /**

@@ -269,6 +269,8 @@ class EventController extends Controller
     {
         $modules = collect(session('modules', []));
 
+        // dd($request);
+
         try {
             $validatedData = $request->validate([
                 'event_name' => 'required|string',
@@ -282,12 +284,12 @@ class EventController extends Controller
                 'venue_id' => 'required|integer|exists:venues,id',
                 'headliner' => 'required|string',
                 'headliner_id' => 'required|integer',
-                'mainSupport' => 'required|string',
+                'main_support' => 'required|string',
                 'main_support_id' => 'required|integer',
                 'artist' => 'nullable|array',
-                'band.*' => 'nullable|string',
-                'band_id' => 'required|array',
-                'band_id.*' => 'required|integer',
+                'bands.*' => 'nullable|string',
+                'bands_ids' => 'required|array',
+                // 'band_id.*' => 'required|integer',
                 'opener' => 'nullable|string',
                 'opener_id' => 'required|integer',
                 'poster_url' => 'required|image|mimes:jpeg,jpg,png,webp,svg|max:5120'
@@ -306,14 +308,14 @@ class EventController extends Controller
                 $bandsArray[] = ['role' => 'Headliner', 'band_id' => $request->headliner_id];
             }
 
-            if (!empty($request->mainSupport)) {
+            if (!empty($request->main_support)) {
                 $bandsArray[] = ['role' => 'Main Support', 'band_id' => $request->main_support_id];
             }
 
-            if (!empty($request->band_id)) {
-                foreach ($request->band_id as $bandId) {
+            if (!empty($request->bands_ids)) {
+                foreach ($request->bands_ids as $bandId) {
                     if (!empty($bandId)) {
-                        $bandsArray[] = ['role' => 'Artist', 'band_id' => $bandId];
+                        $bandsArray[] = ['role' => 'Artist', 'band_id' => $bandId]; // Changed from bands_ids to band_id
                     }
                 }
             }
@@ -368,7 +370,7 @@ class EventController extends Controller
             // Event Band Creation
             if (!empty($bandsArray)) {
                 foreach ($bandsArray as $band) {
-                    $event->services()->attach($band['band_id'], [
+                    $event->services()->attach($band['band_id'], [ // Changed from bands_id to band_id
                         'event_id' => $event->id,
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now(),
