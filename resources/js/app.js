@@ -234,7 +234,7 @@ jQuery(document).ready(function () {
 
 // Function to initialize Summernote
 window.initialiseSummernote = function (selector, initialContent) {
-    jQuery(selector).summernote({
+    $(selector).summernote({
         height: 300,
         toolbar: [
             ["style", ["style"]],

@@ -40,8 +40,13 @@ class OtherService extends Model
     ];
 
     protected $casts = [
-        'contact_links' => 'array',
+        'packages' => 'array',
+        'environment_type' => 'array',
+        'working_times' => 'array',
+        'members' => 'array',
+        'stream_urls' => 'array',
         'genre' => 'array',
+        'contact_links' => 'array',
         'portfolio_images' => 'array',
     ];
 

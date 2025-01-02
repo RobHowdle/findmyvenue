@@ -26,7 +26,7 @@
 </form>
 <script>
   var aboutContent = @json(old('about', $about));
-  jQuery(document).ready(function() {
-    initialiseSummernote("#about", aboutContent);
+  $(document).ready(function() {
+    window.initialiseSummernote("#about", aboutContent);
   });
 </script>

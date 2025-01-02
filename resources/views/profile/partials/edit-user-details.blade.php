@@ -47,10 +47,10 @@
         $dataId = 1;
       @endphp
       <x-google-address-picker :dataId="$dataId" id="location_{{ $dataId }}" name="location" label="Location"
-        placeholder="Enter an address" :value="old('location', $location ?? '')" :latitude="old('latitude', $latitude ?? '')" :longitude="old('longitude', $longitude ?? '')" />
+        placeholder="Enter an address" :value="old('location', $location ?? '')" :latitude="old('latitude', $latitude ?? '')" :longitude="old('longitude', $longitude ?? '')" :postalTown="old('postal_town', $postalTown ?? '')" />
     </div>
 
-    <div class="mt-4">
+    {{-- <div class="mt-4">
       <table id="role-table" class="min-w-full table-auto border-collapse">
         <thead>
           <tr>
@@ -76,7 +76,7 @@
       <div class="mt-4">
         <x-button type="button" id="add-role" label="Add Role"></x-button>
       </div>
-    </div>
+    </div> --}}
 
     <div id="editRoleModal" class="fixed inset-0 hidden items-center justify-center bg-gray-500 bg-opacity-75">
       <div class="rounded bg-black p-4 text-white shadow-md">
