@@ -25,3 +25,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('/venues/{id}', [VenueApiController::class, 'show']);
 Route::get('/dashboard/{$dashboardType}/finances', [FinanceController::class, 'getFinanceData']);
 Route::get('/bands/search', [APIRequestsController::class, 'searchBands']);
+Route::post('/bands/create', [APIRequestsController::class, 'createBand']);

@@ -102,12 +102,12 @@
               class="absolute right-2 top-12 flex h-12 w-12 place-items-center justify-center rounded-50 bg-opac_8_black p-2 transition duration-150 ease-in-out hover:bg-opac_5_black">
               <span class="fas fa-search-plus"></span>
             </div>
+
             <img src="{{ asset($event->poster_url) }}" alt="{{ $event->event_name }} Poster"
               class="cursor-pointer object-cover transition duration-150 ease-in-out hover:opacity-75" id="eventPoster"
               onclick="openModal()">
-            <div id="modal"
-              class="fixed inset-0 flex hidden scale-95 transform justify-center duration-300 ease-in-out">
-              <div class="rounded-lg bg-white p-4">
+            <div id="modal" class="fixed inset-0 hidden scale-95 transform justify-center duration-300 ease-in-out">
+              <div class="flex justify-center rounded-lg bg-opac_8_black p-4">
                 <span
                   class="absolute right-2 top-2 cursor-pointer transition duration-150 ease-in-out hover:text-yns_yellow"
                   onclick="closeModal()"><span class="fas fa-times"></span></span>
