@@ -44,7 +44,7 @@ class OtherService extends Model
         'environment_type' => 'array',
         'working_times' => 'array',
         'members' => 'array',
-        'stream_urls' => 'array',
+        // 'stream_urls' => 'array',
         'genre' => 'array',
         'contact_links' => 'array',
         'portfolio_images' => 'array',

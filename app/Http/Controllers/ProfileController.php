@@ -851,7 +851,10 @@ class ProfileController extends Controller
         $data = json_decode($genreList, true);
         $genres = $data['genres'];
         $bandGenres = is_array($band->genre) ? $band->genre : json_decode($band->genre, true);
-        $streamLinks = is_array($band->stream_urls) ? $band->stream_urls : json_decode($band->stream_urls, true);
+        $streamLinks = json_decode($band->stream_urls, true);
+        // dd(gettype($streamLinks));
+        // $explodedStreamLinks = explode(',', $streamLinks);
+        // dd($streamLinks);
 
         $streamPlatforms = [];
         $streamPlatformsToCheck = ['spotify', 'apple-music', 'youtube-music', 'amazon-music', 'bandcamp', 'soundcloud'];
