@@ -101,7 +101,7 @@ Route::middleware(['auth', 'web', 'verified'])->group(function () {
         Route::get('/band-journey', [BandJourneyController::class, 'index'])->name('band.journey');
         Route::get('/band-search', [BandJourneyController::class, 'search'])->name('band.search');
         Route::post('/band-journey/join/{id}', [BandJourneyController::class, 'joinBand'])->name('band.join');
-        Route::post('/band-journey/create', [BandJourneyController::class, 'createBand'])->name('band.create');
+        Route::post('/band-journey/create', [BandJourneyController::class, 'createBand'])->name('band.store');
     });
 
     Route::prefix('/{dashboardType}')->middleware(['auth'])->group(function () {
@@ -124,7 +124,7 @@ Route::middleware(['auth', 'web', 'verified'])->group(function () {
         Route::get('/photographer-journey', [PhotographerJourneyController::class, 'index'])->name('photographer.journey');
         Route::get('/photographer-search', [PhotographerJourneyController::class, 'searchPhotographer'])->name('photographer.search');
         Route::get('/photographer-select', [PhotographerJourneyController::class, 'selectPhotogrpher'])->name('photographer.select');
-        Route::post('/photographer-journey/link/{id}', [PhotographerJourneyController::class, 'linkPhotographer'])->name('photographer.link');
+        Route::post('/photographer-journey/join/{id}', [PhotographerJourneyController::class, 'joinPhotographer'])->name('photographer.link');
         Route::post('/photographer/create', [PhotographerJourneyController::class, 'createPhotographer'])->name('photographer.store');
     });
 

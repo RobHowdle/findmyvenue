@@ -112,8 +112,8 @@
 <script defer>
   const genres = @json($genres);
   const dashboardType = "{{ $dashboardType }}";
-  let photographerGenres = @json($photographerData['photographerGenres']);
-  let photographerBandTypes = @json($photographerData['bandTypes']);
+  let photographerGenres = @json($photographerUserData['photographerGenres']);
+  let photographerBandTypes = @json($photographerUserData['bandTypes']);
 
   document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("all-genres-checkbox")?.addEventListener("change", (e) => {

@@ -46,8 +46,8 @@
       @php
         $dataId = 1;
       @endphp
-      <x-google-address-picker :dataId="$dataId" id="location_{{ $dataId }}" name="location" label="Location"
-        placeholder="Enter an address" :value="old('location', $location ?? '')" :latitude="old('latitude', $latitude ?? '')" :longitude="old('longitude', $longitude ?? '')" :postalTown="old('postal_town', $postalTown ?? '')" />
+      <x-google-address-picker :postalTown="old('postal_town', $postalTown ?? '')" :dataId="$dataId" id="location_{{ $dataId }}" name="location"
+        label="Location" placeholder="Enter an address" :value="old('location', $location ?? '')" :latitude="old('latitude', $latitude ?? '')" :longitude="old('longitude', $longitude ?? '')" />
     </div>
 
     {{-- <div class="mt-4">

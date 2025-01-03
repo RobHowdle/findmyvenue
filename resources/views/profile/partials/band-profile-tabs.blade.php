@@ -21,10 +21,11 @@
 </div>
 <div x-show="selectedTab === 4" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
   <div class="w-full">
-    @include('profile.band.stream-links', [
+    {{-- @include('profile.band.stream-links', [
         'streamLinks' => $bandData['streamLinks'],
         'streamPlatformsToCheck' => $bandData['streamPlatformsToCheck'],
-    ]) </div>
+    ]) --}}
+  </div>
 </div>
 <div x-show="selectedTab === 5" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
   <div class="w-full">
@@ -40,7 +41,7 @@
 </div>
 <div x-show="selectedTab === 6" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
   <div class="w-full">
-    @include('profile.band.my-genres', [
+    {{-- @include('profile.band.my-genres', [
         'dashboardType' => $dashboardType,
         'userRole' => $userRole,
         'firstName' => $firstName,
@@ -51,7 +52,8 @@
         'promoterGenres' => $bandData['bandGenres'],
         'userId' => $userId,
         'artist' => $bandData['artist'],
-    ]) </div>
+    ])  --}}
+  </div>
 </div>
 <div x-show="selectedTab === 7" class="bg-opac_8_black p-4 shadow sm:rounded-lg sm:p-8" x-cloak>
   <div class="w-full">

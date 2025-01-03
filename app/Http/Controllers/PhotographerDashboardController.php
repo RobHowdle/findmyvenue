@@ -36,13 +36,12 @@ class PhotographerDashboardController extends Controller
                 $query->whereBetween('job_start_date', [$startOfWeek, $endOfWeek]);
             }])
             ->get()
-            ->pluck('jobs') // Pluck the jobs relationship
-            ->flatten() // Flatten the collection of jobs
+            ->pluck('jobs')
+            ->flatten()
             ->count();
 
 
         $service = $photographer->otherService(ucfirst($role))->first();
-        // $dashboardType = lcfirst($service->services);
 
         return view('admin.dashboards.photographer-dash', [
             'userId' => $this->getUserId(),
