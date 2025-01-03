@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\OtherService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -74,7 +75,10 @@ class BandJourneyController extends Controller
         }
 
         // Add the user to the band
-        $user->otherService('artist')->attach($artistId);
+        $user->otherService('artist')->attach($artistId, [
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now()
+        ]);
 
         return response()->json([
             'success' => true,

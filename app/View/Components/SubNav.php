@@ -209,7 +209,7 @@ class SubNav extends Component
     private function loadVenueData($user)
     {
         $venues = $user->venues()->get();
-        if ($venues) {
+        if ($venues->isNotEmpty()) {
             $venue = $venues->first();
             $this->venueId = $venue->id;
             $this->eventsCountVenueYtd = $this->calculateEventsCountPromoterYtd($venue);
