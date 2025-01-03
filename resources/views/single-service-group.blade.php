@@ -207,8 +207,9 @@
         serviceType: serviceType,
       },
       success: function(data) {
+        console.log(Array.isArray(data.results));
         // Extract venues array and pass it to the function
-        if (data.otherServices && Array.isArray(data.otherServices)) {
+        if (data.results && Array.isArray(data.results)) {
           updateTable(data);
         } else {
           console.error("The 'otherServices' field is not an array or is missing:", data.otherServices);
@@ -240,38 +241,48 @@
 
       if (otherService.platforms && Array.isArray(otherService.platforms)) {
         platformsHtml = otherService.platforms.map(function(platform) {
-          var icon = '';
-          switch (platform.platform.toLowerCase()) {
-            case 'facebook':
-              icon = 'fab fa-facebook';
-              break;
-            case 'instagram':
-              icon = 'fab fa-instagram';
-              break;
-            case 'twitter':
-              icon = 'fab fa-twitter';
-              break;
-            case 'website':
-              icon = 'fas fa-globe';
-              break;
-            case 'snapchat':
-              icon = 'fab fa-snapchat-ghost';
-              break;
-            case 'youtube':
-              icon = 'fab fa-youtube';
-              break;
-            case 'tiktok':
-              icon = 'fab fa-tiktok';
-              break;
-            case 'bluesky':
-              icon = 'fa-brands fa-bluesky';
-              break;
-            default:
-              icon = 'fas fa-link';
+          try {
+            // Access platform properties directly
+            const platformType = platform.platform;
+            const url = platform.url;
+
+            let icon = '';
+            switch (platformType.toLowerCase()) {
+              case 'facebook':
+                icon = 'fab fa-facebook';
+                break;
+              case 'instagram':
+                icon = 'fab fa-instagram';
+                break;
+              case 'twitter':
+                icon = 'fab fa-twitter';
+                break;
+              case 'website':
+                icon = 'fas fa-globe';
+                break;
+              case 'snapchat':
+                icon = 'fab fa-snapchat-ghost';
+                break;
+              case 'youtube':
+                icon = 'fab fa-youtube';
+                break;
+              case 'tiktok':
+                icon = 'fab fa-tiktok';
+                break;
+              case 'bluesky':
+                icon = 'fa-brands fa-bluesky';
+                break;
+              default:
+                icon = 'fas fa-link';
+            }
+
+            return `<a href="${url}" target="_blank" class="hover:text-yns_yellow mr-2 transition duration-150 ease-in-out">
+        <span class="${icon}"></span>
+      </a>`;
+          } catch (e) {
+            console.error('Error processing platform:', platform);
+            return '';
           }
-          return `<a href="${platform.url}" target="_blank" class="hover:text-yns_yellow mr-2 transition duration-150 ease-in-out">
-          <span class="${icon}"></span>
-        </a>`;
         }).join('');
       }
 
@@ -349,12 +360,12 @@
     console.log("Data:", data); // Check the entire data object
 
     // If the data doesn't have otherServices, we'll log an error and exit
-    if (!data || !data.otherServices) {
+    if (!data || !data.results) {
       console.error("Other services data is missing or undefined.");
       return; // Exit the function if the data is not structured as expected
     }
 
-    var otherServices = data.otherServices;
+    var otherServices = data.results;
     var pagination = data.pagination;
 
     console.log("Other Services:", otherServices);

@@ -2,7 +2,7 @@
     "genres": [
         {
             "name": "Alternative",
-            "subgenres": ["Alternative Rock","College Rock","Crossover Thrash","Emo Hardcore","Experimental Rock","Goth Rock","Grunge","Hard Rock","Indie Rock","Lofi","Musique Concrete","New Wave","Progressive Rock","Shoegaze"]
+            "subgenres": ["Alternative Rock","College Rock","Crossover Thrash","Emo Mix","Emo Hardcore","Experimental Rock","Goth Rock","Grunge","Hard Rock","Indie Rock","Lofi","Musique Concrete","New Wave","Progressive Rock","Shoegaze"]
         },
         {
             "name": "Blues",
@@ -60,8 +60,7 @@
         },
         {
             "name": "Metal",
-            "subgenres": [
-                "Heavy Metal", "Speed Metal", "Thrash Metal", "Power Metal", "Death Metal", "Nu Death Metal", "Black Metal", "Pagan Metal", "Viking Metal", "Folk Metal", "Symphonic Metal", "Gothic Metal", "Glam Metal", "Hair Metal", "Doom Metal", "Groove Metal", "Industrial Metal", "Modern Metal", "Neoclassical Metal", "New Wave Of British Heavy Metal", "Post Metal", "Progressive Metal", "Avantgarde Metal", "Sludge", "Djent", "Drone", "Kawaii Metal", "Pirate Metal", "Nu Metal", "Neue Deutsche Harte", "Math Metal", "Crossover", "Grindcore", "Hardcore", "Metalcore", "Deathcore", "Post Hardcore", "Mathcore", "Stoner Metal"
+            "subgenres": ["Avantgarde Metal","Beatdown","Black Metal","Crossover","Death Metal","Deathcore","Djent","Doom Metal","Drone","Folk Metal","Glam Metal","Gothic Metal","Grindcore","Groove Metal","Hair Metal","Hardcore","Heavy Metal","Industrial Metal","Kawaii Metal","Math Metal","Mathcore","Metalcore","Modern Metal","Neoclassical Metal","Neue Deutsche Harte","New Wave Of British Heavy Metal","NHBD","NHSD","Nu Death Metal","Nu Metal","Pagan Metal","Pirate Metal","Post Hardcore","Post Metal","Power Metal","Progressive Metal","Slam", "Sludge","Speed Metal","Stoner Metal","Symphonic Metal","Thrash Metal","Viking Metal"
             ]
         },
         {
