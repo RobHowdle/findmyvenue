@@ -137,7 +137,7 @@ class BandJourneyController extends Controller
             return redirect()->route('dashboard', $dashboardType)->with('success', 'Successfully created and joined the new artist!');
         } catch (\Exception $e) {
             logger()->error('Error in createBand:', ['error' => $e->getMessage()]);
-            return back()->withErrors(['error' => 'Something went wrong.']);
+            return back()->withErrors(['error' => 'Something went wrong. We\'ve logged the error and will fix it soon.']);
         }
     }
 }

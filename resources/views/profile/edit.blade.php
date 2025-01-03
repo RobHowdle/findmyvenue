@@ -32,7 +32,7 @@
             ])
           @elseif($dashboardType == 'photographer')
             @include('profile.partials.photographer-profile', [
-                'photographerData' => $photographerData,
+                'photographerUserData' => $photographerUserData,
             ])
           @elseif($dashboardType == 'standard')
             @include('profile.partials.standard-profile', [
@@ -108,7 +108,7 @@
           ])
         @elseif($dashboardType == 'photographer')
           @include('profile.partials.photographer-profile-tabs', [
-              'photographerData' => $photographerData,
+              'photographerUserData' => $photographerUserData,
           ])
         @elseif($dashboardType == 'standard')
           @include('profile.partials.standard-profile-tabs', [

@@ -37,6 +37,7 @@ class ProfileController extends Controller
      */
     public function edit($dashboardType, $user): View
     {
+        // dd($dashboardType);
         $modules = collect(session('modules', []));
         $user = User::where('id', $user)->first();
         $roles = Role::where('name', '!=', 'administrator')->get();
@@ -52,7 +53,7 @@ class ProfileController extends Controller
         $promoterData = [];
         $bandData = [];
         $venueData = [];
-        $photographerData = [];
+        $photographerUserData = [];
         $standardUserData = [];
         $designerUserData = [];
 
@@ -64,7 +65,7 @@ class ProfileController extends Controller
         } elseif ($dashboardType === 'venue') {
             $venueData = $this->getVenueData($user);
         } elseif ($dashboardType === 'photographer') {
-            $photographerData = $this->getPhotographerData($user);
+            $photographerUserData = $this->getPhotographerData($user);
         } elseif ($dashboardType === 'standard') {
             $standardUserData = $this->getStandardUserData($user);
         } elseif ($dashboardType === 'designer') {
@@ -99,7 +100,7 @@ class ProfileController extends Controller
             'promoterData' => $promoterData,
             'bandData' => $bandData,
             'venueData' => $venueData,
-            'photographerData' => $photographerData,
+            'photographerUserData' => $photographerUserData,
             'standardUserData' => $standardUserData,
             'designerUserData' => $designerUserData,
             'user' => $user,
@@ -899,13 +900,15 @@ class ProfileController extends Controller
 
     private function getPhotographerData(User $user)
     {
-        $photographer = $user->otherService("Photography")->first();
+        $photographer = $user->otherService("Photographer")->first();
         $serviceableId = $photographer->id;
         $serviceableType = 'App\Models\OtherService';
 
         $name = $photographer ? $photographer->name : '';
         $location = $photographer ? $photographer->location : '';
-        $logo = $photographer ? $photographer->logo_url : 'images/system/yns_logo.png';
+        $logo = $photographer && $photographer->logo_url
+            ? (filter_var($photographer->logo_url, FILTER_VALIDATE_URL) ? $photographer->logo_url : Storage::url($photographer->logo_url))
+            : asset('images/system/yns_no_image_found.png');
         $phone = $photographer ? $photographer->contact_number : '';
         $contact_name = $photographer ? $photographer->contact_name : '';
         $contact_email = $photographer ? $photographer->contact_email : '';
@@ -936,19 +939,14 @@ class ProfileController extends Controller
         $genres = $data['genres'];
         $photographerGenres = is_array($photographer->genre) ? $photographer->genre : json_decode($photographer->genre, true);
         $portfolioLink = $photographer ? $photographer->portfolio_link : '';
-        $portfolioImages = $photographer->portfolio_images;
+        $waterMarkedPortfolioImages = $photographer->portfolio_images;
 
-        // Decode the first layer
-        $portfolioImages = json_decode($portfolioImages, true);
-
-        // Check if it's still a string and decode again if necessary
-        if (is_string($portfolioImages)) {
-            $portfolioImages = json_decode($portfolioImages, true);
-        }
-
-        // Ensure it's an array
-        if (!is_array($portfolioImages)) {
-            throw new \Exception("Portfolio images could not be converted to an array.");
+        if (!is_array($waterMarkedPortfolioImages)) {
+            try {
+                $waterMarkedPortfolioImages = json_decode($waterMarkedPortfolioImages, true);
+            } catch (\Exception $e) {
+                throw new \Exception("Portfolio images could not be converted to an array.");
+            }
         }
 
         $groupedEnvironmentTypes = config('environment_types');
@@ -970,14 +968,15 @@ class ProfileController extends Controller
         $genres = $data['genres'];
         $photographerGenres = is_array($photographer->genre) ? $photographer->genre : json_decode($photographer->genre, true);
         $normalizedPhotographerGenres = [];
-
-        foreach ($photographerGenres as $genreName => $genreData) {
-            $normalizedPhotographerGenres[$genreName] = [
-                'all' => $genreData['all'] ?? 'false',
-                'subgenres' => isset($genreData['subgenres'][0])
-                    ? (is_array($genreData['subgenres'][0]) ? $genreData['subgenres'][0] : $genreData['subgenres'])
-                    : []
-            ];
+        if ($photographerGenres) {
+            foreach ($photographerGenres as $genreName => $genreData) {
+                $normalizedPhotographerGenres[$genreName] = [
+                    'all' => $genreData['all'] ?? 'false',
+                    'subgenres' => isset($genreData['subgenres'][0])
+                        ? (is_array($genreData['subgenres'][0]) ? $genreData['subgenres'][0] : $genreData['subgenres'])
+                        : []
+                ];
+            }
         }
 
         $bandTypes = json_decode($photographer->band_type) ?? [];
@@ -1000,7 +999,7 @@ class ProfileController extends Controller
             'portfolio_link' => $portfolioLink,
             'serviceableId' => $serviceableId,
             'serviceableType' => $serviceableType,
-            'portfolioImages' => $portfolioImages,
+            'waterMarkedPortfolioImages' => $waterMarkedPortfolioImages,
             'environmentTypes' => $environmentTypes,
             'groups' => $groupedData,
             'workingTimes' => $workingTimes,
@@ -1008,7 +1007,6 @@ class ProfileController extends Controller
             'isAllGenres' => $isAllGenres,
             'photographerGenres' => $normalizedPhotographerGenres,
             'bandTypes' => $bandTypes,
-
         ];
     }
 
@@ -1095,7 +1093,11 @@ class ProfileController extends Controller
 
         // Ensure it's an array
         if (!is_array($waterMarkedPortfolioImages)) {
-            throw new \Exception("Portfolio images could not be converted to an array.");
+            try {
+                $waterMarkedPortfolioImages = json_decode($waterMarkedPortfolioImages, true);
+            } catch (\Exception $e) {
+                throw new \Exception("Portfolio images could not be converted to an array.");
+            }
         }
 
         $groupedEnvironmentTypes = config('environment_types');
@@ -1116,10 +1118,10 @@ class ProfileController extends Controller
         $isAllGenres = in_array('All', $data);
         $genres = $data['genres'];
         $designerGenres = is_array($designer->genre) ? $designer->genre : json_decode($designer->genre, true);
-        $normalizedPhotographerGenres = [];
+        $normalizedDesignerGenres = [];
 
         foreach ($designerGenres as $genreName => $genreData) {
-            $normalizedPhotographerGenres[$genreName] = [
+            $normalizedDesignerGenres[$genreName] = [
                 'all' => $genreData['all'] ?? 'false',
                 'subgenres' => isset($genreData['subgenres'][0])
                     ? (is_array($genreData['subgenres'][0]) ? $genreData['subgenres'][0] : $genreData['subgenres'])
@@ -1152,7 +1154,7 @@ class ProfileController extends Controller
             'workingTimes' => $workingTimes,
             'genres' => $genres,
             'isAllGenres' => $isAllGenres,
-            'photographerGenres' => $normalizedPhotographerGenres,
+            'designerGenres' => $normalizedDesignerGenres,
             'bandTypes' => $bandTypes,
         ];
     }

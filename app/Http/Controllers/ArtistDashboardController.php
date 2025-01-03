@@ -25,7 +25,7 @@ class ArtistDashboardController extends Controller
         $pendingReviews = OtherServicesReview::with('otherService')->where('review_approved', '0')->whereNull('deleted_at')->count();
         $band = Auth::user()->load(['otherService', 'roles']);
         $role = $band->roles->first()->name;
-        $todoItemsCount = $band->otherService()->with(['todos' => function ($query) {
+        $todoItemsCount = $band->otherService('Artist')->with(['todos' => function ($query) {
             $query->where('completed', 0)->whereNull('deleted_at');
         }])->get()->pluck('todos')->flatten()->count();
 
@@ -41,7 +41,6 @@ class ArtistDashboardController extends Controller
             ->count();
 
         $service = $band->otherService(ucfirst($role))->first();
-        // $dashboardType = lcfirst($service->services);
 
         return view('admin.dashboards.artist-dash', [
             'userId' => $this->getUserId(),

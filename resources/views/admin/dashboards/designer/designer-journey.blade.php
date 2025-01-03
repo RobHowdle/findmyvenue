@@ -22,8 +22,8 @@
               enctype="multipart/form-data">
               @csrf
               <x-google-address-picker id="location" name="location" label="Where are you based?"
-                placeholder="Search for a location..." value="" latitude="" longitude=""
-                dataId=""></x-google-address-picker>
+                placeholder="Search for a location..." value="" latitude="" longitude="" dataId=""
+                postalTown=""></x-google-address-picker>
 
               <div class="group">
                 <x-input-label-dark>Promotions Company Name</x-input-label-dark>
