@@ -10,6 +10,9 @@ if (!function_exists('a0rAn')) {
 
         return in_array($firstLetter, $vowels) ? 'an' : 'a';
     }
+} else {
+    // Log a notice instead of an error
+    Log::notice('The a0rAn function was already defined.');
 }
 
 // PHP Money Formatter
@@ -30,4 +33,23 @@ if (!function_exists('formatCurrency')) {
 } else {
     // Log a notice instead of an error
     Log::notice('The formatCurrency function was already defined.');
+}
+
+if (!function_exists('cleanQuery')) {
+    function cleanQuery($query)
+    {
+        // Trim whitespace
+        $cleanQuery = trim($query);
+
+        // Capitalize the first letter of each word
+        $cleanQuery = ucwords(strtolower($cleanQuery));
+
+        // Remove multiple spaces and keep only a single space between words
+        $cleanQuery = preg_replace('/\s+/', ' ', $cleanQuery);
+
+        return $cleanQuery;
+    }
+} else {
+    // Log a notice instead of an error
+    Log::notice('The cleanQuery function was already defined.');
 }

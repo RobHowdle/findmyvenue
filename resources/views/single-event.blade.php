@@ -97,15 +97,20 @@
             </div>
             <img src="{{ asset($event->poster_url) }}" alt="{{ $event->event_name }} Poster"
               class="cursor-pointer object-cover transition duration-150 ease-in-out hover:opacity-75" id="eventPoster"
-              onclick="openModal()">
-            <div id="modal" class="fixed inset-0 hidden scale-95 transform justify-center duration-300 ease-in-out">
+              id="eventPoster">
+
+            <div id="modal"
+              class="fixed inset-0 hidden scale-95 transform justify-center opacity-0 duration-300 ease-in-out">
               <div class="mt-32 rounded-lg bg-white p-4">
                 <span
-                  class="absolute right-2 top-2 cursor-pointer text-white transition duration-150 ease-in-out hover:text-yns_yellow"
-                  onclick="closeModal()"><span class="fas fa-times"></span></span>
+                  class="absolute right-2 top-2 cursor-pointer text-black transition duration-150 ease-in-out hover:text-yns_yellow"
+                  onclick="closeModal()">
+                  <span class="fas fa-times"></span>
+                </span>
                 <img src="{{ asset($event->poster_url) }}" alt="Enlarged Event Poster" class="max-h-80 max-w-3xl" />
               </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -113,23 +118,32 @@
   </div>
 </x-guest-layout>
 <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Ensure the modal is hidden on page load
+    const modal = document.getElementById('modal');
+    modal.classList.add('hidden', 'opacity-0', 'scale-95');
+
+    // Add click event to open modal
+    document.getElementById('eventPoster').addEventListener('click', function() {
+      openModal();
+    });
+  });
+
   function openModal() {
     const modal = document.getElementById('modal');
-    modal.classList.remove('hidden');
+    modal.classList.remove('hidden'); // Show the modal
     setTimeout(() => {
-      modal.classList.remove('opacity-0');
-      modal.classList.add('opacity-100');
+      modal.classList.remove('opacity-0', 'scale-95'); // Smooth fade-in and scale-up animation
+      modal.classList.add('opacity-100', 'scale-100');
     }, 10);
   }
 
   function closeModal() {
     const modal = document.getElementById('modal');
-    modal.classList.remove('opacity-100');
-    modal.classList.add('opacity-0');
-
-    // Hide the modal after the animation ends
+    modal.classList.remove('opacity-100', 'scale-100'); // Smooth fade-out and scale-down animation
+    modal.classList.add('opacity-0', 'scale-95');
     setTimeout(() => {
-      modal.classList.add('hidden');
+      modal.classList.add('hidden'); // Hide the modal after animation
     }, 300);
   }
 </script>
