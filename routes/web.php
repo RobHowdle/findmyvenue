@@ -115,7 +115,7 @@ Route::middleware(['auth', 'web', 'verified'])->group(function () {
         Route::get('/venue-journey', [VenueJourneyController::class, 'index'])->name('venue.journey');
         Route::get('/venue-search', [VenueJourneyController::class, 'searchVenue'])->name('venue.search');
         Route::get('/venue-select', [VenueJourneyController::class, 'selectVenue'])->name('venue.select');
-        Route::post('/venue-journey/link/{id}', [VenueJourneyController::class, 'linkVenue'])->name('venue.link');
+        Route::post('/venue-journey/join/{id}', [VenueJourneyController::class, 'joinVenue'])->name('venue.link');
         Route::post('/venue/create', [VenueJourneyController::class, 'createVenue'])->name('venue.store');
     });
 

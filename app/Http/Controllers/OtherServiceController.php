@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Venue;
+use App\Models\Promoter;
 use App\Models\BandReviews;
 use App\Models\OtherService;
 use Illuminate\Http\Request;
 use App\Models\DesignerReviews;
+use App\Services\FilterService;
 use App\Models\OtherServiceList;
 use App\Helpers\SocialLinksHelper;
 use App\Models\PhotographyReviews;
@@ -134,27 +137,9 @@ class OtherServiceController extends Controller
             ]);
         }
 
-        // Process contact links and map them to platforms
+        // Process contact links using SocialLinksHelper
         foreach ($singleServices as $singleOtherService) {
-            $urls = explode(',', $singleOtherService->contact_link);
-            $platforms = [];
-
-            foreach ($urls as $url) {
-                $matchedPlatform = 'Unknown';
-                $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube', 'bluesky'];
-                foreach ($platformsToCheck as $platform) {
-                    if (stripos($url, $platform) !== false) {
-                        $matchedPlatform = $platform;
-                        break;
-                    }
-                }
-                $platforms[] = [
-                    'url' => $url,
-                    'platform' => $matchedPlatform
-                ];
-            }
-
-            $singleServices->platforms = $platforms;
+            $singleOtherService->platforms = SocialLinksHelper::processSocialLinks($singleOtherService->contact_link);
         }
 
         $overallReviews = []; // Array to store overall reviews for each venue
@@ -216,98 +201,49 @@ class OtherServiceController extends Controller
 
     public function filterCheckboxesSearch(Request $request, $serviceType)
     {
-        $query = OtherService::query();
-
-        $query->where('services', $serviceType);
-
-        // Search Results
-        $searchQuery = $request->input('search_query');
-        if ($searchQuery) {
-            $query->where(function ($query) use ($searchQuery) {
-                $query->where('postal_town', 'LIKE', "%$searchQuery%")
-                    ->orWhere('name', 'LIKE', "%$searchQuery%");
-            });
-        }
-
-        // Band Type Filter
-        if ($request->has('band_type')) {
-            $bandType = $request->input('band_type');
-            if (!empty($bandType)) {
-                $bandType = array_map('trim', $bandType);
-                $query->where(function ($query) use ($bandType) {
-                    foreach ($bandType as $type) {
-                        $query->orWhereRaw('JSON_CONTAINS(band_type, ?)', [json_encode($type)]);
-                    }
-                });
-            }
-        }
-
-        // Genre Filter
-        if ($request->has('genres')) {
-            $genres = $request->input('genres');
-            if (!empty($genres)) {
-                $genres = array_map('trim', $genres);
-                $query->where(function ($query) use ($genres) {
-                    foreach ($genres as $genre) {
-                        $query->orWhereRaw('JSON_CONTAINS(genre, ?)', [json_encode($genre)]);
-                    }
-                });
-            }
-        }
-
-        // Get the venues with pagination
-        $otherServices = $query->paginate(10);
-
-        // Process each venue
-        $transformedData = $otherServices->getCollection()->map(function ($other) {
-            // Split the field containing multiple URLs into an array
-            $urls = explode(',', $other->contact_link);
-            $platforms = [];
-
-            // Check each URL against the platforms
-            foreach ($urls as $url) {
-                // Initialize the platform as unknown
-                $matchedPlatform = 'Unknown';
-                $platformsToCheck = ['facebook', 'twitter', 'instagram', 'snapchat', 'tiktok', 'youtube', 'bluesky'];
-                foreach ($platformsToCheck as $platform) {
-                    if (stripos($url, $platform) !== false) {
-                        $matchedPlatform = $platform;
-                        break;
-                    }
-                }
-
-                // Store the platform information for each URL
-                $platforms[] = [
-                    'url' => $url,
-                    'platform' => $matchedPlatform
+        $filters = [
+            'service_type' => 'services', // The column to filter by service type
+            'search_fields' => ['postal_town', 'name'], // Fields to search
+            'transform' => function ($item) {
+                return [
+                    'id' => $item->id,
+                    'name' => $item->name,
+                    'postal_town' => $item->postal_town,
+                    'contact_number' => $item->contact_number,
+                    'contact_email' => $item->contact_email,
+                    'platforms' => explode(',', $item->contact_link),
+                    'average_rating' => \App\Models\OtherServicesReview::calculateOverallScore($item->id),
+                    'service_type' => $item->services,
                 ];
-            }
+            },
+        ];
 
-            // Use the static method to calculate the overall score
-            $overallScore = \App\Models\OtherServicesReview::calculateOverallScore($other->id);
+        $model = '';
 
-            return [
-                'id' => $other->id,
-                'name' => $other->name,
-                'postal_town' => $other->postal_town,
-                'contact_number' => $other->contact_number,
-                'contact_email' => $other->contact_email,
-                'platforms' => $platforms,
-                'average_rating' => $overallScore,
-                'service_type' => $other->services,
-            ];
-        });
+        switch ($serviceType) {
+            case 'Artist':
+                $model = OtherService::class;
+                break;
+            case 'Photography':
+                $model = OtherService::class;
+                break;
+            case 'Videographer':
+                $model = OtherService::class;
+                break;
+            case 'Designer':
+                $model = OtherService::class;
+                break;
+            case 'Venue':
+                $model = Venue::class;
+                break;
+            case 'Promoter':
+                $model = Promoter::class;
+                break;
+        }
 
-        // Return the transformed data with pagination info
-        return response()->json([
-            'otherServices' => $transformedData,
-            'pagination' => [
-                'current_page' => $otherServices->currentPage(),
-                'last_page' => $otherServices->lastPage(),
-                'total' => $otherServices->total(),
-                'per_page' => $otherServices->perPage(),
-            ]
-        ]);
+        $data = FilterService::filterEntities($request, $model, $filters);
+
+        return response()->json($data);
     }
 
     /**
