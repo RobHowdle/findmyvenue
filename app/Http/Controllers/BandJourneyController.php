@@ -117,7 +117,9 @@ class BandJourneyController extends Controller
                 'contact_number' => $request->contact_number,
                 'contact_email' => $request->contact_email,
                 'contact_link' => $platformsJson,
-                'services' => 'Artist'
+                'services' => 'Artist',
+                'band_type'  =>  [],
+                'genre' => "[]",
             ]);
 
             if (!$band) {

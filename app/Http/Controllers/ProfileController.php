@@ -849,9 +849,24 @@ class ProfileController extends Controller
         $about = $band ? $band->description : '';
         $myEvents = $band ? $band->events()->with('venues')->get() : collect();
         $genreList = file_get_contents(public_path('text/genre_list.json'));
-        $data = json_decode($genreList, true);
+        $data = json_decode($genreList, true) ?? [];
+        $isAllGenres = in_array('All', $data);
         $genres = $data['genres'];
-        $bandGenres = is_array($band->genre) ? $band->genre : json_decode($band->genre, true);
+        $artistGenres = is_array($band->genre) ? $band->genre : json_decode($band->genre, true);
+        $normalizedArtistGenres = [];
+
+        if ($artistGenres) {
+            foreach ($artistGenres as $genreName => $genreData) {
+                $normalizedArtistGenres[$genreName] = [
+                    'all' => $genreData['all'] ?? 'false',
+                    'subgenres' => isset($genreData['subgenres'][0])
+                        ? (is_array($genreData['subgenres'][0]) ? $genreData['subgenres'][0] : $genreData['subgenres'])
+                        : []
+                ];
+            }
+        }
+
+        $bandTypes = json_decode($band->band_type) ?? [];
         $streamLinks = json_decode($band->stream_urls, true);
         // dd(gettype($streamLinks));
         // $explodedStreamLinks = explode(',', $streamLinks);
@@ -891,7 +906,10 @@ class ProfileController extends Controller
             'platforms' => $platforms,
             'platformsToCheck' => $platformsToCheck,
             'genres' => $genres,
-            'bandGenres' => $bandGenres,
+            'artistGenres' => $artistGenres,
+            'isAllGenres' => $isAllGenres,
+            'designerGenres' => $normalizedArtistGenres,
+            'bandTypes' => $bandTypes,
             'streamLinks' => $streamLinks,
             'streamPlatformsToCheck' => $streamPlatformsToCheck,
             'members' => $members
@@ -1087,7 +1105,6 @@ class ProfileController extends Controller
         $genreList = file_get_contents(public_path('text/genre_list.json'));
         $data = json_decode($genreList, true);
         $genres = $data['genres'];
-        $designerGenres = is_array($designer->genre) ? $designer->genre : json_decode($designer->genre, true);
         $portfolioLink = $designer ? $designer->portfolio_link : '';
         $waterMarkedPortfolioImages = $designer->portfolio_images;
 
@@ -1152,7 +1169,6 @@ class ProfileController extends Controller
             'environmentTypes' => $environmentTypes,
             'groups' => $groupedData,
             'workingTimes' => $workingTimes,
-            'genres' => $genres,
             'isAllGenres' => $isAllGenres,
             'designerGenres' => $normalizedDesignerGenres,
             'bandTypes' => $bandTypes,
@@ -1530,7 +1546,7 @@ class ProfileController extends Controller
         // Now continue with updating genres for the selected userType
         if (isset($request['genres']) && !empty($request['genres'])) {
             // Ensure stored genres are an array before merging
-            $storedGenres = is_array($userType->genre) ? $userType->genre : json_decode($userType->genre, true); // Decode if it's a JSON string
+            $storedGenres = is_array($userType->genre) ? $userType->genre : json_decode($userType->genre, true);
             $newGenres = $request->input('genres');
 
             $mergedGenres = array_merge($storedGenres, $newGenres);
@@ -1566,7 +1582,6 @@ class ProfileController extends Controller
         $bandTypes = $request->input('band_types');
 
         $user = User::where('id', Auth::user()->id)->first();
-        dd($dashboardType);
 
         // Ensure the correct user is selected based on dashboard type
         switch ($dashboardType) {

@@ -243,17 +243,38 @@ class OtherServiceController extends Controller
         }
 
         // Genre Filter
-        if ($request->has('genres')) {
-            $genres = $request->input('genres');
-            if (!empty($genres)) {
-                $genres = array_map('trim', $genres);
-                $query->where(function ($query) use ($genres) {
-                    foreach ($genres as $genre) {
-                        $query->orWhereRaw('JSON_CONTAINS(genre, ?)', [json_encode($genre)]);
+        if ($request->has('genres') || $request->has('subgenres')) {
+            $query->where(function ($query) use ($request) {
+                // Handle main genres
+                if ($request->has('genres')) {
+                    $genres = array_map('trim', $request->input('genres'));
+                    if (!empty($genres)) {
+                        foreach ($genres as $genre) {
+                            $query->orWhereRaw('JSON_EXTRACT(genre, ?) IS NOT NULL', ['$."' . $genre . '"']);
+                        }
                     }
-                });
-            }
+                }
+
+                // Handle subgenres
+                if ($request->has('subgenres')) {
+                    $subgenres = array_map(function ($subgenre) {
+                        return strtolower(str_replace(' ', '_', trim($subgenre)));
+                    }, $request->input('subgenres'));
+
+                    if (!empty($subgenres)) {
+                        $query->where(function ($query) use ($subgenres) {
+                            foreach ($subgenres as $subgenre) {
+                                // Updated JSON query to match nested structure
+                                $query->orWhere(function ($q) use ($subgenre) {
+                                    $q->whereRaw('JSON_SEARCH(LOWER(genre), "one", ?)', [$subgenre]);
+                                });
+                            }
+                        });
+                    }
+                }
+            });
         }
+
 
         // Get the venues with pagination
         $otherServices = $query->paginate(10);
